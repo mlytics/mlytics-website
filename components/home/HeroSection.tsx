@@ -108,7 +108,23 @@ export function HeroSection() {
           </div>
 
           {/* Right: Agent dialog */}
-          <div className="w-full max-w-md mx-auto lg:mx-0">
+          <div className="w-full max-w-md mx-auto lg:mx-0 relative">
+            {/* Try it hint — handwritten style, desktop only */}
+            <div className="hidden lg:flex absolute -top-9 right-2 items-start gap-1.5 select-none pointer-events-none">
+              {/* hand-drawn style arrow: sweeps from right, small loop, exits lower-left with └ arrowhead */}
+              <svg width="38" height="26" viewBox="0 0 50 34" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.85, marginTop: '2px' }}>
+                {/* main sweep + small oval loop + exit */}
+                <path d="M 46 6 C 36 2, 24 9, 20 17 C 17 23, 17 29, 21 29 C 25 29, 27 23, 23 19 C 20 15, 13 24, 8 32" stroke="#A8C5C3" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                {/* └ arrowhead */}
+                <path d="M 8 26 L 8 32 L 14 32" stroke="#A8C5C3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              </svg>
+              <span
+                className="text-sm italic"
+                style={{ color: '#A8C5C3', fontFamily: 'Georgia, serif', opacity: 0.9 }}
+              >
+                Try it
+              </span>
+            </div>
             <AgentDialog flow={HERO_FLOW} onComplete={handleComplete} variant="hero" />
           </div>
 

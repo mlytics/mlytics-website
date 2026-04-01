@@ -57,8 +57,8 @@ export function CaseStudies() {
           {CASES.map((c, i) => (
             <div
               key={i}
-              className="rounded-2xl p-6 flex flex-col gap-4 transition-colors duration-200 hover:border-[rgba(168,197,195,0.4)]"
-              style={{ background: 'rgba(34,93,89,0.25)', border: '1px solid rgba(34,93,89,0.4)' }}
+              className="rounded-2xl p-6 flex flex-col gap-4 border transition-colors duration-200 hover:border-[rgba(168,197,195,0.4)]"
+              style={{ background: 'rgba(34,93,89,0.25)', borderColor: 'rgba(34,93,89,0.4)', transform: 'translateZ(0)' }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -76,13 +76,9 @@ export function CaseStudies() {
                 <p className="text-xs mt-0.5" style={{ color: '#A8C5C3' }}>{c.bigDesc}</p>
               </div>
 
-              <p className="text-sm font-semibold leading-snug text-white">{c.headline}</p>
+              <p className="text-sm font-semibold leading-snug text-white" style={{ backfaceVisibility: 'hidden' }}>{c.headline}</p>
               <p className="text-xs leading-relaxed" style={{ color: 'rgba(168,197,195,0.75)' }}>{c.body}</p>
 
-              <button className="mt-auto text-xs font-medium text-left transition-colors hover:text-white"
-                style={{ color: '#A8C5C3' }} onClick={open}>
-                Read full case →
-              </button>
             </div>
           ))}
         </div>
@@ -90,7 +86,7 @@ export function CaseStudies() {
         <div className="text-center">
           <button
             onClick={open}
-            className="px-6 py-3 rounded-full text-sm font-semibold transition-all hover:opacity-90"
+            className="px-6 py-3 rounded-full text-sm font-semibold transition-opacity hover:opacity-90"
             style={{ border: '1.5px solid rgba(168,197,195,0.4)', color: '#A8C5C3' }}
           >
             Want to see more cases?

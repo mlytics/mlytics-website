@@ -23,7 +23,7 @@ const CARDS = [
     products: 'Full Conversation CPL · Lead Pilot',
     metrics: [
       { label: 'Qualified lead', value: '$512' },
-      { label: 'Intent confidence', value: '87%' },
+      { label: 'Confidence', value: '87%' },
     ],
     cta: 'See brand plan',
     href: '/brands',
@@ -62,8 +62,8 @@ export function IdentityCards() {
           {CARDS.map((card, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl p-6 flex flex-col gap-5 border transition-shadow duration-200 hover:shadow-lg"
-              style={{ borderColor: '#E5E5E5' }}
+              className="bg-white rounded-2xl p-6 flex flex-col gap-5 border transition-shadow duration-300 hover:shadow-lg"
+              style={{ borderColor: '#E5E5E5', transform: 'translateZ(0)' }}
             >
               {/* Header */}
               <div className="flex items-start justify-between">
@@ -75,13 +75,13 @@ export function IdentityCards() {
               </div>
 
               {/* Hook */}
-              <p className="text-sm leading-relaxed" style={{ color: '#6B6B6B' }}>{card.hook}</p>
+              <p className="text-sm leading-relaxed flex-1" style={{ color: '#6B6B6B', backfaceVisibility: 'hidden' }}>{card.hook}</p>
 
               {/* Metrics */}
               <div className="grid grid-cols-2 gap-2">
                 {card.metrics.map((m, j) => (
                   <div key={j} className="px-3 py-2.5 rounded-xl" style={{ background: '#FAFAFA', border: '1px solid #E5E5E5' }}>
-                    <p className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color: '#9B9B9B' }}>{m.label}</p>
+                    <p className="text-[10px] uppercase tracking-wider mb-0.5 whitespace-nowrap" style={{ color: '#9B9B9B' }}>{m.label}</p>
                     <p className="text-sm font-bold" style={{ color: card.accent }}>{m.value}</p>
                   </div>
                 ))}
@@ -90,7 +90,7 @@ export function IdentityCards() {
               {/* CTA */}
               <Link
                 href={card.href}
-                className="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+                className="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
                 style={{ background: card.accent }}
               >
                 {card.cta} →
