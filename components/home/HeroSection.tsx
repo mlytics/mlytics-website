@@ -1,12 +1,28 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { type AgentPersona, HERO_FLOW } from '@/lib/agent-data'
 import { AgentDialog } from '@/components/agent/AgentDialog'
 import { WorldMapDots } from './WorldMapDots'
+import { LogoMarquee } from './LogoMarquee'
+import { useContactModal } from '@/context/contact-modal-context'
+
+const MARQUEE_H = 60
+
+const ROTATING_WORDS = [
+  'building your brand',
+  'growing your audience',
+  'driving more revenue',
+]
 
 export function HeroSection() {
   const router = useRouter()
+  const { open } = useContactModal()
+  const spacerRef = useRef<HTMLDivElement>(null)
+  const [isFixed, setIsFixed] = useState(true)
+  const [wordIdx, setWordIdx] = useState(0)
 
   function handleComplete(persona: AgentPersona) {
     const routes: Record<NonNullable<AgentPersona>, string> = {
@@ -17,128 +33,160 @@ export function HeroSection() {
     if (persona) router.push(routes[persona])
   }
 
+  // Fixed → natural marquee logic
+  useEffect(() => {
+    function handleScroll() {
+      if (!spacerRef.current) return
+      const rect = spacerRef.current.getBoundingClientRect()
+      setIsFixed(rect.top > window.innerHeight)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Rotate headline words
+  useEffect(() => {
+    const id = setInterval(() => {
+      setWordIdx(i => (i + 1) % ROTATING_WORDS.length)
+    }, 2600)
+    return () => clearInterval(id)
+  }, [])
+
   return (
-    <section className="relative min-h-screen section-dark flex flex-col overflow-hidden">
-      {/* Map background */}
-      <WorldMapDots />
+    <section className="relative min-h-screen section-white flex flex-col">
+      {/* Background elements — clipped to section bounds so they don't bleed into adjacent sections */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <WorldMapDots variant="light" />
+        {/* Central radial overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 85% 75% at 50% 45%, rgba(240,248,247,0.97) 0%, rgba(255,255,255,0.65) 65%, transparent 100%)',
+          }}
+        />
+      </div>
 
-      {/* Base tone — darkens the whole canvas evenly so dots read as texture, not noise */}
-      <div className="absolute inset-0 bg-[#1A3D3A]/60 pointer-events-none" />
+      {/* Main content — vertically centred, single column */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-24 pb-8">
+        <div className="max-w-3xl w-full mx-auto flex flex-col items-center text-center">
 
-      {/* Directional gradient — heavier from the left/top where text lives */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0D2422]/80 via-[#1A3D3A]/30 to-transparent pointer-events-none" />
-
-      {/* Radial aura centred on the left column — softens the dot-map immediately behind text */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          inset: 0,
-          background: 'radial-gradient(ellipse 60% 80% at 22% 50%, rgba(13,36,34,0.72) 0%, transparent 70%)',
-        }}
-      />
-
-      {/* Bottom fade so the "Scroll to explore" cue reads clearly */}
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#1A3D3A]/90 to-transparent pointer-events-none" />
-
-      {/* Content */}
-      <div className="relative z-10 flex-1 flex items-center">
-        <div className="w-full max-w-6xl mx-auto px-6 pt-24 pb-16 grid lg:grid-cols-2 gap-12 items-center">
-
-          {/* Left: headline + context */}
-          <div className="space-y-6">
+          {/* Live badge */}
+          <div className="mb-5">
             <div
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
-              style={{ background: 'rgba(34,93,89,0.4)', border: '1px solid rgba(34,93,89,0.6)', color: '#A8C5C3' }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium"
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(34,93,89,0.18)',
+                color: '#225D59',
+              }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              Live intent signals — Asia-Pacific network
-            </div>
-
-            <h1
-              className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight"
-              style={{ textShadow: '0 2px 24px rgba(13,36,34,0.9), 0 1px 4px rgba(0,0,0,0.5)' }}
-            >
-              Mlytics<br />
-              <span style={{ color: '#A8C5C3' }}>Decision Engine</span>
-            </h1>
-
-            <p
-              className="text-lg font-medium"
-              style={{ color: '#A8C5C3', textShadow: '0 1px 12px rgba(13,36,34,0.8)' }}
-            >
-              Per dollar, per intelligent outcome.
-            </p>
-
-            <p
-              className="text-base leading-relaxed max-w-md"
-              style={{ color: 'rgba(168,197,195,0.85)', textShadow: '0 1px 8px rgba(13,36,34,0.7)' }}
-            >
-              Raw attention refined into commercial transactions.
-              From 4.1M WAU to qualified leads — every layer self-sustaining.
-            </p>
-
-            {/* Metrics strip */}
-            <div className="flex flex-wrap gap-4 pt-2">
-              {[
-                { label: 'Content cost', before: '$250', after: '$0.10', suffix: '/piece' },
-                { label: 'Qualified lead', value: '$512', note: '87% confidence' },
-                { label: 'Decision latency', value: '< 50ms', note: 'P99' },
-              ].map((m, i) => (
-                <div
-                  key={i}
-                  className="px-4 py-2.5 rounded-xl"
-                  style={{ background: 'rgba(34,93,89,0.35)', border: '1px solid rgba(34,93,89,0.55)' }}
-                >
-                  <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: '#A8C5C3' }}>{m.label}</p>
-                  {m.before ? (
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-xs line-through" style={{ color: 'rgba(168,197,195,0.4)' }}>{m.before}</span>
-                      <span className="text-sm font-bold text-amber-400">{m.after}</span>
-                      <span className="text-[10px]" style={{ color: '#A8C5C3' }}>{m.suffix}</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-sm font-bold text-white">{m.value}</span>
-                      <span className="text-[10px]" style={{ color: '#A8C5C3' }}>{m.note}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
+              <span className="relative flex h-2 w-2 flex-shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+              </span>
+              4.1M WAU · Asia-Pacific
             </div>
           </div>
 
-          {/* Right: Agent dialog */}
-          <div className="w-full max-w-md mx-auto lg:mx-0 relative">
-            {/* Try it hint — handwritten style, desktop only */}
-            <div className="hidden lg:flex absolute -top-9 right-2 items-start gap-1.5 select-none pointer-events-none">
-              {/* hand-drawn style arrow: sweeps from right, small loop, exits lower-left with └ arrowhead */}
-              <svg width="38" height="26" viewBox="0 0 50 34" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.85, marginTop: '2px' }}>
-                {/* main sweep + small oval loop + exit */}
-                <path d="M 46 6 C 36 2, 24 9, 20 17 C 17 23, 17 29, 21 29 C 25 29, 27 23, 23 19 C 20 15, 13 24, 8 32" stroke="#A8C5C3" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-                {/* └ arrowhead */}
-                <path d="M 8 26 L 8 32 L 14 32" stroke="#A8C5C3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-              </svg>
-              <span
-                className="text-sm italic"
-                style={{ color: '#A8C5C3', fontFamily: 'Georgia, serif', opacity: 0.9 }}
-              >
-                Try it
-              </span>
-            </div>
-            <AgentDialog flow={HERO_FLOW} onComplete={handleComplete} variant="hero" />
+          {/* Headline — fixed-height second line prevents layout shift */}
+          <h1
+            className="font-bold leading-tight tracking-tight text-[28px] sm:text-[40px] md:text-[52px] lg:text-[64px] mb-4 text-center w-full"
+            style={{ color: '#1A1A1A' }}
+          >
+            Your investment<br />
+            {/* Fixed-height container — absolute children overlap so height never shifts */}
+            <span
+              style={{
+                display: 'block',
+                height: '1.25em',
+                position: 'relative',
+                textAlign: 'center',
+              }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={wordIdx}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -14 }}
+                  transition={{ duration: 0.38, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  style={{
+                    color: '#225D59',
+                    display: 'block',
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    textAlign: 'center',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {ROTATING_WORDS[wordIdx]}
+                </motion.span>
+              </AnimatePresence>
+            </span>
+          </h1>
+
+          {/* Subtitle — tighter, more authoritative */}
+          <p
+            className="text-base md:text-lg font-medium tracking-wide mb-7"
+            style={{ color: '#5A5A5A', letterSpacing: '0.01em' }}
+          >
+            Per dollar, per intelligent outcome.
+          </p>
+
+          {/* CTA button */}
+          <div className="mb-8">
+            <button
+              onClick={open}
+              className="px-8 py-3.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
+              style={{ background: '#225D59' }}
+            >
+              Book a Demo
+            </button>
+          </div>
+
+          {/* Agent Dialog */}
+          <div className="w-full">
+            <AgentDialog flow={HERO_FLOW} onComplete={handleComplete} variant="page" />
           </div>
 
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <div className="relative z-10 flex justify-center pb-8">
-        <div className="flex flex-col items-center gap-1.5 opacity-40">
-          <span className="text-xs text-white">Scroll to explore</span>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="animate-bounce text-white">
-            <path d="M8 3v10M3 9l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <div className="relative z-10 flex justify-center pb-4">
+        <div className="flex flex-col items-center gap-1.5 opacity-50">
+          <span className="text-xs" style={{ color: '#225D59' }}>Scroll to explore</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="animate-bounce"
+            style={{ color: '#225D59' }}
+          >
+            <path
+              d="M8 3v10M3 9l5 5 5-5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
+      </div>
+
+      {/* Spacer — reserves marquee height */}
+      <div ref={spacerRef} style={{ height: MARQUEE_H }} />
+
+      {/* Logo marquee — fixed at viewport bottom until spacer scrolls into view */}
+      <div
+        style={{ height: MARQUEE_H }}
+        className={isFixed ? 'fixed bottom-0 left-0 right-0 z-50' : 'absolute bottom-0 left-0 right-0'}
+      >
+        <LogoMarquee />
       </div>
     </section>
   )

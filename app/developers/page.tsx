@@ -2,6 +2,7 @@
 // import { DEVELOPER_FLOW } from '@/lib/agent-data'
 import { TCOCalculator } from '@/components/pages/developers/TCOCalculator'
 import { DeveloperPageCTA } from '@/components/pages/developers/DeveloperPageCTA'
+import { InfraPartners } from '@/components/pages/developers/InfraPartners'
 
 export const metadata = { title: 'For Developers — Mlytics Decision Engine' }
 
@@ -26,13 +27,14 @@ export default function DevelopersPage() {
 
       {/* Tech specs overview */}
       <section className="section-white py-16">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-4">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {[
-              { stat: '< 50ms', label: 'P99 decision latency', icon: '⚡' },
-              { stat: '20%', label: 'TCO reduction baseline', icon: '📉' },
-              { stat: '1 API', label: 'Replaces multiple CDN contracts', icon: '🔌' },
-              { stat: 'WAF + DDoS', label: 'Security layer included', icon: '🛡️' },
+              { stat: '< 50ms',   label: 'P99 decision latency',         icon: '⚡' },
+              { stat: '20%',      label: 'TCO reduction baseline',        icon: '📉' },
+              { stat: '99.99%',   label: 'Reliability & SLA guarantee',   icon: '🛡️' },
+              { stat: '1 API',    label: 'Replaces multiple CDN contracts',icon: '🔌' },
+              { stat: '18+',      label: 'Countries in network',           icon: '🌏' },
             ].map(item => (
               <div key={item.label} className="text-center p-5 rounded-2xl border" style={{ borderColor: '#E5E5E5' }}>
                 <span className="text-2xl block mb-2">{item.icon}</span>
@@ -56,6 +58,9 @@ export default function DevelopersPage() {
       </section> */}
 
       <TCOCalculator />
+
+      {/* Infrastructure Partners */}
+      <InfraPartners />
 
       {/* Technical details */}
       <section className="section-dark py-16">

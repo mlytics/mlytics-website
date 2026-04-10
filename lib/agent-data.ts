@@ -94,7 +94,7 @@ export const PUBLISHER_FLOW: AgentStep[] = [
     inputType: 'pills',
     personalizedMessages: {
       finance:
-        'Finance content has the highest intent density in our network. Per 1,000 finance readers, an average of 87 strong intent signals — CPL around $512. Use the calculator below to estimate your monthly revenue potential.',
+        'Finance content has the highest intent density in our network. Strong-intent signals are significantly higher than other content categories. Use the calculator below to estimate your monthly revenue potential.',
       health:
         'Health content readers typically have strong informational needs. Per 1,000 readers, an average of 64 strong intent signals — CPL around $280. Try the calculator below.',
       news:
@@ -126,7 +126,7 @@ export const BRAND_FLOW: AgentStep[] = [
     inputType: 'pills',
     personalizedMessages: {
       finance:
-        'In our 4M WAU network, finance & insurance strong-intent users number ~87,000/week — from publishers like MoneyDJ and major financial portals. CPL ~$512, confidence 87%.',
+        'In our 4M WAU network, finance & insurance strong-intent users number ~87,000/week — from publishers like MoneyDJ and major financial portals. Talk to us to get a custom CPL quote for your category.',
       health:
         'Health & medical strong-intent users: ~64,000/week, primarily from health media platforms. CPL ~$280, confidence 82%.',
       consumer:
@@ -193,9 +193,16 @@ export type DemoExtArticle = {
   summary: string
   cost: string
   intentType: string
+  url?: string
 }
 
 export const DEMO_ARTICLES: DemoArticle[] = [
+  {
+    id: 'aws-datacenter',
+    title: '資料中心首成戰場目標？AWS中東設施停擺',
+    excerpt: '亞馬遜 AWS 在阿拉伯聯合大公國的資料中心遭「不明物體」擊中，引發火警並迫使部分設施斷電，導致中東地區出現電力與連線異常。這起事件發生之際，伊朗向波斯灣國家發射無人機與飛彈……',
+    category: '科技 / 雲端安全',
+  },
   {
     id: 'finance',
     title: 'Complete 2024 Retirement Planning Guide: From Pension to Self-Directed Investing',
@@ -217,6 +224,13 @@ export const DEMO_ARTICLES: DemoArticle[] = [
 ]
 
 export const DEMO_QUESTIONS: Record<string, DemoQuestion[]> = {
+  'aws-datacenter': [
+    { id: 'q1', text: 'AWS 停擺事件後，我的企業數據放在中東雲端服務器安全嗎？', intentStrength: 'strong' },
+    { id: 'q2', text: '雲端服務供應商的地緣政治風險應如何評估？', intentStrength: 'weak' },
+    { id: 'q3', text: '資料中心在衝突地區面臨哪些實體安全威脅？', intentStrength: 'weak' },
+    { id: 'q4', text: '如何制定多雲災難備援計畫以應對突發中斷？', intentStrength: 'strong' },
+    { id: 'q5', text: '台灣企業使用海外雲端服務應注意哪些風險？', intentStrength: 'strong' },
+  ],
   finance: [
     { id: 'q1', text: 'What\'s the difference between a pension and a self-directed retirement account?', intentStrength: 'weak' },
     { id: 'q2', text: 'I\'m 35 — how much do I need to save to retire comfortably?', intentStrength: 'strong' },
@@ -241,6 +255,13 @@ export const DEMO_QUESTIONS: Record<string, DemoQuestion[]> = {
 }
 
 export const DEMO_EXT_ARTICLES: Record<string, DemoExtArticle[]> = {
+  'aws-datacenter': [
+    { id: 'a1', title: 'AWS 阿聯設施遭攻擊，是否意味著資料中心開始成為軍事目標？', summary: '分析此次事件的軍事意涵，以及資料中心在現代衝突中扮演的新角色', cost: '$0.10', intentType: 'Analysis', url: 'https://news.cnyes.com/news/aigc/answer/aws-%E9%98%BF%E8%81%AF-22953420?utm_content=question-22953420' },
+    { id: 'a2', title: '這次 AWS 中東設施停擺，將對該地區的 AI 運算和科技投資帶來什麼衝擊？', summary: '評估對微軟、Google、甲骨文等在阿聯 AI 基礎建設投資計畫的連鎖影響', cost: '$0.10', intentType: 'Impact', url: 'https://news.cnyes.com/news/aigc/answer/%E9%80%99%E6%AC%A1-aws-22953421?utm_content=question-22953421' },
+    { id: 'a3', title: '在無人機技術普及下，全球資料中心面臨的實體安全風險有哪些？', summary: '從低成本彈頭無人機到光纖節點攻擊，CSIS 指出的新型基礎設施威脅', cost: '$0.10', intentType: 'Risk', url: 'https://news.cnyes.com/news/aigc/answer/%E5%9C%A8%E7%84%A1%E4%BA%BA%E6%A9%9F%E6%8A%80%E8%A1%93-22953422?utm_content=question-22953422' },
+    { id: 'a4', title: '除了 AWS，微軟、Google 和甲骨文在阿聯的資料中心是否也面臨潛在威脅？', summary: '盤點各大美國科技巨頭在阿聯的設施佈局與目前已知的安全狀況', cost: '$0.10', intentType: 'Comparison', url: 'https://news.cnyes.com/news/aigc/answer/%E9%99%A4%E4%BA%86-aws-22953423?utm_content=question-22953423' },
+    { id: 'a5', title: '單一資料中心遭攻擊停擺，Mlytics 的 Multi-CDN 架構如何確保企業服務不中斷？', summary: '了解 Multi-CDN 自動切換如何在節點失效時維持服務連續性與低延遲', cost: '$0.10', intentType: 'Solution', url: 'https://news.cnyes.com/news/aigc/answer/%E8%8B%A5%E8%B3%87%E6%96%99%E4%B8%AD%E5%BF%83%E6%88%90-22953424?utm_content=question-22953424' },
+  ],
   finance: [
     { id: 'a1', title: 'Pension vs. Self-Directed Account: 2024 Complete Comparison', summary: 'One table to understand the differences, eligibility rules, and calculation methods', cost: '$0.10', intentType: 'Informational' },
     { id: 'a2', title: 'Starting at 35: Use Compound Interest to Calculate Your Retirement Target', summary: 'Interactive calculator: enter your income and target retirement age to get monthly savings needed', cost: '$0.10', intentType: 'Decision' },
@@ -264,4 +285,4 @@ export const DEMO_EXT_ARTICLES: Record<string, DemoExtArticle[]> = {
   ],
 }
 
-export const DEFAULT_DEMO_ARTICLE_ID = 'finance'
+export const DEFAULT_DEMO_ARTICLE_ID = 'aws-datacenter'

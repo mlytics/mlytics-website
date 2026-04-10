@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
 
 // City coordinates: [x, y] in 1000×500 equirectangular SVG space
 // x = (lon + 180) / 360 * 1000,  y = (90 - lat) / 180 * 500
@@ -104,14 +103,13 @@ const TOPICS = [
 
 let pingCounter = 0
 
-export function WorldMapDots() {
-  const [pings, setPings] = useState<Ping[]>([])
-  const [counter, setCounter] = useState(2_841_203)
-  const counterRef = useRef(counter)
+interface WorldMapDotsProps {
+  variant?: 'dark' | 'light'
+}
 
-  useEffect(() => {
-    counterRef.current = counter
-  }, [counter])
+export function WorldMapDots({ variant = 'dark' }: WorldMapDotsProps) {
+  const isLight = variant === 'light'
+  const [pings, setPings] = useState<Ping[]>([])
 
   useEffect(() => {
     // Add a ping every 1.2–2.4s
@@ -138,12 +136,7 @@ export function WorldMapDots() {
     const interval = setInterval(addPing, 1400 + Math.random() * 1000)
     addPing()
 
-    // Increment counter
-    const counterInterval = setInterval(() => {
-      setCounter(v => v + Math.floor(Math.random() * 8 + 3))
-    }, 1200)
-
-    return () => { clearInterval(interval); clearInterval(counterInterval) }
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -160,7 +153,7 @@ export function WorldMapDots() {
             cx={d.x}
             cy={d.y}
             r={1.4}
-            fill="rgba(34,93,89,0.55)"
+            fill={isLight ? 'rgba(34,93,89,0.14)' : 'rgba(34,93,89,0.55)'}
           />
         ))}
 
@@ -189,48 +182,7 @@ export function WorldMapDots() {
         ))}
       </svg>
 
-      {/* Floating badges for pings */}
-      <AnimatePresence>
-        {pings.filter(p => p.isStrong).slice(-3).map(ping => {
-          // Convert SVG coords to percentage
-          const px = (ping.x / 1000) * 100
-          const py = (ping.y / 500) * 100
-          return (
-            <motion.div
-              key={ping.id}
-              initial={{ opacity: 0, scale: 0.7, y: 4 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.7 }}
-              transition={{ duration: 0.25 }}
-              className="absolute pointer-events-none"
-              style={{ left: `${Math.min(px, 78)}%`, top: `${Math.min(py - 5, 75)}%` }}
-            >
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold whitespace-nowrap"
-                style={{ background: 'rgba(26,61,58,0.92)', border: '1px solid rgba(245,158,11,0.4)', color: '#F59E0B' }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                {ping.topic}
-                <span className="text-white/60">{ping.value}</span>
-              </div>
-            </motion.div>
-          )
-        })}
-      </AnimatePresence>
 
-      {/* Stats overlay */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-6 px-5 py-2.5 rounded-full"
-        style={{ background: 'rgba(26,61,58,0.85)', border: '1px solid rgba(34,93,89,0.5)' }}>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-          <span className="text-xs text-white/80">4.1M WAU</span>
-        </div>
-        <div className="w-px h-3 bg-white/20" />
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-[#225D59]" />
-          <span className="text-xs text-white/80">
-            {counter.toLocaleString()} decisions today
-          </span>
-        </div>
-      </div>
     </div>
   )
 }

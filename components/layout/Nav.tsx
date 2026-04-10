@@ -28,13 +28,13 @@ export function Nav() {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
-  const navBg = scrolled || !isHome
+  const navBg = scrolled
     ? 'bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm'
-    : 'bg-transparent'
+    : 'bg-white/80 backdrop-blur-sm border-b border-gray-100/50'
 
-  const logoColor = !scrolled && isHome ? 'text-white' : 'text-[#225D59]'
-  const linkColor = !scrolled && isHome ? 'text-white/70 hover:text-white' : 'text-[#6B6B6B] hover:text-[#225D59]'
-  const activeLinkColor = !scrolled && isHome ? 'text-white' : 'text-[#225D59]'
+  const logoColor = 'text-[#225D59]'
+  const linkColor = 'text-[#6B6B6B] hover:text-[#225D59]'
+  const activeLinkColor = 'text-[#225D59]'
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-30 transition-all duration-300 ${navBg}`}>
@@ -48,7 +48,7 @@ export function Nav() {
             height={17}
             priority
             className="transition-all duration-300"
-            style={!scrolled && isHome ? { filter: 'brightness(0) invert(1)' } : undefined}
+            style={undefined}
           />
         </Link>
 

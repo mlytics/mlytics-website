@@ -96,6 +96,21 @@ body {
 }
 .animate-fade-in { animation: fade-in 0.5s ease forwards; }
 
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 38s linear infinite;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

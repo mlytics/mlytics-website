@@ -22,8 +22,8 @@ const CARDS = [
     hook: 'How much of your ad budget hits people with zero purchase intent? You can stop guessing.',
     products: 'Full Conversation CPL · Lead Pilot',
     metrics: [
-      { label: 'Qualified lead', value: '$512' },
-      { label: 'Confidence', value: '87%' },
+      { label: 'Lower CAC', value: '60%+' },
+      { label: 'ROI timeline', value: '60 days' },
     ],
     cta: 'See brand plan',
     href: '/brands',

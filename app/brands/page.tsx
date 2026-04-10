@@ -19,7 +19,7 @@ export default function BrandsPage() {
             Don't buy impressions.<br />Buy confirmed intent.
           </h1>
           <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
-            $512/qualified lead. 87% intent confidence. Only pay for users actively deciding to buy.
+            Only pay for users actively deciding to buy.
           </p>
         </div>
       </div>
@@ -44,8 +44,8 @@ export default function BrandsPage() {
               <tbody>
                 {[
                   ['Billing', 'Per 1,000 impressions', 'Per qualified lead'],
-                  ['User intent', 'Unknown', '⚡ Strong intent, 87% confidence'],
-                  ['Cost per contact', '$50 / unqualified', '$512 / confirmed buyer'],
+                  ['User intent', 'Unknown', '⚡ Verified strong intent'],
+                  ['Cost per contact', 'Per impression (unqualified)', 'Per confirmed buyer only'],
                   ['ROI predictability', 'Low', 'High — know before you buy'],
                   ['Lead delivery', 'You manage', 'CRM-ready via Lead Pilot'],
                 ].map(([label, cpm, cpl], i) => (

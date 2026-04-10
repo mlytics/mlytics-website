@@ -55,7 +55,7 @@ const LAYERS = [
     audience: 'Brands',
     price: 'Performance billing',
     priceColor: '#F59E0B',
-    desc: '$512/qualified lead, 87% confidence. Replaces junior SDR cost at $3K–5K/month. Delivered CRM-ready.',
+    desc: 'Verified strong intent, delivered CRM-ready. Replaces junior SDR workflow at a fraction of the cost.',
     color: 'rgba(245,158,11,0.12)',
     borderColor: 'rgba(245,158,11,0.5)',
   },
@@ -160,13 +160,6 @@ export function IntentPipeline() {
                 </div>
               </div>
 
-              {i < LAYERS.length - 1 && (
-                <div className="flex justify-start pl-[26px]">
-                  <svg width="10" height="10" viewBox="0 0 10 10">
-                    <path d="M5 0v7M2 5l3 4 3-4" stroke="rgba(34,93,89,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                  </svg>
-                </div>
-              )}
             </div>
           )
         })}
