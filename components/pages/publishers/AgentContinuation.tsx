@@ -11,7 +11,7 @@ export function PublisherAgentContinuation() {
           className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
           style={{ background: 'rgba(34,93,89,0.4)', color: '#A8C5C3', border: '1px solid rgba(34,93,89,0.6)' }}
         >
-          For Publishers & Media Platforms
+          For Content Owners & Media Platforms
         </span>
         <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
           Every layer earns.

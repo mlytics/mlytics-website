@@ -62,12 +62,12 @@ export const HERO_FLOW: AgentStep[] = [
     agentMessage: '',
     inputType: 'cta',
     personalizedMessages: {
-      publisher: "Let's look at the publisher plan — see how every piece of content becomes a revenue source.",
+      publisher: "Let's look at the content owner plan — see how every piece of content becomes a revenue source.",
       brand: "Let's look at the brand plan — calculate how many of your target audience are in our 4M WAU network.",
       developer: "Let's look at the developer plan — calculate your infrastructure savings in 30 seconds.",
     },
     options: [
-      { label: 'See publisher plan', value: '/publishers' },
+      { label: 'See content owner plan', value: '/publishers' },
       { label: 'See brand plan', value: '/brands' },
       { label: 'See developer plan', value: '/developers' },
     ],
@@ -126,7 +126,7 @@ export const BRAND_FLOW: AgentStep[] = [
     inputType: 'pills',
     personalizedMessages: {
       finance:
-        'In our 4M WAU network, finance & insurance strong-intent users number ~87,000/week — from publishers like MoneyDJ and major financial portals. Talk to us to get a custom CPL quote for your category.',
+        'In our 4M WAU network, finance & insurance strong-intent users number ~87,000/week — from content owners like MoneyDJ and major financial portals. Talk to us to get a custom CPL quote for your category.',
       health:
         'Health & medical strong-intent users: ~64,000/week, primarily from health media platforms. CPL ~$280, confidence 82%.',
       consumer:

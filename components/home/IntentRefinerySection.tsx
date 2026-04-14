@@ -23,7 +23,7 @@ export function IntentRefinerySection() {
               {[
                 { metric: '$1,000/mo', desc: 'Infrastructure entry point' },
                 { metric: '2,500×', desc: 'Content production efficiency' },
-                { metric: '40%', desc: 'Publisher revenue uplift in 30 days' },
+                { metric: '40%', desc: 'Content owner revenue uplift in 30 days' },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-4">
                   <span className="text-xl font-bold" style={{ color: '#225D59' }}>{item.metric}</span>

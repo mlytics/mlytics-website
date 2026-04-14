@@ -5,12 +5,12 @@ import { useContactModal } from '@/context/contact-modal-context'
 const CASES = [
   {
     industry: 'Digital Media',
-    tag: 'AIGC Widget',
+    tag: 'AI Q&A Widget',
     tagColor: '#225D59',
     bigNumber: '2,500×',
     bigDesc: 'Content production efficiency',
     headline: 'Content team cut production cost from $250 to $0.10 per piece',
-    body: 'Facing AI-era traffic decline, this digital publisher deployed AIGC Widget. Every article now generates intent signals and companion content at near-zero marginal cost.',
+    body: 'Facing AI-era traffic decline, this digital publisher deployed AI Q&A Widget. Every article now generates intent signals and companion content at near-zero marginal cost.',
     icon: '📰',
   },
   {

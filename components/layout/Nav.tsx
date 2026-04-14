@@ -9,7 +9,7 @@ import { Menu, X } from 'lucide-react'
 import { useContactModal } from '@/context/contact-modal-context'
 
 const NAV_LINKS = [
-  { label: 'Publishers', href: '/publishers' },
+  { label: 'Content Owners', href: '/publishers' },
   { label: 'Brands', href: '/brands' },
   { label: 'Developers', href: '/developers' },
 ]

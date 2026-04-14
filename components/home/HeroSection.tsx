@@ -69,11 +69,11 @@ export function HeroSection() {
       </div>
 
       {/* Main content — vertically centred, single column */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-24 pb-8">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-[196px] pb-8">
         <div className="max-w-3xl w-full mx-auto flex flex-col items-center text-center">
 
           {/* Live badge */}
-          <div className="mb-5">
+          {/* <div className="mb-5">
             <div
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium"
               style={{
@@ -88,7 +88,7 @@ export function HeroSection() {
               </span>
               4.1M WAU · Asia-Pacific
             </div>
-          </div>
+          </div> */}
 
           {/* Headline — fixed-height second line prevents layout shift */}
           <h1
@@ -128,16 +128,16 @@ export function HeroSection() {
             </span>
           </h1>
 
-          {/* Subtitle — tighter, more authoritative */}
+          {/* Subtitle */}
           <p
-            className="text-base md:text-lg font-medium tracking-wide mb-7"
-            style={{ color: '#5A5A5A', letterSpacing: '0.01em' }}
+            className="text-sm md:text-base font-normal tracking-wide mb-8 mt-2"
+            style={{ color: '#7A7A7A', letterSpacing: '0.04em' }}
           >
-            Per dollar, per intelligent outcome.
+            Intelligent reach.&nbsp;&nbsp;Measurable outcomes.
           </p>
 
           {/* CTA button */}
-          <div className="mb-8">
+          <div className="mb-14">
             <button
               onClick={open}
               className="px-8 py-3.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"

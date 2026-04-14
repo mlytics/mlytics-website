@@ -37,17 +37,17 @@ export default function BrandsPage() {
                   <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#9B9B9B' }}></th>
                   <th className="text-center p-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#9B9B9B' }}>Traditional CPM</th>
                   <th className="text-center p-3 rounded-t-xl" style={{ background: 'rgba(34,93,89,0.08)', color: '#225D59' }}>
-                    <span className="text-xs font-bold uppercase tracking-wider">Decision Engine CPL</span>
+                    <span className="text-xs font-bold uppercase tracking-wider">Mlytics Decision Engine</span>
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {[
-                  ['Billing', 'Per 1,000 impressions', 'Per qualified lead'],
-                  ['User intent', 'Unknown', '⚡ Verified strong intent'],
-                  ['Cost per contact', 'Per impression (unqualified)', 'Per confirmed buyer only'],
-                  ['ROI predictability', 'Low', 'High — know before you buy'],
-                  ['Lead delivery', 'You manage', 'CRM-ready via Lead Pilot'],
+                  ['Billing', 'Per 1,000 impressions', 'Per intent signal'],
+                  ['User intent', 'Unknown', '⚡ Verified in real-time'],
+                  ['What you get', 'Unqualified eyeballs', 'In-market readers'],
+                  ['ROI model', 'Spend first, measure later', 'Pay for verified outcomes'],
+                  ['Discovery', 'DIY SEO / GEO', 'Distributed across 15M+ MAU'],
                 ].map(([label, cpm, cpl], i) => (
                   <tr key={i} className="border-t" style={{ borderColor: '#E5E5E5' }}>
                     <td className="p-3 font-medium text-xs" style={{ color: '#6B6B6B' }}>{label}</td>

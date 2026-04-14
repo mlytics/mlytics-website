@@ -4,15 +4,15 @@ import Link from 'next/link'
 
 const CARDS = [
   {
-    persona: 'Publisher',
+    persona: 'Content Owner',
     emoji: '📰',
     hook: 'Your content produces reader intent signals every day. Right now, every single one is leaking away.',
-    products: 'AIGC Widget · CPL Revenue',
+    products: 'AI Q&A Widget · CPL Revenue',
     metrics: [
       { label: 'Content cost', value: '$0.10/piece' },
       { label: 'vs. human writing', value: '$250/piece' },
     ],
-    cta: 'See publisher plan',
+    cta: 'See content owner plan',
     href: '/publishers',
     accent: '#225D59',
   },

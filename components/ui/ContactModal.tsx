@@ -121,7 +121,7 @@ export function ContactModal() {
                           onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
                           className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors bg-white"
                         >
-                          <option value="publisher">Publisher / Media</option>
+                          <option value="publisher">Content Owner / Media</option>
                           <option value="brand">Brand / Advertiser</option>
                           <option value="developer">Developer / Tech</option>
                         </select>

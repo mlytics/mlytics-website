@@ -41,6 +41,8 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
   const dialogRef = useRef<HTMLDivElement>(null)
   // Captures window.scrollY after scroll settles; used to detect upward scroll-away
   const engagedScrollYRef = useRef(0)
+  // Tracks whether the previous render was engaged — lets us skip position recalc on un-engage
+  const wasEngagedRef = useRef(false)
 
   const currentStep = flow[stepIdx]
   const isDark = variant === 'hero'
@@ -109,19 +111,16 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
 
   useEffect(() => {
     function update() {
-      if (!dialogRef.current) return
+      if (!dialogRef.current || engaged) return
       const rect = dialogRef.current.getBoundingClientRect()
-      if (engaged) {
-        // Keep dialog filling from its current top to near bottom of viewport
-        const avail = window.innerHeight - rect.top - 24
-        setDynamicMaxH(`${Math.max(400, Math.round(avail))}px`)
-      } else {
-        // Limit so it doesn't overflow viewport even before engaging
-        const available = window.innerHeight - rect.top - 24
-        setDynamicMaxH(`${Math.max(220, Math.round(available))}px`)
-      }
+      const available = window.innerHeight - rect.top - 24
+      setDynamicMaxH(`${Math.max(220, Math.round(available))}px`)
     }
-    if (!engaged) update()
+    // Only do the initial position calculation on mount, NOT when transitioning
+    // from engaged→idle (the dialog is still at the top of the viewport at that
+    // point, so rect.top would be ~80px and we'd compute a huge maxHeight again).
+    if (!engaged && !wasEngagedRef.current) update()
+    wasEngagedRef.current = engaged
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
   }, [engaged])
@@ -143,13 +142,22 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
     setDemoComplete(false)
     setDemoVisible(false)
     demoInsertAfterIdxRef.current = -1
+    // Reset to a safe idle height — the height management effect won't overwrite
+    // this because wasEngagedRef prevents it from recalculating on un-engage.
+    setDynamicMaxH('60vh')
   }
 
   // Collapse and reset when user scrolls significantly upward past the engagement point
   useEffect(() => {
     if (!engaged) return
+    // One-shot guard: the scroll event can fire many times before React cleans up the
+    // listener, causing resetConversation() to run repeatedly and produce visual jumps.
+    let collapsed = false
     function onScroll() {
-      if (window.scrollY < engagedScrollYRef.current - 80) {
+      if (collapsed) return
+      // 150px threshold — large enough to avoid accidental collapse on mobile momentum scroll
+      if (window.scrollY < engagedScrollYRef.current - 150) {
+        collapsed = true
         setEngaged(false)
         resetConversation()
       }

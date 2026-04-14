@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 const LAYERS = [
   {
     icon: '🌐',
-    name: 'Publisher Traffic',
+    name: 'Content Owner Traffic',
     sublabel: 'Raw attention',
     audience: 'Raw material',
     price: '400K–4M WAU',
@@ -28,9 +28,9 @@ const LAYERS = [
   },
   {
     icon: '✍️',
-    name: 'AIGC Widget',
+    name: 'AI Q&A Widget',
     sublabel: 'Capture weak intent',
-    audience: 'Publishers',
+    audience: 'Content Owners',
     price: '$5,000/mo',
     priceColor: '#F59E0B',
     desc: '$0.10/article vs $250 human cost. 2,500× productivity. Every article becomes an intent capture point.',
@@ -41,7 +41,7 @@ const LAYERS = [
     icon: '💬',
     name: 'Full Conversation',
     sublabel: 'Capture strong intent',
-    audience: 'Publishers + Brands',
+    audience: 'Content Owners + Brands',
     price: 'CPL billing',
     priceColor: '#F59E0B',
     desc: 'Readers move from browsing to decision. Strong intent captured, qualified, and matched to relevant brands.',

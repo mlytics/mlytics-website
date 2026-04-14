@@ -10,7 +10,7 @@ export function Footer() {
             <p className="text-sm mt-1" style={{ color: '#A8C5C3' }}>Decision Engine — per dollar, per intelligent outcome.</p>
           </div>
           <div className="flex gap-8 text-sm" style={{ color: '#A8C5C3' }}>
-            <Link href="/publishers" className="hover:text-white transition-colors">Publishers</Link>
+            <Link href="/publishers" className="hover:text-white transition-colors">Content Owners</Link>
             <Link href="/brands" className="hover:text-white transition-colors">Brands</Link>
             <Link href="/developers" className="hover:text-white transition-colors">Developers</Link>
           </div>
