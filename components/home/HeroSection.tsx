@@ -26,7 +26,7 @@ export function HeroSection() {
 
   function handleComplete(persona: AgentPersona) {
     const routes: Record<NonNullable<AgentPersona>, string> = {
-      publisher: '/publishers',
+      publisher: '/content-owners',
       brand: '/brands',
       developer: '/developers',
     }

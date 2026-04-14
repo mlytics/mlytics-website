@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
@@ -9,7 +9,7 @@ import { Menu, X } from 'lucide-react'
 import { useContactModal } from '@/context/contact-modal-context'
 
 const NAV_LINKS = [
-  { label: 'Content Owners', href: '/publishers' },
+  { label: 'Content Owners', href: '/content-owners' },
   { label: 'Brands', href: '/brands' },
   { label: 'Developers', href: '/developers' },
 ]
@@ -17,19 +17,39 @@ const NAV_LINKS = [
 export function Nav() {
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
+  const [visible, setVisible] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
   const { open: openContact } = useContactModal()
+  const lastScrollY = useRef(0)
 
   const isHome = pathname === '/'
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', handler)
+    const handler = () => {
+      const currentY = window.scrollY
+      const diff = currentY - lastScrollY.current
+
+      setScrolled(currentY > 20)
+
+      // Only apply hide/show on desktop (window width >= 768)
+      if (window.innerWidth >= 768) {
+        if (currentY < 60) {
+          setVisible(true)
+        } else if (diff > 6) {
+          setVisible(false)
+        } else if (diff < -4) {
+          setVisible(true)
+        }
+      }
+
+      lastScrollY.current = currentY
+    }
+    window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
   const navBg = scrolled
-    ? 'bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm'
+    ? 'bg-white/80 backdrop-blur-sm border-b border-gray-100/50 shadow-sm'
     : 'bg-white/80 backdrop-blur-sm border-b border-gray-100/50'
 
   const logoColor = 'text-[#225D59]'
@@ -37,7 +57,10 @@ export function Nav() {
   const activeLinkColor = 'text-[#225D59]'
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-30 transition-all duration-300 ${navBg}`}>
+    <nav
+      className={`fixed top-0 left-0 right-0 z-30 transition-all duration-300 ${navBg}`}
+      style={{ transform: visible ? 'translateY(0)' : 'translateY(-100%)' }}
+    >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center">

@@ -67,7 +67,7 @@ export const HERO_FLOW: AgentStep[] = [
       developer: "Let's look at the developer plan — calculate your infrastructure savings in 30 seconds.",
     },
     options: [
-      { label: 'See content owner plan', value: '/publishers' },
+      { label: 'See content owner plan', value: '/content-owners' },
       { label: 'See brand plan', value: '/brands' },
       { label: 'See developer plan', value: '/developers' },
     ],

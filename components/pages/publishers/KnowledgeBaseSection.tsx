@@ -83,14 +83,30 @@ export function KnowledgeBaseSection() {
           background: 'radial-gradient(ellipse 700px 400px at 50% 65%, rgba(34,93,89,0.07) 0%, transparent 70%)',
         }}
       />
-      {/* Decorative corner rings */}
+      {/* Decorative corner rings — viewport-relative sizing */}
       <div
-        className="absolute -top-24 -right-24 w-72 h-72 rounded-full pointer-events-none"
-        style={{ border: '1px solid rgba(34,93,89,0.07)' }}
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          width: '38vw', height: '38vw',
+          top: '-12vw', right: '-10vw',
+          border: '1px solid rgba(34,93,89,0.09)',
+        }}
       />
       <div
-        className="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none"
-        style={{ border: '1px solid rgba(34,93,89,0.05)' }}
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          width: '24vw', height: '24vw',
+          top: '-6vw', right: '-5vw',
+          border: '1px solid rgba(34,93,89,0.07)',
+        }}
+      />
+      <div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          width: '12vw', height: '12vw',
+          top: '-1vw', right: '0vw',
+          border: '1px solid rgba(34,93,89,0.05)',
+        }}
       />
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         {/* Header */}
@@ -121,14 +137,14 @@ export function KnowledgeBaseSection() {
         >
           <div className="grid md:grid-cols-[260px_1fr]">
             {/* Left: step list */}
-            <div style={{ borderRight: '1px solid rgba(34,93,89,0.1)', background: 'linear-gradient(160deg, rgba(34,93,89,0.06) 0%, rgba(34,93,89,0.02) 100%)' }}>
+            <div className="flex flex-col" style={{ borderRight: '1px solid rgba(34,93,89,0.1)', background: 'linear-gradient(160deg, rgba(34,93,89,0.06) 0%, rgba(34,93,89,0.02) 100%)' }}>
               {STEPS.map((step, i) => {
                 const isActive = active === i
                 return (
                   <button
                     key={i}
                     onClick={() => setActive(i)}
-                    className="w-full text-left px-5 py-4 transition-colors duration-200 relative"
+                    className="w-full text-left px-5 transition-colors duration-200 relative flex flex-col justify-center flex-1"
                     style={{
                       borderBottom: i < STEPS.length - 1 ? '1px solid rgba(34,93,89,0.08)' : undefined,
                       background: isActive ? '#225D59' : 'transparent',
@@ -169,7 +185,7 @@ export function KnowledgeBaseSection() {
             </div>
 
             {/* Right: content */}
-            <div className="overflow-hidden" style={{ background: '#FFFFFF' }}>
+            <div className="relative overflow-hidden" style={{ background: '#FFFFFF', minHeight: 300 }}>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active}
@@ -177,11 +193,10 @@ export function KnowledgeBaseSection() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.24, ease: 'easeOut' }}
-                  className="p-8 flex flex-col justify-between"
-                  style={{ minHeight: 260 }}
+                  className="absolute inset-0 p-8 flex flex-col justify-between"
                 >
                   {/* Top: label + heading + desc */}
-                  <div className="flex flex-col">
+                  <div className="flex flex-col overflow-hidden" style={{ height: 170 }}>
                     {/* Metadata zone: icon + sub-label tightly grouped */}
                     <div className="flex flex-col gap-1.5 mb-5">
                       <span style={{ color: '#225D59' }}>{STEPS[active].icon}</span>
@@ -223,7 +238,7 @@ export function KnowledgeBaseSection() {
                     </div>
                     <span
                       className="text-5xl font-black tabular-nums select-none"
-                      style={{ color: 'rgba(34,93,89,0.07)', letterSpacing: '-0.04em', lineHeight: 1 }}
+                      style={{ color: 'rgba(180,83,9,0.12)', letterSpacing: '-0.04em', lineHeight: 1 }}
                     >
                       0{active + 1}
                     </span>
@@ -234,19 +249,14 @@ export function KnowledgeBaseSection() {
           </div>
         </div>
 
-        {/* Databricks badge */}
-        <div className="text-center mt-6">
-          <span
-            className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-full"
-            style={{ background: 'rgba(34,93,89,0.06)', border: '1px solid rgba(34,93,89,0.15)', color: '#225D59' }}
-          >
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-              <path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="#225D59" strokeWidth="1.2" strokeLinejoin="round" />
-              <path d="M1 4.5L7 8L13 4.5" stroke="#225D59" strokeWidth="1.2" />
-              <path d="M7 8V13" stroke="#225D59" strokeWidth="1.2" />
-            </svg>
-            Enterprise infrastructure powered by Databricks
-          </span>
+        {/* Databricks credit */}
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <span className="text-xs" style={{ color: '#9B9B9B' }}>Enterprise infrastructure powered by</span>
+          <img
+            src="/logos/databricks.svg"
+            alt="Databricks"
+            style={{ height: 18, width: 'auto', display: 'inline-block' }}
+          />
         </div>
       </div>
     </section>

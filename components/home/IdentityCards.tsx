@@ -13,7 +13,7 @@ const CARDS = [
       { label: 'vs. human writing', value: '$250/piece' },
     ],
     cta: 'See content owner plan',
-    href: '/publishers',
+    href: '/content-owners',
     accent: '#225D59',
   },
   {

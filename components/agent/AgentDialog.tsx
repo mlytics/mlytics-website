@@ -269,7 +269,7 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
   const ctaStep = currentStep.inputType === 'cta'
   const ctaOption =
     currentStep.options?.find(o => {
-      if (persona === 'publisher') return o.value === '/publishers'
+      if (persona === 'publisher') return o.value === '/content-owners'
       if (persona === 'brand') return o.value === '/brands'
       if (persona === 'developer') return o.value === '/developers'
       return false
