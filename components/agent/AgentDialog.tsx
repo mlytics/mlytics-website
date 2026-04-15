@@ -173,6 +173,11 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
     setEngaged(true)
 
     if (!dialogRef.current) return
+
+    // Reset engagement reference to current position so the scroll-away listener
+    // doesn't use a stale value from a previous engagement session and fire immediately.
+    engagedScrollYRef.current = window.scrollY
+
     // Synchronous rect capture before any React re-renders change the layout
     const rect = dialogRef.current.getBoundingClientRect()
 
@@ -180,7 +185,8 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
     const immediateAvail = window.innerHeight - rect.top - 24
     setDynamicMaxH(`${Math.max(300, Math.round(immediateAvail))}px`)
 
-    const scrollNeeded = rect.top - 80
+    // Nav hides on scroll-down, so target a small top margin instead of reserving nav height
+    const scrollNeeded = rect.top - 16
     if (Math.abs(scrollNeeded) < 5) {
       applyEngagedMaxH()
       return

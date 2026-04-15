@@ -5,6 +5,7 @@ import { AgentProvider } from '@/lib/agent-context'
 import { ContactModalProvider } from '@/context/contact-modal-context'
 import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
+import { ScrollToTop } from '@/components/layout/ScrollToTop'
 import { ContactModal } from '@/components/ui/ContactModal'
 import { AgentWidget } from '@/components/agent/AgentWidget'
 
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full flex flex-col">
         <AgentProvider>
           <ContactModalProvider>
+            <ScrollToTop />
             <Nav />
             <main className="flex-1">{children}</main>
             <Footer />

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 const CARDS = [
   {
@@ -48,7 +49,13 @@ export function IdentityCards() {
   return (
     <section className="section-light py-20 lg:py-28">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-12">
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.5 }}
+        >
           <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
             Who are you?
           </span>
@@ -56,14 +63,18 @@ export function IdentityCards() {
           <p className="text-base max-w-xl mx-auto" style={{ color: '#6B6B6B' }}>
             Three types of customers, one Decision Engine. Choose your role to see what it means for you specifically.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {CARDS.map((card, i) => (
-            <div
+            <motion.div
               key={i}
               className="bg-white rounded-2xl p-6 flex flex-col gap-5 border transition-shadow duration-300 hover:shadow-lg"
-              style={{ borderColor: '#E5E5E5', transform: 'translateZ(0)' }}
+              style={{ borderColor: '#E5E5E5' }}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.4, delay: i * 0.1, ease: 'easeOut' }}
             >
               {/* Header */}
               <div className="flex items-start justify-between">
@@ -95,7 +106,7 @@ export function IdentityCards() {
               >
                 {card.cta} →
               </Link>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

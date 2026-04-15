@@ -62,21 +62,21 @@ export function LogoMarquee() {
 
   return (
     <div
-      className="h-full flex items-center"
+      className="h-full flex flex-col justify-center md:flex-row md:items-center"
       style={{ background: '#FFFFFF' }}
     >
-      {/* Static label */}
-      <div className="flex-shrink-0 px-5 hidden sm:flex items-center gap-3">
-        <span
+      {/* Label — above on mobile, left on desktop */}
+      <div className="flex-shrink-0 flex flex-col items-center md:flex-row md:items-center md:gap-3 md:px-5 mb-1.5 md:mb-0">
+        <p
           className="text-[11px] font-medium uppercase tracking-widest whitespace-nowrap"
           style={{ color: '#C8C8C8' }}
         >
           Trusted by
-        </span>
-        <div className="w-px h-4" style={{ background: 'rgba(34,93,89,0.12)' }} />
+        </p>
+        <div className="hidden md:block w-px h-4" style={{ background: 'rgba(34,93,89,0.12)' }} />
       </div>
 
-      {/* Scrolling area */}
+      {/* Scrolling logos */}
       <div className="flex-1 relative overflow-hidden">
         {/* Left fade */}
         <div

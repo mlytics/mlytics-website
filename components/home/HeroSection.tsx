@@ -9,7 +9,7 @@ import { WorldMapDots } from './WorldMapDots'
 import { LogoMarquee } from './LogoMarquee'
 import { useContactModal } from '@/context/contact-modal-context'
 
-const MARQUEE_H = 60
+const MARQUEE_H = 88
 
 const ROTATING_WORDS = [
   'building your brand',
@@ -20,7 +20,7 @@ const ROTATING_WORDS = [
 export function HeroSection() {
   const router = useRouter()
   const { open } = useContactModal()
-  const spacerRef = useRef<HTMLDivElement>(null)
+  const spacerRef = useRef<HTMLDivElement>(null) // keeps layout space for the fixed marquee
   const [isFixed, setIsFixed] = useState(true)
   const [wordIdx, setWordIdx] = useState(0)
 
@@ -33,16 +33,14 @@ export function HeroSection() {
     if (persona) router.push(routes[persona])
   }
 
-  // Fixed → natural marquee logic
+  // Fixed at viewport bottom when at top of page; absolute (natural) once user scrolls
   useEffect(() => {
-    function handleScroll() {
-      if (!spacerRef.current) return
-      const rect = spacerRef.current.getBoundingClientRect()
-      setIsFixed(rect.top > window.innerHeight)
+    function recalc() {
+      setIsFixed(window.scrollY === 0)
     }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', recalc, { passive: true })
+    recalc()
+    return () => window.removeEventListener('scroll', recalc)
   }, [])
 
   // Rotate headline words
@@ -69,7 +67,7 @@ export function HeroSection() {
       </div>
 
       {/* Main content — vertically centred, single column */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-[196px] pb-8">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-[96px] pb-8">
         <div className="max-w-3xl w-full mx-auto flex flex-col items-center text-center">
 
           {/* Live badge */}
@@ -155,36 +153,13 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="relative z-10 flex justify-center pb-4">
-        <div className="flex flex-col items-center gap-1.5 opacity-50">
-          <span className="text-xs" style={{ color: '#225D59' }}>Scroll to explore</span>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            className="animate-bounce"
-            style={{ color: '#225D59' }}
-          >
-            <path
-              d="M8 3v10M3 9l5 5 5-5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-      </div>
-
-      {/* Spacer — reserves marquee height */}
+      {/* Spacer — reserves marquee height so content isn't hidden behind it */}
       <div ref={spacerRef} style={{ height: MARQUEE_H }} />
 
       {/* Logo marquee — fixed at viewport bottom until spacer scrolls into view */}
       <div
         style={{ height: MARQUEE_H }}
-        className={isFixed ? 'fixed bottom-0 left-0 right-0 z-50' : 'absolute bottom-0 left-0 right-0'}
+        className={isFixed ? 'fixed bottom-0 left-0 right-0 z-40' : 'absolute bottom-0 left-0 right-0'}
       >
         <LogoMarquee />
       </div>

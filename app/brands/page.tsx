@@ -1,5 +1,6 @@
 // import { AgentDialog } from '@/components/agent/AgentDialog'
 // import { BRAND_FLOW } from '@/lib/agent-data'
+import { BrandComparison } from '@/components/pages/brands/BrandComparison'
 import { AudienceSimulator } from '@/components/pages/brands/AudienceSimulator'
 import { BrandPageCTA } from '@/components/pages/brands/BrandPageCTA'
 
@@ -24,42 +25,8 @@ export default function BrandsPage() {
         </div>
       </div>
 
-      {/* Comparison table */}
-      <section className="section-white py-16">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold" style={{ color: '#1A1A1A' }}>Intent vs. traditional CPM</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr style={{ background: '#FAFAFA' }}>
-                  <th className="text-left p-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#9B9B9B' }}></th>
-                  <th className="text-center p-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#9B9B9B' }}>Traditional CPM</th>
-                  <th className="text-center p-3 rounded-t-xl" style={{ background: 'rgba(34,93,89,0.08)', color: '#225D59' }}>
-                    <span className="text-xs font-bold uppercase tracking-wider">Mlytics Decision Engine</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  ['Billing', 'Per 1,000 impressions', 'Per intent signal'],
-                  ['User intent', 'Unknown', '⚡ Verified in real-time'],
-                  ['What you get', 'Unqualified eyeballs', 'In-market readers'],
-                  ['ROI model', 'Spend first, measure later', 'Pay for verified outcomes'],
-                  ['Discovery', 'DIY SEO / GEO', 'Distributed across 15M+ MAU'],
-                ].map(([label, cpm, cpl], i) => (
-                  <tr key={i} className="border-t" style={{ borderColor: '#E5E5E5' }}>
-                    <td className="p-3 font-medium text-xs" style={{ color: '#6B6B6B' }}>{label}</td>
-                    <td className="p-3 text-center text-xs" style={{ color: '#9B9B9B' }}>{cpm}</td>
-                    <td className="p-3 text-center text-xs font-semibold" style={{ background: 'rgba(34,93,89,0.04)', color: '#225D59' }}>{cpl}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+      {/* Comparison */}
+      <BrandComparison />
 
       {/* Agent continuation — hidden for now */}
       {/* <section className="section-dark py-16">

@@ -3,11 +3,11 @@
 import { useEffect, useRef } from 'react'
 
 const NODES = [
-  { label: 'More publishers\njoin', sublabel: 'Brand value', angle: -90 },
-  { label: 'More intent\ndata', sublabel: 'Data moat', angle: -18 },
-  { label: 'Smarter\ndecisions', sublabel: 'Distribution', angle: 54 },
-  { label: 'Higher CPL\nfor brands', sublabel: 'Revenue growth', angle: 126 },
-  { label: 'Higher publisher\nrevenue', sublabel: 'User growth', angle: 198 },
+  { label: '15M+ MAU\nInstalled Base', sublabel: 'and growing', angle: -90 },
+  { label: 'More intent\ndata', sublabel: 'data moat deepens', angle: -18 },
+  { label: 'Smarter\ndecisions', sublabel: 'AI routing improves', angle: 54 },
+  { label: 'Higher CPL\nfor brands', sublabel: 'brand revenue up', angle: 126 },
+  { label: 'Higher publisher\nrevenue', sublabel: 'more owners join', angle: 198 },
 ]
 
 const RADIUS = 130
