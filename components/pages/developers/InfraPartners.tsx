@@ -3,11 +3,17 @@
 import { useState } from 'react'
 
 const CLOUD_PARTNERS = [
-  { name: 'AWS',             domain: 'aws.amazon.com' },
-  { name: 'Google Cloud',    domain: 'cloud.google.com' },
-  { name: 'Microsoft Azure', domain: 'microsoft.com' },
-  { name: 'Tencent Cloud',   domain: 'tencentcloud.com' },
-  { name: 'Alibaba Cloud',   domain: 'alibabacloud.com' },
+  { name: 'AWS',             src: '/logos/AWS.svg' },
+  { name: 'Google Cloud',    src: '/logos/Google_Cloud.svg' },
+  { name: 'Microsoft Azure', src: '/logos/microsoft.svg' },
+  { name: 'Tencent Cloud',   src: '/logos/tencent.svg' },
+  { name: 'Alibaba Cloud',   src: '/logos/alibaba.svg' },
+]
+
+const MODEL_PROVIDERS = [
+  { name: 'Gemini',   src: '/logos/gemini.svg' },
+  { name: 'Seedance', src: '/logos/seedance.svg' },
+  { name: 'Seedream', src: '/logos/seedream.svg' },
 ]
 
 const CDN_PARTNERS = [
@@ -62,7 +68,7 @@ export function InfraPartners() {
     <section className="section-white py-16 border-t" style={{ borderColor: '#E5E5E5' }}>
       <div className="max-w-4xl mx-auto px-6">
         <p className="text-center text-xs font-semibold uppercase tracking-widest mb-10" style={{ color: '#9B9B9B' }}>
-          Infrastructure &amp; Network Partners
+          Partners &amp; Integrations
         </p>
 
         {/* Cloud partners */}
@@ -70,9 +76,50 @@ export function InfraPartners() {
           <p className="text-[11px] uppercase tracking-wider mb-4 text-center" style={{ color: '#C8C8C8' }}>
             Cloud Platforms
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-8">
+          <div className="flex flex-wrap items-center justify-center gap-10">
             {CLOUD_PARTNERS.map(p => (
-              <PartnerLogo key={p.domain} name={p.name} domain={p.domain} />
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={p.name}
+                src={p.src}
+                alt={p.name}
+                title={p.name}
+                style={{
+                  height: 28,
+                  width: 'auto',
+                  maxWidth: 140,
+                  objectFit: 'contain',
+                  filter: 'grayscale(1) brightness(0.18)',
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t my-8" style={{ borderColor: '#F0F0F0' }} />
+
+        {/* Model providers */}
+        <div className="mb-8">
+          <p className="text-[11px] uppercase tracking-wider mb-4 text-center" style={{ color: '#C8C8C8' }}>
+            AI Model Providers
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-10">
+            {MODEL_PROVIDERS.map(p => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={p.name}
+                src={p.src}
+                alt={p.name}
+                title={p.name}
+                style={{
+                  height: 28,
+                  width: 'auto',
+                  maxWidth: 140,
+                  objectFit: 'contain',
+                  filter: 'grayscale(1) brightness(0.18)',
+                }}
+              />
             ))}
           </div>
         </div>
@@ -88,6 +135,38 @@ export function InfraPartners() {
           <div className="flex flex-wrap items-center justify-center gap-7">
             {CDN_PARTNERS.map(p => (
               <PartnerLogo key={p.domain} name={p.name} domain={p.domain} />
+            ))}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t my-8" style={{ borderColor: '#F0F0F0' }} />
+
+        {/* Framework compatibility */}
+        <div>
+          <p className="text-[11px] uppercase tracking-wider mb-4 text-center" style={{ color: '#C8C8C8' }}>
+            Framework Compatibility
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            {[
+              'Vercel AI SDK',
+              'OpenAI SDK',
+              'LangChain',
+              'LlamaIndex',
+              'Hugging Face',
+              'Anthropic SDK',
+            ].map(name => (
+              <span
+                key={name}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                style={{
+                  background: '#F5F5F5',
+                  color: '#6B6B6B',
+                  border: '1px solid #E8E8E8',
+                }}
+              >
+                {name}
+              </span>
             ))}
           </div>
         </div>

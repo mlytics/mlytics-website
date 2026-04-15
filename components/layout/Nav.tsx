@@ -58,15 +58,18 @@ export function Nav() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-30 transition-all duration-300 ${navBg}`}
-      style={{ transform: visible ? 'translateY(0)' : 'translateY(-100%)' }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}
+      style={{
+        transform: visible ? 'translateY(0)' : 'translateY(-100%)',
+        pointerEvents: visible ? 'auto' : 'none',
+      }}
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image
             src="/logo.svg"
-            alt="mlytics"
+            alt="Mlytics"
             width={96}
             height={17}
             priority

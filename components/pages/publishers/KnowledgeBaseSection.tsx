@@ -144,7 +144,7 @@ export function KnowledgeBaseSection() {
                   <button
                     key={i}
                     onClick={() => setActive(i)}
-                    className="w-full text-left px-5 transition-colors duration-200 relative flex flex-col justify-center flex-1"
+                    className="w-full text-left px-5 py-4 md:py-0 transition-colors duration-200 relative flex flex-col justify-center md:flex-1"
                     style={{
                       borderBottom: i < STEPS.length - 1 ? '1px solid rgba(34,93,89,0.08)' : undefined,
                       background: isActive ? '#225D59' : 'transparent',
@@ -156,19 +156,11 @@ export function KnowledgeBaseSection() {
                     >
                       0{i + 1}
                     </span>
-                    <span
-                      className="block text-xs font-semibold leading-snug"
-                      style={{ color: isActive ? '#FFFFFF' : '#9B9B9B' }}
-                    >
+                    <span className="block text-xs font-semibold leading-snug" style={{ color: isActive ? '#FFFFFF' : '#9B9B9B' }}>
                       {step.label}
                     </span>
-
-                    {/* Progress bar */}
                     {isActive && (
-                      <div
-                        className="mt-2.5 rounded-full overflow-hidden"
-                        style={{ height: 2, background: 'rgba(255,255,255,0.2)' }}
-                      >
+                      <div className="mt-2.5 rounded-full overflow-hidden" style={{ height: 2, background: 'rgba(255,255,255,0.2)' }}>
                         <motion.div
                           key={`bar-${i}`}
                           className="h-full rounded-full"
@@ -185,7 +177,33 @@ export function KnowledgeBaseSection() {
             </div>
 
             {/* Right: content */}
-            <div className="relative overflow-hidden" style={{ background: '#FFFFFF', minHeight: 300 }}>
+            <div className="relative overflow-hidden" style={{ background: '#FFFFFF' }}>
+              {/* Invisible sizer — renders all steps to establish max natural height */}
+              {STEPS.map((step, si) => (
+                <div
+                  key={si}
+                  className="invisible pointer-events-none p-6 md:p-8 flex flex-col justify-between"
+                  aria-hidden="true"
+                  style={{ position: si === 0 ? 'relative' : 'absolute', inset: 0 }}
+                >
+                  <div className="flex flex-col md:overflow-hidden md:h-[170px]">
+                    <div className="flex flex-col gap-1.5 mb-4 md:mb-5">
+                      <span>{step.icon}</span>
+                      <span className="text-xs font-semibold uppercase tracking-widest">{step.sub}</span>
+                    </div>
+                    <p className="text-lg md:text-xl font-bold leading-snug mb-2">{step.label}</p>
+                    <p className="text-sm leading-relaxed">{step.desc}</p>
+                  </div>
+                  <div className="flex items-center justify-between pt-4 mt-6 md:mt-8" style={{ borderTop: '1px solid rgba(34,93,89,0.08)' }}>
+                    <div className="flex items-center gap-1.5">
+                      {STEPS.map((_, i) => <div key={i} style={{ width: 5, height: 5 }} />)}
+                    </div>
+                    <span className="text-4xl md:text-5xl font-black tabular-nums">01</span>
+                  </div>
+                </div>
+              ))}
+
+              {/* Animated active content */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active}
@@ -193,33 +211,24 @@ export function KnowledgeBaseSection() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.24, ease: 'easeOut' }}
-                  className="absolute inset-0 p-8 flex flex-col justify-between"
+                  className="absolute inset-0 p-6 md:p-8 flex flex-col justify-between"
                 >
-                  {/* Top: label + heading + desc */}
-                  <div className="flex flex-col overflow-hidden" style={{ height: 170 }}>
-                    {/* Metadata zone: icon + sub-label tightly grouped */}
-                    <div className="flex flex-col gap-1.5 mb-5">
+                  <div className="flex flex-col md:overflow-hidden md:h-[170px]">
+                    <div className="flex flex-col gap-1.5 mb-4 md:mb-5">
                       <span style={{ color: '#225D59' }}>{STEPS[active].icon}</span>
-                      <span
-                        className="text-xs font-semibold uppercase tracking-widest"
-                        style={{ color: '#A8C5C3' }}
-                      >
+                      <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#A8C5C3' }}>
                         {STEPS[active].sub}
                       </span>
                     </div>
-
-                    {/* Content zone: heading + desc */}
-                    <p className="text-xl font-bold leading-snug mb-2" style={{ color: '#1A1A1A' }}>
+                    <p className="text-lg md:text-xl font-bold leading-snug mb-2" style={{ color: '#1A1A1A' }}>
                       {STEPS[active].label}
                     </p>
                     <p className="text-sm leading-relaxed" style={{ color: '#6B6B6B' }}>
                       {STEPS[active].desc}
                     </p>
                   </div>
-
-                  {/* Bottom: step dots + ghost counter */}
                   <div
-                    className="flex items-center justify-between pt-4 mt-8"
+                    className="flex items-center justify-between pt-4 mt-6 md:mt-8"
                     style={{ borderTop: '1px solid rgba(34,93,89,0.08)' }}
                   >
                     <div className="flex items-center gap-1.5">
@@ -237,7 +246,7 @@ export function KnowledgeBaseSection() {
                       ))}
                     </div>
                     <span
-                      className="text-5xl font-black tabular-nums select-none"
+                      className="text-4xl md:text-5xl font-black tabular-nums select-none"
                       style={{ color: 'rgba(180,83,9,0.12)', letterSpacing: '-0.04em', lineHeight: 1 }}
                     >
                       0{active + 1}

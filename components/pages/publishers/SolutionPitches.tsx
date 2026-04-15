@@ -9,8 +9,6 @@ const PITCHES = [
     them: { who: 'LLM search engines', desc: 'Summarize your content, answer the user, and keep them. Your readers never arrive.' },
     us: 'Deploy AI experiences on your site. Readers stay, engage longer, and generate intent signals you monetize.',
     accent: '#225D59',
-    rightBg: '#EBF4F3',
-    rightBorder: 'rgba(34,93,89,0.2)',
   },
   {
     num: '02',
@@ -18,8 +16,6 @@ const PITCHES = [
     them: { who: 'AI-powered search', desc: 'Extracts your content, generates an answer, keeps the user. Your analytics show decline.' },
     us: 'Brings AI experiences to your domain. More engagement, not less. Your content, your audience, your data.',
     accent: '#225D59',
-    rightBg: '#EBF4F3',
-    rightBorder: 'rgba(34,93,89,0.2)',
   },
   {
     num: '03',
@@ -27,8 +23,6 @@ const PITCHES = [
     them: { who: 'Traditional SEO & social', desc: "Under-35 cohorts live in AI chat and agent-curated feeds — unreachable by current strategy." },
     us: "Distributes your content into AI-powered surfaces. New demographics, without changing your editorial workflow.",
     accent: '#225D59',
-    rightBg: '#EBF4F3',
-    rightBorder: 'rgba(34,93,89,0.2)',
   },
 ]
 
@@ -61,7 +55,10 @@ export function SolutionPitches() {
             <motion.div
               key={i}
               className="rounded-2xl overflow-hidden"
-              style={{ border: '1px solid rgba(34,93,89,0.15)' }}
+              style={{
+                border: '1px solid rgba(34,93,89,0.14)',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(34,93,89,0.08)',
+              }}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
@@ -79,9 +76,9 @@ export function SolutionPitches() {
               </div>
 
               {/* Contrast panels */}
-              <div className="grid md:grid-cols-[1fr_36px_1fr]">
-                {/* Left — Them (dark, muted) */}
-                <div className="p-5 flex flex-col gap-2"                 style={{ background: '#F7F7F7' }}>
+              <div className="grid md:grid-cols-[1fr_40px_1fr]">
+                {/* Left — Them (muted) */}
+                <div className="p-5 flex flex-col gap-2" style={{ background: '#F7F7F7' }}>
                   <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#CCCCCC' }}>
                     {pitch.them.who}
                   </span>
@@ -91,16 +88,16 @@ export function SolutionPitches() {
                 </div>
 
                 {/* Arrow divider */}
-                <div className="hidden md:flex items-center justify-center" style={{ background: '#EBF4F3' }}>
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <path d="M3 9h12M10 4l5 5-5 5" stroke={pitch.accent} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <div className="hidden md:flex items-center justify-center border-l border-r" style={{ background: '#FAFAFA', borderColor: '#EEEEEE' }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M2 7h10M7.5 3L12 7l-4.5 4" stroke={pitch.accent} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
 
-                {/* Right — Mlytics (colored, prominent) */}
+                {/* Right — Mlytics */}
                 <div
-                  className="p-5 flex flex-col gap-2"
-                  style={{ background: pitch.rightBg }}
+                  className="p-5 flex flex-col gap-2 border-l"
+                  style={{ background: 'rgba(34,93,89,0.04)', borderColor: 'rgba(34,93,89,0.12)' }}
                 >
                   <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: pitch.accent }}>
                     Mlytics
