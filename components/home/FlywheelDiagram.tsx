@@ -1,120 +1,138 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 
 const NODES = [
-  { label: '15M+ MAU\nInstalled Base', sublabel: 'and growing', angle: -90 },
-  { label: 'More intent\ndata', sublabel: 'data moat deepens', angle: -18 },
-  { label: 'Smarter\ndecisions', sublabel: 'AI routing improves', angle: 54 },
-  { label: 'Higher CPL\nfor brands', sublabel: 'brand revenue up', angle: 126 },
-  { label: 'Higher publisher\nrevenue', sublabel: 'more owners join', angle: 198 },
+  { label: '15M+ MAU', sub: 'Installed Base', angle: -90,  icon: '🌐' },
+  { label: 'More Intent', sub: 'data moat deepens', angle: -18,  icon: '📡' },
+  { label: 'Smarter AI', sub: 'routing improves', angle:  54,  icon: '🧠' },
+  { label: 'Higher CPL', sub: 'brand revenue up', angle: 126,  icon: '💰' },
+  { label: 'More Owners', sub: 'publishers join', angle: 198,  icon: '✍️' },
 ]
 
-const RADIUS = 130
-const CX = 200
-const CY = 200
+const R = 148          // orbit radius
+const CX = 200         // SVG centre x
+const CY = 210         // SVG centre y
 
-function nodePos(angleDeg: number) {
-  const rad = (angleDeg - 90) * Math.PI / 180
-  return {
-    x: CX + RADIUS * Math.cos(rad),
-    y: CY + RADIUS * Math.sin(rad),
-  }
+function polar(angleDeg: number, r = R) {
+  const rad = (angleDeg - 90) * (Math.PI / 180)
+  return { x: CX + r * Math.cos(rad), y: CY + r * Math.sin(rad) }
 }
 
-export function FlywheelDiagram() {
-  const ringRef = useRef<SVGCircleElement>(null)
+// Build the circular arrow path (dashed ring)
+const ringPath = `
+  M ${CX} ${CY - R}
+  A ${R} ${R} 0 1 1 ${CX - 0.001} ${CY - R}
+`
 
+export function FlywheelDiagram() {
   return (
-    <div className="flex items-center justify-center py-4">
+    <div className="flex items-center justify-center py-2">
       <svg
-        viewBox="0 0 400 400"
+        viewBox="0 0 400 420"
         className="w-full max-w-sm lg:max-w-none"
         style={{ overflow: 'visible' }}
       >
-        {/* Rotating outer ring */}
-        <circle
-          ref={ringRef}
-          cx={CX}
-          cy={CY}
-          r={RADIUS}
+        {/* ── Orbit ring ── */}
+        <motion.circle
+          cx={CX} cy={CY} r={R}
           fill="none"
-          stroke="rgba(34,93,89,0.3)"
+          stroke="rgba(34,93,89,0.22)"
           strokeWidth="1.5"
-          strokeDasharray="6 4"
-          style={{ animation: 'orbit-ring 18s linear infinite', transformOrigin: `${CX}px ${CY}px` }}
+          strokeDasharray="5 5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          style={{ animation: 'orbit-ring 22s linear infinite', transformOrigin: `${CX}px ${CY}px` }}
         />
 
-        {/* Connection lines between nodes */}
-        {NODES.map((_, i) => {
-          const from = nodePos(NODES[i].angle)
-          const to = nodePos(NODES[(i + 1) % NODES.length].angle)
+        {/* ── Spoke lines ── */}
+        {NODES.map((node, i) => {
+          const p = polar(node.angle, R - 24)
           return (
-            <line
+            <motion.line
               key={i}
-              x1={from.x} y1={from.y}
-              x2={to.x} y2={to.y}
-              stroke="rgba(34,93,89,0.2)"
+              x1={CX} y1={CY} x2={p.x} y2={p.y}
+              stroke="rgba(34,93,89,0.14)"
               strokeWidth="1"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 + i * 0.08 }}
             />
           )
         })}
 
-        {/* Center */}
-        <circle cx={CX} cy={CY} r={52} fill="#1A3D3A" stroke="rgba(34,93,89,0.8)" strokeWidth="1.5" />
-        <circle cx={CX} cy={CY} r={44} fill="rgba(34,93,89,0.4)" />
-        <text x={CX} y={CY - 8} textAnchor="middle" fill="#FAFAFA" fontSize="9" fontWeight="700" letterSpacing="0.5">
-          DECISION
-        </text>
-        <text x={CX} y={CY + 4} textAnchor="middle" fill="#FAFAFA" fontSize="9" fontWeight="700" letterSpacing="0.5">
-          ENGINE
-        </text>
-        <text x={CX} y={CY + 18} textAnchor="middle" fill="#F59E0B" fontSize="7">
-          per dollar ·
-        </text>
-        <text x={CX} y={CY + 28} textAnchor="middle" fill="#F59E0B" fontSize="7">
-          intelligent outcome
-        </text>
+        {/* ── Travelling particle ── */}
+        <circle r="5" fill="#F59E0B" style={{ filter: 'drop-shadow(0 0 5px #F59E0B88)' }}>
+          <animateMotion dur="9s" repeatCount="indefinite" path={ringPath} />
+        </circle>
 
-        {/* Nodes */}
+        {/* ── Hub ── */}
+        <motion.g
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          style={{ transformOrigin: `${CX}px ${CY}px` }}
+        >
+          {/* Outer glow ring */}
+          <circle cx={CX} cy={CY} r={58} fill="none" stroke="rgba(34,93,89,0.25)" strokeWidth="1" />
+          {/* Hub body */}
+          <circle cx={CX} cy={CY} r={50} fill="#1A3D3A" />
+          <circle cx={CX} cy={CY} r={43} fill="rgba(34,93,89,0.5)" />
+          {/* Hub text */}
+          <text x={CX} y={CY - 10} textAnchor="middle" fill="#FAFAFA" fontSize="8.5" fontWeight="700" letterSpacing="0.8">
+            DECISION
+          </text>
+          <text x={CX} y={CY + 2} textAnchor="middle" fill="#FAFAFA" fontSize="8.5" fontWeight="700" letterSpacing="0.8">
+            ENGINE
+          </text>
+          <text x={CX} y={CY + 16} textAnchor="middle" fill="#F59E0B" fontSize="7.5" fontWeight="500">
+            intent · route · earn
+          </text>
+        </motion.g>
+
+        {/* ── Nodes ── */}
         {NODES.map((node, i) => {
-          const pos = nodePos(node.angle)
-          const lines = node.label.split('\n')
-          const isLeft = pos.x < CX - 20
+          const pos = polar(node.angle)
+          const isLeft  = pos.x < CX - 20
           const isRight = pos.x > CX + 20
-          const anchorX = isLeft ? pos.x - 14 : isRight ? pos.x + 14 : pos.x
-          const anchor = isLeft ? 'end' : isRight ? 'start' : 'middle'
+          const textX   = isLeft ? pos.x - 18 : isRight ? pos.x + 18 : pos.x
+          const anchor  = isLeft ? 'end' : isRight ? 'start' : 'middle'
 
           return (
-            <g key={i}>
-              {/* Node circle */}
-              <circle cx={pos.x} cy={pos.y} r={8} fill="#1A3D3A" stroke="#225D59" strokeWidth="2" />
-              <circle cx={pos.x} cy={pos.y} r={3.5} fill="#F59E0B" />
+            <motion.g
+              key={i}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
+            >
+              {/* Outer ring */}
+              <circle cx={pos.x} cy={pos.y} r={18} fill="#1A3D3A" stroke="rgba(34,93,89,0.6)" strokeWidth="1.5" />
+              {/* Inner fill */}
+              <circle cx={pos.x} cy={pos.y} r={14} fill="rgba(34,93,89,0.35)" />
+              {/* Icon */}
+              <text x={pos.x} y={pos.y + 5} textAnchor="middle" fontSize="13">
+                {node.icon}
+              </text>
 
               {/* Label */}
-              <text x={anchorX} y={pos.y - 8} textAnchor={anchor} fill="#FAFAFA" fontSize="8.5" fontWeight="600">
-                {lines[0]}
+              <text
+                x={textX} y={pos.y - 22}
+                textAnchor={anchor}
+                fill="#FAFAFA" fontSize="9" fontWeight="700"
+              >
+                {node.label}
               </text>
-              {lines[1] && (
-                <text x={anchorX} y={pos.y + 2} textAnchor={anchor} fill="#FAFAFA" fontSize="8.5" fontWeight="600">
-                  {lines[1]}
-                </text>
-              )}
-              <text x={anchorX} y={pos.y + 14} textAnchor={anchor} fill="#A8C5C3" fontSize="7.5">
-                {node.sublabel}
+              <text
+                x={textX} y={pos.y - 11}
+                textAnchor={anchor}
+                fill="rgba(168,197,195,0.65)" fontSize="7.5"
+              >
+                {node.sub}
               </text>
-            </g>
+            </motion.g>
           )
         })}
-
-        {/* Animated traveling dot on ring */}
-        <circle r="4" fill="#F59E0B" style={{ filter: 'drop-shadow(0 0 4px #F59E0B)' }}>
-          <animateMotion
-            dur="8s"
-            repeatCount="indefinite"
-            path={`M ${CX} ${CY - RADIUS} A ${RADIUS} ${RADIUS} 0 1 1 ${CX - 0.001} ${CY - RADIUS}`}
-          />
-        </circle>
       </svg>
     </div>
   )
