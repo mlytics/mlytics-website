@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Landmark, ShoppingBag, Heart, Car, Monitor } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const VERTICALS = [
-  { num: '01', icon: '🏦', label: 'Financial Services', desc: 'Banks, insurance, investment funds — audiences actively researching before committing.' },
-  { num: '02', icon: '👟', label: 'Consumer Brands',    desc: 'Products with considered purchase cycles where intent signals determine conversion.' },
-  { num: '03', icon: '❤️', label: 'Health & Wellness',  desc: 'Research-heavy decisions where trust and context matter as much as the message.' },
-  { num: '04', icon: '🚗', label: 'Automotive',          desc: 'High-intent, long consideration cycles — the right moment is everything.' },
-  { num: '05', icon: '💻', label: 'Technology',          desc: 'B2C and prosumer software & hardware with audiences already in AI-powered research flows.' },
+const VERTICALS: { num: string; Icon: LucideIcon; label: string; desc: string }[] = [
+  { num: '01', Icon: Landmark,    label: 'Financial Services', desc: 'Banks, insurance, investment funds — audiences actively researching before committing.' },
+  { num: '02', Icon: ShoppingBag, label: 'Consumer Brands',    desc: 'Products with considered purchase cycles where intent signals determine conversion.' },
+  { num: '03', Icon: Heart,       label: 'Health & Wellness',  desc: 'Research-heavy decisions where trust and context matter as much as the message.' },
+  { num: '04', Icon: Car,         label: 'Automotive',          desc: 'High-intent, long consideration cycles — the right moment is everything.' },
+  { num: '05', Icon: Monitor,     label: 'Technology',          desc: 'B2C and prosumer software & hardware with audiences already in AI-powered research flows.' },
 ]
 
 function VerticalCard({ item, i }: { item: typeof VERTICALS[0]; i: number }) {
@@ -52,7 +54,9 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[0]; i: number }) {
         <p className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: '#C0C0C0' }}>
           {item.num} · Who this is for
         </p>
-        <div className="text-2xl mb-3">{item.icon}</div>
+        <div className="mb-3 w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'rgba(34,93,89,0.08)' }}>
+          <item.Icon size={18} strokeWidth={1.7} style={{ color: '#225D59' }} />
+        </div>
         <h3 className="text-base font-bold leading-snug" style={{ color: '#1A1A1A' }}>{item.label}</h3>
         <p className="text-xs leading-relaxed mt-4 pt-4" style={{ color: '#6B6B6B', borderTop: '1px solid #EFEFEF' }}>
           {item.desc}

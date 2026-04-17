@@ -1,12 +1,14 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Target, BarChart2, Package, Coins } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const STEPS = [
-  { step: '01', label: 'Strong intent detected', icon: '🎯' },
-  { step: '02', label: 'Scored & qualified', icon: '📊' },
-  { step: '03', label: 'Delivered to your CRM', icon: '📦' },
-  { step: '04', label: 'Pay per result', icon: '💰' },
+const STEPS: { step: string; label: string; Icon: LucideIcon }[] = [
+  { step: '01', label: 'Strong intent detected', Icon: Target },
+  { step: '02', label: 'Scored & qualified',      Icon: BarChart2 },
+  { step: '03', label: 'Delivered to your CRM',   Icon: Package },
+  { step: '04', label: 'Pay per result',           Icon: Coins },
 ]
 
 export function BrandLeadPilot() {
@@ -42,7 +44,9 @@ export function BrandLeadPilot() {
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.4, delay: i * 0.1, ease: 'easeOut' }}
             >
-              <span className="text-2xl block mb-3">{item.icon}</span>
+              <div className="flex justify-center mb-3">
+                <item.Icon size={22} strokeWidth={1.6} style={{ color: '#225D59' }} />
+              </div>
               <span className="text-[10px] font-bold uppercase tracking-wider block mb-1.5" style={{ color: '#9B9B9B' }}>
                 {item.step}
               </span>

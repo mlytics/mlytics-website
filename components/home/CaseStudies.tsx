@@ -1,8 +1,19 @@
 'use client'
 
 import { useContactModal } from '@/context/contact-modal-context'
+import { Newspaper, Landmark, Zap } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const CASES = [
+const CASES: Array<{
+  industry: string
+  tag: string
+  tagColor: string
+  bigNumber: string
+  bigDesc: string
+  headline: string
+  body: string
+  Icon: LucideIcon
+}> = [
   {
     industry: 'Digital Media',
     tag: 'AI Q&A Widget',
@@ -11,7 +22,7 @@ const CASES = [
     bigDesc: 'Content production efficiency',
     headline: 'Content team cut production cost from $250 to $0.10 per piece',
     body: 'Facing AI-era traffic decline, this digital publisher deployed AI Q&A Widget. Every article now generates intent signals and companion content at near-zero marginal cost.',
-    icon: '📰',
+    Icon: Newspaper,
   },
   {
     industry: 'Financial Services',
@@ -21,7 +32,7 @@ const CASES = [
     bigDesc: 'Verified purchase intent per lead',
     headline: 'Shifted from CPM impressions to buying confirmed purchase intent',
     body: 'This financial brand stopped buying unqualified CPM reach and now only pays for strong-intent leads identified in our 4M WAU network. ROI is fully predictable.',
-    icon: '🏦',
+    Icon: Landmark,
   },
   {
     industry: 'Content Platform',
@@ -31,7 +42,7 @@ const CASES = [
     bigDesc: 'Infrastructure TCO savings',
     headline: 'Content delivery latency dropped below 50ms while cutting monthly costs',
     body: 'By routing all content delivery decisions through Decisive Engine, this platform cut P99 latency to under 50ms and reduced monthly CDN spend by 20% in the first quarter.',
-    icon: '⚡',
+    Icon: Zap,
   },
 ]
 
@@ -62,7 +73,7 @@ export function CaseStudies() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">{c.icon}</span>
+                  <c.Icon size={18} strokeWidth={1.6} style={{ color: '#A8C5C3' }} />
                   <span className="text-xs font-medium" style={{ color: '#A8C5C3' }}>{c.industry}</span>
                 </div>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"

@@ -1,20 +1,47 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 
 const ROWS = [
-  { label: 'Billing',      cpm: 'Per 1,000 impressions',              mlytics: 'Per qualified intent signal' },
-  { label: 'User intent',  cpm: 'Unknown — hope-based targeting',     mlytics: 'Verified — real-time intent classification' },
-  { label: 'What you get', cpm: 'Eyeballs that may or may not care',  mlytics: 'Readers actively researching your category' },
-  { label: 'ROI model',    cpm: 'Spend first, measure later',         mlytics: 'Outcome-based — pay for verified engagement' },
-  { label: 'Discovery',    cpm: 'You do SEO / GEO yourself',          mlytics: 'Mlytics GEO places your brand across 15M+ MAU network' },
+  { label: 'Billing',       cpm: 'Per 1,000 impressions',             mlytics: 'Per qualified intent signal' },
+  { label: 'User intent',   cpm: 'Unknown — hope-based targeting',    mlytics: 'Verified — real-time intent classification' },
+  { label: 'What you get',  cpm: 'Eyeballs that may or may not care', mlytics: 'Readers actively researching your category' },
+  { label: 'ROI model',     cpm: 'Spend first, measure later',        mlytics: 'Outcome-based — pay for verified engagement' },
+  { label: 'Discovery',     cpm: 'You run SEO / GEO yourself',        mlytics: 'Mlytics GEO places your brand across 15M+ MAU network' },
 ]
 
 export function BrandComparison() {
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const [isStuck, setIsStuck] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    setIsDesktop(mq.matches)
+    const mqHandler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', mqHandler)
+    return () => mq.removeEventListener('change', mqHandler)
+  }, [])
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsStuck(!entry.isIntersecting),
+      { rootMargin: '-65px 0px 0px 0px', threshold: 0 }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [])
+
+  const showBackdrop = isStuck && !isDesktop
+
   return (
-    <section className="section-white py-16 lg:py-20">
+    <section className="section-dark py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-6">
-        {/* Header */}
+
+        {/* Section header */}
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
@@ -22,78 +49,80 @@ export function BrandComparison() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(168,197,195,0.55)' }}>
             The Difference
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-white">
             Traditional CPM vs. Decision Engine
           </h2>
         </motion.div>
 
-        {/* Row cards */}
-        <div className="space-y-3">
-          {ROWS.map((row, i) => (
-            <motion.div
-              key={i}
-              className="rounded-2xl overflow-hidden"
-              style={{
-                border: '1px solid rgba(34,93,89,0.14)',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(34,93,89,0.08)',
-              }}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.4, delay: i * 0.1, ease: 'easeOut' }}
-            >
-              {/* Label bar */}
-              <div
-                className="px-5 py-3 flex items-center justify-between border-b"
-                style={{ background: '#1f4f4b', borderColor: 'rgba(168,197,195,0.08)' }}
-              >
-                <span className="text-sm font-bold text-white">{row.label}</span>
-                <span className="text-xs font-bold tabular-nums" style={{ color: 'rgba(168,197,195,0.6)' }}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-              </div>
+        {/* Sentinel — marks where sticky kicks in */}
+        <div ref={sentinelRef} />
 
-              {/* Contrast panels */}
-              <div className="grid md:grid-cols-[1fr_40px_1fr]">
-                {/* Left — Traditional CPM (muted) */}
-                <div className="p-5 flex flex-col gap-2" style={{ background: '#F7F7F7' }}>
-                  <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#CCCCCC' }}>
-                    Traditional CPM
-                  </span>
-                  <p className="text-sm leading-relaxed" style={{ color: '#BBBBBB' }}>
-                    {row.cpm}
-                  </p>
-                </div>
-
-                {/* Arrow divider — desktop only */}
-                <div
-                  className="hidden md:flex items-center justify-center border-l border-r"
-                  style={{ background: '#FAFAFA', borderColor: '#EEEEEE' }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M2 7h10M7.5 3L12 7l-4.5 4" stroke="#225D59" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-
-                {/* Right — Mlytics (highlighted) */}
-                <div
-                  className="p-5 flex flex-col gap-2 border-t md:border-t-0 border-l-0 md:border-l"
-                  style={{ background: 'rgba(34,93,89,0.04)', borderColor: 'rgba(34,93,89,0.12)' }}
-                >
-                  <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#225D59' }}>
-                    Mlytics
-                  </span>
-                  <p className="text-sm leading-relaxed" style={{ color: '#1A1A1A' }}>
-                    {row.mlytics}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+        {/* Column headers */}
+        <div
+          className="grid grid-cols-2 mb-3 z-20 lg:static transition-colors duration-200"
+          style={{
+            position: isDesktop ? 'static' : 'sticky',
+            top: 64,
+            ...(showBackdrop ? {
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              background: 'rgba(18,40,38,0.88)',
+              borderBottom: '1px solid rgba(168,197,195,0.1)',
+            } : {}),
+          }}
+        >
+          <div className="px-5 py-4 text-center">
+            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Traditional CPM
+            </p>
+          </div>
+          <div className="px-5 py-4 text-center">
+            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.9)' }}>
+              Decision Engine
+            </p>
+          </div>
         </div>
+
+        {/* Data rows */}
+        {ROWS.map((row, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.4, delay: i * 0.08 }}
+          >
+            {/* Category label */}
+            <div
+              className="px-5 py-3 rounded-lg"
+              style={{ background: 'rgba(34,93,89,0.25)' }}
+            >
+              <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(168,197,195,0.6)' }}>
+                {row.label}
+              </span>
+            </div>
+
+            {/* Two-column values */}
+            <div
+              className="grid grid-cols-2 items-center py-5"
+              style={{ borderBottom: i < ROWS.length - 1 ? '1px solid rgba(168,197,195,0.08)' : undefined }}
+            >
+              <div className="px-5 text-center">
+                <p className="text-sm leading-relaxed text-white">
+                  {row.cpm}
+                </p>
+              </div>
+              <div className="px-5 text-center">
+                <p className="text-sm leading-relaxed text-white">
+                  {row.mlytics}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
       </div>
     </section>
   )

@@ -2,11 +2,22 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { Newspaper, Target, Settings2 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const CARDS = [
+const CARDS: Array<{
+  persona: string
+  Icon: LucideIcon
+  hook: string
+  products: string
+  metrics: { label: string; value: string }[]
+  cta: string
+  href: string
+  accent: string
+}> = [
   {
     persona: 'Content Owner',
-    emoji: '📰',
+    Icon: Newspaper,
     hook: 'Your content produces reader intent signals every day. Right now, every single one is leaking away.',
     products: 'AI Q&A Widget · CPL Revenue',
     metrics: [
@@ -19,7 +30,7 @@ const CARDS = [
   },
   {
     persona: 'Brand',
-    emoji: '🎯',
+    Icon: Target,
     hook: 'How much of your ad budget hits people with zero purchase intent? You can stop guessing.',
     products: 'Full Conversation CPL · Lead Pilot',
     metrics: [
@@ -32,7 +43,7 @@ const CARDS = [
   },
   {
     persona: 'Developer',
-    emoji: '⚙️',
+    Icon: Settings2,
     hook: 'Your content delivery infrastructure costs more than it should. One API call changes that.',
     products: 'Decisive Engine API',
     metrics: [
@@ -79,7 +90,9 @@ export function IdentityCards() {
               {/* Header */}
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-2xl mb-2 block">{card.emoji}</span>
+                  <div className="mb-2 w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(34,93,89,0.08)' }}>
+                    <card.Icon size={17} strokeWidth={1.8} style={{ color: '#225D59' }} />
+                  </div>
                   <h3 className="text-lg font-bold" style={{ color: '#1A1A1A' }}>{card.persona}</h3>
                   <p className="text-xs mt-0.5" style={{ color: '#9B9B9B' }}>{card.products}</p>
                 </div>

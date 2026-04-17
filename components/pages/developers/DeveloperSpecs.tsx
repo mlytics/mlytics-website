@@ -2,13 +2,15 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { Zap, TrendingDown, ShieldCheck, Plug, Globe } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const SPECS = [
-  { stat: '< 50ms',  label: 'P99 decision latency',           icon: '⚡' },
-  { stat: '20%',     label: 'TCO reduction baseline',          icon: '📉' },
-  { stat: '99.99%',  label: 'Reliability & SLA guarantee',     icon: '🛡️' },
-  { stat: '1 API',   label: 'Replaces multiple CDN contracts',  icon: '🔌' },
-  { stat: '18+',     label: 'Countries in network',             icon: '🌏' },
+const SPECS: { stat: string; label: string; Icon: LucideIcon }[] = [
+  { stat: '< 50ms',  label: 'P99 decision latency',           Icon: Zap },
+  { stat: '20%',     label: 'TCO reduction baseline',          Icon: TrendingDown },
+  { stat: '99.99%',  label: 'Reliability & SLA guarantee',     Icon: ShieldCheck },
+  { stat: '1 API',   label: 'Replaces multiple CDN contracts',  Icon: Plug },
+  { stat: '18+',     label: 'Countries in network',             Icon: Globe },
 ]
 
 export function DeveloperSpecs() {
@@ -42,7 +44,9 @@ export function DeveloperSpecs() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.45, delay: 0.15 + i * 0.08, ease: 'easeOut' }}
             >
-              <span className="text-2xl block mb-2">{item.icon}</span>
+              <div className="flex justify-center mb-2">
+                <item.Icon size={22} strokeWidth={1.6} style={{ color: '#225D59' }} />
+              </div>
               <p className="text-xl font-bold mb-1" style={{ color: '#225D59' }}>{item.stat}</p>
               <p className="text-xs" style={{ color: '#6B6B6B' }}>{item.label}</p>
             </motion.div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 
 const COMPARISONS = [
   {
@@ -30,6 +31,31 @@ const COMPARISONS = [
 ]
 
 export function AILayerSection() {
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const [isStuck, setIsStuck] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    setIsDesktop(mq.matches)
+    const mqHandler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', mqHandler)
+    return () => mq.removeEventListener('change', mqHandler)
+  }, [])
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsStuck(!entry.isIntersecting),
+      { rootMargin: '-65px 0px 0px 0px', threshold: 0 }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [])
+
+  const showBackdrop = isStuck && !isDesktop
+
   return (
     <section className="section-dark py-16 lg:py-20 relative overflow-hidden">
       {/* Background glow */}
@@ -58,54 +84,71 @@ export function AILayerSection() {
           </p>
         </motion.div>
 
-        {/* Comparison cards */}
-        <div className="space-y-3">
-          {COMPARISONS.map((item, i) => (
-            <motion.div
-              key={i}
-              className="group rounded-2xl overflow-hidden"
-              style={{
-                border: '1px solid rgba(34,93,89,0.14)',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(34,93,89,0.08)',
-              }}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.4, delay: i * 0.08, ease: 'easeOut' }}
-            >
-              <div className="grid md:grid-cols-[1fr_40px_1fr]">
-                {/* Left — Before (muted) */}
-                <div className="p-5 flex flex-col gap-2" style={{ background: '#F7F7F7' }}>
-                  <p className="text-xs font-semibold" style={{ color: '#9B9B9B' }}>{item.label}</p>
-                  <div className="relative inline-block">
-                    <p className="text-sm leading-relaxed" style={{ color: '#BBBBBB' }}>{item.before}</p>
-                    <motion.div
-                      className="absolute left-0 top-1/2 h-px pointer-events-none"
-                      style={{ background: '#AAAAAA', right: 0 }}
-                      initial={{ scaleX: 0, originX: 0 }}
-                      whileInView={{ scaleX: 1 }}
-                      viewport={{ once: true, margin: '-60px' }}
-                      transition={{ duration: 0.5, delay: 0.4 + i * 0.08, ease: 'easeInOut' }}
-                    />
-                  </div>
-                </div>
+        {/* Sentinel */}
+        <div ref={sentinelRef} />
 
-                {/* Arrow divider */}
-                <div className="hidden md:flex items-center justify-center border-l border-r" style={{ background: '#FAFAFA', borderColor: '#EEEEEE' }}>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M2 7h10M7.5 3L12 7l-4.5 4" stroke="#225D59" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-
-                {/* Right — Mlytics */}
-                <div className="p-5 flex flex-col gap-2" style={{ background: '#F7F9F8', borderLeft: '2px solid rgba(34,93,89,0.2)' }}>
-                  <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#225D59' }}>Mlytics</span>
-                  <p className="text-sm leading-relaxed" style={{ color: '#1A1A1A' }}>{item.after}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+        {/* Column headers */}
+        <div
+          className="grid grid-cols-2 mb-3 z-20 transition-colors duration-200"
+          style={{
+            position: isDesktop ? 'static' : 'sticky',
+            top: 64,
+            ...(showBackdrop ? {
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              background: 'rgba(18,40,38,0.88)',
+              borderBottom: '1px solid rgba(168,197,195,0.1)',
+            } : {}),
+          }}
+        >
+          <div className="px-5 py-4 text-center">
+            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Before
+            </p>
+          </div>
+          <div className="px-5 py-4 text-center">
+            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.9)' }}>
+              With Mlytics
+            </p>
+          </div>
         </div>
+
+        {/* Data rows */}
+        {COMPARISONS.map((item, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.4, delay: i * 0.08 }}
+          >
+            {/* Category label */}
+            <div
+              className="px-5 py-3 rounded-lg"
+              style={{ background: 'rgba(34,93,89,0.25)' }}
+            >
+              <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(168,197,195,0.6)' }}>
+                {item.label}
+              </span>
+            </div>
+
+            {/* Two-column values */}
+            <div
+              className="grid grid-cols-2 items-center py-5"
+              style={{ borderBottom: i < COMPARISONS.length - 1 ? '1px solid rgba(168,197,195,0.08)' : undefined }}
+            >
+              {/* Before */}
+              <div className="px-5 text-center">
+                <p className="text-sm leading-relaxed text-white">{item.before}</p>
+              </div>
+
+              {/* With Mlytics */}
+              <div className="px-5 text-center">
+                <p className="text-sm leading-relaxed text-white">{item.after}</p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
 
         {/* Result — large emerging text */}
         <div className="mt-20 text-center relative">

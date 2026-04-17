@@ -2,10 +2,22 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { Globe, Zap, PenLine, MessageSquare, Target } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const LAYERS = [
+const LAYERS: Array<{
+  Icon: LucideIcon
+  name: string
+  sublabel: string
+  audience: string
+  price: string
+  priceColor: string
+  desc: string
+  color: string
+  borderColor: string
+}> = [
   {
-    icon: '🌐',
+    Icon: Globe,
     name: 'Content Owner Traffic',
     sublabel: 'Raw attention',
     audience: 'Raw material',
@@ -16,7 +28,7 @@ const LAYERS = [
     borderColor: 'rgba(168,197,195,0.25)',
   },
   {
-    icon: '⚡',
+    Icon: Zap,
     name: 'Decisive Engine',
     sublabel: 'Route · Observe · Decide',
     audience: 'Developers / Tech',
@@ -27,7 +39,7 @@ const LAYERS = [
     borderColor: 'rgba(34,93,89,0.5)',
   },
   {
-    icon: '✍️',
+    Icon: PenLine,
     name: 'AI Q&A Widget',
     sublabel: 'Capture weak intent',
     audience: 'Content Owners',
@@ -38,7 +50,7 @@ const LAYERS = [
     borderColor: 'rgba(245,158,11,0.3)',
   },
   {
-    icon: '💬',
+    Icon: MessageSquare,
     name: 'Full Conversation',
     sublabel: 'Capture strong intent',
     audience: 'Content Owners + Brands',
@@ -49,7 +61,7 @@ const LAYERS = [
     borderColor: 'rgba(245,158,11,0.4)',
   },
   {
-    icon: '🎯',
+    Icon: Target,
     name: 'Lead Pilot',
     sublabel: 'Qualify · Deliver · Convert',
     audience: 'Brands',
@@ -120,10 +132,10 @@ export function IntentPipeline() {
                 }}
               >
                 <div
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-base z-10"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-10"
                   style={{ background: '#1A3D3A', border: `2px solid ${layer.borderColor}` }}
                 >
-                  {layer.icon}
+                  <layer.Icon size={15} strokeWidth={1.8} style={{ color: '#A8C5C3' }} />
                 </div>
 
                 <div className="flex-1 min-w-0">
