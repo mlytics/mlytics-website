@@ -1,5 +1,4 @@
 import { BrandComparison } from '@/components/pages/brands/BrandComparison'
-import { BrandMAUSection } from '@/components/pages/brands/BrandMAUSection'
 import { BrandPainSection } from '@/components/pages/brands/BrandPainSection'
 import { BrandWhoSection } from '@/components/pages/brands/BrandWhoSection'
 import { BrandGEOSection } from '@/components/pages/brands/BrandGEOSection'
@@ -32,11 +31,8 @@ export default function BrandsPage() {
       {/* Pain */}
       <BrandPainSection />
 
-      {/* 15M+ MAU proof */}
-      <BrandMAUSection />
-
       {/* Who it's for */}
-      <BrandWhoSection />
+      {/* <BrandWhoSection /> */}
 
       {/* GEO — primary sell */}
       <BrandGEOSection />
@@ -45,7 +41,7 @@ export default function BrandsPage() {
       <BrandComparison />
 
       {/* Lead Pilot */}
-      <BrandLeadPilot />
+      {/* <BrandLeadPilot /> */}
 
       <BrandPageCTA />
     </>

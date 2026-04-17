@@ -26,7 +26,7 @@ export function BrandComparison() {
             The Difference
           </span>
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
-            Intent vs. traditional CPM
+            Traditional CPM vs. Decision Engine
           </h2>
         </motion.div>
 
@@ -48,10 +48,10 @@ export function BrandComparison() {
               {/* Label bar */}
               <div
                 className="px-5 py-3 flex items-center justify-between border-b"
-                style={{ background: '#FFFFFF', borderColor: '#EEEEEE' }}
+                style={{ background: '#1f4f4b', borderColor: 'rgba(168,197,195,0.08)' }}
               >
-                <span className="text-sm font-bold" style={{ color: '#225D59' }}>{row.label}</span>
-                <span className="text-xs font-bold tabular-nums" style={{ color: '#225D59', opacity: 0.7 }}>
+                <span className="text-sm font-bold text-white">{row.label}</span>
+                <span className="text-xs font-bold tabular-nums" style={{ color: 'rgba(168,197,195,0.6)' }}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
               </div>

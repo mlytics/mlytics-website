@@ -215,9 +215,6 @@ export function BrandMAUSection() {
           <p className="text-base leading-relaxed" style={{ color: '#A8C5C3' }}>
             Your audience is already part of our network — across 15M+ MAU on managed content properties in finance, health, lifestyle, news, and technology.
           </p>
-          <p className="text-sm mt-4 leading-relaxed" style={{ color: 'rgba(168,197,195,0.55)' }}>
-            They moved to AI experiences. We're already there. And if your target vertical isn't covered yet, Mlytics acquires the content owners to build it.
-          </p>
         </div>
       </motion.div>
     </section>

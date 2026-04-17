@@ -1,4 +1,5 @@
 import { DeveloperPageCTA } from '@/components/pages/developers/DeveloperPageCTA'
+import { DeveloperSpecs } from '@/components/pages/developers/DeveloperSpecs'
 import { InfraPartners } from '@/components/pages/developers/InfraPartners'
 import { AILayerSection } from '@/components/pages/developers/AILayerSection'
 
@@ -27,33 +28,7 @@ export default function DevelopersPage() {
       </div>
 
       {/* Tech specs */}
-      <section className="section-white py-16 lg:py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
-              Performance Specs
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
-              Built for production-grade infrastructure.
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {[
-              { stat: '< 50ms',  label: 'P99 decision latency',          icon: '⚡' },
-              { stat: '20%',     label: 'TCO reduction baseline',         icon: '📉' },
-              { stat: '99.99%',  label: 'Reliability & SLA guarantee',    icon: '🛡️' },
-              { stat: '1 API',   label: 'Replaces multiple CDN contracts', icon: '🔌' },
-              { stat: '18+',     label: 'Countries in network',            icon: '🌏' },
-            ].map(item => (
-              <div key={item.label} className="text-center p-5 rounded-2xl border last:col-span-2 md:last:col-span-1" style={{ borderColor: '#E5E5E5' }}>
-                <span className="text-2xl block mb-2">{item.icon}</span>
-                <p className="text-xl font-bold mb-1" style={{ color: '#225D59' }}>{item.stat}</p>
-                <p className="text-xs" style={{ color: '#6B6B6B' }}>{item.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <DeveloperSpecs />
 
       {/* AI-era reframing */}
       <AILayerSection />

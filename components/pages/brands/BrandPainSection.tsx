@@ -74,7 +74,7 @@ export function BrandPainSection() {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#B45309' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9B9B9B' }}>
               CPM Performance
             </p>
             <p className="text-sm leading-relaxed mb-5" style={{ color: '#6B6B6B' }}>
@@ -143,7 +143,7 @@ export function BrandPainSection() {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#B45309' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9B9B9B' }}>
               Zero-Click Reality
             </p>
             <p className="text-sm leading-relaxed mb-5" style={{ color: '#6B6B6B' }}>
@@ -159,12 +159,12 @@ export function BrandPainSection() {
                 <motion.div
                   key={i}
                   className="flex items-center gap-4 px-4 py-3 rounded-xl"
-                  style={{ background: 'rgba(180,83,9,0.06)', border: '1px solid rgba(180,83,9,0.12)' }}
+                  style={{ background: '#FAFAFA', border: '1px solid #E5E5E5' }}
                   initial={{ opacity: 0, x: -12 }}
                   animate={inView ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.35, delay: 0.7 + i * 0.1 }}
                 >
-                  <span className="text-xl font-black shrink-0" style={{ color: '#B45309' }}>{item.stat}</span>
+                  <span className="text-xl font-black shrink-0" style={{ color: '#D97706' }}>{item.stat}</span>
                   <span className="text-xs leading-relaxed" style={{ color: '#6B6B6B' }}>{item.desc}</span>
                 </motion.div>
               ))}

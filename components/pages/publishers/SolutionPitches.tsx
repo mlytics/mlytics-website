@@ -67,10 +67,10 @@ export function SolutionPitches() {
               {/* Label bar */}
               <div
                 className="px-5 py-3 flex items-center justify-between border-b"
-                style={{ background: '#FFFFFF', borderColor: '#EEEEEE' }}
+                style={{ background: '#1f4f4b', borderColor: 'rgba(168,197,195,0.08)' }}
               >
-                <span className="text-sm font-bold" style={{ color: '#225D59' }}>{pitch.label}</span>
-                <span className="text-xs font-bold tabular-nums" style={{ color: pitch.accent, opacity: 0.7 }}>
+                <span className="text-sm font-bold text-white">{pitch.label}</span>
+                <span className="text-xs font-bold tabular-nums" style={{ color: 'rgba(168,197,195,0.6)' }}>
                   {pitch.num}
                 </span>
               </div>

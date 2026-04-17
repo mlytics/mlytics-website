@@ -88,15 +88,15 @@ export function IdentityCards() {
               {/* Hook */}
               <p className="text-sm leading-relaxed flex-1" style={{ color: '#6B6B6B', backfaceVisibility: 'hidden' }}>{card.hook}</p>
 
-              {/* Metrics */}
-              <div className="grid grid-cols-2 gap-2">
+              {/* Metrics — hidden */}
+              {/* <div className="grid grid-cols-2 gap-2">
                 {card.metrics.map((m, j) => (
                   <div key={j} className="px-3 py-2.5 rounded-xl" style={{ background: '#FAFAFA', border: '1px solid #E5E5E5' }}>
                     <p className="text-[10px] uppercase tracking-wider mb-0.5 whitespace-nowrap" style={{ color: '#9B9B9B' }}>{m.label}</p>
                     <p className="text-sm font-bold" style={{ color: card.accent }}>{m.value}</p>
                   </div>
                 ))}
-              </div>
+              </div> */}
 
               {/* CTA */}
               <Link

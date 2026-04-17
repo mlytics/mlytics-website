@@ -35,10 +35,7 @@ export function ZeroClickSection() {
             The zero-click economy<br />
             <span style={{ color: '#B45309' }}>is already here.</span>
           </h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: '#6B6B6B' }}>
-            LLM search now intercepts your readers before they reach your site.
-            Page views decline. Ad revenue follows.
-          </p>
+
         </motion.div>
 
         {/* Stat cards — staggered entrance + count-up */}

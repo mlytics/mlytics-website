@@ -128,7 +128,8 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
   function applyEngagedMaxH() {
     if (!dialogRef.current) return
     const rect = dialogRef.current.getBoundingClientRect()
-    const avail = window.innerHeight - rect.top - 24
+    const navH = window.innerWidth < 1024 ? 64 : 0
+    const avail = window.innerHeight - rect.top - navH - 24
     setDynamicMaxH(`${Math.max(400, Math.round(avail))}px`)
     engagedScrollYRef.current = window.scrollY
   }
@@ -181,12 +182,15 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
     // Synchronous rect capture before any React re-renders change the layout
     const rect = dialogRef.current.getBoundingClientRect()
 
+    // On mobile/tablet the nav stays visible (64px); on desktop it hides on scroll
+    const navH = window.innerWidth < 1024 ? 64 : 0
+
     // Set a safe immediate cap so the dialog doesn't grow unconstrained while scrolling
-    const immediateAvail = window.innerHeight - rect.top - 24
+    const immediateAvail = window.innerHeight - rect.top - navH - 24
     setDynamicMaxH(`${Math.max(300, Math.round(immediateAvail))}px`)
 
-    // Nav hides on scroll-down, so target a small top margin instead of reserving nav height
-    const scrollNeeded = rect.top - 16
+    // Reserve nav height as top margin on mobile/tablet; desktop nav hides so 16px is enough
+    const scrollNeeded = rect.top - navH - 16
     if (Math.abs(scrollNeeded) < 5) {
       applyEngagedMaxH()
       return

@@ -75,52 +75,41 @@ export function KnowledgeBaseSection() {
   }, [paused, active])
 
   return (
-    <section className="section-light py-16 lg:py-20 relative overflow-hidden">
+    <section className="section-dark py-16 lg:py-20 relative overflow-hidden" style={{ borderBottom: '1px solid rgba(168,197,195,0.12)' }}>
       {/* Background glow */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 700px 400px at 50% 65%, rgba(34,93,89,0.07) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 700px 400px at 50% 65%, rgba(34,93,89,0.2) 0%, transparent 70%)',
         }}
       />
-      {/* Decorative corner rings — viewport-relative sizing */}
+      {/* Decorative corner rings */}
       <div
         className="absolute rounded-full pointer-events-none"
-        style={{
-          width: '38vw', height: '38vw',
-          top: '-12vw', right: '-10vw',
-          border: '1px solid rgba(34,93,89,0.09)',
-        }}
+        style={{ width: '38vw', height: '38vw', top: '-12vw', right: '-10vw', border: '1px solid rgba(168,197,195,0.06)' }}
       />
       <div
         className="absolute rounded-full pointer-events-none"
-        style={{
-          width: '24vw', height: '24vw',
-          top: '-6vw', right: '-5vw',
-          border: '1px solid rgba(34,93,89,0.07)',
-        }}
+        style={{ width: '24vw', height: '24vw', top: '-6vw', right: '-5vw', border: '1px solid rgba(168,197,195,0.05)' }}
       />
       <div
         className="absolute rounded-full pointer-events-none"
-        style={{
-          width: '12vw', height: '12vw',
-          top: '-1vw', right: '0vw',
-          border: '1px solid rgba(34,93,89,0.05)',
-        }}
+        style={{ width: '12vw', height: '12vw', top: '-1vw', right: '0vw', border: '1px solid rgba(168,197,195,0.04)' }}
       />
+
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-10">
           <span
             className="inline-block text-xs font-semibold uppercase tracking-widest mb-3"
-            style={{ color: '#225D59' }}
+            style={{ color: 'rgba(168,197,195,0.55)' }}
           >
             AI Infrastructure
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Your Knowledge Base, Engineered.
           </h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: '#6B6B6B' }}>
+          <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
             Custom-built from your content. Structured, cross-referenced, and governed by your editorial standards.
           </p>
         </div>
@@ -129,15 +118,15 @@ export function KnowledgeBaseSection() {
         <div
           className="rounded-2xl overflow-hidden"
           style={{
-            border: '1px solid rgba(34,93,89,0.16)',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(34,93,89,0.09), 0 28px 48px rgba(34,93,89,0.07)',
+            border: '1px solid rgba(34,93,89,0.45)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2), 0 8px 24px rgba(34,93,89,0.2)',
           }}
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
           <div className="grid md:grid-cols-[260px_1fr]">
             {/* Left: step list */}
-            <div className="flex flex-col" style={{ borderRight: '1px solid rgba(34,93,89,0.1)', background: 'linear-gradient(160deg, rgba(34,93,89,0.06) 0%, rgba(34,93,89,0.02) 100%)' }}>
+            <div className="flex flex-col" style={{ borderRight: '1px solid rgba(168,197,195,0.12)', background: 'rgba(255,255,255,0.04)' }}>
               {STEPS.map((step, i) => {
                 const isActive = active === i
                 return (
@@ -146,25 +135,25 @@ export function KnowledgeBaseSection() {
                     onClick={() => setActive(i)}
                     className="w-full text-left px-5 py-4 md:py-0 transition-colors duration-200 relative flex flex-col justify-center md:flex-1"
                     style={{
-                      borderBottom: i < STEPS.length - 1 ? '1px solid rgba(34,93,89,0.08)' : undefined,
-                      background: isActive ? '#225D59' : 'transparent',
+                      borderBottom: i < STEPS.length - 1 ? '1px solid rgba(168,197,195,0.08)' : undefined,
+                      background: isActive ? 'rgba(34,93,89,0.55)' : 'transparent',
                     }}
                   >
                     <span
                       className="block text-[10px] font-bold tabular-nums mb-1"
-                      style={{ color: isActive ? 'rgba(255,255,255,0.5)' : '#D5D5D5', letterSpacing: '0.05em' }}
+                      style={{ color: isActive ? 'rgba(168,197,195,0.7)' : 'rgba(168,197,195,0.45)', letterSpacing: '0.05em' }}
                     >
                       0{i + 1}
                     </span>
-                    <span className="block text-xs font-semibold leading-snug" style={{ color: isActive ? '#FFFFFF' : '#9B9B9B' }}>
+                    <span className="block text-xs font-semibold leading-snug" style={{ color: isActive ? '#FFFFFF' : 'rgba(168,197,195,0.7)' }}>
                       {step.label}
                     </span>
                     {isActive && (
-                      <div className="mt-2.5 rounded-full overflow-hidden" style={{ height: 2, background: 'rgba(255,255,255,0.2)' }}>
+                      <div className="mt-2.5 rounded-full overflow-hidden" style={{ height: 2, background: 'rgba(168,197,195,0.15)' }}>
                         <motion.div
                           key={`bar-${i}`}
                           className="h-full rounded-full"
-                          style={{ background: 'rgba(255,255,255,0.8)' }}
+                          style={{ background: 'rgba(168,197,195,0.6)' }}
                           initial={{ width: '0%' }}
                           animate={{ width: paused ? undefined : '100%' }}
                           transition={{ duration: INTERVAL / 1000, ease: 'linear' }}
@@ -178,7 +167,7 @@ export function KnowledgeBaseSection() {
 
             {/* Right: content */}
             <div className="relative overflow-hidden" style={{ background: '#FFFFFF' }}>
-              {/* Invisible sizer — renders all steps to establish max natural height */}
+              {/* Invisible sizer */}
               {STEPS.map((step, si) => (
                 <div
                   key={si}
@@ -194,7 +183,7 @@ export function KnowledgeBaseSection() {
                     <p className="text-lg md:text-xl font-bold leading-snug mb-2">{step.label}</p>
                     <p className="text-sm leading-relaxed">{step.desc}</p>
                   </div>
-                  <div className="flex items-center justify-between pt-4 mt-6 md:mt-8" style={{ borderTop: '1px solid rgba(34,93,89,0.08)' }}>
+                  <div className="flex items-center justify-between pt-4 mt-6 md:mt-8" style={{ borderTop: '1px solid rgba(168,197,195,0.1)' }}>
                     <div className="flex items-center gap-1.5">
                       {STEPS.map((_, i) => <div key={i} style={{ width: 5, height: 5 }} />)}
                     </div>
@@ -260,11 +249,11 @@ export function KnowledgeBaseSection() {
 
         {/* Databricks credit */}
         <div className="flex items-center justify-center gap-2 mt-6">
-          <span className="text-xs" style={{ color: '#9B9B9B' }}>Enterprise infrastructure powered by</span>
+          <span className="text-xs" style={{ color: 'rgba(168,197,195,0.4)' }}>Enterprise infrastructure powered by</span>
           <img
             src="/logos/databricks.svg"
             alt="Databricks"
-            style={{ height: 18, width: 'auto', display: 'inline-block' }}
+            style={{ height: 18, width: 'auto', display: 'inline-block', filter: 'brightness(0) invert(1) opacity(0.4)' }}
           />
         </div>
       </div>
