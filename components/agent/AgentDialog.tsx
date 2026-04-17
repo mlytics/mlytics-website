@@ -12,11 +12,14 @@ interface AgentDialogProps {
   flow: AgentStep[]
   onComplete?: (persona: AgentPersona) => void
   variant?: 'hero' | 'page'
+  bottomPadding?: number
+  onEngage?: () => void
+  onReset?: () => void
 }
 
 type MessageItem = { role: 'agent' | 'user'; text: string; isTyping?: boolean }
 
-export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogProps) {
+export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding = 0, onEngage, onReset }: AgentDialogProps) {
   const { persona, setPersona, addHistory, setHeroCompleted } = useAgent()
   const { open: openContact } = useContactModal()
   const router = useRouter()
@@ -88,15 +91,65 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
     return () => clearInterval(interval)
   }, [stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-scroll the chat body to bottom on new content
+  // Auto-scroll: immediate (double-rAF) for new messages and demo mount
   useEffect(() => {
     const body = scrollBodyRef.current
-    if (body) body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
-  }, [messages, showInput])
+    if (!body) return
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
+      })
+    })
+  }, [messages, demoVisible])
+
+  // Auto-scroll: delayed for showInput — waits for pinned footer animation (200ms) to finish
+  useEffect(() => {
+    if (!showInput) return
+    const body = scrollBodyRef.current
+    if (!body) return
+    const timer = setTimeout(() => {
+      body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [showInput])
 
   useEffect(() => {
     setDemoComplete(false)
   }, [stepIdx])
+
+  // Auto-advance when demo finishes — no button needed
+  useEffect(() => {
+    if (!demoComplete) return
+    const timer = setTimeout(() => {
+      const next = stepIdx + 1
+      if (next < flow.length) {
+        setMessages(prev => [
+          ...prev,
+          { role: 'agent', text: '', isTyping: true },
+        ])
+        setStepIdx(next)
+      } else {
+        onComplete?.(persona)
+      }
+    }, 600)
+    return () => clearTimeout(timer)
+  }, [demoComplete]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-advance for 'message' steps — no user interaction needed
+  useEffect(() => {
+    if (currentStep.inputType !== 'message' || !showInput) return
+    const timer = setTimeout(() => {
+      const next = stepIdx + 1
+      if (next < flow.length) {
+        setMessages(prev => [
+          ...prev,
+          { role: 'agent', text: '', isTyping: true },
+        ])
+        setStepIdx(next)
+      }
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // When the demo step's typewriter finishes (showInput becomes true on the demo step),
   // record the message index and mark the demo as permanently visible.
@@ -113,7 +166,7 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
     function update() {
       if (!dialogRef.current || engaged) return
       const rect = dialogRef.current.getBoundingClientRect()
-      const available = window.innerHeight - rect.top - 24
+      const available = window.innerHeight - rect.top - bottomPadding - 24
       setDynamicMaxH(`${Math.max(220, Math.round(available))}px`)
     }
     // Only do the initial position calculation on mount, NOT when transitioning
@@ -128,8 +181,7 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
   function applyEngagedMaxH() {
     if (!dialogRef.current) return
     const rect = dialogRef.current.getBoundingClientRect()
-    const navH = window.innerWidth < 1024 ? 64 : 0
-    const avail = window.innerHeight - rect.top - navH - 24
+    const avail = window.innerHeight - rect.top - bottomPadding - 24
     setDynamicMaxH(`${Math.max(400, Math.round(avail))}px`)
     engagedScrollYRef.current = window.scrollY
   }
@@ -146,6 +198,7 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
     // Reset to a safe idle height — the height management effect won't overwrite
     // this because wasEngagedRef prevents it from recalculating on un-engage.
     setDynamicMaxH('60vh')
+    onReset?.()
   }
 
   // Collapse and reset when user scrolls significantly upward past the engagement point
@@ -172,6 +225,7 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
   function engageAndScroll() {
     if (engaged) return
     setEngaged(true)
+    onEngage?.()
 
     if (!dialogRef.current) return
 
@@ -185,9 +239,9 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
     // On mobile/tablet the nav stays visible (64px); on desktop it hides on scroll
     const navH = window.innerWidth < 1024 ? 64 : 0
 
-    // Set a safe immediate cap so the dialog doesn't grow unconstrained while scrolling
-    const immediateAvail = window.innerHeight - rect.top - navH - 24
-    setDynamicMaxH(`${Math.max(300, Math.round(immediateAvail))}px`)
+    // Do NOT change maxHeight here — growing the dialog before scrolling causes the
+    // flex justify-center container to re-center it upward, shifting rect.top under the nav.
+    // The dialog keeps its idle size during the scroll; applyEngagedMaxH expands it after.
 
     // Reserve nav height as top margin on mobile/tablet; desktop nav hides so 16px is enough
     const scrollNeeded = rect.top - navH - 16
@@ -225,12 +279,6 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
 
     if (currentStep.id === 'step1-persona') {
       setPersona(userValue as AgentPersona)
-    }
-
-    if (currentStep.id === 'step2-demo-choice' && userValue === 'custom') {
-      setMessages(prev => [...prev, { role: 'user', text: userLabel }])
-      setShowUrlInput(true)
-      return
     }
 
     if (currentStep.inputType === 'cta') {
@@ -288,10 +336,12 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
   const borderColor = isDark ? 'rgba(34,93,89,0.7)' : '#E5E5E5'
   const bg = isDark ? 'rgba(18,46,44,0.88)' : 'rgba(255,255,255,0.97)'
 
+  const stepOptions =
+    (persona && currentStep.personalizedOptions?.[persona]) ?? currentStep.options
+
   const showPills = showInput && currentStep.inputType === 'pills' && !showUrlInput
   const showCta = showInput && ctaStep && ctaOption && !showUrlInput
-  const showDemoContinue = currentStep.inputType === 'demo' && demoComplete
-  const hasInputContent = showPills || showCta || showUrlInput || showDemoContinue
+  const hasInputContent = showPills || showCta || showUrlInput
 
   // Last agent message (used in initial/idle layout)
   const lastMsg = messages[messages.length - 1]
@@ -359,9 +409,9 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
           {/* Pills inline in the initial view */}
           {showPills && (
             <div className="px-4 pb-4 flex flex-wrap gap-2">
-              {currentStep.options?.map(opt => (
+              {stepOptions?.map(opt => (
                 <button
-                  key={opt.value}
+                  key={opt.label}
                   onClick={() => advance(opt.label, opt.value)}
                   className={isDark ? 'pill-btn pill-btn--dark' : 'pill-btn'}
                 >
@@ -411,6 +461,8 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
                   <div className="mt-1">
                     <ArticleScanDemo
                       isDark={isDark}
+                      articleId={persona === 'publisher' || persona === 'brand' || persona === 'developer' ? 'media-ai' : undefined}
+                      showIntentStrength={persona === 'brand' || persona === 'developer'}
                       onProgress={() => {
                         const body = scrollBodyRef.current
                         if (body) body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
@@ -444,9 +496,9 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
               >
                 {showPills && (
                   <div className="flex flex-wrap gap-2">
-                    {currentStep.options?.map(opt => (
+                    {stepOptions?.map(opt => (
                       <button
-                        key={opt.value}
+                        key={opt.label}
                         onClick={() => advance(opt.label, opt.value)}
                         className={isDark ? 'pill-btn pill-btn--dark' : 'pill-btn'}
                       >
@@ -494,29 +546,6 @@ export function AgentDialog({ flow, onComplete, variant = 'hero' }: AgentDialogP
                   </button>
                 )}
 
-                {showDemoContinue && (
-                  <motion.button
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    onClick={() => {
-                      const next = stepIdx + 1
-                      if (next < flow.length) {
-                        setMessages(prev => [
-                          ...prev,
-                          { role: 'agent', text: '', isTyping: true },
-                        ])
-                        setStepIdx(next)
-                      } else {
-                        onComplete?.(persona)
-                      }
-                    }}
-                    className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                    style={{ background: '#225D59' }}
-                  >
-                    See what this means for you →
-                  </motion.button>
-                )}
               </motion.div>
             )}
           </AnimatePresence>

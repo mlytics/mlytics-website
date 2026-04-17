@@ -5,8 +5,9 @@ export type AgentPersona = 'publisher' | 'brand' | 'developer' | null
 export type AgentStep = {
   id: string
   agentMessage: string
-  inputType: 'pills' | 'text-input' | 'demo' | 'cta'
+  inputType: 'pills' | 'text-input' | 'demo' | 'cta' | 'message'
   options?: { label: string; value: string }[]
+  personalizedOptions?: Record<string, { label: string; value: string }[]>
   ctaLabel?: string
   ctaHref?: string
   isDemo?: boolean
@@ -21,50 +22,79 @@ export const HERO_FLOW: AgentStep[] = [
     agentMessage: "Hi, I'm the Mlytics Decision Engine.\nWhat's the most pressing problem you want to solve?",
     inputType: 'pills',
     options: [
-      { label: 'Help my content earn more revenue', value: 'publisher' },
-      { label: 'Find users who actually want to buy', value: 'brand' },
-      { label: 'Reduce infrastructure costs', value: 'developer' },
+      { label: "Content isn't earning enough", value: 'publisher' },
+      { label: 'Ads miss purchase-ready users', value: 'brand' },
+      { label: 'Infrastructure lacks AI', value: 'developer' },
     ],
   },
   {
-    id: 'step2-demo-choice',
-    agentMessage: "Let me show you what the Decision Engine does.\nPaste an article URL, or I'll use a sample article to demo.",
-    inputType: 'pills',
-    options: [
-      { label: 'Show me with a sample article', value: 'demo' },
-      { label: 'Paste my article URL', value: 'custom' },
-    ],
+    id: 'step2-intro',
+    agentMessage: "Let me show you what the Decision Engine does.",
+    inputType: 'message',
   },
   {
     id: 'step3-scan',
-    agentMessage: 'Analyzing the article\'s content structure and reader intent signals...',
+    agentMessage: "Analyzing the article's content structure and reader intent signals...",
     inputType: 'demo',
     isDemo: true,
   },
   {
     id: 'step4-personalized',
     agentMessage: '',
-    inputType: 'pills',
+    inputType: 'message',
     personalizedMessages: {
       publisher:
-        'Each of these 5 follow-up articles is an entry point to capture reader intent. Human writing costs $250/piece. Decision Engine costs $0.10. How many articles can your site produce per month?',
+        'Each of these 5 follow-up articles is an entry point to capture reader intent. Human writing costs $250/piece. Decision Engine costs $0.10.',
       brand:
-        '2 of these 5 questions are strong intent signals — readers actively comparing products, ready to decide. That\'s where your ads should appear, not on pages with no purchase intent.',
+        '2 of these 5 questions are strong intent signals — readers actively comparing products, ready to decide. We embed these intent questions across content owner pages. When a reader clicks, Decision Engine captures the signal and places your brand exactly where purchase intent is highest.',
       developer:
         'This entire flow — article analysis, content generation, intent classification — runs on Decisive Engine with decision latency < 50ms. Can your current infrastructure do this?',
     },
-    options: [
-      { label: 'Continue', value: 'continue' },
-    ],
+  },
+  {
+    id: 'step4b-question',
+    agentMessage: '',
+    inputType: 'pills',
+    personalizedMessages: {
+      publisher: 'How many articles can your site produce per month?',
+      brand:     'Which verticals do you primarily focus on?',
+      developer: 'What\'s your approximate monthly CDN spend?',
+    },
+    personalizedOptions: {
+      publisher: [
+        { label: '100+',  value: 'continue' },
+        { label: '300+',  value: 'continue' },
+        { label: '700+',  value: 'continue' },
+        { label: '1000+', value: 'continue' },
+        { label: '5000+', value: 'continue' },
+        { label: '10K+',  value: 'continue' },
+      ],
+      brand: [
+        { label: 'BFSI',                  value: 'continue' },
+        { label: 'FMCG',                  value: 'continue' },
+        { label: 'Automotive',            value: 'continue' },
+        { label: 'Tech & Telco',          value: 'continue' },
+        { label: 'Travel & Hospitality',  value: 'continue' },
+        { label: 'Real Estate',           value: 'continue' },
+        { label: 'Health & Wellness',     value: 'continue' },
+        { label: 'Luxury & Fashion',      value: 'continue' },
+      ],
+      developer: [
+        { label: '< $500/mo',      value: 'continue' },
+        { label: '$500–$2K/mo',    value: 'continue' },
+        { label: '$2K–$10K/mo',    value: 'continue' },
+        { label: '$10K+/mo',       value: 'continue' },
+      ],
+    },
   },
   {
     id: 'step5-cta',
     agentMessage: '',
     inputType: 'cta',
     personalizedMessages: {
-      publisher: "Let's look at the content owner plan — see how every piece of content becomes a revenue source.",
-      brand: "Let's look at the brand plan — calculate how many of your target audience are in our 4M WAU network.",
-      developer: "Let's look at the developer plan — calculate your infrastructure savings in 30 seconds.",
+      publisher: "Your content is already generating intent signals — across 15M+ MAU. Let's start capturing them.",
+      brand: "Your audience is already in our network — 15M+ MAU, intent-classified. Let's put your brand in front of them.",
+      developer: "Every delivery decision you make could feed an AI flywheel — at <50ms, across 15M+ MAU. Let's show you how.",
     },
     options: [
       { label: 'See content owner plan', value: '/content-owners' },
@@ -179,6 +209,7 @@ export type DemoArticle = {
   title: string
   excerpt: string
   category: string
+  url?: string
 }
 
 export type DemoQuestion = {
@@ -193,10 +224,18 @@ export type DemoExtArticle = {
   summary: string
   cost: string
   intentType: string
+  intentStrength?: 'weak' | 'medium' | 'strong'
   url?: string
 }
 
 export const DEMO_ARTICLES: DemoArticle[] = [
+  {
+    id: 'media-ai',
+    title: 'How Can AI Optimize Digital Assets For Media In Southeast Asia?',
+    excerpt: 'In the fast-evolving media landscape of Southeast Asia, AI is revolutionizing how digital assets are managed and optimized — from content creation to distribution and monetization.',
+    category: 'Media & Technology',
+    url: 'https://www.mlytics.com/blog/how-can-ai-optimize-digital-assets-for-media-in-southeast-asia/',
+  },
   {
     id: 'aws-datacenter',
     title: '資料中心首成戰場目標？AWS中東設施停擺',
@@ -255,6 +294,13 @@ export const DEMO_QUESTIONS: Record<string, DemoQuestion[]> = {
 }
 
 export const DEMO_EXT_ARTICLES: Record<string, DemoExtArticle[]> = {
+  'media-ai': [
+    { id: 'a1', title: 'How does AI automate content creation for Southeast Asian media?', summary: 'Exploring machine learning tools that generate articles, summaries, and social posts at scale', cost: '$0.10', intentType: 'Informational', intentStrength: 'weak',   url: 'https://ai.mlyticsaigc.com/answer/how-does-ai-29574668?utm_content=question-29574668&_gl=1*1yiiqlo*_ga*MzM2MjY5NzA0LjE3NzM2NDQ0MjY.*_ga_GVHKX7L2G4*czE3NzY0MTE3NDIkbzIwJGcxJHQxNzc2NDExNzUzJGo0OSRsMCRoMA..' },
+    { id: 'a2', title: 'What role does AI play in personalizing content for users in Malaysia and Singapore?', summary: 'How AI analyzes user data to curate recommendations and drive engagement on streaming platforms', cost: '$0.10', intentType: 'Informational', intentStrength: 'weak',   url: 'https://ai.mlyticsaigc.com/answer/what-role-does-29574669?utm_content=question-29574669&_gl=1*1yiiqlo*_ga*MzM2MjY5NzA0LjE3NzM2NDQ0MjY.*_ga_GVHKX7L2G4*czE3NzY0MTE3NDIkbzIwJGcxJHQxNzc2NDExNzUzJGo0OSRsMCRoMA..' },
+    { id: 'a3', title: 'How does AI enrichment of metadata improve digital asset management?', summary: 'Automatic tagging, categorization, and version control to streamline vast media libraries', cost: '$0.10', intentType: 'Practical',    intentStrength: 'medium', url: 'https://ai.mlyticsaigc.com/answer/how-does-ai-29574670?utm_content=question-29574670&_gl=1*1yiiqlo*_ga*MzM2MjY5NzA0LjE3NzM2NDQ0MjY.*_ga_GVHKX7L2G4*czE3NzY0MTE3NDIkbzIwJGcxJHQxNzc2NDExNzUzJGo0OSRsMCRoMA..' },
+    { id: 'a4', title: 'What are the primary data privacy concerns for AI in Southeast Asian media?', summary: 'Navigating PDPA and PDPC compliance while leveraging AI-driven personalization at scale', cost: '$0.10', intentType: 'Decision',      intentStrength: 'strong', url: 'https://ai.mlyticsaigc.com/answer/what-are-the-29574671?utm_content=question-29574671&_gl=1*1yiiqlo*_ga*MzM2MjY5NzA0LjE3NzM2NDQ0MjY.*_ga_GVHKX7L2G4*czE3NzY0MTE3NDIkbzIwJGcxJHQxNzc2NDExNzUzJGo0OSRsMCRoMA..' },
+    { id: 'a5', title: 'How does AI-powered automated metadata generation streamline asset searchability?', summary: 'Reducing manual tagging effort while making media archives instantly searchable and retrievable', cost: '$0.10', intentType: 'Solution', intentStrength: 'strong', url: 'https://ai.mlyticsaigc.com/answer/how-does-aipowered-29574672?utm_content=question-29574672&_gl=1*1yiiqlo*_ga*MzM2MjY5NzA0LjE3NzM2NDQ0MjY.*_ga_GVHKX7L2G4*czE3NzY0MTE3NDIkbzIwJGcxJHQxNzc2NDExNzUzJGo0OSRsMCRoMA..' },
+  ],
   'aws-datacenter': [
     { id: 'a1', title: 'AWS 阿聯設施遭攻擊，是否意味著資料中心開始成為軍事目標？', summary: '分析此次事件的軍事意涵，以及資料中心在現代衝突中扮演的新角色', cost: '$0.10', intentType: 'Analysis', url: 'https://news.cnyes.com/news/aigc/answer/aws-%E9%98%BF%E8%81%AF-22953420?utm_content=question-22953420' },
     { id: 'a2', title: '這次 AWS 中東設施停擺，將對該地區的 AI 運算和科技投資帶來什麼衝擊？', summary: '評估對微軟、Google、甲骨文等在阿聯 AI 基礎建設投資計畫的連鎖影響', cost: '$0.10', intentType: 'Impact', url: 'https://news.cnyes.com/news/aigc/answer/%E9%80%99%E6%AC%A1-aws-22953421?utm_content=question-22953421' },

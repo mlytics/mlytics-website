@@ -30,16 +30,16 @@ export function FlywheelSection() {
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section className="section-dark py-20 lg:py-28">
+    <section className="section-dark py-20 lg:py-28 overflow-x-hidden">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left: flywheel — contain layout+paint so SVG overflow:visible never shifts right column */}
-          <div style={{ contain: 'layout paint' }}>
+          {/* Left: flywheel */}
+          <div>
             <FlywheelDiagram />
           </div>
 
           {/* Right: copy */}
-          <div ref={ref}>
+          <div ref={ref} className="min-w-0">
             <motion.span
               className="inline-block text-xs font-semibold uppercase tracking-widest mb-4"
               style={{ color: 'rgba(168,197,195,0.55)' }}
@@ -100,7 +100,7 @@ export function FlywheelSection() {
                 <div
                   className="font-black tabular-nums leading-none"
                   style={{
-                    fontSize: 'clamp(3rem, 8vw, 5.5rem)',
+                    fontSize: 'clamp(2.5rem, 7vw, 4.5rem)',
                     letterSpacing: '-0.04em',
                     color: '#FAFAFA',
                     lineHeight: 1,

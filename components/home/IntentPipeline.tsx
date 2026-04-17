@@ -151,26 +151,19 @@ export function IntentPipeline() {
                 <span className="shrink-0 text-xs font-semibold" style={{ color: layer.priceColor }}>{layer.price}</span>
               </motion.div>
 
-              {/*
-                grid-template-rows: 0fr ↔ 1fr uses the actual content height as 1fr.
-                Both closing and opening animate over the same real pixel height,
-                so their sum is always constant → zero net layout shift.
-              */}
-              <div
-                className="pl-14 pr-4"
-                style={{
-                  display: 'grid',
-                  gridTemplateRows: isOpen ? '1fr' : '0fr',
+              <motion.div
+                className="pl-14 pr-4 overflow-hidden"
+                initial={false}
+                animate={{
+                  height: isOpen ? 'auto' : 0,
                   opacity: isOpen ? 1 : 0,
-                  transition: 'grid-template-rows 0.35s ease-in-out, opacity 0.25s ease-in-out',
                 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
               >
-                <div style={{ overflow: 'hidden' }}>
-                  <p className="text-xs py-2 leading-relaxed" style={{ color: 'rgba(168,197,195,0.85)' }}>
-                    {layer.desc}
-                  </p>
-                </div>
-              </div>
+                <p className="text-xs py-2 leading-relaxed" style={{ color: 'rgba(168,197,195,0.85)' }}>
+                  {layer.desc}
+                </p>
+              </motion.div>
 
             </div>
           )

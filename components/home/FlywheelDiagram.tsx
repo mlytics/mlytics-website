@@ -28,7 +28,7 @@ export function FlywheelDiagram() {
   return (
     <div className="flex items-center justify-center py-2">
       <svg
-        viewBox="0 0 400 420"
+        viewBox="-40 0 480 420"
         className="w-full max-w-sm lg:max-w-none"
         style={{ overflow: 'visible' }}
       >

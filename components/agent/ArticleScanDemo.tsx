@@ -12,11 +12,13 @@ type Phase = 'scanning' | 'articles' | 'done'
 interface ArticleScanDemoProps {
   articleId?: string
   isDark?: boolean
+  showIntentStrength?: boolean
+  showMetadata?: boolean
   onComplete: () => void
   onProgress?: () => void
 }
 
-export function ArticleScanDemo({ articleId = DEFAULT_DEMO_ARTICLE_ID, isDark = true, onComplete, onProgress }: ArticleScanDemoProps) {
+export function ArticleScanDemo({ articleId = DEFAULT_DEMO_ARTICLE_ID, isDark = true, showIntentStrength = false, showMetadata = true, onComplete, onProgress }: ArticleScanDemoProps) {
   const textPrimary = isDark ? '#FAFAFA' : '#1A1A1A'
   const textSecondary = isDark ? '#A8C5C3' : '#5A5A5A'
   const cardBg = isDark ? 'rgba(34,93,89,0.08)' : 'rgba(34,93,89,0.06)'
@@ -82,9 +84,21 @@ export function ArticleScanDemo({ articleId = DEFAULT_DEMO_ARTICLE_ID, isDark = 
             Analyzing content structure…
           </span>
         </div>
-        <p className="text-xs font-medium leading-snug text-left" style={{ color: textPrimary }}>
-          {article.title}
-        </p>
+        {article.url ? (
+          <a
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-xs font-medium leading-snug text-left hover:opacity-75 transition-opacity"
+            style={{ color: textPrimary }}
+          >
+            {article.title}
+          </a>
+        ) : (
+          <p className="text-xs font-medium leading-snug text-left" style={{ color: textPrimary }}>
+            {article.title}
+          </p>
+        )}
         <div className="mt-2.5 h-1 rounded-full overflow-hidden" style={{ background: trackBg }}>
           <motion.div
             className="h-full rounded-full"
@@ -121,10 +135,24 @@ export function ArticleScanDemo({ articleId = DEFAULT_DEMO_ARTICLE_ID, isDark = 
                       {a.summary}
                     </p>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <p className="text-xs font-bold" style={{ color: '#F59E0B' }}>{a.cost}</p>
-                    <p className="text-[9px]" style={{ color: textSecondary }}>Cost</p>
-                  </div>
+                  {showMetadata && <div className="shrink-0 text-right">
+                    {showIntentStrength && a.intentStrength ? (
+                      <span
+                        className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full whitespace-nowrap"
+                        style={{
+                          background: a.intentStrength === 'strong' ? 'rgba(34,197,94,0.15)' : a.intentStrength === 'medium' ? 'rgba(245,158,11,0.15)' : 'rgba(156,163,175,0.15)',
+                          color: a.intentStrength === 'strong' ? '#16a34a' : a.intentStrength === 'medium' ? '#d97706' : '#6b7280',
+                        }}
+                      >
+                        {a.intentStrength === 'strong' ? 'High Intent' : a.intentStrength === 'medium' ? 'Mid Intent' : 'Low Intent'}
+                      </span>
+                    ) : (
+                      <>
+                        <p className="text-xs font-bold" style={{ color: '#F59E0B' }}>{a.cost}</p>
+                        <p className="text-[9px]" style={{ color: textSecondary }}>Cost</p>
+                      </>
+                    )}
+                  </div>}
                 </>
               )
               const cardStyle = { background: extBg, border: `1px solid ${extBorder}` }

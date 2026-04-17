@@ -22,6 +22,7 @@ export function HeroSection() {
   const { open } = useContactModal()
   const spacerRef = useRef<HTMLDivElement>(null) // keeps layout space for the fixed marquee
   const [isFixed, setIsFixed] = useState(true)
+  const [dialogEngaged, setDialogEngaged] = useState(false)
   const [wordIdx, setWordIdx] = useState(0)
 
   function handleComplete(persona: AgentPersona) {
@@ -66,7 +67,7 @@ export function HeroSection() {
         />
       </div>
 
-      {/* Main content — vertically centred, single column */}
+      {/* Main content — vertically centred */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-[96px] pb-8">
         <div className="max-w-3xl w-full mx-auto flex flex-col items-center text-center">
 
@@ -145,9 +146,16 @@ export function HeroSection() {
             </button>
           </div>
 
-          {/* Agent Dialog */}
-          <div className="w-full">
-            <AgentDialog flow={HERO_FLOW} onComplete={handleComplete} variant="page" />
+          {/* Agent Dialog — sticky when engaged so flex re-centering can't push it behind the nav */}
+          <div className={dialogEngaged ? 'w-full sticky top-20 lg:top-4 z-20' : 'w-full'}>
+            <AgentDialog
+              flow={HERO_FLOW}
+              onComplete={handleComplete}
+              variant="page"
+              bottomPadding={0}
+              onEngage={() => setDialogEngaged(true)}
+              onReset={() => setDialogEngaged(false)}
+            />
           </div>
 
         </div>
@@ -156,9 +164,9 @@ export function HeroSection() {
       {/* Spacer — reserves marquee height so content isn't hidden behind it */}
       <div ref={spacerRef} className="h-14" />
 
-      {/* Logo marquee — fixed at viewport bottom until spacer scrolls into view */}
+      {/* Logo marquee — fixed at viewport bottom when at top of page; slides down when dialog is engaged */}
       <div
-        className={`h-14 ${isFixed ? 'fixed bottom-0 left-0 right-0 z-40' : 'absolute bottom-0 left-0 right-0'}`}
+        className={`h-14 transition-transform duration-300 ease-in-out ${dialogEngaged ? 'translate-y-full' : 'translate-y-0'} ${isFixed ? 'fixed bottom-0 left-0 right-0 z-40' : 'absolute bottom-0 left-0 right-0'}`}
       >
         <LogoMarquee isFixed={isFixed} />
       </div>
