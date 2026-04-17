@@ -60,13 +60,17 @@ function ClientLogo({ name, logo, invert, brightness, opacity, maxWidth, height 
   )
 }
 
-export function LogoMarquee() {
+export function LogoMarquee({ isFixed = false }: { isFixed?: boolean }) {
   const doubled = [...CLIENTS, ...CLIENTS]
 
   return (
     <div
       className="h-full flex flex-col justify-center md:flex-row md:items-center"
-      style={{ background: '#FFFFFF' }}
+      style={{
+        background: '#FFFFFF',
+        paddingBottom: 0,
+        paddingTop: 0,
+      }}
     >
       {/* Label — above on mobile, left on desktop */}
       <div className="flex-shrink-0 flex flex-col items-center md:flex-row md:items-center md:gap-3 md:px-5 mb-1.5 md:mb-0">

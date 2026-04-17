@@ -154,14 +154,13 @@ export function HeroSection() {
       </div>
 
       {/* Spacer — reserves marquee height so content isn't hidden behind it */}
-      <div ref={spacerRef} style={{ height: MARQUEE_H }} />
+      <div ref={spacerRef} className="h-14" />
 
       {/* Logo marquee — fixed at viewport bottom until spacer scrolls into view */}
       <div
-        style={{ height: MARQUEE_H }}
-        className={isFixed ? 'fixed bottom-0 left-0 right-0 z-40' : 'absolute bottom-0 left-0 right-0'}
+        className={`h-14 ${isFixed ? 'fixed bottom-0 left-0 right-0 z-40' : 'absolute bottom-0 left-0 right-0'}`}
       >
-        <LogoMarquee />
+        <LogoMarquee isFixed={isFixed} />
       </div>
     </section>
   )

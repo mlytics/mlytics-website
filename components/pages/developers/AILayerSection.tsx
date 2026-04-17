@@ -57,7 +57,7 @@ export function AILayerSection() {
   const showBackdrop = isStuck && !isDesktop
 
   return (
-    <section className="section-dark py-16 lg:py-20 relative overflow-hidden">
+    <section className="section-dark py-16 lg:py-20 relative overflow-clip">
       {/* Background glow */}
       <div
         className="absolute inset-0 pointer-events-none"

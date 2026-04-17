@@ -15,8 +15,7 @@ export function DeveloperPageCTA() {
         </p>
         <button
           onClick={open}
-          className="px-8 py-3.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-          style={{ background: '#225D59' }}
+          className="px-8 py-3.5 rounded-full text-sm font-semibold text-[#225D59] bg-white hover:bg-gray-100 transition-all active:scale-[0.98]"
         >
           Get a Personalized Demo
         </button>
