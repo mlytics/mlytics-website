@@ -150,6 +150,7 @@ export function HeroSection() {
           <div className={dialogEngaged ? 'w-full sticky top-20 lg:top-4 z-20' : 'w-full'}>
             <AgentDialog
               flow={HERO_FLOW}
+              mode="cortex"
               onComplete={handleComplete}
               variant="page"
               bottomPadding={0}
