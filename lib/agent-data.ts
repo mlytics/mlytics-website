@@ -5,13 +5,101 @@ export type AgentPersona = 'publisher' | 'brand' | 'developer' | null
 export type AgentStep = {
   id: string
   agentMessage: string
-  inputType: 'pills' | 'text-input' | 'demo' | 'cta' | 'message'
+  inputType: 'pills' | 'text-input' | 'demo' | 'cta' | 'message' | 'product-card'
   options?: { label: string; value: string }[]
   personalizedOptions?: Record<string, { label: string; value: string }[]>
   ctaLabel?: string
   ctaHref?: string
   isDemo?: boolean
   personalizedMessages?: Record<string, string>
+  collectsStylistAnswer?: boolean
+}
+
+// ─── Stylist Types & Data ─────────────────────────────────────────────────────
+
+export type StylistProduct = {
+  brand: string
+  name: string
+  priceNTD: string
+  tags: {
+    style: string[]
+    recipient: string[]
+    budget: string[]
+  }
+  stylistNote: string
+}
+
+export const STYLIST_PRODUCTS: StylistProduct[] = [
+  {
+    brand: 'Coach',
+    name: 'Pillow Tabby 18',
+    priceNTD: 'NT$14,800',
+    tags: { style: ['elegant', 'classic'], recipient: ['mom', 'gift'], budget: ['mid', 'top'] },
+    stylistNote: 'That cloud-like quilting isn\'t just soft — it signals taste without trying. The bag that quietly owns the room.',
+  },
+  {
+    brand: 'Kate Spade New York',
+    name: 'Sam Icon Mini',
+    priceNTD: 'NT$9,800',
+    tags: { style: ['trendy', 'classic'], recipient: ['self', 'gift'], budget: ['entry', 'mid'] },
+    stylistNote: 'Playful but never frivolous. The spade emblem does the talking so she doesn\'t have to.',
+  },
+  {
+    brand: 'Longchamp',
+    name: 'Le Pliage Original L',
+    priceNTD: 'NT$5,500',
+    tags: { style: ['classic', 'minimal'], recipient: ['mom', 'self'], budget: ['entry'] },
+    stylistNote: 'Forty years of Parisian pragmatism. Folds flat, holds everything, and never feels out of place.',
+  },
+  {
+    brand: 'Michael Kors',
+    name: 'Jet Set MD TZ Tote',
+    priceNTD: 'NT$12,800',
+    tags: { style: ['classic', 'minimal'], recipient: ['mom', 'gift'], budget: ['mid'] },
+    stylistNote: 'Structured and spacious. The bag that makes a busy schedule look effortless.',
+  },
+  {
+    brand: 'Mulberry',
+    name: 'Bayswater Mini',
+    priceNTD: 'NT$19,800',
+    tags: { style: ['elegant', 'refined'], recipient: ['mom', 'gift'], budget: ['top'] },
+    stylistNote: 'British heritage, compact form. For someone who appreciates craft over logo.',
+  },
+  {
+    brand: 'Furla',
+    name: 'Camelia Mini Tote',
+    priceNTD: 'NT$11,500',
+    tags: { style: ['trendy', 'elegant'], recipient: ['self', 'mom'], budget: ['mid'] },
+    stylistNote: 'Italian sensibility meets modern edge. The one that grows a collection from zero to curated.',
+  },
+]
+
+export function getStylistRecommendation(answers: string[]): StylistProduct {
+  const [recipientAns = '', styleAns = '', budgetAns = ''] = answers
+
+  const recipientKey =
+    recipientAns.includes('mom') ? 'mom' :
+    recipientAns.includes('myself') ? 'self' : 'gift'
+
+  const styleKey =
+    styleAns.includes('Classic') ? 'classic' :
+    styleAns.includes('Elegant') ? 'elegant' :
+    styleAns.includes('Bold') ? 'trendy' : 'classic'
+
+  const budgetKey =
+    budgetAns.includes('10,000') && budgetAns.includes('Under') ? 'entry' :
+    budgetAns.includes('15,000') ? 'mid' : 'top'
+
+  const scored = STYLIST_PRODUCTS.map(p => ({
+    product: p,
+    score:
+      (p.tags.recipient.includes(recipientKey) ? 2 : 0) +
+      (p.tags.style.includes(styleKey) ? 2 : 0) +
+      (p.tags.budget.includes(budgetKey) ? 3 : 0),
+  }))
+
+  scored.sort((a, b) => b.score - a.score)
+  return scored[0].product
 }
 
 // ─── Hero Flow (5 steps) ────────────────────────────────────────────────────
@@ -332,3 +420,62 @@ export const DEMO_EXT_ARTICLES: Record<string, DemoExtArticle[]> = {
 }
 
 export const DEFAULT_DEMO_ARTICLE_ID = 'aws-datacenter'
+
+// ─── Stylist Flow ─────────────────────────────────────────────────────────────
+
+export const STYLIST_FLOW: AgentStep[] = [
+  {
+    id: 'stylist-intro',
+    agentMessage: "Hi! I'm your Bella Style Advisor ✦\nI've read this article. Let me find the right bag for you in 30 seconds.",
+    inputType: 'message',
+  },
+  {
+    id: 'stylist-recipient',
+    agentMessage: "Who are you buying this for?",
+    inputType: 'pills',
+    collectsStylistAnswer: true,
+    options: [
+      { label: 'For my mom', value: 'mom' },
+      { label: 'For myself', value: 'self' },
+      { label: 'As a gift', value: 'gift' },
+    ],
+  },
+  {
+    id: 'stylist-style',
+    agentMessage: "How would you describe her style?",
+    inputType: 'pills',
+    collectsStylistAnswer: true,
+    options: [
+      { label: 'Understated & Classic', value: 'classic' },
+      { label: 'Elegant & Refined', value: 'elegant' },
+      { label: 'Bold & Contemporary', value: 'trendy' },
+    ],
+  },
+  {
+    id: 'stylist-budget',
+    agentMessage: "What's your budget?",
+    inputType: 'pills',
+    collectsStylistAnswer: true,
+    options: [
+      { label: 'Under NT$10,000', value: 'entry' },
+      { label: 'NT$10,000 – NT$15,000', value: 'mid' },
+      { label: 'NT$15,000 – NT$20,000', value: 'top' },
+    ],
+  },
+  {
+    id: 'stylist-recommendation',
+    agentMessage: "Perfect — here's my pick for you.",
+    inputType: 'product-card',
+  },
+  {
+    id: 'stylist-reveal',
+    agentMessage: "Those 3 questions you just answered? That's live purchase intent.\nMlytics captures these signals across 15M+ monthly readers — and routes them to brands the moment a decision is forming.",
+    inputType: 'message',
+  },
+  {
+    id: 'stylist-cta',
+    agentMessage: "Want to see how brands reach readers like you — precisely when they're ready to buy?",
+    inputType: 'cta',
+    options: [{ label: 'See how brands use Mlytics', value: '/brands' }],
+  },
+]

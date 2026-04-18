@@ -3,13 +3,14 @@
 import { useState, useEffect, useRef, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { type AgentStep, type AgentPersona } from '@/lib/agent-data'
+import { type AgentStep, type AgentPersona, type StylistProduct, getStylistRecommendation } from '@/lib/agent-data'
 import { useAgent } from '@/lib/agent-context'
 import { ArticleScanDemo } from './ArticleScanDemo'
 import { useContactModal } from '@/context/contact-modal-context'
 
 interface AgentDialogProps {
   flow: AgentStep[]
+  mode?: 'cortex' | 'stylist'
   onComplete?: (persona: AgentPersona) => void
   variant?: 'hero' | 'page'
   bottomPadding?: number
@@ -19,7 +20,7 @@ interface AgentDialogProps {
 
 type MessageItem = { role: 'agent' | 'user'; text: string; isTyping?: boolean }
 
-export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding = 0, onEngage, onReset }: AgentDialogProps) {
+export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero', bottomPadding = 0, onEngage, onReset }: AgentDialogProps) {
   const { persona, setPersona, addHistory, setHeroCompleted } = useAgent()
   const { open: openContact } = useContactModal()
   const router = useRouter()
@@ -32,6 +33,8 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
   const [urlInput, setUrlInput] = useState('')
   const [showUrlInput, setShowUrlInput] = useState(false)
   const [demoComplete, setDemoComplete] = useState(false)
+  const [stylistAnswers, setStylistAnswers] = useState<string[]>([])
+  const [stylistProduct, setStylistProduct] = useState<StylistProduct | null>(null)
   // demoVisible stays true once the demo starts — ArticleScanDemo is never unmounted
   const [demoVisible, setDemoVisible] = useState(false)
   // Index in messages[] after which ArticleScanDemo is inserted (fixed once set)
@@ -151,6 +154,22 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
     return () => clearTimeout(timer)
   }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Auto-advance for 'product-card' steps — show card then move on
+  useEffect(() => {
+    if (currentStep.inputType !== 'product-card' || !showInput) return
+    const timer = setTimeout(() => {
+      const next = stepIdx + 1
+      if (next < flow.length) {
+        setMessages(prev => [
+          ...prev,
+          { role: 'agent', text: '', isTyping: true },
+        ])
+        setStepIdx(next)
+      }
+    }, 3200)
+    return () => clearTimeout(timer)
+  }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // When the demo step's typewriter finishes (showInput becomes true on the demo step),
   // record the message index and mark the demo as permanently visible.
   useEffect(() => {
@@ -195,6 +214,8 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
     setDemoComplete(false)
     setDemoVisible(false)
     demoInsertAfterIdxRef.current = -1
+    setStylistAnswers([])
+    setStylistProduct(null)
     // Reset to a safe idle height — the height management effect won't overwrite
     // this because wasEngagedRef prevents it from recalculating on un-engage.
     setDynamicMaxH('60vh')
@@ -281,10 +302,20 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
       setPersona(userValue as AgentPersona)
     }
 
+    if (currentStep.collectsStylistAnswer) {
+      const updated = [...stylistAnswers, userLabel]
+      setStylistAnswers(updated)
+      // After the 3rd answer (budget), pre-compute the recommendation
+      if (updated.length === 3) {
+        setStylistProduct(getStylistRecommendation(updated))
+      }
+    }
+
     if (currentStep.inputType === 'cta') {
       setMessages(prev => [...prev, { role: 'user', text: userLabel }])
       setHeroCompleted()
       if (userValue.startsWith('/')) router.push(userValue)
+      else if (currentStep.options?.[0]?.value.startsWith('/')) router.push(currentStep.options[0].value)
       return
     }
 
@@ -325,16 +356,19 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
   // ── Derived ───────────────────────────────────────────────────────────────
 
   const ctaStep = currentStep.inputType === 'cta'
-  const ctaOption =
-    currentStep.options?.find(o => {
-      if (persona === 'publisher') return o.value === '/content-owners'
-      if (persona === 'brand') return o.value === '/brands'
-      if (persona === 'developer') return o.value === '/developers'
-      return false
-    }) ?? currentStep.options?.[0]
+  const ctaOption = isStylist
+    ? currentStep.options?.[0]
+    : (currentStep.options?.find(o => {
+        if (persona === 'publisher') return o.value === '/content-owners'
+        if (persona === 'brand') return o.value === '/brands'
+        if (persona === 'developer') return o.value === '/developers'
+        return false
+      }) ?? currentStep.options?.[0])
 
-  const borderColor = isDark ? 'rgba(34,93,89,0.7)' : '#E5E5E5'
+  const isStylist = mode === 'stylist'
+  const borderColor = isStylist ? 'rgba(201,169,110,0.4)' : (isDark ? 'rgba(34,93,89,0.7)' : '#E5E5E5')
   const bg = isDark ? 'rgba(18,46,44,0.88)' : 'rgba(255,255,255,0.97)'
+  const headerBg = isStylist ? '#C9A96E' : (isDark ? 'rgba(34,93,89,0.45)' : '#225D59')
 
   const stepOptions =
     (persona && currentStep.personalizedOptions?.[persona]) ?? currentStep.options
@@ -371,12 +405,12 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
       {/* ── Header ── */}
       <div
         className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b"
-        style={{ borderColor, background: isDark ? 'rgba(34,93,89,0.45)' : '#225D59' }}
+        style={{ borderColor, background: headerBg }}
       >
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+          <span className="w-2.5 h-2.5 rounded-full bg-white/70 animate-pulse" />
           <span className="text-xs font-semibold tracking-widest uppercase text-white">
-            Mlytics Cortex
+            {isStylist ? 'Bella Style Advisor' : 'Mlytics Cortex'}
           </span>
         </div>
         <span className="text-xs font-medium text-white/60">LIVE</span>
@@ -477,6 +511,32 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
                     />
                   </div>
                 )}
+
+                {/* Stylist product card — shown after the product-card step message */}
+                {isStylist && stylistProduct && msg.role === 'agent' && flow[stepIdx - 1]?.inputType === 'product-card' && i === messages.length - 2 && (
+                  <motion.div
+                    className="mt-2 rounded-xl overflow-hidden border"
+                    style={{ borderColor: 'rgba(201,169,110,0.3)', background: 'rgba(201,169,110,0.06)' }}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                  >
+                    <div className="px-4 py-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest mb-1" style={{ color: '#C9A96E' }}>
+                        {stylistProduct.brand}
+                      </p>
+                      <p className="text-sm font-bold mb-1" style={{ color: '#1A1A1A' }}>
+                        {stylistProduct.name}
+                      </p>
+                      <p className="text-xs mb-2" style={{ color: '#6B6B6B' }}>
+                        {stylistProduct.stylistNote}
+                      </p>
+                      <p className="text-sm font-semibold" style={{ color: '#C9A96E' }}>
+                        {stylistProduct.priceNTD}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
               </Fragment>
             ))}
 
@@ -540,7 +600,7 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
                   <button
                     onClick={() => advance(ctaOption.label, ctaOption.value)}
                     className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                    style={{ background: '#225D59' }}
+                    style={{ background: isStylist ? '#C9A96E' : '#225D59' }}
                   >
                     {ctaOption.label} →
                   </button>
