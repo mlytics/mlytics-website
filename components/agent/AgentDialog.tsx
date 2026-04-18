@@ -355,6 +355,11 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
+  const isStylist = mode === 'stylist'
+  const borderColor = isStylist ? 'rgba(201,169,110,0.4)' : (isDark ? 'rgba(34,93,89,0.7)' : '#E5E5E5')
+  const bg = isDark ? 'rgba(18,46,44,0.88)' : 'rgba(255,255,255,0.97)'
+  const headerBg = isStylist ? '#C9A96E' : (isDark ? 'rgba(34,93,89,0.45)' : '#225D59')
+
   const ctaStep = currentStep.inputType === 'cta'
   const ctaOption = isStylist
     ? currentStep.options?.[0]
@@ -364,11 +369,6 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
         if (persona === 'developer') return o.value === '/developers'
         return false
       }) ?? currentStep.options?.[0])
-
-  const isStylist = mode === 'stylist'
-  const borderColor = isStylist ? 'rgba(201,169,110,0.4)' : (isDark ? 'rgba(34,93,89,0.7)' : '#E5E5E5')
-  const bg = isDark ? 'rgba(18,46,44,0.88)' : 'rgba(255,255,255,0.97)'
-  const headerBg = isStylist ? '#C9A96E' : (isDark ? 'rgba(34,93,89,0.45)' : '#225D59')
 
   const stepOptions =
     (persona && currentStep.personalizedOptions?.[persona]) ?? currentStep.options
