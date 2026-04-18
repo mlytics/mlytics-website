@@ -3,10 +3,113 @@
 import { useState, useEffect, useRef, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { type AgentStep, type AgentPersona, type StylistProduct, getStylistRecommendation } from '@/lib/agent-data'
+import { type AgentStep, type AgentPersona, type StylistProduct, type StyleCard, getStylistRecommendation, STYLIST_FLOW } from '@/lib/agent-data'
 import { useAgent } from '@/lib/agent-context'
 import { ArticleScanDemo } from './ArticleScanDemo'
 import { useContactModal } from '@/context/contact-modal-context'
+
+// ── Style card carousel ────────────────────────────────────────────────────────
+
+function StyleCardCarousel({
+  cards,
+  isDark,
+  onSelect,
+  frozenValue,
+}: {
+  cards: StyleCard[]
+  isDark: boolean
+  onSelect?: (label: string, value: string) => void
+  frozenValue?: string
+}) {
+  const [selected, setSelected] = useState<string | null>(frozenValue ?? null)
+  const frozen = frozenValue !== undefined
+
+  function handleClick(card: StyleCard) {
+    if (frozen || selected) return
+    setSelected(card.value)
+    setTimeout(() => onSelect?.(card.label, card.value), 300)
+  }
+
+  return (
+    <div
+      className="overflow-x-auto"
+      style={{
+        scrollSnapType: 'x mandatory',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        WebkitOverflowScrolling: 'touch',
+        paddingBottom: 8,
+      }}
+    >
+      <div className="flex gap-2.5" style={{ width: 'max-content', paddingRight: 8 }}>
+        {cards.map(card => {
+          const isSelected = selected === card.value
+          const isDimmed = selected !== null && !isSelected
+          return (
+            <button
+              key={card.value}
+              onClick={() => handleClick(card)}
+              disabled={frozen || !!selected}
+              style={{
+                width: 120,
+                height: 168,
+                scrollSnapAlign: 'start',
+                flexShrink: 0,
+                borderRadius: 12,
+                border: `2px solid ${isSelected ? (isDark ? 'rgba(168,197,195,0.85)' : '#225D59') : 'transparent'}`,
+                overflow: 'hidden',
+                cursor: (frozen || selected) ? 'default' : 'pointer',
+                opacity: isDimmed ? 0.3 : 1,
+                transition: 'opacity 0.25s ease, border-color 0.2s ease, transform 0.15s ease',
+                transform: isSelected ? 'scale(1.04)' : 'scale(1)',
+                position: 'relative',
+                padding: 0,
+                background: '#1A1A1A',
+              }}
+            >
+              {/* Photo */}
+              <img
+                src={card.imageUrl}
+                alt={card.label}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+                draggable={false}
+              />
+              {/* Selected checkmark overlay */}
+              {isSelected && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    width: 22,
+                    height: 22,
+                    borderRadius: '50%',
+                    background: isDark ? 'rgba(168,197,195,0.92)' : '#225D59',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 12,
+                    color: 'white',
+                    boxShadow: '0 1px 6px rgba(0,0,0,0.3)',
+                  }}
+                >
+                  ✓
+                </span>
+              )}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface AgentDialogProps {
   flow: AgentStep[]
@@ -25,6 +128,13 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   const { open: openContact } = useContactModal()
   const router = useRouter()
 
+  // Internal flow & mode — can be switched mid-conversation when user picks __stylist__
+  const originalFlowRef = useRef(flow)
+  const [currentFlow, setCurrentFlow] = useState(flow)
+  const [currentMode, setCurrentMode] = useState<'cortex' | 'stylist'>(mode)
+  // Bumped whenever the active flow changes so the typewriter effect re-runs even if stepIdx stays 0
+  const [flowVersion, setFlowVersion] = useState(0)
+
   const [stepIdx, setStepIdx] = useState(0)
   const [messages, setMessages] = useState<MessageItem[]>([
     { role: 'agent', text: '', isTyping: true },
@@ -39,18 +149,25 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   const [demoVisible, setDemoVisible] = useState(false)
   // Index in messages[] after which ArticleScanDemo is inserted (fixed once set)
   const demoInsertAfterIdxRef = useRef(-1)
+  // Index in messages[] for the product-card insertion (fixed once set)
+  const productCardInsertAfterIdxRef = useRef(-1)
+  // Index in messages[] after which the style-card carousel is rendered inline
+  const [styleCardInsertAfterIdx, setStyleCardInsertAfterIdx] = useState(-1)
+  const styleCardsCache = useRef<StyleCard[]>([])
+  const [selectedStyleValue, setSelectedStyleValue] = useState<string | null>(null)
   // dynamicMaxH is used as maxHeight when idle, and as height+maxHeight when engaged
   const [dynamicMaxH, setDynamicMaxH] = useState<string>('60vh')
-  const [engaged, setEngaged] = useState(false)
+  // Stylist mode starts in engaged state so the full chat layout is visible from step 1
+  const [engaged, setEngaged] = useState(mode === 'stylist')
 
   const scrollBodyRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
   // Captures window.scrollY after scroll settles; used to detect upward scroll-away
   const engagedScrollYRef = useRef(0)
   // Tracks whether the previous render was engaged — lets us skip position recalc on un-engage
-  const wasEngagedRef = useRef(false)
+  const wasEngagedRef = useRef(mode === 'stylist')
 
-  const currentStep = flow[stepIdx]
+  const currentStep = currentFlow[stepIdx]
   const isDark = variant === 'hero'
 
   function resolveMessage(step: AgentStep): string {
@@ -92,7 +209,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
       }
     }, 18)
     return () => clearInterval(interval)
-  }, [stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-scroll: immediate (double-rAF) for new messages and demo mount
   useEffect(() => {
@@ -120,12 +237,24 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     setDemoComplete(false)
   }, [stepIdx])
 
+  // For stylist mode: notify parent and compute height on mount (already engaged)
+  useEffect(() => {
+    if (mode !== 'stylist') return
+    onEngage?.()
+    engagedScrollYRef.current = window.scrollY
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        applyEngagedMaxH()
+      })
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Auto-advance when demo finishes — no button needed
   useEffect(() => {
     if (!demoComplete) return
     const timer = setTimeout(() => {
       const next = stepIdx + 1
-      if (next < flow.length) {
+      if (next < currentFlow.length) {
         setMessages(prev => [
           ...prev,
           { role: 'agent', text: '', isTyping: true },
@@ -143,7 +272,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     if (currentStep.inputType !== 'message' || !showInput) return
     const timer = setTimeout(() => {
       const next = stepIdx + 1
-      if (next < flow.length) {
+      if (next < currentFlow.length) {
         setMessages(prev => [
           ...prev,
           { role: 'agent', text: '', isTyping: true },
@@ -154,12 +283,16 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     return () => clearTimeout(timer)
   }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-advance for 'product-card' steps — show card then move on
+  // Auto-advance for 'product-card' steps — record insert position, show card, then move on
   useEffect(() => {
     if (currentStep.inputType !== 'product-card' || !showInput) return
+    // Pin the card's position in the message list so it persists after auto-advance
+    if (productCardInsertAfterIdxRef.current === -1) {
+      productCardInsertAfterIdxRef.current = messages.length - 1
+    }
     const timer = setTimeout(() => {
       const next = stepIdx + 1
-      if (next < flow.length) {
+      if (next < currentFlow.length) {
         setMessages(prev => [
           ...prev,
           { role: 'agent', text: '', isTyping: true },
@@ -169,6 +302,14 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     }, 3200)
     return () => clearTimeout(timer)
   }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Pin the style-card carousel position in the message list when it becomes interactive
+  useEffect(() => {
+    if (currentStep.inputType === 'style-cards' && showInput && styleCardInsertAfterIdx === -1) {
+      setStyleCardInsertAfterIdx(messages.length - 1)
+      styleCardsCache.current = currentStep.styleCards ?? []
+    }
+  }, [showInput, stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // When the demo step's typewriter finishes (showInput becomes true on the demo step),
   // record the message index and mark the demo as permanently visible.
@@ -206,6 +347,9 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   }
 
   function resetConversation() {
+    setCurrentFlow(originalFlowRef.current)
+    setCurrentMode(mode)
+    setFlowVersion(v => v + 1)
     setStepIdx(0)
     setMessages([{ role: 'agent', text: '', isTyping: true }])
     setShowInput(false)
@@ -214,10 +358,13 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     setDemoComplete(false)
     setDemoVisible(false)
     demoInsertAfterIdxRef.current = -1
+    productCardInsertAfterIdxRef.current = -1
+    setStyleCardInsertAfterIdx(-1)
+    styleCardsCache.current = []
+    setSelectedStyleValue(null)
     setStylistAnswers([])
     setStylistProduct(null)
-    // Reset to a safe idle height — the height management effect won't overwrite
-    // this because wasEngagedRef prevents it from recalculating on un-engage.
+    setEngaged(false)
     setDynamicMaxH('60vh')
     onReset?.()
   }
@@ -294,6 +441,29 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   // ── Conversation advance ──────────────────────────────────────────────────
 
   function advance(userLabel: string, userValue: string) {
+    if (userValue === '__stylist__') {
+      // Same interaction as other pills: show user bubble → agent starts typing → flow switches internally
+      engageAndScroll()
+      setShowInput(false)
+      addHistory({ role: 'user', content: userLabel })
+      setStylistAnswers([])
+      setStylistProduct(null)
+      productCardInsertAfterIdxRef.current = -1
+      setStyleCardInsertAfterIdx(-1)
+      styleCardsCache.current = []
+      setSelectedStyleValue(null)
+      setMessages(prev => [
+        ...prev,
+        { role: 'user', text: userLabel },
+        { role: 'agent', text: '', isTyping: true },
+      ])
+      setCurrentFlow(STYLIST_FLOW)
+      setCurrentMode('stylist')
+      setFlowVersion(v => v + 1)
+      setStepIdx(0)
+      return
+    }
+
     engageAndScroll()
     setShowInput(false)
     addHistory({ role: 'user', content: userLabel })
@@ -320,7 +490,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     }
 
     const next = stepIdx + 1
-    if (next < flow.length) {
+    if (next < currentFlow.length) {
       // Atomically add user bubble + next agent placeholder in one state update
       setMessages(prev => [
         ...prev,
@@ -355,10 +525,10 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
-  const isStylist = mode === 'stylist'
-  const borderColor = isStylist ? 'rgba(201,169,110,0.4)' : (isDark ? 'rgba(34,93,89,0.7)' : '#E5E5E5')
+  const isStylist = currentMode === 'stylist'
+  const borderColor = isDark ? 'rgba(34,93,89,0.7)' : '#E5E5E5'
   const bg = isDark ? 'rgba(18,46,44,0.88)' : 'rgba(255,255,255,0.97)'
-  const headerBg = isStylist ? '#C9A96E' : (isDark ? 'rgba(34,93,89,0.45)' : '#225D59')
+  const headerBg = isDark ? 'rgba(34,93,89,0.45)' : '#225D59'
 
   const ctaStep = currentStep.inputType === 'cta'
   const ctaOption = isStylist
@@ -410,7 +580,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-white/70 animate-pulse" />
           <span className="text-xs font-semibold tracking-widest uppercase text-white">
-            {isStylist ? 'Bella Style Advisor' : 'Mlytics Cortex'}
+            Mlytics Cortex
           </span>
         </div>
         <span className="text-xs font-medium text-white/60">LIVE</span>
@@ -447,13 +617,14 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                 <button
                   key={opt.label}
                   onClick={() => advance(opt.label, opt.value)}
-                  className={isDark ? 'pill-btn pill-btn--dark' : 'pill-btn'}
+                  className={opt.value === '__stylist__' ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
                 >
                   {opt.label}
                 </button>
               ))}
             </div>
           )}
+
         </div>
       ) : (
         // ── Engaged layout: full chat conversation ────────────────────────────
@@ -512,28 +683,89 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                   </div>
                 )}
 
-                {/* Stylist product card — shown after the product-card step message */}
-                {isStylist && stylistProduct && msg.role === 'agent' && flow[stepIdx - 1]?.inputType === 'product-card' && i === messages.length - 2 && (
+                {/* Style card carousel — inline in chat, interactive or frozen */}
+                {isStylist && styleCardsCache.current.length > 0 && msg.role === 'agent' && i === styleCardInsertAfterIdx && (
                   <motion.div
-                    className="mt-2 rounded-xl overflow-hidden border"
-                    style={{ borderColor: 'rgba(201,169,110,0.3)', background: 'rgba(201,169,110,0.06)' }}
+                    className="mt-2"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                  >
+                    <StyleCardCarousel
+                      cards={styleCardsCache.current}
+                      isDark={isDark}
+                      frozenValue={selectedStyleValue ?? undefined}
+                      onSelect={(label, value) => {
+                        setSelectedStyleValue(value)
+                        advance(label, value)
+                      }}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Stylist product card — pinned at the product-card step message index */}
+                {isStylist && stylistProduct && msg.role === 'agent' && i === productCardInsertAfterIdxRef.current && (
+                  <motion.div
+                    className="mt-2 rounded-xl overflow-hidden"
+                    style={{
+                      border: '1px solid rgba(34,93,89,0.14)',
+                      background: isDark ? 'rgba(18,46,44,0.55)' : 'white',
+                      boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+                    }}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}
                   >
-                    <div className="px-4 py-3">
-                      <p className="text-[10px] font-semibold uppercase tracking-widest mb-1" style={{ color: '#C9A96E' }}>
-                        {stylistProduct.brand}
-                      </p>
-                      <p className="text-sm font-bold mb-1" style={{ color: '#1A1A1A' }}>
-                        {stylistProduct.name}
-                      </p>
-                      <p className="text-xs mb-2" style={{ color: '#6B6B6B' }}>
-                        {stylistProduct.stylistNote}
-                      </p>
-                      <p className="text-sm font-semibold" style={{ color: '#C9A96E' }}>
-                        {stylistProduct.priceNTD}
-                      </p>
+                    <div className="flex">
+                      {/* Product image */}
+                      <div style={{ width: 96, flexShrink: 0, background: '#F5F0EB' }}>
+                        <img
+                          src={stylistProduct.imageUrl}
+                          alt={stylistProduct.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        />
+                      </div>
+
+                      {/* Product info */}
+                      <div style={{ flex: 1, padding: '12px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
+                        <div>
+                          <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#225D59', marginBottom: 3 }}>
+                            {stylistProduct.brand}
+                          </p>
+                          <p style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#F5F5F5' : '#1A1A1A', marginBottom: 4, lineHeight: 1.3 }}>
+                            {stylistProduct.name}
+                          </p>
+                          <p style={{ fontSize: 11, color: isDark ? 'rgba(245,245,245,0.55)' : '#7A7A7A', lineHeight: 1.45, marginBottom: 8 }}>
+                            {stylistProduct.stylistNote}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <p style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#A8C5C3' : '#225D59' }}>
+                            {stylistProduct.priceNTD}
+                          </p>
+                          <a
+                            href={stylistProduct.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 600,
+                              color: 'white',
+                              background: '#225D59',
+                              borderRadius: 6,
+                              padding: '4px 10px',
+                              textDecoration: 'none',
+                              whiteSpace: 'nowrap',
+                              transition: 'opacity 0.15s',
+                            }}
+                            onMouseEnter={e => (e.currentTarget.style.opacity = '0.82')}
+                            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                          >
+                            Shop now →
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -551,16 +783,16 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="flex-shrink-0 border-t px-4 py-3"
+                className="flex-shrink-0 border-t"
                 style={{ borderColor }}
               >
                 {showPills && (
-                  <div className="flex flex-wrap gap-2">
+                  <div className="px-4 py-3 flex flex-wrap gap-2">
                     {stepOptions?.map(opt => (
                       <button
                         key={opt.label}
                         onClick={() => advance(opt.label, opt.value)}
-                        className={isDark ? 'pill-btn pill-btn--dark' : 'pill-btn'}
+                        className={opt.value === '__stylist__' ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
                       >
                         {opt.label}
                       </button>
@@ -569,7 +801,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                 )}
 
                 {showUrlInput && (
-                  <div className="flex gap-2">
+                  <div className="px-4 py-3 flex gap-2">
                     <input
                       autoFocus
                       type="url"
@@ -597,13 +829,15 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                 )}
 
                 {showCta && ctaOption && (
-                  <button
-                    onClick={() => advance(ctaOption.label, ctaOption.value)}
-                    className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                    style={{ background: isStylist ? '#C9A96E' : '#225D59' }}
-                  >
-                    {ctaOption.label} →
-                  </button>
+                  <div className="px-4 py-3">
+                    <button
+                      onClick={() => advance(ctaOption.label, ctaOption.value)}
+                      className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
+                      style={{ background: '#225D59' }}
+                    >
+                      {ctaOption.label} →
+                    </button>
+                  </div>
                 )}
 
               </motion.div>

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { type AgentPersona, HERO_FLOW, STYLIST_FLOW } from '@/lib/agent-data'
+import { type AgentPersona, HERO_FLOW } from '@/lib/agent-data'
 import { AgentDialog } from '@/components/agent/AgentDialog'
 import { WorldMapDots } from './WorldMapDots'
 import { LogoMarquee } from './LogoMarquee'
@@ -24,8 +24,6 @@ export function HeroSection() {
   const [isFixed, setIsFixed] = useState(true)
   const [dialogEngaged, setDialogEngaged] = useState(false)
   const [wordIdx, setWordIdx] = useState(0)
-  const [activeFlow, setActiveFlow] = useState<'cortex' | 'stylist'>('cortex')
-  const [dialogKey, setDialogKey] = useState(0)
 
   function handleComplete(persona: AgentPersona) {
     const routes: Record<NonNullable<AgentPersona>, string> = {
@@ -151,42 +149,14 @@ export function HeroSection() {
           {/* Agent Dialog — sticky when engaged so flex re-centering can't push it behind the nav */}
           <div className={dialogEngaged ? 'w-full sticky top-20 lg:top-4 z-20' : 'w-full'}>
             <AgentDialog
-              key={dialogKey}
-              flow={activeFlow === 'stylist' ? STYLIST_FLOW : HERO_FLOW}
-              mode={activeFlow}
+              flow={HERO_FLOW}
+              mode="cortex"
               onComplete={handleComplete}
               variant="page"
               bottomPadding={0}
               onEngage={() => setDialogEngaged(true)}
               onReset={() => setDialogEngaged(false)}
             />
-          </div>
-
-          {/* Flow toggle */}
-          <div className="mt-4 flex items-center justify-center gap-2">
-            <span className="text-xs" style={{ color: '#BBBBBB' }}>Try as:</span>
-            <button
-              onClick={() => { setActiveFlow('cortex'); setDialogKey(k => k + 1); setDialogEngaged(false) }}
-              className="text-xs px-3 py-1 rounded-full transition-all"
-              style={{
-                background: activeFlow === 'cortex' ? '#225D59' : 'transparent',
-                color: activeFlow === 'cortex' ? 'white' : '#9B9B9B',
-                border: `1px solid ${activeFlow === 'cortex' ? '#225D59' : '#E5E5E5'}`,
-              }}
-            >
-              Brand / Publisher / Dev
-            </button>
-            <button
-              onClick={() => { setActiveFlow('stylist'); setDialogKey(k => k + 1); setDialogEngaged(false) }}
-              className="text-xs px-3 py-1 rounded-full transition-all"
-              style={{
-                background: activeFlow === 'stylist' ? '#C9A96E' : 'transparent',
-                color: activeFlow === 'stylist' ? 'white' : '#9B9B9B',
-                border: `1px solid ${activeFlow === 'stylist' ? '#C9A96E' : '#E5E5E5'}`,
-              }}
-            >
-              ✦ Reader Experience
-            </button>
           </div>
 
         </div>

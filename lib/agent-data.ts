@@ -2,10 +2,16 @@
 
 export type AgentPersona = 'publisher' | 'brand' | 'developer' | null
 
+export type StyleCard = {
+  label: string
+  value: string
+  imageUrl: string
+}
+
 export type AgentStep = {
   id: string
   agentMessage: string
-  inputType: 'pills' | 'text-input' | 'demo' | 'cta' | 'message' | 'product-card'
+  inputType: 'pills' | 'text-input' | 'demo' | 'cta' | 'message' | 'product-card' | 'style-cards'
   options?: { label: string; value: string }[]
   personalizedOptions?: Record<string, { label: string; value: string }[]>
   ctaLabel?: string
@@ -13,6 +19,7 @@ export type AgentStep = {
   isDemo?: boolean
   personalizedMessages?: Record<string, string>
   collectsStylistAnswer?: boolean
+  styleCards?: StyleCard[]
 }
 
 // ─── Stylist Types & Data ─────────────────────────────────────────────────────
@@ -27,6 +34,8 @@ export type StylistProduct = {
     budget: string[]
   }
   stylistNote: string
+  imageUrl: string
+  url: string
 }
 
 export const STYLIST_PRODUCTS: StylistProduct[] = [
@@ -36,6 +45,8 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
     priceNTD: 'NT$14,800',
     tags: { style: ['elegant', 'classic'], recipient: ['mom', 'gift'], budget: ['mid', 'top'] },
     stylistNote: 'That cloud-like quilting isn\'t just soft — it signals taste without trying. The bag that quietly owns the room.',
+    imageUrl: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=240&q=80',
+    url: 'https://www.coach.com/handbags',
   },
   {
     brand: 'Kate Spade New York',
@@ -43,6 +54,8 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
     priceNTD: 'NT$9,800',
     tags: { style: ['trendy', 'classic'], recipient: ['self', 'gift'], budget: ['entry', 'mid'] },
     stylistNote: 'Playful but never frivolous. The spade emblem does the talking so she doesn\'t have to.',
+    imageUrl: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=240&q=80',
+    url: 'https://www.katespade.com/products/bags/handbags/',
   },
   {
     brand: 'Longchamp',
@@ -50,6 +63,8 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
     priceNTD: 'NT$5,500',
     tags: { style: ['classic', 'minimal'], recipient: ['mom', 'self'], budget: ['entry'] },
     stylistNote: 'Forty years of Parisian pragmatism. Folds flat, holds everything, and never feels out of place.',
+    imageUrl: 'https://images.unsplash.com/photo-1473188588951-666fce8e7c68?w=240&q=80',
+    url: 'https://www.longchamp.com/tw/en/le-pliage-original',
   },
   {
     brand: 'Michael Kors',
@@ -57,6 +72,8 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
     priceNTD: 'NT$12,800',
     tags: { style: ['classic', 'minimal'], recipient: ['mom', 'gift'], budget: ['mid'] },
     stylistNote: 'Structured and spacious. The bag that makes a busy schedule look effortless.',
+    imageUrl: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=240&q=80',
+    url: 'https://www.michaelkors.com/handbags/',
   },
   {
     brand: 'Mulberry',
@@ -64,6 +81,8 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
     priceNTD: 'NT$19,800',
     tags: { style: ['elegant', 'refined'], recipient: ['mom', 'gift'], budget: ['top'] },
     stylistNote: 'British heritage, compact form. For someone who appreciates craft over logo.',
+    imageUrl: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?w=240&q=80',
+    url: 'https://www.mulberry.com/gb/categories/bags',
   },
   {
     brand: 'Furla',
@@ -71,6 +90,8 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
     priceNTD: 'NT$11,500',
     tags: { style: ['trendy', 'elegant'], recipient: ['self', 'mom'], budget: ['mid'] },
     stylistNote: 'Italian sensibility meets modern edge. The one that grows a collection from zero to curated.',
+    imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=240&q=80',
+    url: 'https://www.furla.com/en/eu/c/handbags',
   },
 ]
 
@@ -113,6 +134,7 @@ export const HERO_FLOW: AgentStep[] = [
       { label: "Content isn't earning enough", value: 'publisher' },
       { label: 'Ads miss purchase-ready users', value: 'brand' },
       { label: 'Infrastructure lacks AI', value: 'developer' },
+      { label: 'Try reader experience', value: '__stylist__' },
     ],
   },
   {
@@ -426,7 +448,7 @@ export const DEFAULT_DEMO_ARTICLE_ID = 'aws-datacenter'
 export const STYLIST_FLOW: AgentStep[] = [
   {
     id: 'stylist-intro',
-    agentMessage: "Hi! I'm your Bella Style Advisor ✦\nI've read this article. Let me find the right bag for you in 30 seconds.",
+    agentMessage: "Hi! I'm your Style Advisor\nI've read this article. Let me find the right bag for you in 30 seconds.",
     inputType: 'message',
   },
   {
@@ -443,12 +465,24 @@ export const STYLIST_FLOW: AgentStep[] = [
   {
     id: 'stylist-style',
     agentMessage: "How would you describe her style?",
-    inputType: 'pills',
+    inputType: 'style-cards',
     collectsStylistAnswer: true,
-    options: [
-      { label: 'Understated & Classic', value: 'classic' },
-      { label: 'Elegant & Refined', value: 'elegant' },
-      { label: 'Bold & Contemporary', value: 'trendy' },
+    styleCards: [
+      {
+        label: 'Understated & Classic',
+        value: 'classic',
+        imageUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=300&q=80',
+      },
+      {
+        label: 'Elegant & Refined',
+        value: 'elegant',
+        imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300&q=80',
+      },
+      {
+        label: 'Bold & Contemporary',
+        value: 'trendy',
+        imageUrl: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=300&q=80',
+      },
     ],
   },
   {
@@ -476,6 +510,6 @@ export const STYLIST_FLOW: AgentStep[] = [
     id: 'stylist-cta',
     agentMessage: "Want to see how brands reach readers like you — precisely when they're ready to buy?",
     inputType: 'cta',
-    options: [{ label: 'See how brands use Mlytics', value: '/brands' }],
+    options: [{ label: 'See brand plan', value: '/brands' }],
   },
 ]

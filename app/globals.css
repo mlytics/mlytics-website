@@ -61,6 +61,16 @@ body {
 }
 .pill-btn--dark:hover { background: rgba(34,93,89,0.6); color: white; border-color: #2d7a74; }
 
+.pill-btn--stylist {
+  display: inline-flex; align-items: center;
+  padding: 0.5rem 1.25rem; border-radius: 9999px;
+  border: 1.5px solid rgba(201,169,110,0.55); color: #B8934A;
+  font-size: 0.875rem; font-weight: 500; cursor: pointer;
+  transition: all 0.18s ease; background: rgba(201,169,110,0.06); white-space: nowrap;
+}
+.pill-btn--stylist:hover { background: #C9A96E; color: white; border-color: #C9A96E; }
+.pill-btn--stylist:active { transform: scale(0.97); }
+
 @keyframes ping-out {
   0%   { transform: scale(1); opacity: 0.7; }
   100% { transform: scale(2.8); opacity: 0; }
