@@ -11,7 +11,7 @@ export type StyleCard = {
 export type AgentStep = {
   id: string
   agentMessage: string
-  inputType: 'pills' | 'text-input' | 'demo' | 'cta' | 'message' | 'product-card' | 'style-cards'
+  inputType: 'pills' | 'text-input' | 'demo' | 'cta' | 'message' | 'product-card' | 'style-cards' | 'thinking'
   options?: { label: string; value: string }[]
   personalizedOptions?: Record<string, { label: string; value: string }[]>
   ctaLabel?: string
@@ -20,6 +20,10 @@ export type AgentStep = {
   personalizedMessages?: Record<string, string>
   collectsStylistAnswer?: boolean
   styleCards?: StyleCard[]
+  // Resolves agentMessage dynamically from a past stylist answer
+  resolveFromStylistAnswer?: { index: number; messages: Record<string, string> }
+  // Override the 500ms auto-advance delay for 'message' steps (ms)
+  autoAdvanceDelay?: number
 }
 
 // ─── Stylist Types & Data ─────────────────────────────────────────────────────
@@ -27,7 +31,7 @@ export type AgentStep = {
 export type StylistProduct = {
   brand: string
   name: string
-  priceNTD: string
+  price: string
   tags: {
     style: string[]
     recipient: string[]
@@ -42,7 +46,7 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
   {
     brand: 'Coach',
     name: 'Pillow Tabby 18',
-    priceNTD: 'NT$14,800',
+    price: '$459',
     tags: { style: ['elegant', 'classic'], recipient: ['mom', 'gift'], budget: ['mid', 'top'] },
     stylistNote: 'That cloud-like quilting isn\'t just soft — it signals taste without trying. The bag that quietly owns the room.',
     imageUrl: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=240&q=80',
@@ -51,7 +55,7 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
   {
     brand: 'Kate Spade New York',
     name: 'Sam Icon Mini',
-    priceNTD: 'NT$9,800',
+    price: '$299',
     tags: { style: ['trendy', 'classic'], recipient: ['self', 'gift'], budget: ['entry', 'mid'] },
     stylistNote: 'Playful but never frivolous. The spade emblem does the talking so she doesn\'t have to.',
     imageUrl: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=240&q=80',
@@ -60,7 +64,7 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
   {
     brand: 'Longchamp',
     name: 'Le Pliage Original L',
-    priceNTD: 'NT$5,500',
+    price: '$169',
     tags: { style: ['classic', 'minimal'], recipient: ['mom', 'self'], budget: ['entry'] },
     stylistNote: 'Forty years of Parisian pragmatism. Folds flat, holds everything, and never feels out of place.',
     imageUrl: 'https://images.unsplash.com/photo-1473188588951-666fce8e7c68?w=240&q=80',
@@ -69,7 +73,7 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
   {
     brand: 'Michael Kors',
     name: 'Jet Set MD TZ Tote',
-    priceNTD: 'NT$12,800',
+    price: '$399',
     tags: { style: ['classic', 'minimal'], recipient: ['mom', 'gift'], budget: ['mid'] },
     stylistNote: 'Structured and spacious. The bag that makes a busy schedule look effortless.',
     imageUrl: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=240&q=80',
@@ -78,7 +82,7 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
   {
     brand: 'Mulberry',
     name: 'Bayswater Mini',
-    priceNTD: 'NT$19,800',
+    price: '$619',
     tags: { style: ['elegant', 'refined'], recipient: ['mom', 'gift'], budget: ['top'] },
     stylistNote: 'British heritage, compact form. For someone who appreciates craft over logo.',
     imageUrl: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?w=240&q=80',
@@ -87,7 +91,7 @@ export const STYLIST_PRODUCTS: StylistProduct[] = [
   {
     brand: 'Furla',
     name: 'Camelia Mini Tote',
-    priceNTD: 'NT$11,500',
+    price: '$359',
     tags: { style: ['trendy', 'elegant'], recipient: ['self', 'mom'], budget: ['mid'] },
     stylistNote: 'Italian sensibility meets modern edge. The one that grows a collection from zero to curated.',
     imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=240&q=80',
@@ -108,8 +112,8 @@ export function getStylistRecommendation(answers: string[]): StylistProduct {
     styleAns.includes('Bold') ? 'trendy' : 'classic'
 
   const budgetKey =
-    budgetAns.includes('10,000') && budgetAns.includes('Under') ? 'entry' :
-    budgetAns.includes('15,000') ? 'mid' : 'top'
+    budgetAns.includes('Under') && budgetAns.includes('300') ? 'entry' :
+    budgetAns.includes('450') ? 'mid' : 'top'
 
   const scored = STYLIST_PRODUCTS.map(p => ({
     product: p,
@@ -462,6 +466,21 @@ export const STYLIST_FLOW: AgentStep[] = [
       { label: 'As a gift', value: 'gift' },
     ],
   },
+  { id: 'stylist-recipient-thinking', agentMessage: '', inputType: 'thinking' },
+  {
+    id: 'stylist-recipient-reaction',
+    agentMessage: '',
+    inputType: 'message',
+    autoAdvanceDelay: 900,
+    resolveFromStylistAnswer: {
+      index: 0,
+      messages: {
+        'my mom': "A gift for mom — that's such a thoughtful choice.",
+        'myself': "Treating yourself? Best decision of the week.",
+        'gift': "A gift with intention — I love that.",
+      },
+    },
+  },
   {
     id: 'stylist-style',
     agentMessage: "How would you describe her style?",
@@ -485,16 +504,46 @@ export const STYLIST_FLOW: AgentStep[] = [
       },
     ],
   },
+  { id: 'stylist-style-thinking', agentMessage: '', inputType: 'thinking' },
+  {
+    id: 'stylist-style-reaction',
+    agentMessage: '',
+    inputType: 'message',
+    autoAdvanceDelay: 900,
+    resolveFromStylistAnswer: {
+      index: 1,
+      messages: {
+        'Classic': "Classic taste — she knows exactly what she wants.",
+        'Elegant': "Refined and polished. I have a few ideas forming.",
+        'Bold': "Bold, contemporary — she makes an entrance.",
+      },
+    },
+  },
   {
     id: 'stylist-budget',
-    agentMessage: "What's your budget?",
+    agentMessage: "And what's your budget?",
     inputType: 'pills',
     collectsStylistAnswer: true,
     options: [
-      { label: 'Under NT$10,000', value: 'entry' },
-      { label: 'NT$10,000 – NT$15,000', value: 'mid' },
-      { label: 'NT$15,000 – NT$20,000', value: 'top' },
+      { label: 'Under $300', value: 'entry' },
+      { label: '$300 – $450', value: 'mid' },
+      { label: '$450 – $650', value: 'top' },
     ],
+  },
+  { id: 'stylist-budget-thinking', agentMessage: '', inputType: 'thinking' },
+  {
+    id: 'stylist-budget-reaction',
+    agentMessage: '',
+    inputType: 'message',
+    autoAdvanceDelay: 900,
+    resolveFromStylistAnswer: {
+      index: 2,
+      messages: {
+        'Under $300': "Smart budget — there's something beautiful in every range.",
+        '$300': "A great range — plenty of standout options here.",
+        '$450': "Wonderful. Let me find something truly special.",
+      },
+    },
   },
   {
     id: 'stylist-recommendation',

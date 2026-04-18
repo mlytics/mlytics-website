@@ -121,7 +121,7 @@ interface AgentDialogProps {
   onReset?: () => void
 }
 
-type MessageItem = { role: 'agent' | 'user'; text: string; isTyping?: boolean }
+type MessageItem = { role: 'agent' | 'user'; text: string; isTyping?: boolean; isThinking?: boolean }
 
 export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero', bottomPadding = 0, onEngage, onReset }: AgentDialogProps) {
   const { persona, setPersona, addHistory, setHeroCompleted } = useAgent()
@@ -171,6 +171,16 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   const isDark = variant === 'hero'
 
   function resolveMessage(step: AgentStep): string {
+    if (step.resolveFromStylistAnswer) {
+      const { index, messages } = step.resolveFromStylistAnswer
+      const answerLabel = stylistAnswers[index] ?? ''
+      // Check longest keys first to avoid partial matches (e.g. 'Under $300' before '$300')
+      const keys = Object.keys(messages).sort((a, b) => b.length - a.length)
+      for (const key of keys) {
+        if (answerLabel.includes(key)) return messages[key]
+      }
+      return Object.values(messages)[0] ?? step.agentMessage
+    }
     if (step.personalizedMessages && persona) {
       return step.personalizedMessages[persona] ?? step.agentMessage
     }
@@ -180,8 +190,20 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   // ── Typewriter: mutates the last message in-place ──────────────────────────
 
   useEffect(() => {
-    const msg = resolveMessage(currentStep)
     setShowInput(false)
+
+    // Thinking steps: skip typewriter, mark bubble as thinking, immediately signal ready
+    if (currentStep.inputType === 'thinking') {
+      setMessages(prev => {
+        const next = [...prev]
+        next[next.length - 1] = { role: 'agent', text: '', isThinking: true }
+        return next
+      })
+      setShowInput(true)
+      return
+    }
+
+    const msg = resolveMessage(currentStep)
 
     if (!msg) {
       setMessages(prev => {
@@ -270,6 +292,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   // Auto-advance for 'message' steps — no user interaction needed
   useEffect(() => {
     if (currentStep.inputType !== 'message' || !showInput) return
+    const delay = currentStep.autoAdvanceDelay ?? 500
     const timer = setTimeout(() => {
       const next = stepIdx + 1
       if (next < currentFlow.length) {
@@ -279,7 +302,24 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
         ])
         setStepIdx(next)
       }
-    }, 500)
+    }, delay)
+    return () => clearTimeout(timer)
+  }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-advance for 'thinking' steps — remove the dots bubble then start the next message
+  useEffect(() => {
+    if (currentStep.inputType !== 'thinking' || !showInput) return
+    const timer = setTimeout(() => {
+      const next = stepIdx + 1
+      if (next < currentFlow.length) {
+        setMessages(prev => [
+          // Drop the thinking bubble; the next agent message takes its place
+          ...prev.filter(m => !m.isThinking),
+          { role: 'agent', text: '', isTyping: true },
+        ])
+        setStepIdx(next)
+      }
+    }, 1200)
     return () => clearTimeout(timer)
   }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -598,14 +638,24 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                 color: isDark ? '#FAFAFA' : '#1A1A1A',
               }}
             >
-              {(lastMsg?.text ?? '').split('\n').map((line, j, arr) => (
-                <span key={j}>
-                  {line}
-                  {j < arr.length - 1 && <br />}
-                </span>
-              ))}
-              {lastMsg?.isTyping && (
-                <span className="cursor-blink ml-0.5 opacity-70">|</span>
+              {lastMsg?.isThinking ? (
+                <div className="flex gap-1 items-center" style={{ height: 18 }}>
+                  <span className="thinking-dot" style={{ background: isDark ? 'rgba(250,250,250,0.6)' : 'rgba(34,93,89,0.5)' }} />
+                  <span className="thinking-dot" style={{ background: isDark ? 'rgba(250,250,250,0.6)' : 'rgba(34,93,89,0.5)', animationDelay: '0.18s' }} />
+                  <span className="thinking-dot" style={{ background: isDark ? 'rgba(250,250,250,0.6)' : 'rgba(34,93,89,0.5)', animationDelay: '0.36s' }} />
+                </div>
+              ) : (
+                <>
+                  {(lastMsg?.text ?? '').split('\n').map((line, j, arr) => (
+                    <span key={j}>
+                      {line}
+                      {j < arr.length - 1 && <br />}
+                    </span>
+                  ))}
+                  {lastMsg?.isTyping && (
+                    <span className="cursor-blink ml-0.5 opacity-70">|</span>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -647,14 +697,24 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                         : { background: '#225D59', color: 'white' }
                     }
                   >
-                    {msg.text.split('\n').map((line, j, arr) => (
-                      <span key={j}>
-                        {line}
-                        {j < arr.length - 1 && <br />}
-                      </span>
-                    ))}
-                    {msg.isTyping && (
-                      <span className="cursor-blink ml-0.5 opacity-70">|</span>
+                    {msg.isThinking ? (
+                      <div className="flex gap-1 items-center" style={{ height: 18 }}>
+                        <span className="thinking-dot" style={{ background: isDark ? 'rgba(250,250,250,0.6)' : 'rgba(34,93,89,0.5)' }} />
+                        <span className="thinking-dot" style={{ background: isDark ? 'rgba(250,250,250,0.6)' : 'rgba(34,93,89,0.5)', animationDelay: '0.18s' }} />
+                        <span className="thinking-dot" style={{ background: isDark ? 'rgba(250,250,250,0.6)' : 'rgba(34,93,89,0.5)', animationDelay: '0.36s' }} />
+                      </div>
+                    ) : (
+                      <>
+                        {msg.text.split('\n').map((line, j, arr) => (
+                          <span key={j}>
+                            {line}
+                            {j < arr.length - 1 && <br />}
+                          </span>
+                        ))}
+                        {msg.isTyping && (
+                          <span className="cursor-blink ml-0.5 opacity-70">|</span>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -742,7 +802,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
 
                         <div className="flex items-center justify-between">
                           <p style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#A8C5C3' : '#225D59' }}>
-                            {stylistProduct.priceNTD}
+                            {stylistProduct.price}
                           </p>
                           <a
                             href={stylistProduct.url}

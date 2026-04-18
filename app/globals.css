@@ -61,6 +61,19 @@ body {
 }
 .pill-btn--dark:hover { background: rgba(34,93,89,0.6); color: white; border-color: #2d7a74; }
 
+@keyframes thinking-bounce {
+  0%, 70%, 100% { transform: translateY(0); opacity: 0.4; }
+  35% { transform: translateY(-4px); opacity: 1; }
+}
+.thinking-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: thinking-bounce 1.1s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
 .pill-btn--stylist {
   display: inline-flex; align-items: center;
   padding: 0.5rem 1.25rem; border-radius: 9999px;
