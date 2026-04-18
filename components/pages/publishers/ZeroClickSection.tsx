@@ -32,8 +32,8 @@ export function ZeroClickSection() {
             The Problem
           </span>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4" style={{ color: '#1A1A1A' }}>
-            The zero-click economy<br />
-            <span style={{ color: '#B45309' }}>is already here.</span>
+            The Zero Click Search<br />
+            <span style={{ color: '#B45309' }}>is draining your revenue.</span>
           </h2>
 
         </motion.div>

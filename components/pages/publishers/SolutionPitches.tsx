@@ -45,7 +45,7 @@ export function SolutionPitches() {
             The Solution
           </span>
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
-            We&apos;re built to be the opposite.
+            We&apos;re built to keep your audience, not steal it.
           </h2>
         </motion.div>
 

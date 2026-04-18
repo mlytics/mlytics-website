@@ -57,7 +57,7 @@ export function CaseStudies() {
             Case Studies
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-            How they use Decision Engine
+            How they use Mlytics Cortex
           </h2>
           <p className="text-base" style={{ color: '#A8C5C3' }}>
             Real results across the refinery chain. Numbers are representative; contact us for verified case details.

@@ -19,7 +19,7 @@ export type AgentStep = {
 export const HERO_FLOW: AgentStep[] = [
   {
     id: 'step1-persona',
-    agentMessage: "Hi, I'm the Mlytics Decision Engine.\nWhat's the most pressing problem you want to solve?",
+    agentMessage: "Hi, I'm the Mlytics Mlytics Cortex.\nWhat's the most pressing problem you want to solve?",
     inputType: 'pills',
     options: [
       { label: "Content isn't earning enough", value: 'publisher' },
@@ -29,7 +29,7 @@ export const HERO_FLOW: AgentStep[] = [
   },
   {
     id: 'step2-intro',
-    agentMessage: "Let me show you what the Decision Engine does.",
+    agentMessage: "Let me show you what the Mlytics Cortex does.",
     inputType: 'message',
   },
   {
@@ -44,9 +44,9 @@ export const HERO_FLOW: AgentStep[] = [
     inputType: 'message',
     personalizedMessages: {
       publisher:
-        'Each of these 5 follow-up articles is an entry point to capture reader intent. Human writing costs $250/piece. Decision Engine costs $0.10.',
+        'Each of these 5 follow-up articles is an entry point to capture reader intent. Human writing costs $250/piece. Mlytics Cortex costs $0.10.',
       brand:
-        '2 of these 5 questions are strong intent signals — readers actively comparing products, ready to decide. We embed these intent questions across content owner pages. When a reader clicks, Decision Engine captures the signal and places your brand exactly where purchase intent is highest.',
+        '2 of these 5 questions are strong intent signals — readers actively comparing products, ready to decide. We embed these intent questions across content owner pages. When a reader clicks, Mlytics Cortex captures the signal and places your brand exactly where purchase intent is highest.',
       developer:
         'This entire flow — article analysis, content generation, intent classification — runs on Decisive Engine with decision latency < 50ms. Can your current infrastructure do this?',
     },

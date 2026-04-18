@@ -137,13 +137,13 @@ export function BrandGEOSection() {
 
         {/* Chart + copy */}
         <motion.div
-          className="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-0 relative z-10"
+          className="max-w-5xl mx-auto px-6 grid lg:grid-cols-2 gap-0 relative z-10"
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.55 }}
         >
           {/* Left — chart */}
-          <div className="pt-8 pb-4 md:border-r" style={{ borderColor: 'rgba(168,197,195,0.12)' }}>
+          <div className="pt-8 pb-4 lg:border-r" style={{ borderColor: 'rgba(168,197,195,0.12)' }}>
             <svg viewBox={`0 0 ${SVG_W / 2} ${SVG_H}`} className="w-full" style={{ overflow: 'visible' }}>
               <defs>
                 <linearGradient id="geo-mau-fill" x1="0" y1="0" x2="0" y2="1">
@@ -246,8 +246,8 @@ export function BrandGEOSection() {
             GEO — Generative Engine Optimization
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
-            Stop doing GEO yourself.<br />
-            <span>We cover the entire network.</span>
+            Open web GEO is a lottery.<br />
+            <span>Our network is where your buyers already read.</span>
           </h2>
           <p className="text-base max-w-xl" style={{ color: '#A8C5C3' }}>
             Mlytics handles GEO across our entire content owner network. Your brand appears as a relevant reference when readers ask AI-powered questions about your vertical.

@@ -376,7 +376,7 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
           <span className="text-xs font-semibold tracking-widest uppercase text-white">
-            Decision Engine
+            Mlytics Cortex
           </span>
         </div>
         <span className="text-xs font-medium text-white/60">LIVE</span>

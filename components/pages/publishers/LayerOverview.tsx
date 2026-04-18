@@ -61,24 +61,24 @@ function LayerCard({ item, i }: { item: Layer; i: number }) {
 const LAYERS: Layer[] = [
   {
     num: '01',
-    name: 'Decisive Engine',
-    price: '$1,000 / mo',
-    tag: 'Infrastructure',
-    desc: 'Content delivery under 50ms. One API replaces your CDN contracts. 20% TCO reduction from day one.',
-  },
-  {
-    num: '02',
     name: 'AI Q&A Widget',
     price: '$5,000 / mo',
     tag: 'AI Layer',
     desc: '$0.10 per article vs $250 human cost. Every article becomes an active intent capture point.',
   },
   {
-    num: '03',
+    num: '02',
     name: 'Full Conversation CPL',
     price: 'Revenue share',
     tag: 'Monetization',
     desc: 'Strong-intent readers matched to brand partners. CPL revenue from content you already own.',
+  },
+  {
+    num: '03',
+    name: 'Decisive Engine',
+    price: '$1,000 / mo',
+    tag: 'Infrastructure',
+    desc: 'Content delivery under 50ms. One API replaces your CDN contracts. 20% TCO reduction from day one.',
   },
 ]
 

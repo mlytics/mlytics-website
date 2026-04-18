@@ -35,7 +35,7 @@ export function AgentWidget() {
             <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'rgba(34,93,89,0.6)' }}>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                <span className="text-xs font-semibold text-white tracking-wider uppercase">Decision Engine</span>
+                <span className="text-xs font-semibold text-white tracking-wider uppercase">Mlytics Cortex</span>
               </div>
               <button onClick={() => setOpen(false)} className="text-[#A8C5C3] hover:text-white transition-colors">
                 <ChevronDown size={16} />

@@ -110,7 +110,7 @@ export function ArticleScanDemo({ articleId = DEFAULT_DEMO_ARTICLE_ID, isDark = 
         </div>
       </div>
 
-      {/* Extended articles — Decision Engine follow-up content */}
+      {/* Extended articles — Mlytics Cortex follow-up content */}
       <AnimatePresence>
         {(phase === 'articles' || phase === 'done') && (
           <motion.div
@@ -122,7 +122,7 @@ export function ArticleScanDemo({ articleId = DEFAULT_DEMO_ARTICLE_ID, isDark = 
               className="text-[10px] font-semibold uppercase tracking-wider"
               style={{ color: textSecondary }}
             >
-              Decision Engine generating follow-up content
+              Mlytics Cortex generating follow-up content
             </p>
             {extArticles.slice(0, visibleArts).map(a => {
               const inner = (

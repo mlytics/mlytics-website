@@ -124,13 +124,13 @@ export function BrandMAUSection() {
 
       {/* Bottom: chart left + copy right */}
       <motion.div
-        className="max-w-4xl mx-auto px-6 grid md:grid-cols-2 gap-0 relative z-10"
+        className="max-w-4xl mx-auto px-6 grid lg:grid-cols-2 gap-0 relative z-10"
         initial={{ opacity: 0, y: 16 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6, delay: 0.55 }}
       >
         {/* Left — chart */}
-        <div className="pt-8 pb-4 md:border-r" style={{ borderColor: 'rgba(168,197,195,0.12)' }}>
+        <div className="pt-8 pb-4 lg:border-r" style={{ borderColor: 'rgba(168,197,195,0.12)' }}>
           <svg
             viewBox={`0 0 ${SVG_W / 2} ${SVG_H}`}
             className="w-full"

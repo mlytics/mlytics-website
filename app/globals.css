@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  /* Design system breakpoints:
+     sm  = 480px  (large phone)
+     md  = 768px  (tablet)
+     lg  = 1024px (desktop)
+  */
+  --breakpoint-sm: 30rem; /* 480px */
+}
+
 :root {
   --primary: #225D59;
   --primary-dark: #1A3D3A;

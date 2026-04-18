@@ -31,8 +31,8 @@ export function Nav() {
 
       setScrolled(currentY > 20)
 
-      // Only apply hide/show on desktop (window width >= 768)
-      if (window.innerWidth >= 768) {
+      // Only apply hide/show on desktop (window width >= 1024)
+      if (window.innerWidth >= 1024) {
         if (currentY < 60) {
           setVisible(true)
         } else if (diff > 6) {
@@ -79,7 +79,7 @@ export function Nav() {
         </Link>
 
         {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-8">
           {NAV_LINKS.map(link => (
             <Link
               key={link.href}
@@ -100,7 +100,7 @@ export function Nav() {
         </div>
 
         {/* CTA */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-3">
           <button
             onClick={openContact}
             className="px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
@@ -112,7 +112,7 @@ export function Nav() {
 
         {/* Mobile menu button */}
         <button
-          className={`md:hidden transition-colors ${logoColor}`}
+          className={`lg:hidden transition-colors ${logoColor}`}
           onClick={() => setMobileOpen(v => !v)}
         >
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
@@ -126,7 +126,7 @@ export function Nav() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden bg-white border-b border-gray-100 overflow-hidden"
+            className="lg:hidden bg-white border-b border-gray-100 overflow-hidden"
           >
             <div className="px-6 py-4 space-y-3">
               {NAV_LINKS.map(link => (

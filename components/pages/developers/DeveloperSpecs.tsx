@@ -34,11 +34,11 @@ export function DeveloperSpecs() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {SPECS.map((item, i) => (
             <motion.div
               key={item.label}
-              className="text-center p-5 rounded-2xl border last:col-span-2 md:last:col-span-1"
+              className="text-center p-5 rounded-2xl border last:col-span-2 lg:last:col-span-1"
               style={{ borderColor: '#E5E5E5', background: '#FAFAFA' }}
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}

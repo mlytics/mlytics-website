@@ -53,7 +53,7 @@ export function BrandComparison() {
             The Difference
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-white">
-            Traditional CPM vs. Decision Engine
+            Traditional CPM vs. Mlytics Cortex
           </h2>
         </motion.div>
 
@@ -81,7 +81,7 @@ export function BrandComparison() {
           </div>
           <div className="px-5 py-4 text-center">
             <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.9)' }}>
-              Decision Engine
+              Mlytics Cortex
             </p>
           </div>
         </div>

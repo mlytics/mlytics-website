@@ -5,7 +5,7 @@ import { BrandGEOSection } from '@/components/pages/brands/BrandGEOSection'
 import { BrandLeadPilot } from '@/components/pages/brands/BrandLeadPilot'
 import { BrandPageCTA } from '@/components/pages/brands/BrandPageCTA'
 
-export const metadata = { title: 'For Brands — Mlytics Decision Engine' }
+export const metadata = { title: 'For Brands — Mlytics Mlytics Cortex' }
 
 export default function BrandsPage() {
   return (

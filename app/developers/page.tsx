@@ -3,7 +3,7 @@ import { DeveloperSpecs } from '@/components/pages/developers/DeveloperSpecs'
 import { InfraPartners } from '@/components/pages/developers/InfraPartners'
 import { AILayerSection } from '@/components/pages/developers/AILayerSection'
 
-export const metadata = { title: 'For Developers — Mlytics Decision Engine' }
+export const metadata = { title: 'For Developers — Mlytics Mlytics Cortex' }
 
 export default function DevelopersPage() {
   return (
@@ -19,10 +19,10 @@ export default function DevelopersPage() {
           </span>
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
             One API.
-            <span className="block">Content delivery meets multimodal AI.</span>
+            <span className="block">Route your AI Content at Scale.</span>
           </h1>
           <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
-            Decisive Engine routes every content delivery decision in &lt;50ms. Replace your CDN contracts. Cut TCO by 20%. Contribute data to the intent flywheel.
+            Integrated with leading model providers. One workflow from content generation to global delivery — text, image, voice, and video.
           </p>
         </div>
       </div>
@@ -33,10 +33,10 @@ export default function DevelopersPage() {
       {/* AI-era reframing */}
       <AILayerSection />
 
+      <DeveloperPageCTA />
+
       {/* Infrastructure Partners */}
       <InfraPartners />
-
-      <DeveloperPageCTA />
     </>
   )
 }

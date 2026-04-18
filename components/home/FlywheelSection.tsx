@@ -118,7 +118,7 @@ export function FlywheelSection() {
                 animate={inView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.6, delay: 0.6 }}
               >
-                Not a CDN vendor. A platform with distribution.
+                A platform with distribution.
               </motion.p>
             </div>
           </div>

@@ -7,7 +7,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-start justify-between gap-8">
           <div>
             <span className="text-lg font-bold text-white">Mlytics</span>
-            <p className="text-sm mt-1" style={{ color: '#A8C5C3' }}>Decision Engine — per dollar, per intelligent outcome.</p>
+            <p className="text-sm mt-1" style={{ color: '#A8C5C3' }}>Mlytics Cortex, AI-Decision Engine - per dollar per intelligent outcome.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 text-sm" style={{ color: '#A8C5C3' }}>
             <div className="flex flex-col gap-2">

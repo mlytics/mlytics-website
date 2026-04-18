@@ -139,7 +139,7 @@ export function RevenueCalculator() {
                 {result.upliftRatio > 0 && (
                   <div className="p-4 rounded-xl" style={{ background: 'rgba(34,93,89,0.06)', border: '1px solid rgba(34,93,89,0.15)' }}>
                     <p className="text-sm font-medium" style={{ color: '#225D59' }}>
-                      Decision Engine CPL revenue is <strong>{result.upliftRatio}× higher</strong> than your estimated current CPM revenue.
+                      Mlytics Cortex CPL revenue is <strong>{result.upliftRatio}× higher</strong> than your estimated current CPM revenue.
                     </p>
                   </div>
                 )}
