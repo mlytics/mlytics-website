@@ -81,17 +81,30 @@ const DESC_H = 76
 export function IntentPipeline() {
   const [expanded, setExpanded] = useState(0)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const inViewRef = useRef(false)
 
   function startTimer() {
     if (timerRef.current) clearInterval(timerRef.current)
     timerRef.current = setInterval(() => {
+      if (!inViewRef.current) return
       setExpanded(prev => (prev + 1) % LAYERS.length)
     }, CYCLE_INTERVAL)
   }
 
   useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { inViewRef.current = entry.isIntersecting },
+      { threshold: 0.1 }
+    )
+    observer.observe(el)
     startTimer()
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+    return () => {
+      observer.disconnect()
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
   }, [])
 
   function handleClick(i: number) {
@@ -100,7 +113,7 @@ export function IntentPipeline() {
   }
 
   return (
-    <div className="relative max-w-lg mx-auto">
+    <div ref={containerRef} className="relative max-w-lg mx-auto">
       {/* Vertical flow line */}
       <div
         className="absolute left-[28px] top-8 bottom-8 w-px"
