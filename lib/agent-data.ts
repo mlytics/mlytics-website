@@ -586,11 +586,17 @@ export const READER_FLOW: AgentStep[] = [
     id: 'reader-intro',
     agentMessage: "Your article is written. But most readers finish it and leave.\nWe turn every article into an interactive experience — automatically.",
     inputType: 'message',
-    autoAdvanceDelay: 800,
+    autoAdvanceDelay: 400,
   },
   {
     id: 'reader-article',
     agentMessage: "Here's an article →",
+    inputType: 'message',
+    autoAdvanceDelay: 1500,
+  },
+  {
+    id: 'reader-article-followup',
+    agentMessage: "See those 5 questions? Cortex generated them by reading your article — and injected them directly into the page.\n\nWhen a reader clicks a question, Cortex generates a dedicated answer page — built from your article, paired with relevant products.\n\nClick any question above to experience it.",
     inputType: 'reader-article',
   },
   {
@@ -602,13 +608,13 @@ export const READER_FLOW: AgentStep[] = [
     id: 'reader-answer',
     agentMessage: '',
     inputType: 'message',
-    autoAdvanceDelay: 3000,
+    autoAdvanceDelay: 1200,
   },
   {
     id: 'reader-product-bridge',
     agentMessage: "In the chat experience, Cortex goes further — proactively asking readers questions, capturing their intent, and guiding them toward the right product or next step.\n\nHere's an example. Select your answer:",
     inputType: 'message',
-    autoAdvanceDelay: 800,
+    autoAdvanceDelay: 400,
   },
   {
     id: 'reader-preference',
@@ -635,7 +641,7 @@ export const READER_FLOW: AgentStep[] = [
     id: 'reader-reveal',
     agentMessage: "Now you've seen it firsthand.\n\nEvery question is a new touchpoint. Every answer is a monetization opportunity — through sponsored content, product recommendations, and qualified leads delivered directly to your partners.\n\nYour content. Your audience. Your revenue.",
     inputType: 'message',
-    autoAdvanceDelay: 800,
+    autoAdvanceDelay: 400,
   },
   {
     id: 'reader-cta',

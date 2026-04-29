@@ -331,7 +331,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
         ])
         setStepIdx(next)
       }
-    }, 800)
+    }, 500)
     return () => clearTimeout(timer)
   }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -351,7 +351,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
         ])
         setStepIdx(next)
       }
-    }, 2000)
+    }, 1200)
     return () => clearTimeout(timer)
   }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -363,9 +363,9 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     }
   }, [showInput, stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Pin the ArticleQnADemo position when the reader-article step becomes interactive
+  // Pin the ArticleQnADemo position when the reader-article step finishes typing
   useEffect(() => {
-    if (currentStep.inputType === 'reader-article' && showInput && readerArticleInsertAfterIdxRef.current === -1) {
+    if (currentStep.id === 'reader-article' && showInput && readerArticleInsertAfterIdxRef.current === -1) {
       readerArticleInsertAfterIdxRef.current = messages.length - 1
     }
   }, [showInput, stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -839,13 +839,13 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                   </motion.div>
                 )}
 
-                {/* ArticleQnADemo — pinned after the reader-article step message */}
-                {isReader && readerArticleInsertAfterIdxRef.current !== -1 && msg.role === 'agent' && i === readerArticleInsertAfterIdxRef.current && (
+                {/* ArticleQnADemo — pinned after the reader-article step message, only when bubble is done typing */}
+                {isReader && readerArticleInsertAfterIdxRef.current !== -1 && msg.role === 'agent' && i === readerArticleInsertAfterIdxRef.current && !msg.isTyping && (
                   <motion.div
                     className="mt-2"
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                    transition={{ duration: 0.35, ease: 'easeOut', delay: 0.4 }}
                   >
                     <ArticleQnADemo
                       isDark={isDark}
@@ -854,26 +854,8 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                   </motion.div>
                 )}
 
-                {/* Follow-up message after ArticleQnADemo */}
-                {isReader && readerArticleInsertAfterIdxRef.current !== -1 && msg.role === 'agent' && i === readerArticleInsertAfterIdxRef.current && (
-                  <motion.div
-                    className="mt-2 max-w-[85%] rounded-xl px-3 py-2 text-sm leading-relaxed text-left"
-                    style={{
-                      background: isDark ? 'rgba(34,93,89,0.25)' : 'rgba(34,93,89,0.06)',
-                      color: isDark ? '#FAFAFA' : '#1A1A1A',
-                    }}
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, ease: 'easeOut', delay: 0.5 }}
-                  >
-                    {"See those 5 questions? Cortex generated them by reading your article — and injected them directly into the page.\n\nWhen a reader clicks a question, Cortex generates a dedicated answer page — built from your article, paired with relevant products.\n\nClick any question above to experience it.".split('\n').map((line, j, arr) => (
-                      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
-                    ))}
-                  </motion.div>
-                )}
-
-                {/* Answer Page card — replaces the empty reader-answer bubble */}
-                {isReader && readerAnswerInsertAfterIdxRef.current !== -1 && msg.role === 'agent' && i === readerAnswerInsertAfterIdxRef.current && (() => {
+                {/* Answer Page card — replaces the empty reader-answer bubble, only after prior bubble done */}
+                {isReader && readerAnswerInsertAfterIdxRef.current !== -1 && msg.role === 'agent' && i === readerAnswerInsertAfterIdxRef.current && !msg.isTyping && (() => {
                   const q = READER_QUESTIONS.find(rq => rq.id === readerQuestionId)
                   if (!q) return null
                   const cardBg = isDark ? 'rgba(255,255,255,0.04)' : 'white'
@@ -922,8 +904,8 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                   )
                 })()}
 
-                {/* Reader product card — pinned at the product-card step message index */}
-                {isReader && readerProduct && msg.role === 'agent' && i === readerProductCardInsertAfterIdxRef.current && (
+                {/* Reader product card — pinned at the product-card step message index, only after bubble done */}
+                {isReader && readerProduct && msg.role === 'agent' && i === readerProductCardInsertAfterIdxRef.current && !msg.isTyping && (
                   <motion.div
                     className="mt-2"
                     style={{ maxWidth: 300 }}
