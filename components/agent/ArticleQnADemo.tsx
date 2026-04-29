@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { READER_QUESTIONS, type ReaderQuestion } from '@/lib/agent-data'
-
 
 interface ArticleQnADemoProps {
   isDark?: boolean
@@ -25,7 +24,7 @@ export function ArticleQnADemo({ isDark = true, onSelect }: ArticleQnADemoProps)
   function handleClick(q: ReaderQuestion) {
     if (frozen) return
     setSelected(q.id)
-    setTimeout(() => onSelect(q.text, q.id), 250)
+    setTimeout(() => onSelect(q.text, q.id), 300)
   }
 
   return (
@@ -49,25 +48,14 @@ export function ArticleQnADemo({ isDark = true, onSelect }: ArticleQnADemoProps)
           <span style={{ fontSize: 10, fontWeight: 600, color: textSecondary, letterSpacing: '0.04em' }}>
             NEWSWEEK · AUTOMOTIVE
           </span>
-          <span
-            className="ml-auto flex-shrink-0"
-            style={{ fontSize: 9, color: textSecondary }}
-          >
+          <span className="ml-auto flex-shrink-0" style={{ fontSize: 9, color: textSecondary }}>
             Apr 21, 2026
           </span>
         </div>
 
         {/* Article body */}
         <div className="px-3 py-2.5">
-          <p
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: textPrimary,
-              lineHeight: 1.4,
-              marginBottom: 6,
-            }}
-          >
+          <p style={{ fontSize: 12, fontWeight: 700, color: textPrimary, lineHeight: 1.4, marginBottom: 6 }}>
             New York Drivers Can Now Get Up to $2,000 Toward a New Electric Car
           </p>
           <p style={{ fontSize: 10.5, color: textSecondary, lineHeight: 1.5 }}>
@@ -117,11 +105,10 @@ export function ArticleQnADemo({ isDark = true, onSelect }: ArticleQnADemoProps)
                 if (!frozen) (e.currentTarget as HTMLElement).style.background = questionHoverBg
               }}
               onMouseLeave={e => {
-                if (!frozen) (e.currentTarget as HTMLElement).style.background = cardBg
+                if (!frozen) (e.currentTarget as HTMLElement).style.background = isSelected ? questionSelectedBg : cardBg
               }}
             >
               <div className="flex items-start gap-2">
-                {/* Question number */}
                 <span
                   className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center mt-0.5"
                   style={{
@@ -134,40 +121,14 @@ export function ArticleQnADemo({ isDark = true, onSelect }: ArticleQnADemoProps)
                 >
                   {idx + 1}
                 </span>
-
-                <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: 11, color: textPrimary, lineHeight: 1.45, fontWeight: isSelected ? 600 : 400 }}>
-                    {q.text}
-                  </p>
-                </div>
+                <p style={{ fontSize: 11, color: textPrimary, lineHeight: 1.45, fontWeight: isSelected ? 600 : 400 }}>
+                  {q.text}
+                </p>
               </div>
             </motion.button>
           )
         })}
       </div>
-
-      {/* Product annotation */}
-      <AnimatePresence>
-        {!frozen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="flex items-center gap-1.5 px-1"
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full animate-pulse"
-              style={{ background: '#225D59' }}
-            />
-            <span style={{ fontSize: 9.5, color: textSecondary, letterSpacing: '0.02em' }}>
-              <span style={{ color: isDark ? '#A8C5C3' : '#225D59', fontWeight: 600 }}>
-                01 AI Q&A Widget
-              </span>
-              {' '}— Every article becomes an interactive answer surface
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }

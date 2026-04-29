@@ -519,7 +519,7 @@ export const READER_PRODUCTS: Record<string, ReaderProduct> = {
     ],
     ctaLabel: 'Request a Quote',
     ctaHref: 'https://www.chevrolet.com/equinox-ev?x-modelyear=2026&x-carline=equinox%20ev&x-bodystyle=equinox&x-provider-id=560803',
-    imageUrl: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=300&q=80',
+    imageUrl: '/Equinox EV.png',
   },
   mid500700: {
     brand: 'Hyundai',
@@ -537,7 +537,7 @@ export const READER_PRODUCTS: Record<string, ReaderProduct> = {
     ],
     ctaLabel: 'Request a Quote',
     ctaHref: 'https://www.hyundaiusa.com/us/en/vehicles/ioniq-6',
-    imageUrl: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=300&q=80',
+    imageUrl: '/Ioniq 6.png',
   },
   mid700900: {
     brand: 'Tesla',
@@ -555,7 +555,7 @@ export const READER_PRODUCTS: Record<string, ReaderProduct> = {
     ],
     ctaLabel: 'Request a Quote',
     ctaHref: 'https://www.tesla.com/model3',
-    imageUrl: '/ev-tesla-model3.png',
+    imageUrl: '/Model 3.png',
   },
   over900: {
     brand: 'Porsche',
@@ -573,7 +573,7 @@ export const READER_PRODUCTS: Record<string, ReaderProduct> = {
     ],
     ctaLabel: 'Request a Quote',
     ctaHref: 'https://www.porsche.com/usa/models/taycan/taycan-models/taycan/',
-    imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=300&q=80',
+    imageUrl: '/Porsche Taycan.png',
   },
 }
 
@@ -590,7 +590,7 @@ export const READER_FLOW: AgentStep[] = [
   },
   {
     id: 'reader-article',
-    agentMessage: "Mlytics Cortex reads your article and injects a widget directly into the page — surfacing the questions your readers are already thinking.\n\nClick any question below to see it in action.",
+    agentMessage: "Here's an article →",
     inputType: 'reader-article',
   },
   {
@@ -602,18 +602,11 @@ export const READER_FLOW: AgentStep[] = [
     id: 'reader-answer',
     agentMessage: '',
     inputType: 'message',
-    autoAdvanceDelay: 1000,
-    readerMessages: {
-      q1: "Two years ago, federal EV tax credits worth up to $7,000 were still in place. That changed when the Trump administration ended those rebates — seven years before they were intended to expire.\n\nNew York has stepped in with up to $2,000 off through the Drive Clean Rebate. But the net incentive gap is still roughly $5,000 wider than two years ago.\n\nThe saving grace: EV sticker prices have dropped considerably, and today's elevated gas prices make the long-term ownership math more favorable.",
-      q2: "EV drivers pay the equivalent of about $1.33 per gallon in electricity costs, compared to over $4.00 at the pump.\n\nFor a typical driver covering 12,000 miles a year, that's over $1,000 in annual fuel savings at current prices. Add in lower maintenance costs, and the payback window is significantly shorter than it was a year ago.",
-      q3: "All three qualify for the full $2,000 rebate. After applying it at the dealership:\n\nModel 3 — ~$780/month\nIoniq 6 — ~$700/month\nEquinox EV — ~$645/month\n\nA $135/month spread across the three. Worth confirming your specific trim qualifies — the program covers 60+ models.",
-      q4: "Yes — once the $30 million runs out, buyers wait for the next funding cycle. But New York has consistently refilled the program since 2017, issuing more than 228,000 rebates to date.\n\nDemand could spike faster than expected with gas above $4. If you're buying in the next few months, there's no good reason to wait.",
-      q5: "A few deals worth stacking:\n\nManufacturer financing — rates as low as 4.9% APR on some models\nInsurance bundling — saving several hundred dollars a year\nHome charger credit — federal tax credits for EV charging equipment may still apply\n\nNew York also has over 19,000 public chargers — second only to California.",
-    },
+    autoAdvanceDelay: 3000,
   },
   {
     id: 'reader-product-bridge',
-    agentMessage: "When a reader clicks a question, Mlytics Cortex generates a dedicated answer page — built from your article, paired with relevant products.\n\nOne more question to complete the picture.",
+    agentMessage: "In the chat experience, Cortex goes further — proactively asking readers questions, capturing their intent, and guiding them toward the right product or next step.\n\nHere's an example. Select your answer:",
     inputType: 'message',
     autoAdvanceDelay: 800,
   },
@@ -640,7 +633,7 @@ export const READER_FLOW: AgentStep[] = [
   },
   {
     id: 'reader-reveal',
-    agentMessage: "You just saw how it works.\n\nEvery question is a new touchpoint. Every answer is a monetization opportunity — through sponsored content, product recommendations, and qualified leads delivered directly to your partners.\n\nYour content. Your audience. Your revenue.",
+    agentMessage: "Now you've seen it firsthand.\n\nEvery question is a new touchpoint. Every answer is a monetization opportunity — through sponsored content, product recommendations, and qualified leads delivered directly to your partners.\n\nYour content. Your audience. Your revenue.",
     inputType: 'message',
     autoAdvanceDelay: 800,
   },

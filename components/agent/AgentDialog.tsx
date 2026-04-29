@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { type AgentStep, type AgentPersona, type StylistProduct, type StyleCard, type ReaderProduct, getStylistRecommendation, getReaderProduct, STYLIST_FLOW, READER_FLOW } from '@/lib/agent-data'
+import { type AgentStep, type AgentPersona, type StylistProduct, type StyleCard, type ReaderProduct, getStylistRecommendation, getReaderProduct, STYLIST_FLOW, READER_FLOW, READER_QUESTIONS } from '@/lib/agent-data'
 import { useAgent } from '@/lib/agent-context'
 import { ArticleScanDemo } from './ArticleScanDemo'
 import { ArticleQnADemo } from './ArticleQnADemo'
@@ -150,6 +150,8 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   const [readerProduct, setReaderProduct] = useState<ReaderProduct | null>(null)
   // Index in messages[] after which ArticleQnADemo is inserted (fixed once set)
   const readerArticleInsertAfterIdxRef = useRef(-1)
+  // Index in messages[] where the Answer Page card replaces the agent bubble (fixed once set)
+  const readerAnswerInsertAfterIdxRef = useRef(-1)
   // Index in messages[] for the reader product card insertion (fixed once set)
   const readerProductCardInsertAfterIdxRef = useRef(-1)
   // demoVisible stays true once the demo starts — ArticleScanDemo is never unmounted
@@ -368,6 +370,13 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     }
   }, [showInput, stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Pin the Answer Page card position at the reader-answer step
+  useEffect(() => {
+    if (currentStep.id === 'reader-answer' && showInput && readerAnswerInsertAfterIdxRef.current === -1) {
+      readerAnswerInsertAfterIdxRef.current = messages.length - 1
+    }
+  }, [showInput, stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Pin the reader product card position (reader mode uses its own ref)
   useEffect(() => {
     if (currentStep.inputType === 'product-card' && showInput && readerProductCardInsertAfterIdxRef.current === -1 && currentMode === 'reader') {
@@ -431,6 +440,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     setReaderQuestionId('')
     setReaderProduct(null)
     readerArticleInsertAfterIdxRef.current = -1
+    readerAnswerInsertAfterIdxRef.current = -1
     readerProductCardInsertAfterIdxRef.current = -1
     setEngaged(false)
     setDynamicMaxH('60vh')
@@ -750,7 +760,8 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
           >
             {messages.map((msg, i) => (
               <Fragment key={i}>
-                <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                {/* Skip rendering an empty agent bubble when the Answer Page card fills that slot */}
+                <div className={`flex ${(isReader && i === readerAnswerInsertAfterIdxRef.current && msg.role === 'agent' && !msg.text && !msg.isTyping) ? 'hidden' : (msg.role === 'user' ? 'justify-end' : 'justify-start')}`}>
                   <div
                     className="max-w-[85%] rounded-xl px-3 py-2 text-sm leading-relaxed text-left"
                     style={
@@ -843,95 +854,151 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                   </motion.div>
                 )}
 
+                {/* Follow-up message after ArticleQnADemo */}
+                {isReader && readerArticleInsertAfterIdxRef.current !== -1 && msg.role === 'agent' && i === readerArticleInsertAfterIdxRef.current && (
+                  <motion.div
+                    className="mt-2 max-w-[85%] rounded-xl px-3 py-2 text-sm leading-relaxed text-left"
+                    style={{
+                      background: isDark ? 'rgba(34,93,89,0.25)' : 'rgba(34,93,89,0.06)',
+                      color: isDark ? '#FAFAFA' : '#1A1A1A',
+                    }}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: 'easeOut', delay: 0.5 }}
+                  >
+                    {"See those 5 questions? Cortex generated them by reading your article — and injected them directly into the page.\n\nWhen a reader clicks a question, Cortex generates a dedicated answer page — built from your article, paired with relevant products.\n\nClick any question above to experience it.".split('\n').map((line, j, arr) => (
+                      <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
+                    ))}
+                  </motion.div>
+                )}
+
+                {/* Answer Page card — replaces the empty reader-answer bubble */}
+                {isReader && readerAnswerInsertAfterIdxRef.current !== -1 && msg.role === 'agent' && i === readerAnswerInsertAfterIdxRef.current && (() => {
+                  const q = READER_QUESTIONS.find(rq => rq.id === readerQuestionId)
+                  if (!q) return null
+                  const cardBg = isDark ? 'rgba(255,255,255,0.04)' : 'white'
+                  const cardBorder = isDark ? 'rgba(255,255,255,0.1)' : '#E5E5E5'
+                  const textPrimary = isDark ? '#FAFAFA' : '#1A1A1A'
+                  const textSecondary = isDark ? 'rgba(250,250,250,0.55)' : '#7A7A7A'
+                  const dividerColor = isDark ? 'rgba(255,255,255,0.08)' : '#EEEEEE'
+                  return (
+                    <motion.div
+                      className="mt-2 rounded-xl overflow-hidden"
+                      style={{ border: `1px solid ${cardBorder}`, background: cardBg, boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.07)' }}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, ease: 'easeOut' }}
+                    >
+                      {/* Header */}
+                      <div
+                        className="flex items-center gap-2 px-3 py-2 border-b"
+                        style={{ borderColor: cardBorder }}
+                      >
+                        <div
+                          className="w-4 h-4 rounded-sm flex items-center justify-center flex-shrink-0"
+                          style={{ background: '#225D59' }}
+                        >
+                          <span style={{ fontSize: 7, fontWeight: 900, color: 'white', letterSpacing: '-0.02em' }}>M</span>
+                        </div>
+                        <span style={{ fontSize: 10, fontWeight: 600, color: textSecondary, letterSpacing: '0.04em' }}>
+                          ANSWER PAGE
+                        </span>
+                      </div>
+                      {/* Question */}
+                      <div className="px-3 pt-2.5 pb-2">
+                        <p style={{ fontSize: 12, fontWeight: 700, color: textPrimary, lineHeight: 1.4, marginBottom: 0 }}>
+                          {q.text}
+                        </p>
+                      </div>
+                      {/* Divider */}
+                      <div style={{ height: 1, background: dividerColor, marginLeft: 12, marginRight: 12 }} />
+                      {/* Answer */}
+                      <div className="px-3 pt-2 pb-3">
+                        <p style={{ fontSize: 11, color: textSecondary, lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>
+                          {q.answer}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )
+                })()}
+
                 {/* Reader product card — pinned at the product-card step message index */}
                 {isReader && readerProduct && msg.role === 'agent' && i === readerProductCardInsertAfterIdxRef.current && (
                   <motion.div
-                    className="mt-2 rounded-xl overflow-hidden"
-                    style={{
-                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                      background: isDark ? 'rgba(18,46,44,0.7)' : 'white',
-                      boxShadow: isDark
-                        ? '0 4px 24px rgba(0,0,0,0.4)'
-                        : '0 4px 20px rgba(0,0,0,0.08)',
-                    }}
+                    className="mt-2"
+                    style={{ maxWidth: 300 }}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.45, ease: 'easeOut' }}
                   >
-                    {/* ── Photo hero with gradient overlay ── */}
-                    <div style={{ position: 'relative', paddingBottom: '56.25%', overflow: 'hidden', background: '#111' }}>
-                      <img
-                        src={readerProduct.imageUrl}
-                        alt={readerProduct.name}
-                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                      />
-                      <div style={{
-                        position: 'absolute', inset: 0,
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)',
-                      }} />
-                      <div style={{ position: 'absolute', bottom: 10, left: 12, right: 12 }}>
-                        <p style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', marginBottom: 2 }}>
+                    <div
+                      style={{
+                        borderRadius: 12,
+                        overflow: 'hidden',
+                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+                        background: isDark ? 'rgba(18,46,44,0.7)' : 'white',
+                        boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.35)' : '0 2px 16px rgba(0,0,0,0.07)',
+                      }}
+                    >
+                      {/* Photo */}
+                      <div style={{ aspectRatio: '1/1', overflow: 'hidden', background: '#1a1a1a' }}>
+                        <img
+                          src={readerProduct.imageUrl}
+                          alt={readerProduct.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        />
+                      </div>
+
+                      {/* Text */}
+                      <div style={{ padding: '10px 12px 8px', textAlign: 'left' }}>
+                        {/* Header block */}
+                        <p style={{ fontSize: 8, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: isDark ? 'rgba(250,250,250,0.35)' : '#BBBBBB', marginBottom: 3 }}>
                           {readerProduct.brand}
                         </p>
-                        <p style={{ fontSize: 17, fontWeight: 800, color: 'white', lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: 3 }}>
+                        <p style={{ fontSize: 15, fontWeight: 800, color: isDark ? '#FFFFFF' : '#111111', lineHeight: 1.15, letterSpacing: '-0.025em', marginBottom: 4 }}>
                           {readerProduct.name}
                         </p>
-                        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)', lineHeight: 1.35, fontWeight: 400 }}>
+                        <p style={{ fontSize: 10, fontWeight: 400, color: isDark ? 'rgba(250,250,250,0.65)' : '#555', lineHeight: 1.45, marginBottom: 0 }}>
                           {readerProduct.tagline}
                         </p>
-                      </div>
-                    </div>
 
-                    {/* ── Key stats row ── */}
-                    <div style={{
-                      display: 'flex',
-                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'}`,
-                    }}>
-                      {readerProduct.highlights.map((h, hi) => (
-                        <div
-                          key={hi}
+                        {/* Divider */}
+                        <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.08)' : '#EEEEEE', margin: '8px 0' }} />
+
+                        {/* Features */}
+                        <ul style={{ margin: '0 0 8px', padding: 0, listStyle: 'none' }}>
+                          {readerProduct.features.map((f, fi) => (
+                            <li key={fi} style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginBottom: 3 }}>
+                              <span style={{ fontSize: 8, color: '#225D59', flexShrink: 0 }}>▸</span>
+                              <span style={{ fontSize: 9.5, color: isDark ? 'rgba(250,250,250,0.65)' : '#555', lineHeight: 1.45 }}>{f}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        {/* CTA */}
+                        <a
+                          href={readerProduct.ctaHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           style={{
-                            flex: 1,
-                            padding: '10px 0',
+                            display: 'block',
                             textAlign: 'center',
-                            borderRight: hi < readerProduct.highlights.length - 1
-                              ? `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'}` : 'none',
+                            fontSize: 10.5,
+                            fontWeight: 700,
+                            color: 'white',
+                            background: '#225D59',
+                            borderRadius: 7,
+                            padding: '7px 0',
+                            textDecoration: 'none',
+                            letterSpacing: '0.02em',
+                            transition: 'opacity 0.15s',
                           }}
+                          onMouseEnter={e => (e.currentTarget.style.opacity = '0.82')}
+                          onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
                         >
-                          <p style={{ fontSize: 19, fontWeight: 800, color: isDark ? '#FAFAFA' : '#1A1A1A', lineHeight: 1, marginBottom: 3, letterSpacing: '-0.03em' }}>
-                            {h.value}
-                          </p>
-                          <p style={{ fontSize: 8.5, fontWeight: 500, color: isDark ? 'rgba(250,250,250,0.4)' : '#AAA', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                            {h.label}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* ── CTA ── */}
-                    <div style={{ padding: '10px 12px' }}>
-                      <a
-                        href={readerProduct.ctaHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'block',
-                          textAlign: 'center',
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: 'white',
-                          background: '#225D59',
-                          borderRadius: 8,
-                          padding: '8px 0',
-                          textDecoration: 'none',
-                          letterSpacing: '0.02em',
-                          transition: 'opacity 0.15s',
-                        }}
-                        onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
-                        onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-                      >
-                        {readerProduct.ctaLabel} →
-                      </a>
+                          {readerProduct.ctaLabel} →
+                        </a>
+                      </div>
                     </div>
                   </motion.div>
                 )}
