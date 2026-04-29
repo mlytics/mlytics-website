@@ -6,7 +6,7 @@ import { LayerOverview } from '@/components/pages/publishers/LayerOverview'
 import { ContentOwnerVerticals } from '@/components/pages/publishers/ContentOwnerVerticals'
 import { PublisherPageCTA } from '@/components/pages/publishers/PublisherPageCTA'
 
-export const metadata = { title: 'For Content Owners — Mlytics Mlytics Cortex' }
+export const metadata = { title: 'For Content Owners — Mlytics Cortex' }
 
 export default function PublishersPage() {
   return (

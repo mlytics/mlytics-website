@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { type AgentStep, type AgentPersona, type StylistProduct, type StyleCard, getStylistRecommendation, STYLIST_FLOW } from '@/lib/agent-data'
+import { type AgentStep, type AgentPersona, type StylistProduct, type StyleCard, type ReaderProduct, getStylistRecommendation, getReaderProduct, STYLIST_FLOW, READER_FLOW } from '@/lib/agent-data'
 import { useAgent } from '@/lib/agent-context'
 import { ArticleScanDemo } from './ArticleScanDemo'
+import { ArticleQnADemo } from './ArticleQnADemo'
 import { useContactModal } from '@/context/contact-modal-context'
 
 // ── Style card carousel ────────────────────────────────────────────────────────
@@ -131,7 +132,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   // Internal flow & mode — can be switched mid-conversation when user picks __stylist__
   const originalFlowRef = useRef(flow)
   const [currentFlow, setCurrentFlow] = useState(flow)
-  const [currentMode, setCurrentMode] = useState<'cortex' | 'stylist'>(mode)
+  const [currentMode, setCurrentMode] = useState<'cortex' | 'stylist' | 'reader'>(mode)
   // Bumped whenever the active flow changes so the typewriter effect re-runs even if stepIdx stays 0
   const [flowVersion, setFlowVersion] = useState(0)
 
@@ -145,6 +146,12 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   const [demoComplete, setDemoComplete] = useState(false)
   const [stylistAnswers, setStylistAnswers] = useState<string[]>([])
   const [stylistProduct, setStylistProduct] = useState<StylistProduct | null>(null)
+  const [readerQuestionId, setReaderQuestionId] = useState<string>('')
+  const [readerProduct, setReaderProduct] = useState<ReaderProduct | null>(null)
+  // Index in messages[] after which ArticleQnADemo is inserted (fixed once set)
+  const readerArticleInsertAfterIdxRef = useRef(-1)
+  // Index in messages[] for the reader product card insertion (fixed once set)
+  const readerProductCardInsertAfterIdxRef = useRef(-1)
   // demoVisible stays true once the demo starts — ArticleScanDemo is never unmounted
   const [demoVisible, setDemoVisible] = useState(false)
   // Index in messages[] after which ArticleScanDemo is inserted (fixed once set)
@@ -180,6 +187,9 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
         if (answerLabel.includes(key)) return messages[key]
       }
       return Object.values(messages)[0] ?? step.agentMessage
+    }
+    if (step.readerMessages && readerQuestionId) {
+      return step.readerMessages[readerQuestionId] ?? step.agentMessage
     }
     if (step.personalizedMessages && persona) {
       return step.personalizedMessages[persona] ?? step.agentMessage
@@ -319,7 +329,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
         ])
         setStepIdx(next)
       }
-    }, 1200)
+    }, 800)
     return () => clearTimeout(timer)
   }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -339,7 +349,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
         ])
         setStepIdx(next)
       }
-    }, 3200)
+    }, 2000)
     return () => clearTimeout(timer)
   }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -350,6 +360,20 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
       styleCardsCache.current = currentStep.styleCards ?? []
     }
   }, [showInput, stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Pin the ArticleQnADemo position when the reader-article step becomes interactive
+  useEffect(() => {
+    if (currentStep.inputType === 'reader-article' && showInput && readerArticleInsertAfterIdxRef.current === -1) {
+      readerArticleInsertAfterIdxRef.current = messages.length - 1
+    }
+  }, [showInput, stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Pin the reader product card position (reader mode uses its own ref)
+  useEffect(() => {
+    if (currentStep.inputType === 'product-card' && showInput && readerProductCardInsertAfterIdxRef.current === -1 && currentMode === 'reader') {
+      readerProductCardInsertAfterIdxRef.current = messages.length - 1
+    }
+  }, [showInput, stepIdx, currentMode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // When the demo step's typewriter finishes (showInput becomes true on the demo step),
   // record the message index and mark the demo as permanently visible.
@@ -404,6 +428,10 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     setSelectedStyleValue(null)
     setStylistAnswers([])
     setStylistProduct(null)
+    setReaderQuestionId('')
+    setReaderProduct(null)
+    readerArticleInsertAfterIdxRef.current = -1
+    readerProductCardInsertAfterIdxRef.current = -1
     setEngaged(false)
     setDynamicMaxH('60vh')
     onReset?.()
@@ -481,6 +509,27 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   // ── Conversation advance ──────────────────────────────────────────────────
 
   function advance(userLabel: string, userValue: string) {
+    if (userValue === '__reader__') {
+      engageAndScroll()
+      setShowInput(false)
+      addHistory({ role: 'user', content: userLabel })
+      setReaderQuestionId('')
+      setReaderProduct(null)
+      readerArticleInsertAfterIdxRef.current = -1
+      readerProductCardInsertAfterIdxRef.current = -1
+      productCardInsertAfterIdxRef.current = -1
+      setMessages(prev => [
+        ...prev,
+        { role: 'user', text: userLabel },
+        { role: 'agent', text: '', isTyping: true },
+      ])
+      setCurrentFlow(READER_FLOW)
+      setCurrentMode('reader')
+      setFlowVersion(v => v + 1)
+      setStepIdx(0)
+      return
+    }
+
     if (userValue === '__stylist__') {
       // Same interaction as other pills: show user bubble → agent starts typing → flow switches internally
       engageAndScroll()
@@ -519,6 +568,16 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
       if (updated.length === 3) {
         setStylistProduct(getStylistRecommendation(updated))
       }
+    }
+
+    // Reader flow: capture selected question id from reader-article step
+    if (currentStep.inputType === 'reader-article') {
+      setReaderQuestionId(userValue)
+    }
+
+    // Reader flow: after budget selection, pre-compute the reader product
+    if (currentStep.id === 'reader-preference') {
+      setReaderProduct(getReaderProduct(userValue))
     }
 
     if (currentStep.inputType === 'cta') {
@@ -566,13 +625,19 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   // ── Derived ───────────────────────────────────────────────────────────────
 
   const isStylist = currentMode === 'stylist'
+  const isReader = currentMode === 'reader'
   const borderColor = isDark ? 'rgba(34,93,89,0.7)' : '#E5E5E5'
   const bg = isDark ? 'rgba(18,46,44,0.88)' : 'rgba(255,255,255,0.97)'
   const headerBg = isDark ? 'rgba(34,93,89,0.45)' : '#225D59'
 
   const ctaStep = currentStep.inputType === 'cta'
-  const ctaOption = isStylist
-    ? currentStep.options?.[0]
+  const ctaOption = (isStylist || isReader)
+    ? (currentStep.options?.find(o => {
+        if (persona === 'publisher') return o.value === '/content-owners'
+        if (persona === 'brand') return o.value === '/brands'
+        if (persona === 'developer') return o.value === '/developers'
+        return false
+      }) ?? currentStep.options?.[0])
     : (currentStep.options?.find(o => {
         if (persona === 'publisher') return o.value === '/content-owners'
         if (persona === 'brand') return o.value === '/brands'
@@ -667,7 +732,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                 <button
                   key={opt.label}
                   onClick={() => advance(opt.label, opt.value)}
-                  className={opt.value === '__stylist__' ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
+                  className={(opt.value === '__stylist__' || opt.value === '__reader__') ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
                 >
                   {opt.label}
                 </button>
@@ -763,6 +828,114 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                   </motion.div>
                 )}
 
+                {/* ArticleQnADemo — pinned after the reader-article step message */}
+                {isReader && readerArticleInsertAfterIdxRef.current !== -1 && msg.role === 'agent' && i === readerArticleInsertAfterIdxRef.current && (
+                  <motion.div
+                    className="mt-2"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                  >
+                    <ArticleQnADemo
+                      isDark={isDark}
+                      onSelect={(label, value) => advance(label, value)}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Reader product card — pinned at the product-card step message index */}
+                {isReader && readerProduct && msg.role === 'agent' && i === readerProductCardInsertAfterIdxRef.current && (
+                  <motion.div
+                    className="mt-2 rounded-xl overflow-hidden"
+                    style={{
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                      background: isDark ? 'rgba(18,46,44,0.7)' : 'white',
+                      boxShadow: isDark
+                        ? '0 4px 24px rgba(0,0,0,0.4)'
+                        : '0 4px 20px rgba(0,0,0,0.08)',
+                    }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, ease: 'easeOut' }}
+                  >
+                    {/* ── Photo hero with gradient overlay ── */}
+                    <div style={{ position: 'relative', paddingBottom: '56.25%', overflow: 'hidden', background: '#111' }}>
+                      <img
+                        src={readerProduct.imageUrl}
+                        alt={readerProduct.name}
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)',
+                      }} />
+                      <div style={{ position: 'absolute', bottom: 10, left: 12, right: 12 }}>
+                        <p style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', marginBottom: 2 }}>
+                          {readerProduct.brand}
+                        </p>
+                        <p style={{ fontSize: 17, fontWeight: 800, color: 'white', lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: 3 }}>
+                          {readerProduct.name}
+                        </p>
+                        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)', lineHeight: 1.35, fontWeight: 400 }}>
+                          {readerProduct.tagline}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* ── Key stats row ── */}
+                    <div style={{
+                      display: 'flex',
+                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'}`,
+                    }}>
+                      {readerProduct.highlights.map((h, hi) => (
+                        <div
+                          key={hi}
+                          style={{
+                            flex: 1,
+                            padding: '10px 0',
+                            textAlign: 'center',
+                            borderRight: hi < readerProduct.highlights.length - 1
+                              ? `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'}` : 'none',
+                          }}
+                        >
+                          <p style={{ fontSize: 19, fontWeight: 800, color: isDark ? '#FAFAFA' : '#1A1A1A', lineHeight: 1, marginBottom: 3, letterSpacing: '-0.03em' }}>
+                            {h.value}
+                          </p>
+                          <p style={{ fontSize: 8.5, fontWeight: 500, color: isDark ? 'rgba(250,250,250,0.4)' : '#AAA', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                            {h.label}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* ── CTA ── */}
+                    <div style={{ padding: '10px 12px' }}>
+                      <a
+                        href={readerProduct.ctaHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'block',
+                          textAlign: 'center',
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: 'white',
+                          background: '#225D59',
+                          borderRadius: 8,
+                          padding: '8px 0',
+                          textDecoration: 'none',
+                          letterSpacing: '0.02em',
+                          transition: 'opacity 0.15s',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+                        onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                      >
+                        {readerProduct.ctaLabel} →
+                      </a>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Stylist product card — pinned at the product-card step message index */}
                 {isStylist && stylistProduct && msg.role === 'agent' && i === productCardInsertAfterIdxRef.current && (
                   <motion.div
@@ -852,7 +1025,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                       <button
                         key={opt.label}
                         onClick={() => advance(opt.label, opt.value)}
-                        className={opt.value === '__stylist__' ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
+                        className={(opt.value === '__stylist__' || opt.value === '__reader__') ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
                       >
                         {opt.label}
                       </button>

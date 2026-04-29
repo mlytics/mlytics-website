@@ -3,7 +3,7 @@ import { DeveloperSpecs } from '@/components/pages/developers/DeveloperSpecs'
 import { InfraPartners } from '@/components/pages/developers/InfraPartners'
 import { AILayerSection } from '@/components/pages/developers/AILayerSection'
 
-export const metadata = { title: 'For Developers — Mlytics Mlytics Cortex' }
+export const metadata = { title: 'For Developers — Mlytics Cortex' }
 
 export default function DevelopersPage() {
   return (

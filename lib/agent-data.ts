@@ -11,7 +11,7 @@ export type StyleCard = {
 export type AgentStep = {
   id: string
   agentMessage: string
-  inputType: 'pills' | 'text-input' | 'demo' | 'cta' | 'message' | 'product-card' | 'style-cards' | 'thinking'
+  inputType: 'pills' | 'text-input' | 'demo' | 'cta' | 'message' | 'product-card' | 'style-cards' | 'thinking' | 'reader-article'
   options?: { label: string; value: string }[]
   personalizedOptions?: Record<string, { label: string; value: string }[]>
   ctaLabel?: string
@@ -22,6 +22,8 @@ export type AgentStep = {
   styleCards?: StyleCard[]
   // Resolves agentMessage dynamically from a past stylist answer
   resolveFromStylistAnswer?: { index: number; messages: Record<string, string> }
+  // Resolves agentMessage dynamically from the selected reader question id
+  readerMessages?: Record<string, string>
   // Override the 500ms auto-advance delay for 'message' steps (ms)
   autoAdvanceDelay?: number
 }
@@ -132,13 +134,13 @@ export function getStylistRecommendation(answers: string[]): StylistProduct {
 export const HERO_FLOW: AgentStep[] = [
   {
     id: 'step1-persona',
-    agentMessage: "Hi, I'm the Mlytics Mlytics Cortex.\nWhat's the most pressing problem you want to solve?",
+    agentMessage: "Hi, I'm the Mlytics Cortex.\nWhat's the most pressing problem you want to solve?",
     inputType: 'pills',
     options: [
       { label: "Content isn't earning enough", value: 'publisher' },
       { label: 'Ads miss purchase-ready users', value: 'brand' },
       { label: 'Infrastructure lacks AI', value: 'developer' },
-      { label: 'Try reader experience', value: '__stylist__' },
+      { label: 'Try reader experience', value: '__reader__' },
     ],
   },
   {
@@ -446,6 +448,211 @@ export const DEMO_EXT_ARTICLES: Record<string, DemoExtArticle[]> = {
 }
 
 export const DEFAULT_DEMO_ARTICLE_ID = 'aws-datacenter'
+
+// ─── Reader Experience Types & Data ──────────────────────────────────────────
+
+export type ReaderQuestion = {
+  id: string
+  text: string
+  intentType: 'Informational' | 'Decision' | 'Comparison' | 'Practical'
+  answer: string
+}
+
+export type ReaderProduct = {
+  brand: string
+  name: string
+  tagline: string
+  features: string[]
+  highlights: { value: string; label: string }[]
+  ctaLabel: string
+  ctaHref: string
+  imageUrl: string
+}
+
+export const READER_QUESTIONS: ReaderQuestion[] = [
+  {
+    id: 'q1',
+    text: 'Buying an EV today vs. two years ago — how much has the real cost changed?',
+    intentType: 'Comparison',
+    answer: "Two years ago, federal EV tax credits worth up to $7,000 were still in place. That changed when the Trump administration ended those rebates — seven years before they were intended to expire.\n\nNew York has partially stepped in with up to $2,000 off through the Drive Clean Rebate, applied instantly at the dealership. But the net incentive gap is still roughly $5,000 wider than two years ago.\n\nThe saving grace: EV sticker prices have dropped considerably as competition grew, and today's elevated gas prices make the long-term ownership math more favorable than the upfront numbers suggest.",
+  },
+  {
+    id: 'q2',
+    text: 'Gas went from $3 to $4 a gallon — how quickly does an EV pay for itself now?',
+    intentType: 'Decision',
+    answer: "According to NYSERDA, EV drivers pay the equivalent of about $1.33 per gallon in electricity costs, compared to over $4.00 at the pump — a gap driven by oil supply disruptions following the war with Iran.\n\nFor a typical driver covering 12,000 miles a year, that translates to over $1,000 in annual fuel savings at current prices. Analysts expect prices to stay elevated for months.\n\nAdd in lower maintenance costs, and the payback window is significantly shorter than it was a year ago.",
+  },
+  {
+    id: 'q3',
+    text: 'Model 3, Ioniq 6, or Equinox EV — what\'s the real monthly payment difference?',
+    intentType: 'Comparison',
+    answer: "All three qualify for the full $2,000 rebate, which goes to vehicles with over 200 miles of electric range. After applying it at the dealership, here's the rough breakdown at 6.5% APR over 60 months:\n\nModel 3 — ~$40,000 post-rebate, ~$780/month\nIoniq 6 — ~$36,000 post-rebate, ~$700/month\nEquinox EV — ~$33,000 post-rebate, ~$645/month\n\nA $135/month spread across the three. Worth confirming your specific trim qualifies — the program covers 60+ models.",
+  },
+  {
+    id: 'q4',
+    text: 'Is the $30M pot first-come, first-served? Will the rebate still be there if I wait?',
+    intentType: 'Practical',
+    answer: "Yes — once the $30 million runs out, buyers wait for the next funding cycle. But New York has consistently refilled the program since 2017, issuing more than 228,000 rebates to date.\n\nHochul's framing makes the state's position clear: \"as the federal administration continues to roll back support, New York State is leaning in.\" Politically, this program isn't going away.\n\nThat said, demand could spike faster than expected with gas above $4. If you're buying in the next few months, there's no good reason to wait.",
+  },
+  {
+    id: 'q5',
+    text: 'Beyond Drive Clean, what other deals can NY buyers stack — financing, insurance, tax breaks?',
+    intentType: 'Informational',
+    answer: "The rebate can be combined with other programs depending on eligibility. A few worth knowing:\n\nManufacturer financing — some dealers are offering rates as low as 4.9% APR to move EV inventory since the federal credit ended\nInsurance bundling — combining auto and home coverage can save several hundred dollars a year\nLow-income supplements — NY directs at least 35% of climate investments to disadvantaged communities\nHome charger credit — federal tax credits for EV charging equipment may still apply\n\nNew York also has over 19,000 public chargers — second only to California.",
+  },
+]
+
+export const READER_PRODUCTS: Record<string, ReaderProduct> = {
+  under500: {
+    brand: 'Chevrolet',
+    name: 'Equinox EV',
+    tagline: 'The capable and affordable electric SUV',
+    features: [
+      'EPA-est. 319 miles electric range (FWD)',
+      '17.7-inch diagonal touch-screen display',
+      '57.2 cu. ft. max cargo space',
+      '~80 miles of range in 10 min with DC Fast Charging',
+    ],
+    highlights: [
+      { value: '319 mi', label: 'Electric Range' },
+      { value: '80 mi', label: '10-min Fast Charge' },
+    ],
+    ctaLabel: 'Request a Quote',
+    ctaHref: 'https://www.chevrolet.com/equinox-ev?x-modelyear=2026&x-carline=equinox%20ev&x-bodystyle=equinox&x-provider-id=560803',
+    imageUrl: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=300&q=80',
+  },
+  mid500700: {
+    brand: 'Hyundai',
+    name: 'Ioniq 6',
+    tagline: 'The aerodynamic long-range electric sedan',
+    features: [
+      'EPA-est. 361 miles electric range (Long Range RWD)',
+      'Best-in-class 135 MPGe combined efficiency',
+      '10–80% charge in 18 minutes with DC Fast Charging',
+      'Est. $46/month in fuel costs',
+    ],
+    highlights: [
+      { value: '361 mi', label: 'Electric Range' },
+      { value: '18 min', label: '10–80% Charge' },
+    ],
+    ctaLabel: 'Request a Quote',
+    ctaHref: 'https://www.hyundaiusa.com/us/en/vehicles/ioniq-6',
+    imageUrl: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=300&q=80',
+  },
+  mid700900: {
+    brand: 'Tesla',
+    name: 'Model 3',
+    tagline: 'The iconic electric sedan with the longest range',
+    features: [
+      'EPA-est. 363 miles electric range (Premium RWD)',
+      'Up to 195 miles of range in 15 min with DC Fast Charging',
+      '0–60 mph in 4.9 seconds (Premium RWD)',
+      'Starting at $38,630 including destination fees',
+    ],
+    highlights: [
+      { value: '363 mi', label: 'Electric Range' },
+      { value: '4.9s', label: '0–60 mph' },
+    ],
+    ctaLabel: 'Request a Quote',
+    ctaHref: 'https://www.tesla.com/model3',
+    imageUrl: '/ev-tesla-model3.png',
+  },
+  over900: {
+    brand: 'Porsche',
+    name: 'Taycan',
+    tagline: 'The performance electric sedan engineered by Porsche',
+    features: [
+      'EPA-est. 318 miles electric range',
+      '10–80% charge in 18 min with 320 kW DC Fast Charging',
+      'Up to 1,019 hp with Launch Control',
+      '0–60 mph in 2.1 seconds (Turbo GT)',
+    ],
+    highlights: [
+      { value: '2.1s', label: '0–60 mph' },
+      { value: '1,019 hp', label: 'With Launch Control' },
+    ],
+    ctaLabel: 'Request a Quote',
+    ctaHref: 'https://www.porsche.com/usa/models/taycan/taycan-models/taycan/',
+    imageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=300&q=80',
+  },
+}
+
+export function getReaderProduct(budgetKey: string): ReaderProduct {
+  return READER_PRODUCTS[budgetKey] ?? READER_PRODUCTS['mid500700']
+}
+
+export const READER_FLOW: AgentStep[] = [
+  {
+    id: 'reader-intro',
+    agentMessage: "Your article is written. But most readers finish it and leave.\nWe turn every article into an interactive experience — automatically.",
+    inputType: 'message',
+    autoAdvanceDelay: 800,
+  },
+  {
+    id: 'reader-article',
+    agentMessage: "Mlytics Cortex reads your article and injects a widget directly into the page — surfacing the questions your readers are already thinking.\n\nClick any question below to see it in action.",
+    inputType: 'reader-article',
+  },
+  {
+    id: 'reader-thinking',
+    agentMessage: '',
+    inputType: 'thinking',
+  },
+  {
+    id: 'reader-answer',
+    agentMessage: '',
+    inputType: 'message',
+    autoAdvanceDelay: 1000,
+    readerMessages: {
+      q1: "Two years ago, federal EV tax credits worth up to $7,000 were still in place. That changed when the Trump administration ended those rebates — seven years before they were intended to expire.\n\nNew York has stepped in with up to $2,000 off through the Drive Clean Rebate. But the net incentive gap is still roughly $5,000 wider than two years ago.\n\nThe saving grace: EV sticker prices have dropped considerably, and today's elevated gas prices make the long-term ownership math more favorable.",
+      q2: "EV drivers pay the equivalent of about $1.33 per gallon in electricity costs, compared to over $4.00 at the pump.\n\nFor a typical driver covering 12,000 miles a year, that's over $1,000 in annual fuel savings at current prices. Add in lower maintenance costs, and the payback window is significantly shorter than it was a year ago.",
+      q3: "All three qualify for the full $2,000 rebate. After applying it at the dealership:\n\nModel 3 — ~$780/month\nIoniq 6 — ~$700/month\nEquinox EV — ~$645/month\n\nA $135/month spread across the three. Worth confirming your specific trim qualifies — the program covers 60+ models.",
+      q4: "Yes — once the $30 million runs out, buyers wait for the next funding cycle. But New York has consistently refilled the program since 2017, issuing more than 228,000 rebates to date.\n\nDemand could spike faster than expected with gas above $4. If you're buying in the next few months, there's no good reason to wait.",
+      q5: "A few deals worth stacking:\n\nManufacturer financing — rates as low as 4.9% APR on some models\nInsurance bundling — saving several hundred dollars a year\nHome charger credit — federal tax credits for EV charging equipment may still apply\n\nNew York also has over 19,000 public chargers — second only to California.",
+    },
+  },
+  {
+    id: 'reader-product-bridge',
+    agentMessage: "When a reader clicks a question, Mlytics Cortex generates a dedicated answer page — built from your article, paired with relevant products.\n\nOne more question to complete the picture.",
+    inputType: 'message',
+    autoAdvanceDelay: 800,
+  },
+  {
+    id: 'reader-preference',
+    agentMessage: "What's your monthly budget for a car payment?",
+    inputType: 'pills',
+    options: [
+      { label: 'Under $500', value: 'under500' },
+      { label: '$500 – $700', value: 'mid500700' },
+      { label: '$700 – $900', value: 'mid700900' },
+      { label: 'Over $900', value: 'over900' },
+    ],
+  },
+  {
+    id: 'reader-thinking-2',
+    agentMessage: '',
+    inputType: 'thinking',
+  },
+  {
+    id: 'reader-product-card',
+    agentMessage: "Based on your budget, here's a match.",
+    inputType: 'product-card',
+  },
+  {
+    id: 'reader-reveal',
+    agentMessage: "You just saw how it works.\n\nEvery question is a new touchpoint. Every answer is a monetization opportunity — through sponsored content, product recommendations, and qualified leads delivered directly to your partners.\n\nYour content. Your audience. Your revenue.",
+    inputType: 'message',
+    autoAdvanceDelay: 800,
+  },
+  {
+    id: 'reader-cta',
+    agentMessage: "Want to add this AI-powered Q&A experience to your own publisher site?",
+    inputType: 'cta',
+    options: [
+      { label: 'See how it works for publishers', value: '/content-owners' },
+    ],
+  },
+]
 
 // ─── Stylist Flow ─────────────────────────────────────────────────────────────
 

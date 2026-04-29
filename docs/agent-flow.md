@@ -7,7 +7,7 @@
 ### Step 1 — 選擇角色 `step1-persona`
 
 **Agent：**
-> Hi, I'm the Mlytics Mlytics Cortex.
+> Hi, I'm the Mlytics Cortex.
 > What's the most pressing problem you want to solve?
 
 **選項（Pills）：**

@@ -12,7 +12,7 @@ import { AgentWidget } from '@/components/agent/AgentWidget'
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
-  title: 'Mlytics Mlytics Cortex — Per dollar, per intelligent outcome.',
+  title: 'Mlytics Cortex — Per dollar, per intelligent outcome.',
   description: 'From 4.1M WAU to qualified leads. The intent refinery that turns raw attention into commercial transactions.',
 }
 
