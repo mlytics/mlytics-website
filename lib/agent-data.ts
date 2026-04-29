@@ -648,7 +648,7 @@ export const READER_FLOW: AgentStep[] = [
     agentMessage: "Want to add this AI-powered Q&A experience to your own publisher site?",
     inputType: 'cta',
     options: [
-      { label: 'See how it works for publishers', value: '/content-owners' },
+      { label: 'See how it works for content owners', value: '/content-owners' },
     ],
   },
 ]
