@@ -25,7 +25,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-6 border-t text-xs text-center" style={{ borderColor: 'rgba(255,255,255,0.08)', color: '#6B8F8D' }}>
-          © 2026 Mlytics. Prototype — for demo purposes only.
+          © 2026 Mlytics. All rights reserved.
         </div>
       </div>
     </footer>

@@ -2,17 +2,119 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, CheckCircle } from 'lucide-react'
+import { X, CheckCircle, ChevronDown, Search } from 'lucide-react'
 import { useContactModal } from '@/context/contact-modal-context'
+import { allCountries } from 'country-telephone-data'
+
+// Convert ISO2 to flag emoji
+function isoToFlag(iso2: string) {
+  return iso2.toUpperCase().replace(/./g, c =>
+    String.fromCodePoint(c.charCodeAt(0) + 0x1F1A5)
+  )
+}
+
+interface Country { name: string; iso2: string; dialCode: string }
+
+const COUNTRIES: Country[] = (allCountries as Country[]).filter(c => c.dialCode)
+
+const inputCls = 'w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors'
+const labelCls = 'block text-xs font-medium text-gray-600 mb-0.5'
+
+function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: Country) => void }) {
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const containerRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const filtered = query.trim()
+    ? COUNTRIES.filter(c =>
+        c.name.toLowerCase().includes(query.toLowerCase()) ||
+        c.dialCode.includes(query) ||
+        c.iso2.toLowerCase().includes(query.toLowerCase())
+      )
+    : COUNTRIES
+
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 50)
+    else setQuery('')
+  }, [open])
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  return (
+    <div ref={containerRef} className="relative flex-shrink-0">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-1 px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors bg-white whitespace-nowrap"
+        style={{ minWidth: 90 }}
+      >
+        <span>{isoToFlag(value.iso2)}</span>
+        <span className="text-gray-700">+{value.dialCode}</span>
+        <ChevronDown size={12} className="text-gray-400 ml-0.5" />
+      </button>
+
+      {open && (
+        <div
+          className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden"
+          style={{ width: 260 }}
+        >
+          {/* Search */}
+          <div className="p-2 border-b border-gray-100 flex items-center gap-2">
+            <Search size={13} className="text-gray-400 flex-shrink-0" />
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search country or code..."
+              className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400"
+            />
+          </div>
+          {/* List */}
+          <div className="overflow-y-auto" style={{ maxHeight: 220 }}>
+            {filtered.length === 0 ? (
+              <p className="px-3 py-3 text-xs text-gray-400 text-center">No results</p>
+            ) : filtered.map(c => (
+              <button
+                key={`${c.iso2}-${c.dialCode}`}
+                type="button"
+                onClick={() => { onChange(c); setOpen(false) }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-gray-50 transition-colors text-left"
+                style={{ background: c.iso2 === value.iso2 ? 'rgba(34,93,89,0.06)' : undefined }}
+              >
+                <span className="flex-shrink-0 text-base">{isoToFlag(c.iso2)}</span>
+                <span className="flex-1 text-gray-700 truncate">{c.name.replace(/\s*\(.*?\)\s*/g, '').trim()}</span>
+                <span className="text-gray-400 text-xs flex-shrink-0">+{c.dialCode}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function ContactModal() {
   const { isOpen, close } = useContactModal()
   const [submitted, setSubmitted] = useState(false)
-  const [form, setForm] = useState({ name: '', company: '', role: 'publisher', website: '', message: '' })
+  const [selectedCountry, setSelectedCountry] = useState<Country>(
+    COUNTRIES.find(c => c.iso2 === 'tw') ?? COUNTRIES[0]
+  )
+  const [form, setForm] = useState({
+    firstName: '', lastName: '',
+    email: '', phone: '',
+    company: '', role: 'publisher', website: '', message: '',
+  })
   const overlayRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!isOpen) { setTimeout(() => setSubmitted(false), 400) }
+    if (!isOpen) setTimeout(() => setSubmitted(false), 400)
   }, [isOpen])
 
   useEffect(() => {
@@ -23,9 +125,12 @@ export function ContactModal() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    console.log('[POC Request]', form)
+    console.log('[POC Request]', { ...form, countryCode: `+${selectedCountry.dialCode}` })
     setSubmitted(true)
   }
+
+  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+    setForm(p => ({ ...p, [field]: e.target.value }))
 
   return (
     <AnimatePresence>
@@ -48,23 +153,19 @@ export function ContactModal() {
             className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden"
           >
             {/* Header */}
-            <div className="px-6 pt-6 pb-4 border-b border-gray-100">
+            <div className="px-6 pt-5 pb-4 border-b border-gray-100">
               <button
                 onClick={close}
                 className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 <X size={18} />
               </button>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-3"
-                style={{ background: 'rgba(34,93,89,0.1)', color: '#225D59' }}>
-                Get a Personalized Demo
-              </div>
               <h2 className="text-xl font-bold text-gray-900">Let's use your data to talk.</h2>
-              <p className="text-sm text-gray-500 mt-1">We'll be in touch within 24 hours.</p>
+              <p className="text-sm text-gray-500 mt-1">We'll get back to you as soon as possible.</p>
             </div>
 
             {/* Body */}
-            <div className="px-6 py-5">
+            <div className="px-6 py-4">
               <AnimatePresence mode="wait">
                 {submitted ? (
                   <motion.div
@@ -79,7 +180,7 @@ export function ContactModal() {
                     </div>
                     <div>
                       <p className="text-lg font-semibold text-gray-900">Request received.</p>
-                      <p className="text-sm text-gray-500 mt-1">We'll be in touch within 24 hours with a tailored POC proposal.</p>
+                      <p className="text-sm text-gray-500 mt-1">We'll get back to you as soon as possible.</p>
                     </div>
                     <button
                       onClick={close}
@@ -90,66 +191,75 @@ export function ContactModal() {
                     </button>
                   </motion.div>
                 ) : (
-                  <motion.form key="form" onSubmit={handleSubmit} className="space-y-4">
+                  <motion.form key="form" onSubmit={handleSubmit} className="space-y-2.5">
+                    {/* First / Last name */}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Name *</label>
-                        <input
-                          required
-                          value={form.name}
-                          onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors"
-                          placeholder="Jane Smith"
-                        />
+                        <label className={labelCls}>First Name *</label>
+                        <input required value={form.firstName} onChange={set('firstName')}
+                          className={inputCls} placeholder="Jane" />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Company *</label>
-                        <input
-                          required
-                          value={form.company}
-                          onChange={e => setForm(p => ({ ...p, company: e.target.value }))}
-                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors"
-                          placeholder="Acme Media"
-                        />
+                        <label className={labelCls}>Last Name *</label>
+                        <input required value={form.lastName} onChange={set('lastName')}
+                          className={inputCls} placeholder="Smith" />
                       </div>
                     </div>
+
+                    {/* Email */}
+                    <div>
+                      <label className={labelCls}>Email *</label>
+                      <input required type="email" value={form.email} onChange={set('email')}
+                        className={inputCls} placeholder="jane@company.com" />
+                    </div>
+
+                    {/* Phone with searchable country code */}
+                    <div>
+                      <label className={labelCls}>Phone</label>
+                      <div className="flex gap-2">
+                        <CountryCodePicker value={selectedCountry} onChange={setSelectedCountry} />
+                        <input type="tel" value={form.phone} onChange={set('phone')}
+                          className={inputCls} placeholder="912 345 678" />
+                      </div>
+                    </div>
+
+                    {/* Company / Role */}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">I am a...</label>
-                        <select
-                          value={form.role}
-                          onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
-                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors bg-white"
-                        >
-                          <option value="publisher">Content Owner / Media</option>
-                          <option value="brand">Brand / Advertiser</option>
-                          <option value="developer">Developer / Tech</option>
+                        <label className={labelCls}>Company *</label>
+                        <input required value={form.company} onChange={set('company')}
+                          className={inputCls} placeholder="Acme Media" />
+                      </div>
+                      <div>
+                        <label className={labelCls}>I am a...</label>
+                        <select value={form.role} onChange={set('role')}
+                          className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors bg-white">
+                          <option value="publisher">Content Owner</option>
+                          <option value="brand">Brand</option>
+                          <option value="developer">Developer</option>
                         </select>
                       </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Website</label>
-                        <input
-                          value={form.website}
-                          onChange={e => setForm(p => ({ ...p, website: e.target.value }))}
-                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors"
-                          placeholder="https://example.com"
-                        />
-                      </div>
                     </div>
+
+                    {/* Website */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">What do you want to solve?</label>
-                      <textarea
-                        rows={3}
-                        value={form.message}
-                        onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
-                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors resize-none"
-                        placeholder="Tell us about your current setup and what you're hoping to achieve..."
-                      />
+                      <label className={labelCls}>Website</label>
+                      <input value={form.website} onChange={set('website')}
+                        className={inputCls} placeholder="https://example.com" />
                     </div>
+
+                    {/* Message */}
+                    <div>
+                      <label className={labelCls}>What do you want to solve?</label>
+                      <textarea rows={2} value={form.message} onChange={set('message')}
+                        className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors resize-none"
+                        placeholder="Tell us about your current setup and what you're hoping to achieve..." />
+                    </div>
+
                     <button
                       type="submit"
                       className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                      style={{ background: '#225D59' }}
+                      style={{ background: '#225D59', border: '1.5px solid transparent' }}
                     >
                       Get a Personalized Demo
                     </button>

@@ -245,27 +245,63 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     return () => clearInterval(interval)
   }, [stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-scroll: immediate (double-rAF) for new messages and demo mount
+  // True when user has intentionally scrolled up (pauses auto-scroll)
+  const userScrolledUpRef = useRef(false)
+
+  const scrollToBottom = () => {
+    const body = scrollBodyRef.current
+    if (!body) return
+    if (userScrolledUpRef.current) return
+    body.scrollTop = body.scrollHeight
+  }
+
+  // wheel/touch: detect user intent to scroll up — never fires on programmatic scrollTop changes
+  // scroll: detect when user has returned to the bottom — resume auto-scroll
   useEffect(() => {
     const body = scrollBodyRef.current
     if (!body) return
+
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY < 0) userScrolledUpRef.current = true   // scrolling up → pause
+    }
+    const onTouchStart = (() => {
+      let startY = 0
+      const start = (e: TouchEvent) => { startY = e.touches[0].clientY }
+      const move = (e: TouchEvent) => {
+        if (e.touches[0].clientY > startY) userScrolledUpRef.current = true  // dragging down = scrolling up
+      }
+      return { start, move }
+    })()
+    const onScroll = () => {
+      const distFromBottom = body.scrollHeight - body.scrollTop - body.clientHeight
+      if (distFromBottom <= 20) userScrolledUpRef.current = false  // back at bottom → resume
+    }
+
+    body.addEventListener('wheel', onWheel, { passive: true })
+    body.addEventListener('touchstart', onTouchStart.start, { passive: true })
+    body.addEventListener('touchmove', onTouchStart.move, { passive: true })
+    body.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      body.removeEventListener('wheel', onWheel)
+      body.removeEventListener('touchstart', onTouchStart.start)
+      body.removeEventListener('touchmove', onTouchStart.move)
+      body.removeEventListener('scroll', onScroll)
+    }
+  }, [engaged]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-scroll on every message change — instant scroll so no racing with user scroll
+  useEffect(() => {
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
-      })
+      requestAnimationFrame(() => scrollToBottom())
     })
-  }, [messages, demoVisible])
+  }, [messages, demoVisible]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-scroll: delayed for showInput — waits for pinned footer animation (200ms) to finish
   useEffect(() => {
     if (!showInput) return
-    const body = scrollBodyRef.current
-    if (!body) return
-    const timer = setTimeout(() => {
-      body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
-    }, 250)
+    const timer = setTimeout(() => scrollToBottom(), 250)
     return () => clearTimeout(timer)
-  }, [showInput])
+  }, [showInput]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setDemoComplete(false)
@@ -519,6 +555,9 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   // ── Conversation advance ──────────────────────────────────────────────────
 
   function advance(userLabel: string, userValue: string) {
+    // User interacted — resume auto-scroll so new content is visible
+    userScrolledUpRef.current = false
+
     if (userValue === '__reader__') {
       engageAndScroll()
       setShowInput(false)
@@ -804,16 +843,10 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                       isDark={isDark}
                       articleId={persona === 'publisher' || persona === 'brand' || persona === 'developer' ? 'media-ai' : undefined}
                       showIntentStrength={persona === 'brand' || persona === 'developer'}
-                      onProgress={() => {
-                        const body = scrollBodyRef.current
-                        if (body) body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
-                      }}
+                      onProgress={() => scrollToBottom()}
                       onComplete={() => {
                         setDemoComplete(true)
-                        setTimeout(() => {
-                          const body = scrollBodyRef.current
-                          if (body) body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' })
-                        }, 50)
+                        setTimeout(() => scrollToBottom(), 50)
                       }}
                     />
                   </div>
