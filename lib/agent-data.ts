@@ -137,9 +137,9 @@ export const HERO_FLOW: AgentStep[] = [
     agentMessage: "Hi, I'm the Mlytics Cortex.\nWhat's the most pressing problem you want to solve?",
     inputType: 'pills',
     options: [
-      { label: "Content isn't earning enough", value: 'publisher' },
-      { label: 'Ads miss purchase-ready users', value: 'brand' },
-      { label: 'Infrastructure lacks AI', value: 'developer' },
+      { label: 'Losing traffic to AI', value: 'publisher' },
+      { label: 'CPM model is broken', value: 'brand' },
+      { label: "AI content won't scale", value: 'developer' },
       { label: 'Try reader experience', value: '__reader__' },
     ],
   },

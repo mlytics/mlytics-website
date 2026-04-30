@@ -69,7 +69,7 @@ export function HeroSection() {
 
       {/* Main content — vertically centred */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-[96px] pb-8">
-        <div className="max-w-3xl w-full mx-auto flex flex-col items-center text-center">
+        <div className="max-w-[52rem] w-full mx-auto flex flex-col items-center text-center">
 
           {/* Live badge */}
           {/* <div className="mb-5">
