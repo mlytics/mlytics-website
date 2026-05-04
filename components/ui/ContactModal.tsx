@@ -140,7 +140,7 @@ export function ContactModal() {
               { name: 'company', value: form.company },
               { name: 'persona_type', value: form.role },
               { name: 'website', value: form.website },
-              { name: 'message', value: form.message },
+              { name: 'pain_and_problem', value: form.message },
             ],
             context: {
               pageUri: window.location.href,

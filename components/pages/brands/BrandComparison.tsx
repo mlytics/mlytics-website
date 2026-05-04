@@ -38,7 +38,7 @@ export function BrandComparison() {
   const showBackdrop = isStuck && !isDesktop
 
   return (
-    <section className="section-dark py-16 lg:py-20">
+    <section className="section-white py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-6">
 
         {/* Section header */}
@@ -49,10 +49,10 @@ export function BrandComparison() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(168,197,195,0.55)' }}>
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
             The Difference
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white">
+          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
             Traditional CPM vs. Mlytics Cortex
           </h2>
         </motion.div>
@@ -69,18 +69,18 @@ export function BrandComparison() {
             ...(showBackdrop ? {
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
-              background: 'rgba(18,40,38,0.88)',
-              borderBottom: '1px solid rgba(168,197,195,0.1)',
+              background: 'rgba(255,255,255,0.92)',
+              borderBottom: '1px solid rgba(0,0,0,0.06)',
             } : {}),
           }}
         >
           <div className="px-5 py-4 text-center">
-            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(26,26,26,0.35)' }}>
               Traditional CPM
             </p>
           </div>
           <div className="px-5 py-4 text-center">
-            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.9)' }}>
+            <p className="text-base font-bold uppercase tracking-widest" style={{ color: '#225D59' }}>
               Mlytics Cortex
             </p>
           </div>
@@ -98,9 +98,9 @@ export function BrandComparison() {
             {/* Category label */}
             <div
               className="px-5 py-3 rounded-lg"
-              style={{ background: 'rgba(34,93,89,0.25)' }}
+              style={{ background: 'rgba(34,93,89,0.08)' }}
             >
-              <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(168,197,195,0.6)' }}>
+              <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#225D59' }}>
                 {row.label}
               </span>
             </div>
@@ -108,15 +108,15 @@ export function BrandComparison() {
             {/* Two-column values */}
             <div
               className="grid grid-cols-2 items-center py-5"
-              style={{ borderBottom: i < ROWS.length - 1 ? '1px solid rgba(168,197,195,0.08)' : undefined }}
+              style={{ borderBottom: i < ROWS.length - 1 ? '1px solid rgba(0,0,0,0.06)' : undefined }}
             >
               <div className="px-5 text-center">
-                <p className="text-sm leading-relaxed text-white">
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(26,26,26,0.45)' }}>
                   {row.cpm}
                 </p>
               </div>
               <div className="px-5 text-center">
-                <p className="text-sm leading-relaxed text-white">
+                <p className="text-sm leading-relaxed font-medium" style={{ color: '#1A1A1A' }}>
                   {row.mlytics}
                 </p>
               </div>
