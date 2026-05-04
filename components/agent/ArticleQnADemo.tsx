@@ -6,10 +6,11 @@ import { READER_QUESTIONS, type ReaderQuestion } from '@/lib/agent-data'
 
 interface ArticleQnADemoProps {
   isDark?: boolean
+  disabled?: boolean
   onSelect: (label: string, value: string) => void
 }
 
-export function ArticleQnADemo({ isDark = true, onSelect }: ArticleQnADemoProps) {
+export function ArticleQnADemo({ isDark = true, disabled = false, onSelect }: ArticleQnADemoProps) {
   const [selected, setSelected] = useState<string | null>(null)
   const frozen = selected !== null
 
@@ -22,7 +23,7 @@ export function ArticleQnADemo({ isDark = true, onSelect }: ArticleQnADemoProps)
   const questionBorder = isDark ? 'rgba(34,93,89,0.5)' : '#225D59'
 
   function handleClick(q: ReaderQuestion) {
-    if (frozen) return
+    if (frozen || disabled) return
     setSelected(q.id)
     setTimeout(() => onSelect(q.text, q.id), 300)
   }

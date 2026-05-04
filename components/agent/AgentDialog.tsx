@@ -887,10 +887,11 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                     className="mt-2"
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, ease: 'easeOut', delay: 0.4 }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
                   >
                     <ArticleQnADemo
                       isDark={isDark}
+                      disabled={messages[messages.length - 1]?.isTyping === true}
                       onSelect={(label, value) => advance(label, value)}
                     />
                   </motion.div>

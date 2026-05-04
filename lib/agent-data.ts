@@ -592,7 +592,7 @@ export const READER_FLOW: AgentStep[] = [
     id: 'reader-article',
     agentMessage: "Here's an article →",
     inputType: 'message',
-    autoAdvanceDelay: 1500,
+    autoAdvanceDelay: 200,
   },
   {
     id: 'reader-article-followup',
