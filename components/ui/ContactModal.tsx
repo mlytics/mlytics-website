@@ -138,7 +138,7 @@ export function ContactModal() {
               { name: 'email', value: form.email },
               { name: 'phone', value: `+${selectedCountry.dialCode} ${form.phone}`.trim() },
               { name: 'company', value: form.company },
-              { name: 'jobtitle', value: form.role },
+              { name: 'persona_type', value: form.role },
               { name: 'website', value: form.website },
               { name: 'message', value: form.message },
             ],
