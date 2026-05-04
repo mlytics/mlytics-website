@@ -259,6 +259,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   const scrollToBottom = () => {
     const body = scrollBodyRef.current
     if (!body) return
+    if (!engaged) return
     if (userScrolledUpRef.current) return
     body.scrollTop = body.scrollHeight
   }
@@ -444,7 +445,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
       if (!dialogRef.current || engaged) return
       const rect = dialogRef.current.getBoundingClientRect()
       const available = window.innerHeight - rect.top - bottomPadding - 24
-      setDynamicMaxH(`${Math.max(260, Math.round(available))}px`)
+      setDynamicMaxH(`${Math.max(320, Math.round(available))}px`)
     }
     // Only do the initial position calculation on mount, NOT when transitioning
     // from engaged→idle (the dialog is still at the top of the viewport at that
