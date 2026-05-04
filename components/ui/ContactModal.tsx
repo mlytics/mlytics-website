@@ -144,7 +144,7 @@ export function ContactModal() {
             ],
             context: {
               pageUri: window.location.href,
-              pageName: document.title,
+              pageName: window.location.pathname === '/' ? 'Home' : window.location.pathname.replace(/^\//, '').replace(/-/g, ' '),
             },
           }),
         }
