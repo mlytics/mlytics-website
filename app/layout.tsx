@@ -13,8 +13,20 @@ import { AgentWidget } from '@/components/agent/AgentWidget'
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
-  title: 'Mlytics Cortex — Per dollar, per intelligent outcome.',
-  description: 'From 4.1M WAU to qualified leads. The intent refinery that turns raw attention into commercial transactions.',
+  title: 'Mlytics',
+  description: 'Mlytics is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
+  openGraph: {
+    title: 'Mlytics',
+    description: 'Mlytics is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mlytics',
+    description: 'Mlytics is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
+    images: ['/og-image.png'],
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
