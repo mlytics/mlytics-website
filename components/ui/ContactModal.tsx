@@ -245,7 +245,7 @@ export function ContactModal() {
                       <div className="flex gap-2">
                         <CountryCodePicker value={selectedCountry} onChange={setSelectedCountry} />
                         <input type="tel" value={form.phone} onChange={set('phone')}
-                          className={inputCls} placeholder="912 345 678" />
+                          className={inputCls} placeholder="" />
                       </div>
                     </div>
 
