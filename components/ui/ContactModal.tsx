@@ -254,7 +254,7 @@ export function ContactModal() {
                       <div>
                         <label className={labelCls}>Company *</label>
                         <input required value={form.company} onChange={set('company')}
-                          className={inputCls} placeholder="Acme Media" />
+                          className={inputCls} placeholder="Your company name" />
                       </div>
                       <div>
                         <label className={labelCls}>I am a...</label>
