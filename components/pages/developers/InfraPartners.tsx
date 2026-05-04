@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 
 const FILTER_DEFAULT = 'grayscale(1) brightness(0.45) opacity(0.9)'
-const FILTER_HOVER   = 'grayscale(0) brightness(1) opacity(1)'
+const FILTER_HOVER   = 'grayscale(0) brightness(0.85) opacity(1)'
 
 const BASE = '/logos/Developer%20Partner/svg'
 
