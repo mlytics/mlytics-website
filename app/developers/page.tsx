@@ -33,10 +33,10 @@ export default function DevelopersPage() {
       {/* AI-era reframing */}
       <AILayerSection />
 
-      <DeveloperPageCTA />
-
       {/* Infrastructure Partners */}
       <InfraPartners />
+
+      <DeveloperPageCTA />
     </>
   )
 }
