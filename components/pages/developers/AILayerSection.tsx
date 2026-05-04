@@ -94,9 +94,7 @@ export function AILayerSection() {
             position: isDesktop ? 'static' : 'sticky',
             top: 64,
             ...(showBackdrop ? {
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              background: 'rgba(18,40,38,0.88)',
+              background: '#1A3D3A',
               borderBottom: '1px solid rgba(168,197,195,0.1)',
             } : {}),
           }}
