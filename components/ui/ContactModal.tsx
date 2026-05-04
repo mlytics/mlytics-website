@@ -109,7 +109,7 @@ export function ContactModal() {
   const [form, setForm] = useState({
     firstName: '', lastName: '',
     email: '', phone: '',
-    company: '', role: 'publisher', website: '', message: '',
+    company: '', role: 'content_owner', website: '', message: '',
   })
   const overlayRef = useRef<HTMLDivElement>(null)
 
