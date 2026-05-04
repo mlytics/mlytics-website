@@ -104,7 +104,7 @@ export function BrandGEOSection() {
             <div
               className="font-black tabular-nums leading-none"
               style={{
-                fontSize: 'clamp(4rem, 14vw, 9rem)',
+                fontSize: 'clamp(2rem, 11vw, 9rem)',
                 letterSpacing: '-0.04em',
                 color: '#FAFAFA',
                 lineHeight: 1,
