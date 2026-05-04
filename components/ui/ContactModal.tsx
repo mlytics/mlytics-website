@@ -123,9 +123,31 @@ export function ContactModal() {
     return () => document.removeEventListener('keydown', handleKey)
   }, [isOpen, close])
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    console.log('[POC Request]', { ...form, countryCode: `+${selectedCountry.dialCode}` })
+    try {
+      await fetch(
+        'https://api.hsforms.com/submissions/v3/integration/submit/4284310/b9751670-5043-401f-b789-22ef2d735f89',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fields: [
+              { name: 'firstname', value: form.firstName },
+              { name: 'lastname', value: form.lastName },
+              { name: 'email', value: form.email },
+              { name: 'phone', value: `+${selectedCountry.dialCode} ${form.phone}`.trim() },
+              { name: 'company', value: form.company },
+              { name: 'jobtitle', value: form.role },
+              { name: 'website', value: form.website },
+              { name: 'message', value: form.message },
+            ],
+          }),
+        }
+      )
+    } catch (err) {
+      console.error('[HubSpot] submit error', err)
+    }
     setSubmitted(true)
   }
 
