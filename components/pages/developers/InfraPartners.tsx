@@ -63,7 +63,7 @@ function HoverLogo({ name, src, height = 28 }: { name: string; src: string | nul
         objectFit: 'contain',
         filter: hovered ? FILTER_HOVER : FILTER_DEFAULT,
         transition: 'filter 0.25s ease',
-        cursor: 'pointer',
+        cursor: 'default',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

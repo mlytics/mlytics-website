@@ -96,7 +96,7 @@ export function SolutionPitches() {
 
                 {/* Right — Mlytics */}
                 <div
-                  className="p-5 flex flex-col gap-2 border-l"
+                  className="p-5 flex flex-col gap-2 border-t md:border-t-0 md:border-l"
                   style={{ background: 'rgba(34,93,89,0.04)', borderColor: 'rgba(34,93,89,0.12)' }}
                 >
                   <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: pitch.accent }}>

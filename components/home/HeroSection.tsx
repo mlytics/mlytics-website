@@ -53,7 +53,7 @@ export function HeroSection() {
   }, [])
 
   return (
-    <section className="relative min-h-screen section-white flex flex-col">
+    <section className="relative min-h-screen min-h-[100dvh] section-white flex flex-col">
       {/* Background elements — clipped to section bounds so they don't bleed into adjacent sections */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <WorldMapDots variant="light" />
@@ -136,7 +136,7 @@ export function HeroSection() {
           </p>
 
           {/* CTA button */}
-          <div className="mb-14">
+          <div className="mb-6 md:mb-14">
             <button
               onClick={open}
               className="px-8 py-3.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"

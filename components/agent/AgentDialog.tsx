@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { type AgentStep, type AgentPersona, type StylistProduct, type StyleCard, type ReaderProduct, getStylistRecommendation, getReaderProduct, STYLIST_FLOW, READER_FLOW, READER_QUESTIONS } from '@/lib/agent-data'
+import { type AgentStep, type AgentPersona, type StylistProduct, type StyleCard, type ReaderProduct, getStylistRecommendation, getReaderProduct, STYLIST_FLOW, READER_FLOW, READER_QUESTIONS, READER_PRODUCTS } from '@/lib/agent-data'
 import { useAgent } from '@/lib/agent-context'
 import { ArticleScanDemo } from './ArticleScanDemo'
 import { ArticleQnADemo } from './ArticleQnADemo'
@@ -173,6 +173,14 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   const dialogRef = useRef<HTMLDivElement>(null)
   // Captures window.scrollY after scroll settles; used to detect upward scroll-away
   const engagedScrollYRef = useRef(0)
+
+  // Preload car images so they're ready when the reader product card appears
+  useEffect(() => {
+    Object.values(READER_PRODUCTS).forEach(p => {
+      const img = new window.Image()
+      img.src = p.imageUrl
+    })
+  }, [])
   // Tracks whether the previous render was engaged — lets us skip position recalc on un-engage
   const wasEngagedRef = useRef(mode === 'stylist')
 
@@ -956,11 +964,13 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                       }}
                     >
                       {/* Photo */}
-                      <div style={{ aspectRatio: '1/1', overflow: 'hidden', background: '#1a1a1a' }}>
+                      <div style={{ aspectRatio: '1/1', overflow: 'hidden', background: '#e8e8e8' }}>
                         <img
                           src={readerProduct.imageUrl}
                           alt={readerProduct.name}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0, transition: 'opacity 0.3s ease' }}
+                          onLoad={e => { (e.currentTarget as HTMLImageElement).style.opacity = '1' }}
+                          onError={e => { (e.currentTarget as HTMLImageElement).style.opacity = '1' }}
                         />
                       </div>
 

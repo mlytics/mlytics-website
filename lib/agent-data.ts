@@ -612,7 +612,7 @@ export const READER_FLOW: AgentStep[] = [
   },
   {
     id: 'reader-product-bridge',
-    agentMessage: "In the chat experience, Cortex goes further — proactively asking readers questions, capturing their intent, and guiding them toward the right product or next step.\n\nHere's an example. Select your answer:",
+    agentMessage: "In the chat experience, Cortex goes further — proactively asking readers questions, capturing their intent, and guiding them toward the right product or next step.\n\nHere's an example.",
     inputType: 'message',
     autoAdvanceDelay: 400,
   },
