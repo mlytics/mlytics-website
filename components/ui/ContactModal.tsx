@@ -142,6 +142,10 @@ export function ContactModal() {
               { name: 'website', value: form.website },
               { name: 'message', value: form.message },
             ],
+            context: {
+              pageUri: window.location.href,
+              pageName: document.title,
+            },
           }),
         }
       )
