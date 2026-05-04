@@ -21,6 +21,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geist.variable} h-full antialiased`}>
       <GoogleAnalytics gaId="G-BHS28B1S3P" />
+      {/* HubSpot Tracking Code */}
+      <script async defer src="//js.hs-scripts.com/4284310.js" />
       <body className="min-h-full flex flex-col">
         <AgentProvider>
           <ContactModalProvider>
