@@ -519,7 +519,7 @@ export const READER_PRODUCTS: Record<string, ReaderProduct> = {
     ],
     ctaLabel: 'Request a Quote',
     ctaHref: 'https://www.chevrolet.com/equinox-ev?x-modelyear=2026&x-carline=equinox%20ev&x-bodystyle=equinox&x-provider-id=560803',
-    imageUrl: '/Equinox EV.png',
+    imageUrl: '/images/Equinox EV.png',
   },
   mid500700: {
     brand: 'Hyundai',
@@ -537,7 +537,7 @@ export const READER_PRODUCTS: Record<string, ReaderProduct> = {
     ],
     ctaLabel: 'Request a Quote',
     ctaHref: 'https://www.hyundaiusa.com/us/en/vehicles/ioniq-6',
-    imageUrl: '/Ioniq 6.png',
+    imageUrl: '/images/Ioniq 6.png',
   },
   mid700900: {
     brand: 'Tesla',
@@ -555,7 +555,7 @@ export const READER_PRODUCTS: Record<string, ReaderProduct> = {
     ],
     ctaLabel: 'Request a Quote',
     ctaHref: 'https://www.tesla.com/model3',
-    imageUrl: '/Model 3.png',
+    imageUrl: '/images/Model 3.png',
   },
   over900: {
     brand: 'Porsche',
@@ -573,7 +573,7 @@ export const READER_PRODUCTS: Record<string, ReaderProduct> = {
     ],
     ctaLabel: 'Request a Quote',
     ctaHref: 'https://www.porsche.com/usa/models/taycan/taycan-models/taycan/',
-    imageUrl: '/Porsche Taycan.png',
+    imageUrl: '/images/Porsche Taycan.png',
   },
 }
 
