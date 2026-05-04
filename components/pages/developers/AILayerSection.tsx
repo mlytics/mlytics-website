@@ -99,13 +99,13 @@ export function AILayerSection() {
             } : {}),
           }}
         >
-          <div className="px-5 py-4 text-center">
-            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <div className="px-5 py-4 flex items-center justify-center">
+            <p className="text-base font-bold uppercase tracking-widest text-center" style={{ color: 'rgba(255,255,255,0.35)' }}>
               Before
             </p>
           </div>
-          <div className="px-5 py-4 text-center">
-            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.9)' }}>
+          <div className="px-5 py-4 flex items-center justify-center">
+            <p className="text-base font-bold uppercase tracking-widest text-center" style={{ color: 'rgba(255,255,255,0.9)' }}>
               With Mlytics
             </p>
           </div>
