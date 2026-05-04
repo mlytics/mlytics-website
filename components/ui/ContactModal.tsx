@@ -260,7 +260,7 @@ export function ContactModal() {
                         <label className={labelCls}>I am a...</label>
                         <select value={form.role} onChange={set('role')}
                           className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors bg-white">
-                          <option value="publisher">Content Owner</option>
+                          <option value="content_owner">Content Owner</option>
                           <option value="brand">Brand</option>
                           <option value="developer">Developer</option>
                         </select>
