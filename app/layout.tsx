@@ -13,6 +13,7 @@ import { AgentWidget } from '@/components/agent/AgentWidget'
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.mlytics.com'),
   title: 'Mlytics',
   description: 'Mlytics is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
   openGraph: {
