@@ -19,14 +19,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Mlytics',
     description: 'Mlytics is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://storage.googleapis.com/mlytics-website/og-image.png', width: 1200, height: 630 }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Mlytics',
     description: 'Mlytics is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
-    images: ['/og-image.png'],
+    images: ['https://storage.googleapis.com/mlytics-website/og-image.png'],
   },
 }
 
