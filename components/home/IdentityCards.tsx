@@ -117,7 +117,7 @@ export function IdentityCards() {
                 className="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
                 style={{ background: card.accent }}
               >
-                {card.cta} →
+                {card.cta}
               </Link>
             </motion.div>
           ))}

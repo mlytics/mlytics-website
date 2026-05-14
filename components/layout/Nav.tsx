@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { useContactModal } from '@/context/contact-modal-context'
+import { trackCTA } from '@/lib/analytics'
 
 const NAV_LINKS = [
   { label: 'Content Owners', href: '/content-owners' },
@@ -22,7 +23,7 @@ export function Nav() {
   const { open: openContact } = useContactModal()
   const lastScrollY = useRef(0)
 
-  const isHome = pathname === '/'
+  const normalizedPathname = pathname.replace(/\/$/, '') || '/'
 
   useEffect(() => {
     const handler = () => {
@@ -82,17 +83,11 @@ export function Nav() {
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium transition-colors relative ${
-                pathname === link.href ? activeLinkColor : linkColor
+              className={`text-sm transition-colors ${
+                normalizedPathname === link.href ? `${activeLinkColor} font-semibold` : `${linkColor} font-medium`
               }`}
             >
               {link.label}
-              {pathname === link.href && (
-                <motion.span
-                  layoutId="nav-underline"
-                  className="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full bg-[#225D59]"
-                />
-              )}
             </Link>
           ))}
         </div>
@@ -100,7 +95,7 @@ export function Nav() {
         {/* CTA */}
         <div className="hidden lg:flex items-center gap-3">
           <button
-            onClick={openContact}
+            onClick={() => { trackCTA('Book a Demo', 'nav'); openContact() }}
             className="px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
             style={{ background: '#225D59' }}
           >
@@ -132,15 +127,15 @@ export function Nav() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className={`block text-sm font-medium py-1 ${
-                    pathname === link.href ? 'text-[#225D59]' : 'text-[#6B6B6B]'
+                  className={`block text-sm py-1 ${
+                    normalizedPathname === link.href ? 'text-[#225D59] font-semibold' : 'text-[#6B6B6B] font-medium'
                   }`}
                 >
                   {link.label}
                 </Link>
               ))}
               <button
-                onClick={() => { setMobileOpen(false); openContact() }}
+                onClick={() => { trackCTA('Book a Demo', 'nav_mobile'); setMobileOpen(false); openContact() }}
                 className="w-full mt-2 py-2.5 rounded-full text-sm font-semibold text-white"
                 style={{ background: '#225D59' }}
               >

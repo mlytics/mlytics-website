@@ -1,6 +1,7 @@
 'use client'
 
 import { useContactModal } from '@/context/contact-modal-context'
+import { trackCTA } from '@/lib/analytics'
 
 export function PublisherPageCTA() {
   const { open } = useContactModal()
@@ -14,7 +15,7 @@ export function PublisherPageCTA() {
           Paste your article. We'll run a real analysis and show you what intent signals are leaving your site uncaptured.
         </p>
         <button
-          onClick={open}
+          onClick={() => { trackCTA('Book a Demo', 'content_owners_cta'); open() }}
           className="px-8 py-3.5 rounded-full text-sm font-semibold text-[#225D59] bg-white hover:bg-gray-100 transition-all active:scale-[0.98]"
         >
           Get a Personalized Demo

@@ -8,6 +8,7 @@ import { AgentDialog } from '@/components/agent/AgentDialog'
 import { WorldMapDots } from './WorldMapDots'
 import { LogoMarquee } from './LogoMarquee'
 import { useContactModal } from '@/context/contact-modal-context'
+import { trackCTA } from '@/lib/analytics'
 
 const MARQUEE_H = 88
 
@@ -138,7 +139,7 @@ export function HeroSection() {
           {/* CTA button */}
           <div className="mb-6 md:mb-14">
             <button
-              onClick={open}
+              onClick={() => { trackCTA('Book a Demo', 'hero'); open() }}
               className="px-8 py-3.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
               style={{ background: '#225D59' }}
             >
@@ -150,7 +151,7 @@ export function HeroSection() {
           <div className={dialogEngaged ? 'w-full sticky top-20 lg:top-4 z-20' : 'w-full'}>
             <AgentDialog
               flow={HERO_FLOW}
-              mode="cortex"
+
               onComplete={handleComplete}
               variant="page"
               bottomPadding={0}

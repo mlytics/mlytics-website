@@ -3,118 +3,26 @@
 import { useState, useEffect, useRef, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { type AgentStep, type AgentPersona, type StylistProduct, type StyleCard, type ReaderProduct, getStylistRecommendation, getReaderProduct, STYLIST_FLOW, READER_FLOW, READER_QUESTIONS, READER_PRODUCTS } from '@/lib/agent-data'
+import { type AgentStep, type AgentPersona, type ReaderProduct, getReaderProduct, HERO_FLOW, READER_FLOW, PUBLISHER_FLOW, BRAND_FLOW, DEVELOPER_FLOW, READER_QUESTIONS, READER_PRODUCTS } from '@/lib/agent-data'
 import { useAgent } from '@/lib/agent-context'
 import { ArticleScanDemo } from './ArticleScanDemo'
 import { ArticleQnADemo } from './ArticleQnADemo'
 import { useContactModal } from '@/context/contact-modal-context'
+import { trackAG } from '@/lib/analytics'
 
-// ── Style card carousel ────────────────────────────────────────────────────────
-
-function StyleCardCarousel({
-  cards,
-  isDark,
-  onSelect,
-  frozenValue,
-}: {
-  cards: StyleCard[]
-  isDark: boolean
-  onSelect?: (label: string, value: string) => void
-  frozenValue?: string
-}) {
-  const [selected, setSelected] = useState<string | null>(frozenValue ?? null)
-  const frozen = frozenValue !== undefined
-
-  function handleClick(card: StyleCard) {
-    if (frozen || selected) return
-    setSelected(card.value)
-    setTimeout(() => onSelect?.(card.label, card.value), 300)
-  }
-
-  return (
-    <div
-      className="overflow-x-auto"
-      style={{
-        scrollSnapType: 'x mandatory',
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-        WebkitOverflowScrolling: 'touch',
-        paddingBottom: 8,
-      }}
-    >
-      <div className="flex gap-2.5" style={{ width: 'max-content', paddingRight: 8 }}>
-        {cards.map(card => {
-          const isSelected = selected === card.value
-          const isDimmed = selected !== null && !isSelected
-          return (
-            <button
-              key={card.value}
-              onClick={() => handleClick(card)}
-              disabled={frozen || !!selected}
-              style={{
-                width: 120,
-                height: 168,
-                scrollSnapAlign: 'start',
-                flexShrink: 0,
-                borderRadius: 12,
-                border: `2px solid ${isSelected ? (isDark ? 'rgba(168,197,195,0.85)' : '#225D59') : 'transparent'}`,
-                overflow: 'hidden',
-                cursor: (frozen || selected) ? 'default' : 'pointer',
-                opacity: isDimmed ? 0.3 : 1,
-                transition: 'opacity 0.25s ease, border-color 0.2s ease, transform 0.15s ease',
-                transform: isSelected ? 'scale(1.04)' : 'scale(1)',
-                position: 'relative',
-                padding: 0,
-                background: '#1A1A1A',
-              }}
-            >
-              {/* Photo */}
-              <img
-                src={card.imageUrl}
-                alt={card.label}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
-                draggable={false}
-              />
-              {/* Selected checkmark overlay */}
-              {isSelected && (
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                    width: 22,
-                    height: 22,
-                    borderRadius: '50%',
-                    background: isDark ? 'rgba(168,197,195,0.92)' : '#225D59',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 12,
-                    color: 'white',
-                    boxShadow: '0 1px 6px rgba(0,0,0,0.3)',
-                  }}
-                >
-                  ✓
-                </span>
-              )}
-            </button>
-          )
-        })}
-      </div>
-    </div>
-  )
+function detectFlowName(flow: AgentStep[]): string {
+  if (flow === HERO_FLOW) return 'HERO_FLOW'
+  if (flow === READER_FLOW) return 'READER_FLOW'
+  if (flow === PUBLISHER_FLOW) return 'PUBLISHER_FLOW'
+  if (flow === BRAND_FLOW) return 'BRAND_FLOW'
+  if (flow === DEVELOPER_FLOW) return 'DEVELOPER_FLOW'
+  return 'UNKNOWN_FLOW'
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface AgentDialogProps {
   flow: AgentStep[]
-  mode?: 'cortex' | 'stylist'
   onComplete?: (persona: AgentPersona) => void
   variant?: 'hero' | 'page'
   bottomPadding?: number
@@ -124,15 +32,15 @@ interface AgentDialogProps {
 
 type MessageItem = { role: 'agent' | 'user'; text: string; isTyping?: boolean; isThinking?: boolean }
 
-export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero', bottomPadding = 0, onEngage, onReset }: AgentDialogProps) {
+export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding = 0, onEngage, onReset }: AgentDialogProps) {
+  const mode = 'cortex'
   const { persona, setPersona, addHistory, setHeroCompleted } = useAgent()
   const { open: openContact } = useContactModal()
   const router = useRouter()
 
-  // Internal flow & mode — can be switched mid-conversation when user picks __stylist__
   const originalFlowRef = useRef(flow)
   const [currentFlow, setCurrentFlow] = useState(flow)
-  const [currentMode, setCurrentMode] = useState<'cortex' | 'stylist' | 'reader'>(mode)
+  const [currentMode, setCurrentMode] = useState<'cortex' | 'reader'>(mode)
   // Bumped whenever the active flow changes so the typewriter effect re-runs even if stepIdx stays 0
   const [flowVersion, setFlowVersion] = useState(0)
 
@@ -144,8 +52,6 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   const [urlInput, setUrlInput] = useState('')
   const [showUrlInput, setShowUrlInput] = useState(false)
   const [demoComplete, setDemoComplete] = useState(false)
-  const [stylistAnswers, setStylistAnswers] = useState<string[]>([])
-  const [stylistProduct, setStylistProduct] = useState<StylistProduct | null>(null)
   const [readerQuestionId, setReaderQuestionId] = useState<string>('')
   const [readerProduct, setReaderProduct] = useState<ReaderProduct | null>(null)
   // Index in messages[] after which ArticleQnADemo is inserted (fixed once set)
@@ -160,14 +66,9 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
   const demoInsertAfterIdxRef = useRef(-1)
   // Index in messages[] for the product-card insertion (fixed once set)
   const productCardInsertAfterIdxRef = useRef(-1)
-  // Index in messages[] after which the style-card carousel is rendered inline
-  const [styleCardInsertAfterIdx, setStyleCardInsertAfterIdx] = useState(-1)
-  const styleCardsCache = useRef<StyleCard[]>([])
-  const [selectedStyleValue, setSelectedStyleValue] = useState<string | null>(null)
   // dynamicMaxH is used as maxHeight when idle, and as height+maxHeight when engaged
   const [dynamicMaxH, setDynamicMaxH] = useState<string>('60vh')
-  // Stylist mode starts in engaged state so the full chat layout is visible from step 1
-  const [engaged, setEngaged] = useState(mode === 'stylist')
+  const [engaged, setEngaged] = useState(false)
 
   const scrollBodyRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -181,23 +82,71 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
       img.src = p.imageUrl
     })
   }, [])
+
+  // FR-07: impression tracking — fires once when the dialog enters the viewport
+  useEffect(() => {
+    if (!dialogRef.current) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !impressionTrackedRef.current) {
+        impressionTrackedRef.current = true
+        trackAG('agentdialog_impression', { flow: currentFlowNameRef.current })
+        observer.disconnect()
+      }
+    }, { threshold: 0.5 })
+    observer.observe(dialogRef.current)
+    return () => observer.disconnect()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // FR-07: step_view + step_duration — fires on every step change
+  useEffect(() => {
+    const step = currentFlow[stepIdx]
+    if (!step) return
+    const now = Date.now()
+    if (prevStepIdRef.current) {
+      trackAG('agentdialog_step_duration', {
+        flow: currentFlowNameRef.current,
+        step_id: prevStepIdRef.current,
+        duration_ms: now - trackStartTimeRef.current,
+      })
+    }
+    trackAG('agentdialog_step_view', {
+      flow: currentFlowNameRef.current,
+      step_id: step.id,
+      step_index: stepIdx,
+    })
+    trackStartTimeRef.current = now
+    prevStepIdRef.current = step.id
+  }, [stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // FR-07: flow_abandon — fires on page unload if flow was never completed
+  useEffect(() => {
+    function handleUnload() {
+      if (!flowCompletedRef.current && prevStepIdRef.current) {
+        trackAG('agentdialog_flow_abandon', {
+          flow: currentFlowNameRef.current,
+          last_step_id: prevStepIdRef.current,
+          persona: selectedPersonaRef.current || persona || '',
+        })
+      }
+    }
+    window.addEventListener('beforeunload', handleUnload)
+    return () => window.removeEventListener('beforeunload', handleUnload)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // Analytics tracking refs (FR-07)
+  const trackStartTimeRef = useRef<number>(Date.now())
+  const prevStepIdRef = useRef<string>('')
+  const currentFlowNameRef = useRef<string>(detectFlowName(flow))
+  const flowCompletedRef = useRef<boolean>(false)
+  const selectedPersonaRef = useRef<string>('')
+  const impressionTrackedRef = useRef<boolean>(false)
+
   // Tracks whether the previous render was engaged — lets us skip position recalc on un-engage
-  const wasEngagedRef = useRef(mode === 'stylist')
+  const wasEngagedRef = useRef(false)
 
   const currentStep = currentFlow[stepIdx]
   const isDark = variant === 'hero'
 
   function resolveMessage(step: AgentStep): string {
-    if (step.resolveFromStylistAnswer) {
-      const { index, messages } = step.resolveFromStylistAnswer
-      const answerLabel = stylistAnswers[index] ?? ''
-      // Check longest keys first to avoid partial matches (e.g. 'Under $300' before '$300')
-      const keys = Object.keys(messages).sort((a, b) => b.length - a.length)
-      for (const key of keys) {
-        if (answerLabel.includes(key)) return messages[key]
-      }
-      return Object.values(messages)[0] ?? step.agentMessage
-    }
     if (step.readerMessages && readerQuestionId) {
       return step.readerMessages[readerQuestionId] ?? step.agentMessage
     }
@@ -316,18 +265,6 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     setDemoComplete(false)
   }, [stepIdx])
 
-  // For stylist mode: notify parent and compute height on mount (already engaged)
-  useEffect(() => {
-    if (mode !== 'stylist') return
-    onEngage?.()
-    engagedScrollYRef.current = window.scrollY
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        applyEngagedMaxH()
-      })
-    })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
   // Auto-advance when demo finishes — no button needed
   useEffect(() => {
     if (!demoComplete) return
@@ -340,6 +277,13 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
         ])
         setStepIdx(next)
       } else {
+        if (!flowCompletedRef.current) {
+          flowCompletedRef.current = true
+          trackAG('agentdialog_flow_complete', {
+            flow: currentFlowNameRef.current,
+            persona: selectedPersonaRef.current || persona || '',
+          })
+        }
         onComplete?.(persona)
       }
     }, 600)
@@ -399,14 +343,6 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     }, 1200)
     return () => clearTimeout(timer)
   }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Pin the style-card carousel position in the message list when it becomes interactive
-  useEffect(() => {
-    if (currentStep.inputType === 'style-cards' && showInput && styleCardInsertAfterIdx === -1) {
-      setStyleCardInsertAfterIdx(messages.length - 1)
-      styleCardsCache.current = currentStep.styleCards ?? []
-    }
-  }, [showInput, stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Pin the ArticleQnADemo position when the reader-article step finishes typing
   useEffect(() => {
@@ -477,11 +413,6 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     setDemoVisible(false)
     demoInsertAfterIdxRef.current = -1
     productCardInsertAfterIdxRef.current = -1
-    setStyleCardInsertAfterIdx(-1)
-    styleCardsCache.current = []
-    setSelectedStyleValue(null)
-    setStylistAnswers([])
-    setStylistProduct(null)
     setReaderQuestionId('')
     setReaderProduct(null)
     readerArticleInsertAfterIdxRef.current = -1
@@ -489,6 +420,12 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     readerProductCardInsertAfterIdxRef.current = -1
     setEngaged(false)
     setDynamicMaxH('60vh')
+    // Reset analytics tracking state for fresh session
+    flowCompletedRef.current = false
+    currentFlowNameRef.current = detectFlowName(originalFlowRef.current)
+    prevStepIdRef.current = ''
+    selectedPersonaRef.current = ''
+    trackStartTimeRef.current = Date.now()
     onReset?.()
   }
 
@@ -567,7 +504,16 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     // User interacted — resume auto-scroll so new content is visible
     userScrolledUpRef.current = false
 
+    // FR-07: track every button click
+    trackAG('agentdialog_button_click', {
+      flow: currentFlowNameRef.current,
+      step_id: currentStep.id,
+      button_label: userLabel,
+      button_value: userValue,
+    })
+
     if (userValue === '__reader__') {
+      currentFlowNameRef.current = 'READER_FLOW'
       engageAndScroll()
       setShowInput(false)
       addHistory({ role: 'user', content: userLabel })
@@ -588,44 +534,17 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
       return
     }
 
-    if (userValue === '__stylist__') {
-      // Same interaction as other pills: show user bubble → agent starts typing → flow switches internally
-      engageAndScroll()
-      setShowInput(false)
-      addHistory({ role: 'user', content: userLabel })
-      setStylistAnswers([])
-      setStylistProduct(null)
-      productCardInsertAfterIdxRef.current = -1
-      setStyleCardInsertAfterIdx(-1)
-      styleCardsCache.current = []
-      setSelectedStyleValue(null)
-      setMessages(prev => [
-        ...prev,
-        { role: 'user', text: userLabel },
-        { role: 'agent', text: '', isTyping: true },
-      ])
-      setCurrentFlow(STYLIST_FLOW)
-      setCurrentMode('stylist')
-      setFlowVersion(v => v + 1)
-      setStepIdx(0)
-      return
-    }
-
     engageAndScroll()
     setShowInput(false)
     addHistory({ role: 'user', content: userLabel })
 
     if (currentStep.id === 'step1-persona') {
       setPersona(userValue as AgentPersona)
-    }
-
-    if (currentStep.collectsStylistAnswer) {
-      const updated = [...stylistAnswers, userLabel]
-      setStylistAnswers(updated)
-      // After the 3rd answer (budget), pre-compute the recommendation
-      if (updated.length === 3) {
-        setStylistProduct(getStylistRecommendation(updated))
-      }
+      selectedPersonaRef.current = userValue
+      // Split analytics flow by persona so GA4 filters don't need a separate persona dimension
+      if (userValue === 'publisher') currentFlowNameRef.current = 'PUBLISHER_FLOW'
+      else if (userValue === 'brand') currentFlowNameRef.current = 'BRAND_FLOW'
+      else if (userValue === 'developer') currentFlowNameRef.current = 'DEVELOPER_FLOW'
     }
 
     // Reader flow: capture selected question id from reader-article step
@@ -641,6 +560,13 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
     if (currentStep.inputType === 'cta') {
       setMessages(prev => [...prev, { role: 'user', text: userLabel }])
       setHeroCompleted()
+      if (!flowCompletedRef.current) {
+        flowCompletedRef.current = true
+        trackAG('agentdialog_flow_complete', {
+          flow: currentFlowNameRef.current,
+          persona: selectedPersonaRef.current || persona || '',
+        })
+      }
       if (userValue.startsWith('/')) router.push(userValue)
       else if (currentStep.options?.[0]?.value.startsWith('/')) router.push(currentStep.options[0].value)
       return
@@ -657,6 +583,13 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
       setStepIdx(next)
     } else {
       setMessages(prev => [...prev, { role: 'user', text: userLabel }])
+      if (!flowCompletedRef.current) {
+        flowCompletedRef.current = true
+        trackAG('agentdialog_flow_complete', {
+          flow: currentFlowNameRef.current,
+          persona: selectedPersonaRef.current || persona || '',
+        })
+      }
       onComplete?.(persona)
     }
   }
@@ -682,26 +615,18 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
-  const isStylist = currentMode === 'stylist'
   const isReader = currentMode === 'reader'
   const borderColor = isDark ? 'rgba(34,93,89,0.7)' : '#E5E5E5'
   const bg = isDark ? 'rgba(18,46,44,0.88)' : 'rgba(255,255,255,0.97)'
   const headerBg = isDark ? 'rgba(34,93,89,0.45)' : '#225D59'
 
   const ctaStep = currentStep.inputType === 'cta'
-  const ctaOption = (isStylist || isReader)
-    ? (currentStep.options?.find(o => {
-        if (persona === 'publisher') return o.value === '/content-owners'
-        if (persona === 'brand') return o.value === '/brands'
-        if (persona === 'developer') return o.value === '/developers'
-        return false
-      }) ?? currentStep.options?.[0])
-    : (currentStep.options?.find(o => {
-        if (persona === 'publisher') return o.value === '/content-owners'
-        if (persona === 'brand') return o.value === '/brands'
-        if (persona === 'developer') return o.value === '/developers'
-        return false
-      }) ?? currentStep.options?.[0])
+  const ctaOption = currentStep.options?.find(o => {
+    if (persona === 'publisher') return o.value === '/content-owners'
+    if (persona === 'brand') return o.value === '/brands'
+    if (persona === 'developer') return o.value === '/developers'
+    return false
+  }) ?? currentStep.options?.[0]
 
   const stepOptions =
     (persona && currentStep.personalizedOptions?.[persona]) ?? currentStep.options
@@ -790,7 +715,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                 <button
                   key={opt.label}
                   onClick={() => advance(opt.label, opt.value)}
-                  className={(opt.value === '__stylist__' || opt.value === '__reader__') ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
+                  className={opt.value === '__reader__' ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
                 >
                   {opt.label}
                 </button>
@@ -859,26 +784,6 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                       }}
                     />
                   </div>
-                )}
-
-                {/* Style card carousel — inline in chat, interactive or frozen */}
-                {isStylist && styleCardsCache.current.length > 0 && msg.role === 'agent' && i === styleCardInsertAfterIdx && (
-                  <motion.div
-                    className="mt-2"
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, ease: 'easeOut' }}
-                  >
-                    <StyleCardCarousel
-                      cards={styleCardsCache.current}
-                      isDark={isDark}
-                      frozenValue={selectedStyleValue ?? undefined}
-                      onSelect={(label, value) => {
-                        setSelectedStyleValue(value)
-                        advance(label, value)
-                      }}
-                    />
-                  </motion.div>
                 )}
 
                 {/* ArticleQnADemo — pinned after the reader-article step message, only when bubble is done typing */}
@@ -1023,79 +928,13 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                           onMouseEnter={e => (e.currentTarget.style.opacity = '0.82')}
                           onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
                         >
-                          {readerProduct.ctaLabel} →
+                          {readerProduct.ctaLabel}
                         </a>
                       </div>
                     </div>
                   </motion.div>
                 )}
 
-                {/* Stylist product card — pinned at the product-card step message index */}
-                {isStylist && stylistProduct && msg.role === 'agent' && i === productCardInsertAfterIdxRef.current && (
-                  <motion.div
-                    className="mt-2 rounded-xl overflow-hidden"
-                    style={{
-                      border: '1px solid rgba(34,93,89,0.14)',
-                      background: isDark ? 'rgba(18,46,44,0.55)' : 'white',
-                      boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-                    }}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
-                  >
-                    <div className="flex">
-                      {/* Product image */}
-                      <div style={{ width: 96, flexShrink: 0, background: '#F5F0EB' }}>
-                        <img
-                          src={stylistProduct.imageUrl}
-                          alt={stylistProduct.name}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                        />
-                      </div>
-
-                      {/* Product info */}
-                      <div style={{ flex: 1, padding: '12px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
-                        <div>
-                          <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#225D59', marginBottom: 3 }}>
-                            {stylistProduct.brand}
-                          </p>
-                          <p style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#F5F5F5' : '#1A1A1A', marginBottom: 4, lineHeight: 1.3 }}>
-                            {stylistProduct.name}
-                          </p>
-                          <p style={{ fontSize: 11, color: isDark ? 'rgba(245,245,245,0.55)' : '#7A7A7A', lineHeight: 1.45, marginBottom: 8 }}>
-                            {stylistProduct.stylistNote}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <p style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#A8C5C3' : '#225D59' }}>
-                            {stylistProduct.price}
-                          </p>
-                          <a
-                            href={stylistProduct.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                              fontSize: 11,
-                              fontWeight: 600,
-                              color: 'white',
-                              background: '#225D59',
-                              borderRadius: 6,
-                              padding: '4px 10px',
-                              textDecoration: 'none',
-                              whiteSpace: 'nowrap',
-                              transition: 'opacity 0.15s',
-                            }}
-                            onMouseEnter={e => (e.currentTarget.style.opacity = '0.82')}
-                            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-                          >
-                            Shop now →
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
               </Fragment>
             ))}
 
@@ -1113,13 +952,13 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                 className="flex-shrink-0 border-t"
                 style={{ borderColor }}
               >
-                {showPills && (
+                  {showPills && (
                   <div className="px-4 py-3 flex flex-wrap gap-2">
                     {stepOptions?.map(opt => (
                       <button
                         key={opt.label}
                         onClick={() => advance(opt.label, opt.value)}
-                        className={(opt.value === '__stylist__' || opt.value === '__reader__') ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
+                        className={opt.value === '__reader__' ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
                       >
                         {opt.label}
                       </button>
@@ -1162,7 +1001,7 @@ export function AgentDialog({ flow, mode = 'cortex', onComplete, variant = 'hero
                       className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
                       style={{ background: '#225D59' }}
                     >
-                      {ctaOption.label} →
+                      {ctaOption.label}
                     </button>
                   </div>
                 )}

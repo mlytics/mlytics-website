@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+
+import { trackAG, getPage } from '@/lib/analytics'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, CheckCircle, ChevronDown, Search } from 'lucide-react'
 import { useContactModal } from '@/context/contact-modal-context'
@@ -112,9 +114,15 @@ export function ContactModal() {
     company: '', role: 'content_owner', website: '', message: '',
   })
   const overlayRef = useRef<HTMLDivElement>(null)
+  const modalOpenTimeRef = useRef<number>(0)
 
   useEffect(() => {
-    if (!isOpen) setTimeout(() => setSubmitted(false), 400)
+    if (!isOpen) {
+      setTimeout(() => setSubmitted(false), 400)
+    } else {
+      modalOpenTimeRef.current = Date.now()
+      trackAG('contact_modal_open', { page_audience: getPage() })
+    }
   }, [isOpen])
 
   useEffect(() => {
@@ -153,6 +161,10 @@ export function ContactModal() {
       console.error('[HubSpot] submit error', err)
     }
     setSubmitted(true)
+    trackAG('contact_form_submit', {
+      page_audience: getPage(),
+      time_to_submit_ms: Date.now() - modalOpenTimeRef.current,
+    })
   }
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>

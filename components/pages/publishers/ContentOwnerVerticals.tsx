@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useContactModal } from '@/context/contact-modal-context'
+import { trackCTA } from '@/lib/analytics'
 
 const grayFilter = (invert = false, brightness = 1, opacity = 0.5) =>
   `${invert ? 'invert(1) ' : ''}grayscale(1) brightness(${brightness}) opacity(${opacity})`
@@ -139,7 +140,7 @@ export function ContentOwnerVerticals() {
 
           {/* CTA card — col-span-2 on mobile/tablet, col-span-2 (1/3) on lg */}
           <motion.button
-            onClick={openContact}
+            onClick={() => { trackCTA('Get Started', 'content_owners_section'); openContact() }}
             className="col-span-2 lg:col-span-2 p-5 rounded-2xl flex flex-col items-start justify-between w-full text-left relative"
             style={{ background: '#225D59' }}
             whileHover="hover"

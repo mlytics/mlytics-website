@@ -8,7 +8,8 @@ import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
 import { ScrollToTop } from '@/components/layout/ScrollToTop'
 import { ContactModal } from '@/components/ui/ContactModal'
-import { AgentWidget } from '@/components/agent/AgentWidget'
+import { SectionViewTracker } from '@/components/analytics/SectionViewTracker'
+import { ScrollDepthTracker } from '@/components/analytics/ScrollDepthTracker'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geist.variable} h-full antialiased`}>
-      <GoogleAnalytics gaId="G-BHS28B1S3P" />
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       {/* HubSpot Tracking Code */}
       <script async defer src="//js.hs-scripts.com/4284310.js" />
       <body className="min-h-full flex flex-col">
@@ -46,7 +47,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="flex-1">{children}</main>
             <Footer />
             <ContactModal />
-            <AgentWidget />
+            <SectionViewTracker />
+            <ScrollDepthTracker />
           </ContactModalProvider>
         </AgentProvider>
       </body>
