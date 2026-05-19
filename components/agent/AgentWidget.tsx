@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, ChevronDown } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useAgent } from '@/lib/agent-context'
-import { useContactModal } from '@/context/contact-modal-context'
 import { PUBLISHER_FLOW, BRAND_FLOW, DEVELOPER_FLOW } from '@/lib/agent-data'
 import { AgentDialog } from './AgentDialog'
 
 export function AgentWidget() {
   const { heroCompleted, persona } = useAgent()
-  const { open: openContact } = useContactModal()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
 
   if (!heroCompleted) return null
@@ -46,7 +46,7 @@ export function AgentWidget() {
             </div>
             <div className="px-4 pb-4 pt-1">
               <button
-                onClick={() => { setOpen(false); openContact() }}
+                onClick={() => { setOpen(false); router.push('/book-a-demo') }}
                 className="w-full py-2.5 rounded-xl text-xs font-semibold text-white/80 border transition-colors"
                 style={{ borderColor: 'rgba(34,93,89,0.5)' }}
               >

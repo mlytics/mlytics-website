@@ -1,11 +1,9 @@
 'use client'
 
-import { useContactModal } from '@/context/contact-modal-context'
+import Link from 'next/link'
 import { trackCTA } from '@/lib/analytics'
 
 export function FinalCTA() {
-  const { open } = useContactModal()
-
   return (
     <section className="section-dark py-16 text-center">
       <div className="max-w-2xl mx-auto px-6">
@@ -15,12 +13,13 @@ export function FinalCTA() {
         <p className="text-base mb-8" style={{ color: '#A8C5C3' }}>
           Paste your website. We'll use your actual data to run a real analysis — not a generic demo.
         </p>
-        <button
-          onClick={() => { trackCTA('Book a Demo', 'home_cta'); open() }}
-          className="px-8 py-3.5 rounded-full text-sm font-semibold text-[#225D59] bg-white hover:bg-gray-100 transition-all active:scale-[0.98]"
+        <Link
+          href="/book-a-demo"
+          onClick={() => trackCTA('Book a Demo', 'home_cta')}
+          className="inline-block px-8 py-3.5 rounded-full text-sm font-semibold text-[#225D59] bg-white hover:bg-gray-100 transition-all active:scale-[0.98]"
         >
           See what the Mlytics Cortex finds
-        </button>
+        </Link>
       </div>
     </section>
   )

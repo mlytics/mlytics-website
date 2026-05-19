@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
-import { useContactModal } from '@/context/contact-modal-context'
 import { trackCTA } from '@/lib/analytics'
 
 const NAV_LINKS = [
@@ -20,7 +19,6 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [visible, setVisible] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { open: openContact } = useContactModal()
   const lastScrollY = useRef(0)
 
   const normalizedPathname = pathname.replace(/\/$/, '') || '/'
@@ -94,13 +92,14 @@ export function Nav() {
 
         {/* CTA */}
         <div className="hidden lg:flex items-center gap-3">
-          <button
-            onClick={() => { trackCTA('Book a Demo', 'nav'); openContact() }}
+          <Link
+            href="/book-a-demo"
+            onClick={() => trackCTA('Book a Demo', 'nav')}
             className="px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
             style={{ background: '#225D59' }}
           >
             Book a Demo
-          </button>
+          </Link>
         </div>
 
         {/* Mobile menu button */}
@@ -134,13 +133,14 @@ export function Nav() {
                   {link.label}
                 </Link>
               ))}
-              <button
-                onClick={() => { trackCTA('Book a Demo', 'nav_mobile'); setMobileOpen(false); openContact() }}
-                className="w-full mt-2 py-2.5 rounded-full text-sm font-semibold text-white"
+              <Link
+                href="/book-a-demo"
+                onClick={() => { trackCTA('Book a Demo', 'nav_mobile'); setMobileOpen(false) }}
+                className="block w-full mt-2 py-2.5 rounded-full text-sm font-semibold text-white text-center"
                 style={{ background: '#225D59' }}
               >
                 Book a Demo
-              </button>
+              </Link>
             </div>
           </motion.div>
         )}

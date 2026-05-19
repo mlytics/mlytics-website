@@ -21,6 +21,7 @@ export function Footer() {
               <Link href="/content-owners" className="hover:text-white transition-colors" style={isActive('/content-owners') ? { color: '#fff', fontWeight: 600 } : {}}>Content Owners</Link>
               <Link href="/brands" className="hover:text-white transition-colors" style={isActive('/brands') ? { color: '#fff', fontWeight: 600 } : {}}>Brands</Link>
               <Link href="/developers" className="hover:text-white transition-colors" style={isActive('/developers') ? { color: '#fff', fontWeight: 600 } : {}}>Developers</Link>
+              <Link href="/book-a-demo" className="hover:text-white transition-colors" style={isActive('/book-a-demo') ? { color: '#fff', fontWeight: 600 } : {}}>Book a Demo</Link>
             </div>
             <div className="flex flex-col gap-2">
               <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#6B8F8D' }}>Resources</span>

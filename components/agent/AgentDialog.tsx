@@ -7,7 +7,6 @@ import { type AgentStep, type AgentPersona, type ReaderProduct, getReaderProduct
 import { useAgent } from '@/lib/agent-context'
 import { ArticleScanDemo } from './ArticleScanDemo'
 import { ArticleQnADemo } from './ArticleQnADemo'
-import { useContactModal } from '@/context/contact-modal-context'
 import { trackAG } from '@/lib/analytics'
 
 function detectFlowName(flow: AgentStep[]): string {
@@ -35,7 +34,6 @@ type MessageItem = { role: 'agent' | 'user'; text: string; isTyping?: boolean; i
 export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding = 0, onEngage, onReset }: AgentDialogProps) {
   const mode = 'cortex'
   const { persona, setPersona, addHistory, setHeroCompleted } = useAgent()
-  const { open: openContact } = useContactModal()
   const router = useRouter()
 
   const originalFlowRef = useRef(flow)
@@ -610,7 +608,7 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
     setShowUrlInput(false)
     setUrlInput('')
     setShowInput(false)
-    setTimeout(() => openContact(), 400)
+    setTimeout(() => router.push('/book-a-demo'), 400)
   }
 
   // ── Derived ───────────────────────────────────────────────────────────────

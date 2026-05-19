@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useContactModal } from '@/context/contact-modal-context'
 import { trackCTA } from '@/lib/analytics'
 
 const grayFilter = (invert = false, brightness = 1, opacity = 0.5) =>
@@ -113,8 +113,6 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[number]; i: number }
 }
 
 export function ContentOwnerVerticals() {
-  const { open: openContact } = useContactModal()
-
   return (
     <section className="section-white py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-6">
@@ -139,12 +137,16 @@ export function ContentOwnerVerticals() {
           ))}
 
           {/* CTA card — col-span-2 on mobile/tablet, col-span-2 (1/3) on lg */}
-          <motion.button
-            onClick={() => { trackCTA('Get Started', 'content_owners_section'); openContact() }}
-            className="col-span-2 lg:col-span-2 p-5 rounded-2xl flex flex-col items-start justify-between w-full text-left relative"
-            style={{ background: '#225D59' }}
+          <motion.div
+            className="col-span-2 lg:col-span-2"
             whileHover="hover"
             initial="rest"
+          >
+          <Link
+            href="/book-a-demo"
+            onClick={() => trackCTA('Get Started', 'content_owners_section')}
+            className="p-5 rounded-2xl flex flex-col items-start justify-between w-full h-full text-left relative"
+            style={{ background: '#225D59', display: 'flex' }}
           >
             <div className="flex items-center justify-between w-full">
               <p className="text-base font-bold text-white leading-snug">
@@ -167,7 +169,8 @@ export function ContentOwnerVerticals() {
                 </svg>
               </motion.div>
             </div>
-          </motion.button>
+          </Link>
+          </motion.div>
         </div>
       </div>
     </section>

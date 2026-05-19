@@ -3,11 +3,9 @@ import { Geist } from 'next/font/google'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 import { AgentProvider } from '@/lib/agent-context'
-import { ContactModalProvider } from '@/context/contact-modal-context'
 import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
 import { ScrollToTop } from '@/components/layout/ScrollToTop'
-import { ContactModal } from '@/components/ui/ContactModal'
 import { SectionViewTracker } from '@/components/analytics/SectionViewTracker'
 import { ScrollDepthTracker } from '@/components/analytics/ScrollDepthTracker'
 
@@ -41,15 +39,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <script async defer src="//js.hs-scripts.com/4284310.js" />
       <body className="min-h-full flex flex-col">
         <AgentProvider>
-          <ContactModalProvider>
-            <ScrollToTop />
-            <Nav />
-            <main className="flex-1 flex flex-col">{children}</main>
-            <Footer />
-            <ContactModal />
-            <SectionViewTracker />
-            <ScrollDepthTracker />
-          </ContactModalProvider>
+          <ScrollToTop />
+          <Nav />
+          <main className="flex-1 flex flex-col">{children}</main>
+          <Footer />
+          <SectionViewTracker />
+          <ScrollDepthTracker />
         </AgentProvider>
       </body>
     </html>

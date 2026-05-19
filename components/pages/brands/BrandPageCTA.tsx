@@ -1,10 +1,9 @@
 'use client'
 
-import { useContactModal } from '@/context/contact-modal-context'
+import Link from 'next/link'
 import { trackCTA } from '@/lib/analytics'
 
 export function BrandPageCTA() {
-  const { open } = useContactModal()
   return (
     <section className="section-dark py-16 text-center">
       <div className="max-w-2xl mx-auto px-6">
@@ -14,12 +13,13 @@ export function BrandPageCTA() {
         <p className="text-base mb-8" style={{ color: '#A8C5C3' }}>
           We'll run a real audience snapshot using your ICP criteria against our live 15M+ MAU data.
         </p>
-        <button
-          onClick={() => { trackCTA('Get a Personalized Demo', 'brands_cta'); open() }}
-          className="px-8 py-3.5 rounded-full text-sm font-semibold text-[#225D59] bg-white hover:bg-gray-100 transition-all active:scale-[0.98]"
+        <Link
+          href="/book-a-demo"
+          onClick={() => trackCTA('Get a Personalized Demo', 'brands_cta')}
+          className="inline-block px-8 py-3.5 rounded-full text-sm font-semibold text-[#225D59] bg-white hover:bg-gray-100 transition-all active:scale-[0.98]"
         >
           Get a Personalized Demo
-        </button>
+        </Link>
       </div>
     </section>
   )

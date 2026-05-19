@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -7,7 +8,6 @@ import { type AgentPersona, HERO_FLOW } from '@/lib/agent-data'
 import { AgentDialog } from '@/components/agent/AgentDialog'
 import { WorldMapDots } from './WorldMapDots'
 import { LogoMarquee } from './LogoMarquee'
-import { useContactModal } from '@/context/contact-modal-context'
 import { trackCTA } from '@/lib/analytics'
 
 const MARQUEE_H = 88
@@ -20,7 +20,6 @@ const ROTATING_WORDS = [
 
 export function HeroSection() {
   const router = useRouter()
-  const { open } = useContactModal()
   const spacerRef = useRef<HTMLDivElement>(null) // keeps layout space for the fixed marquee
   const [isFixed, setIsFixed] = useState(true)
   const [dialogEngaged, setDialogEngaged] = useState(false)
@@ -138,13 +137,14 @@ export function HeroSection() {
 
           {/* CTA button */}
           <div className="mb-6 md:mb-14">
-            <button
-              onClick={() => { trackCTA('Book a Demo', 'hero'); open() }}
+            <Link
+              href="/book-a-demo"
+              onClick={() => trackCTA('Book a Demo', 'hero')}
               className="px-8 py-3.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
               style={{ background: '#225D59' }}
             >
               Book a Demo
-            </button>
+            </Link>
           </div>
 
           {/* Agent Dialog — sticky when engaged so flex re-centering can't push it behind the nav */}
