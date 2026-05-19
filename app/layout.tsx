@@ -14,10 +14,10 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.mlytics.com'),
   title: 'Mlytics',
-  description: 'Mlytics is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
+  description: 'Mlytics (摩速科技) is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
   openGraph: {
     title: 'Mlytics',
-    description: 'Mlytics is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
+    description: 'Mlytics (摩速科技) is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
     url: 'https://www.mlytics.com',
     siteName: 'Mlytics',
     images: [{ url: 'https://storage.googleapis.com/mlytics-website/og-image.png', width: 1200, height: 630 }],
@@ -26,15 +26,26 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Mlytics',
-    description: 'Mlytics is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
+    description: 'Mlytics (摩速科技) is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
     images: ['https://storage.googleapis.com/mlytics-website/og-image.png'],
   },
+}
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Mlytics',
+  alternateName: '摩速科技',
+  url: 'https://www.mlytics.com',
+  logo: 'https://storage.googleapis.com/mlytics-website/og-image.png',
+  sameAs: ['https://www.linkedin.com/company/mlytics/'],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geist.variable} h-full antialiased`}>
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       {/* HubSpot Tracking Code */}
       <script async defer src="//js.hs-scripts.com/4284310.js" />
       <body className="min-h-full flex flex-col">
