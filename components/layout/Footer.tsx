@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation'
 
 export function Footer() {
   const pathname = usePathname()
+  const p = pathname.replace(/\/$/, '') || '/'
+  const isActive = (href: string) => p === href
   return (
     <footer className="section-dark border-t" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
       <div className="max-w-6xl mx-auto px-6 py-12">
@@ -16,9 +18,9 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 text-sm" style={{ color: '#A8C5C3' }}>
             <div className="flex flex-col gap-2">
               <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#6B8F8D' }}>Solutions</span>
-              <Link href="/content-owners" className="hover:text-white transition-colors" style={pathname === '/content-owners' ? { color: '#fff', fontWeight: 600 } : {}}>Content Owners</Link>
-              <Link href="/brands" className="hover:text-white transition-colors" style={pathname === '/brands' ? { color: '#fff', fontWeight: 600 } : {}}>Brands</Link>
-              <Link href="/developers" className="hover:text-white transition-colors" style={pathname === '/developers' ? { color: '#fff', fontWeight: 600 } : {}}>Developers</Link>
+              <Link href="/content-owners" className="hover:text-white transition-colors" style={isActive('/content-owners') ? { color: '#fff', fontWeight: 600 } : {}}>Content Owners</Link>
+              <Link href="/brands" className="hover:text-white transition-colors" style={isActive('/brands') ? { color: '#fff', fontWeight: 600 } : {}}>Brands</Link>
+              <Link href="/developers" className="hover:text-white transition-colors" style={isActive('/developers') ? { color: '#fff', fontWeight: 600 } : {}}>Developers</Link>
             </div>
             <div className="flex flex-col gap-2">
               <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#6B8F8D' }}>Resources</span>
@@ -28,8 +30,8 @@ export function Footer() {
             </div>
             <div className="flex flex-col gap-2">
               <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#6B8F8D' }}>Legal</span>
-              <Link href="/terms-of-service" className="hover:text-white transition-colors" style={pathname === '/terms-of-service' ? { color: '#fff', fontWeight: 600 } : {}}>Terms of Service</Link>
-              <Link href="/privacy-policy" className="hover:text-white transition-colors" style={pathname === '/privacy-policy' ? { color: '#fff', fontWeight: 600 } : {}}>Privacy Policy</Link>
+              <Link href="/terms-of-service" className="hover:text-white transition-colors" style={isActive('/terms-of-service') ? { color: '#fff', fontWeight: 600 } : {}}>Terms of Service</Link>
+              <Link href="/privacy-policy" className="hover:text-white transition-colors" style={isActive('/privacy-policy') ? { color: '#fff', fontWeight: 600 } : {}}>Privacy Policy</Link>
             </div>
           </div>
         </div>
