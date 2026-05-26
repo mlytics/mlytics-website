@@ -70,9 +70,12 @@ gcloud auth login
 ```
 mlytics-website/
 ├── app/                        # Next.js App Router 頁面
-│   ├── layout.tsx              # 全站 layout（Nav、Footer、GA）
+│   ├── layout.tsx              # 全站 layout（Nav、Footer、GA、JSON-LD）
 │   ├── page.tsx                # 首頁 /
 │   ├── not-found.tsx           # 404 頁面
+│   ├── book-a-demo/            # /book-a-demo（預約 Demo 表單頁）
+│   │   ├── page.tsx
+│   │   └── BookADemoForm.tsx   # HubSpot 表單元件
 │   ├── brands/page.tsx         # /brands
 │   ├── content-owners/page.tsx # /content-owners
 │   ├── developers/page.tsx     # /developers
@@ -95,6 +98,8 @@ mlytics-website/
 ├── public/                     # 靜態資源（圖片、logo、sitemap）
 │   ├── logos/                  # 合作夥伴 Logo
 │   ├── agentdialog_image/      # AI Demo 用圖片
+│   ├── .well-known/
+│   │   └── security.txt        # 安全漏洞回報聯絡資訊
 │   └── og-image.png
 │
 ├── out/                        # Build 輸出（不進 git，部署用）
@@ -226,3 +231,24 @@ git push mlytics main
 
 **Q: 新增頁面後 sitemap 要更新嗎**
 要。手動編輯 `public/sitemap.xml`，加入新路由後重新 build 部署。
+
+---
+
+## 10. 功能說明
+
+### Book a Demo 頁面（`/book-a-demo`）
+- 獨立頁面，取代原本的 Modal 彈窗
+- 表單提交到 HubSpot（Portal ID: `4284310`，Form ID: `b9751670-5043-401f-b789-22ef2d735f89`）
+- 欄位：First Name、Last Name、Email、Phone（含國碼選擇）、Company、角色、Website、需求說明
+- 所有 CTA 按鈕（Nav、Hero、Footer、各頁面）皆導向此頁
+
+### Footer
+- LinkedIn 公司頁連結：https://www.linkedin.com/company/mlytics/
+- Careers 連結（104人力銀行）：https://www.104.com.tw/company/1a2x6bk3ve
+- Book a Demo 連結在 Solutions 欄
+
+### SEO / AI 可發現性
+- `app/layout.tsx` 內含 Organization JSON-LD schema
+  - `name: "Mlytics"`、`alternateName: "摩速科技"`
+- Meta description 包含「摩速科技」中文名稱
+- `public/.well-known/security.txt`：安全漏洞回報信箱 help@mlytics.com
