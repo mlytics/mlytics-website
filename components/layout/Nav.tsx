@@ -9,9 +9,10 @@ import { Menu, X } from 'lucide-react'
 import { trackCTA } from '@/lib/analytics'
 
 const NAV_LINKS = [
-  { label: 'Content Owners', href: '/content-owners' },
+  { label: 'Media and Content', href: '/content-owners' },
   { label: 'Brands', href: '/brands' },
   { label: 'Developers', href: '/developers' },
+  { label: 'Contact', href: '/book-a-demo' },
 ]
 
 export function Nav() {
@@ -94,11 +95,11 @@ export function Nav() {
         <div className="hidden lg:flex items-center gap-3">
           <Link
             href="/book-a-demo"
-            onClick={() => trackCTA('Book a Demo', 'nav')}
+            onClick={() => trackCTA('Get Started', 'nav')}
             className="px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
             style={{ background: '#225D59' }}
           >
-            Book a Demo
+            Get Started
           </Link>
         </div>
 
@@ -135,11 +136,11 @@ export function Nav() {
               ))}
               <Link
                 href="/book-a-demo"
-                onClick={() => { trackCTA('Book a Demo', 'nav_mobile'); setMobileOpen(false) }}
+                onClick={() => { trackCTA('Get Started', 'nav_mobile'); setMobileOpen(false) }}
                 className="block w-full mt-2 py-2.5 rounded-full text-sm font-semibold text-white text-center"
                 style={{ background: '#225D59' }}
               >
-                Book a Demo
+                Get Started
               </Link>
             </div>
           </motion.div>

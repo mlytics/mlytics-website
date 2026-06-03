@@ -6,18 +6,28 @@ import { motion, useInView } from 'framer-motion'
 const STEPS = [
   {
     num: '01',
-    label: 'Your brand content, indexed',
-    desc: 'We ingest and structure your brand messaging, product pages, and editorial content into our AI knowledge layer.',
+    label: 'Brand onboarding',
+    desc: 'Import your brand data into the Mlytics knowledge base — messaging, products, and editorial assets.',
   },
   {
     num: '02',
-    label: 'Mlytics GEO engine activates',
-    desc: 'Our Generative Engine Optimization layer surfaces your brand as a relevant reference when readers ask AI-powered questions in your vertical — across all 15M+ MAU.',
+    label: 'Reader moments captured',
+    desc: 'We track what audiences read across finance, health, news, lifestyle, and tech — fresh context from live media and content traffic.',
   },
   {
     num: '03',
-    label: 'You get the citations',
-    desc: 'Your brand appears contextually inside AI answers readers trust — not as an ad, but as the right answer at the right moment. We do the work. You get the citations.',
+    label: 'News matched to your products',
+    desc: 'The system matches trending stories and reader questions to relevant products in your catalog.',
+  },
+  {
+    num: '04',
+    label: 'AI Q&A generated',
+    desc: 'Cortex creates intent-driven Q&A content — natural angles, not one-way ad copy.',
+  },
+  {
+    num: '05',
+    label: 'Organic exposure in context',
+    desc: 'Your brand appears inside AI answers and editorial context — citations readers trust, across 15M+ MAU.',
   },
 ]
 
@@ -121,7 +131,7 @@ export function BrandGEOSection() {
             animate={inView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.35 }}
           >
-            Monthly Active Users — and counting.
+            Monthly Active Users across managed media and content properties.
           </motion.p>
         </div>
 
@@ -222,7 +232,7 @@ export function BrandGEOSection() {
           {/* Right — copy */}
           <div className="pt-8 pb-4 md:pl-10 flex flex-col justify-center text-left">
             <p className="text-base leading-relaxed" style={{ color: '#A8C5C3' }}>
-              Your audience is already part of our network — across 15M+ MAU on managed content properties in finance, health, lifestyle, news, and technology.
+              Premium content platforms in finance, health, news, lifestyle, and technology — your buyers already read here.
             </p>
           </div>
         </motion.div>
@@ -233,7 +243,7 @@ export function BrandGEOSection() {
         <div style={{ height: 1, background: 'rgba(168,197,195,0.12)' }} />
       </div>
 
-      {/* ── GEO part ──────────────────────────────────────────────── */}
+      {/* ── Media AEO workflow ────────────────────────────────────── */}
       <div className="max-w-5xl mx-auto px-6 relative z-10 pt-16 lg:pt-20 pb-20 lg:pb-28">
         <motion.div
           className="mb-12"
@@ -243,14 +253,14 @@ export function BrandGEOSection() {
           transition={{ duration: 0.5 }}
         >
           <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(168,197,195,0.55)' }}>
-            GEO — Generative Engine Optimization
+            Media AEO — Answer Engine Optimization
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
-            Open web GEO is a lottery.<br />
+            Open-web AEO is a lottery.<br />
             <span>Our network is where your buyers already read.</span>
           </h2>
           <p className="text-base max-w-xl" style={{ color: '#A8C5C3' }}>
-            Mlytics handles GEO across our entire content owner network. Your brand appears as a relevant reference when readers ask AI-powered questions about your vertical.
+            SEO drives clicks. Media AEO drives AI citations — your brand referenced when readers ask AI-powered questions in your vertical.
           </p>
         </motion.div>
 

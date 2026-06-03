@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, ChevronDown, Search } from 'lucide-react'
 import { allCountries } from 'country-telephone-data'
@@ -87,6 +88,7 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
 }
 
 export function BookADemoForm() {
+  const searchParams = useSearchParams()
   const [submitted, setSubmitted] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState<Country>(
     COUNTRIES.find(c => c.iso2 === 'tw') ?? COUNTRIES[0]
@@ -94,7 +96,7 @@ export function BookADemoForm() {
   const [form, setForm] = useState({
     firstName: '', lastName: '',
     email: '', phone: '',
-    company: '', role: 'content_owner', website: '', message: '',
+    company: '', website: searchParams.get('website') ?? '',
   })
   const openTimeRef = useRef<number>(Date.now())
 
@@ -115,9 +117,7 @@ export function BookADemoForm() {
               { name: 'email', value: form.email },
               { name: 'phone', value: `+${selectedCountry.dialCode} ${form.phone}`.trim() },
               { name: 'company', value: form.company },
-              { name: 'persona_type', value: form.role },
               { name: 'website', value: form.website },
-              { name: 'pain_and_problem', value: form.message },
             ],
             context: {
               pageUri: window.location.href,
@@ -179,30 +179,13 @@ export function BookADemoForm() {
               <input type="tel" value={form.phone} onChange={set('phone')} className={inputCls} placeholder="" />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Company *</label>
-              <input required value={form.company} onChange={set('company')} className={inputCls} placeholder="Your company name" />
-            </div>
-            <div>
-              <label className={labelCls}>I am a...</label>
-              <select value={form.role} onChange={set('role')}
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors bg-white">
-                <option value="content_owner">Content Owner</option>
-                <option value="brand">Brand</option>
-                <option value="developer">Developer</option>
-              </select>
-            </div>
+          <div>
+            <label className={labelCls}>Company *</label>
+            <input required value={form.company} onChange={set('company')} className={inputCls} placeholder="Your company name" />
           </div>
           <div>
-            <label className={labelCls}>Website</label>
-            <input value={form.website} onChange={set('website')} className={inputCls} placeholder="https://example.com" />
-          </div>
-          <div>
-            <label className={labelCls}>What do you want to solve?</label>
-            <textarea rows={3} value={form.message} onChange={set('message')}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors resize-none"
-              placeholder="Tell us about your current setup and what you're hoping to achieve..." />
+            <label className={labelCls}>Website *</label>
+            <input required value={form.website} onChange={set('website')} className={inputCls} placeholder="https://example.com" />
           </div>
           <button
             type="submit"

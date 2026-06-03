@@ -5,7 +5,7 @@ import { BrandGEOSection } from '@/components/pages/brands/BrandGEOSection'
 import { BrandLeadPilot } from '@/components/pages/brands/BrandLeadPilot'
 import { BrandPageCTA } from '@/components/pages/brands/BrandPageCTA'
 
-export const metadata = { title: 'For Brands — Mlytics Cortex' }
+export const metadata = { title: 'For Brands — Media AEO | Mlytics' }
 
 export default function BrandsPage() {
   return (
@@ -17,13 +17,13 @@ export default function BrandsPage() {
             className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
             style={{ background: 'rgba(34,93,89,0.4)', color: '#A8C5C3', border: '1px solid rgba(34,93,89,0.6)' }}
           >
-            For Brands &amp; Advertisers
+            For Brands
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
-            Your audience moved to AI.<br />Your ads didn't.
+            Your audience moved to AI.<br />Your ads didn&apos;t.
           </h1>
           <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
-            ROAS is declining. Zero-click is killing your content marketing. Mlytics puts your brand inside AI conversations — across 15M+ MAU.
+            Build an AI search moat on premium content platforms — get cited in AI answers where 15M+ MAU already read.
           </p>
         </div>
       </div>
@@ -34,7 +34,7 @@ export default function BrandsPage() {
       {/* Who it's for */}
       {/* <BrandWhoSection /> */}
 
-      {/* GEO — primary sell */}
+      {/* Media AEO — network + workflow */}
       <BrandGEOSection />
 
       {/* Comparison */}

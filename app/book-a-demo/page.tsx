@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { BookADemoForm } from './BookADemoForm'
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export default function BookADemoPage() {
             className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
             style={{ background: 'rgba(34,93,89,0.4)', color: '#A8C5C3', border: '1px solid rgba(34,93,89,0.6)' }}
           >
-            Book a Demo
+            Contact Sales
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
             Let&apos;s use your data to talk.
@@ -31,7 +32,9 @@ export default function BookADemoPage() {
 
       <section className="section-white py-16 lg:py-20">
         <div className="max-w-lg mx-auto px-6">
-          <BookADemoForm />
+          <Suspense>
+            <BookADemoForm />
+          </Suspense>
         </div>
       </section>
     </>

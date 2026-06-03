@@ -26,6 +26,14 @@ export type AgentStep = {
   readerMessages?: Record<string, string>
   // Override the 500ms auto-advance delay for 'message' steps (ms)
   autoAdvanceDelay?: number
+  // Fixed ms to reveal agent text (uniform pacing regardless of length)
+  typewriterDurationMs?: number
+  // When true, pill selection sets publisher | brand | developer persona
+  collectsPersona?: boolean
+  // When true, pill value is stored for the next step's optionMessages lookup
+  collectsOption?: boolean
+  // Answers keyed by pill value from the previous collectsOption step
+  optionMessages?: Record<string, string>
 }
 
 // ─── Stylist Types & Data ─────────────────────────────────────────────────────
@@ -136,6 +144,7 @@ export const HERO_FLOW: AgentStep[] = [
     id: 'step1-persona',
     agentMessage: "Hi, I'm the Mlytics Cortex.\nWhat's the most pressing problem you want to solve?",
     inputType: 'pills',
+    collectsPersona: true,
     options: [
       { label: 'Losing traffic to AI', value: 'publisher' },
       { label: 'CPM model is broken', value: 'brand' },
@@ -162,7 +171,7 @@ export const HERO_FLOW: AgentStep[] = [
       publisher:
         'Each of these 5 follow-up articles is an entry point to capture reader intent. Human writing costs $250/piece. Mlytics Cortex costs $0.10.',
       brand:
-        '2 of these 5 questions are strong intent signals — readers actively comparing products, ready to decide. We embed these intent questions across content owner pages. When a reader clicks, Mlytics Cortex captures the signal and places your brand exactly where purchase intent is highest.',
+        '2 of these 5 questions are strong intent signals — readers actively comparing products, ready to decide. We embed these intent questions across media and content pages. When a reader clicks, Mlytics Cortex captures the signal and places your brand exactly where purchase intent is highest.',
       developer:
         'This entire flow — article analysis, content generation, intent classification — runs on Decisive Engine with decision latency < 50ms. Can your current infrastructure do this?',
     },
@@ -213,9 +222,104 @@ export const HERO_FLOW: AgentStep[] = [
       developer: "Every delivery decision you make could feed an AI flywheel — at <50ms, across 15M+ MAU. Let's show you how.",
     },
     options: [
-      { label: 'See content owner plan', value: '/content-owners' },
+      { label: 'See media and content plan', value: '/content-owners' },
       { label: 'See brand plan', value: '/brands' },
       { label: 'See developer plan', value: '/developers' },
+    ],
+  },
+]
+
+// ─── Hero Flow v2 (Cortex product introduction) ──────────────────────────────
+
+export const HERO_FLOW_V2: AgentStep[] = [
+  {
+    id: 'v2-welcome',
+    agentMessage:
+      "Hi — I'm Mlytics Cortex.\nI'm an AI Answer Engine agent built for media and content businesses.",
+    inputType: 'message',
+  },
+  {
+    id: 'v2-mission',
+    agentMessage:
+      'In the AI-search era, traffic alone is not enough. I help you get discovered and chosen — by turning articles into intent signals, and intent into measurable outcomes.',
+    inputType: 'message',
+  },
+  {
+    id: 'v2-faq',
+    agentMessage: 'People usually ask me things like this — pick one:',
+    inputType: 'pills',
+    collectsOption: true,
+    options: [
+      { label: 'What is Cortex, in plain terms?', value: 'faq-what' },
+      { label: 'How is this different from ads or SEO?', value: 'faq-diff' },
+      { label: 'Who is this built for?', value: 'faq-who' },
+      { label: 'How does intent capture work?', value: 'faq-how' },
+      { label: 'What outcomes can I measure?', value: 'faq-metrics' },
+    ],
+  },
+  {
+    id: 'v2-faq-answer',
+    agentMessage: '',
+    inputType: 'message',
+    optionMessages: {
+      'faq-what':
+        "I'm an AI Answer Engine agent. I read your articles, generate intent-driven Q&A, and surface the right answers — and brand connections — where readers are actually deciding.",
+      'faq-diff':
+        'Ads chase impressions; SEO chases rankings. I chase intent — signals from readers who are comparing, qualifying, and ready to act. That is how content turns into revenue.',
+      'faq-who':
+        'Three groups: media and content owners monetizing intent from traffic, brands reaching buyers inside AI answers, and developers running sub-50ms AI decisions at the edge.',
+      'faq-how':
+        'I analyze article structure, generate follow-up questions readers would ask, classify intent strength, and route high-intent moments to the right offer — on every article, automatically.',
+      'faq-metrics':
+        'Intent signals captured, qualified leads, CPL on strong intent, and production cost ($0.10/article vs. $250 human) — metrics tied to revenue, not vanity traffic.',
+    },
+  },
+  {
+    id: 'v2-demo',
+    agentMessage: 'Let me show you on a real article…',
+    inputType: 'demo',
+    isDemo: true,
+  },
+  {
+    id: 'v2-audience',
+    agentMessage: 'Which best describes you?',
+    inputType: 'pills',
+    collectsPersona: true,
+    options: [
+      { label: 'Media and Content', value: 'publisher' },
+      { label: 'Brand or advertiser', value: 'brand' },
+      { label: 'Developer / infrastructure', value: 'developer' },
+    ],
+  },
+  {
+    id: 'v2-value',
+    agentMessage: '',
+    inputType: 'message',
+    personalizedMessages: {
+      publisher:
+        'For media and content: every article becomes an intent capture point — $0.10 per piece vs. $250 human writing, across our 15M+ MAU media and content network.',
+      brand:
+        'For brands: I place you inside AI answers at the moment readers compare and decide — intent-classified reach, not spray-and-pray CPM.',
+      developer:
+        'For developers: analysis, generation, and routing run on Decisive Engine — sub-50ms decisions at the edge, every request feeding the intent flywheel.',
+    },
+  },
+  {
+    id: 'v2-cta',
+    agentMessage: '',
+    inputType: 'cta',
+    personalizedMessages: {
+      publisher:
+        "Want to see how Cortex works on your content? Let's explore the media and content plan.",
+      brand:
+        "Ready to reach buyers inside AI conversations? Let's explore the brand plan.",
+      developer:
+        "Want to map Cortex onto your stack? Let's explore the developer plan.",
+    },
+    options: [
+      { label: 'Explore media and content plan', value: '/content-owners' },
+      { label: 'Explore brand plan', value: '/brands' },
+      { label: 'Explore developer plan', value: '/developers' },
     ],
   },
 ]
@@ -272,7 +376,7 @@ export const BRAND_FLOW: AgentStep[] = [
     inputType: 'pills',
     personalizedMessages: {
       finance:
-        'In our 4M WAU network, finance & insurance strong-intent users number ~87,000/week — from content owners like MoneyDJ and major financial portals. Talk to us to get a custom CPL quote for your category.',
+        'In our 4M WAU network, finance & insurance strong-intent users number ~87,000/week — from media and content partners like MoneyDJ and major financial portals. Talk to us to get a custom CPL quote for your category.',
       health:
         'Health & medical strong-intent users: ~64,000/week, primarily from health media platforms. CPL ~$280, confidence 82%.',
       consumer:
@@ -645,10 +749,10 @@ export const READER_FLOW: AgentStep[] = [
   },
   {
     id: 'reader-cta',
-    agentMessage: "Want to add this AI-powered Q&A experience to your own publisher site?",
+    agentMessage: "Want to add this AI-powered Q&A experience to your own media site?",
     inputType: 'cta',
     options: [
-      { label: 'See how it works for content owners', value: '/content-owners' },
+      { label: 'See how it works for media and content', value: '/content-owners' },
     ],
   },
 ]

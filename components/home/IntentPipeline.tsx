@@ -18,7 +18,7 @@ const LAYERS: Array<{
 }> = [
   {
     Icon: Globe,
-    name: 'Content Owner Traffic',
+    name: 'Media and Content Traffic',
     sublabel: 'Raw attention',
     audience: 'Raw material',
     price: '400K–4M WAU',
@@ -42,7 +42,7 @@ const LAYERS: Array<{
     Icon: PenLine,
     name: 'AI Q&A Widget',
     sublabel: 'Capture weak intent',
-    audience: 'Content Owners',
+    audience: 'Media and Content',
     price: '$5,000/mo',
     priceColor: '#F59E0B',
     desc: '$0.10/article vs $250 human cost. 2,500× productivity. Every article becomes an intent capture point.',
@@ -53,7 +53,7 @@ const LAYERS: Array<{
     Icon: MessageSquare,
     name: 'Full Conversation',
     sublabel: 'Capture strong intent',
-    audience: 'Content Owners + Brands',
+    audience: 'Media and Content + Brands',
     price: 'CPL billing',
     priceColor: '#F59E0B',
     desc: 'Readers move from browsing to decision. Strong intent captured, qualified, and matched to relevant brands.',

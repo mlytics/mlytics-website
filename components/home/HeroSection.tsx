@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { type AgentPersona, HERO_FLOW } from '@/lib/agent-data'
+import { CORTEX_FLOW_S0 } from '@/lib/cortex-conversation-flow'
 import { AgentDialog } from '@/components/agent/AgentDialog'
 import { WorldMapDots } from './WorldMapDots'
 import { LogoMarquee } from './LogoMarquee'
@@ -139,19 +140,28 @@ export function HeroSection() {
           <div className="mb-6 md:mb-14">
             <Link
               href="/book-a-demo"
-              onClick={() => trackCTA('Book a Demo', 'hero')}
+              onClick={() => trackCTA('Get Started', 'hero')}
               className="px-8 py-3.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
               style={{ background: '#225D59' }}
             >
-              Book a Demo
+              Get Started
             </Link>
           </div>
 
-          {/* Agent Dialog — sticky when engaged so flex re-centering can't push it behind the nav */}
-          <div className={dialogEngaged ? 'w-full sticky top-20 lg:top-4 z-20' : 'w-full'}>
+          {/* Legacy hero AgentDialog (HERO_FLOW) — hidden, kept for rollback */}
+          <div className="hidden" aria-hidden>
             <AgentDialog
               flow={HERO_FLOW}
+              onComplete={handleComplete}
+              variant="page"
+              bottomPadding={0}
+            />
+          </div>
 
+          {/* Cortex conversation flow (spec: cortex_conversation_flow.md) */}
+          <div className={dialogEngaged ? 'w-full sticky top-20 lg:top-4 z-20' : 'w-full'}>
+            <AgentDialog
+              flow={CORTEX_FLOW_S0}
               onComplete={handleComplete}
               variant="page"
               bottomPadding={0}

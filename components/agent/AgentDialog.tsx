@@ -1,16 +1,208 @@
 'use client'
 
 import { useState, useEffect, useRef, Fragment } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { type AgentStep, type AgentPersona, type ReaderProduct, getReaderProduct, HERO_FLOW, READER_FLOW, PUBLISHER_FLOW, BRAND_FLOW, DEVELOPER_FLOW, READER_QUESTIONS, READER_PRODUCTS } from '@/lib/agent-data'
+import { type AgentStep, type AgentPersona, type ReaderProduct, getReaderProduct, HERO_FLOW, HERO_FLOW_V2, READER_FLOW, PUBLISHER_FLOW, BRAND_FLOW, DEVELOPER_FLOW, READER_QUESTIONS, READER_PRODUCTS } from '@/lib/agent-data'
+import {
+  CORTEX_PATH_FLOW_NAMES,
+  CORTEX_PATH_FLOWS,
+  type CortexPathKey,
+  isCortexConversationFlow,
+} from '@/lib/cortex-conversation-flow'
 import { useAgent } from '@/lib/agent-context'
 import { ArticleScanDemo } from './ArticleScanDemo'
 import { ArticleQnADemo } from './ArticleQnADemo'
 import { trackAG } from '@/lib/analytics'
 
+function InlineChatPillSkeleton({ count, isDark }: { count: number; isDark: boolean }) {
+  return (
+    <div className="flex flex-col gap-1.5 w-full mt-2.5" aria-hidden>
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="w-full rounded-lg animate-pulse"
+          style={{
+            height: 42,
+            background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(34,93,89,0.1)',
+            animationDelay: `${i * 70}ms`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function InlineChatPillChoices({
+  options,
+  isDark,
+  onSelect,
+  variant = 'outline',
+}: {
+  options: { label: string; value: string }[]
+  isDark: boolean
+  onSelect: (label: string, value: string) => void
+  variant?: 'outline' | 'primary'
+}) {
+  return (
+    <motion.div
+      className="flex flex-col gap-1.5 w-full mt-2.5"
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, ease: 'easeOut' }}
+    >
+      {options.map(opt => (
+        <button
+          key={opt.label}
+          type="button"
+          onClick={() => onSelect(opt.label, opt.value)}
+          className="w-full text-left px-3 py-2.5 rounded-lg text-sm leading-snug transition-colors hover:opacity-90 active:scale-[0.99]"
+          style={
+            variant === 'primary'
+              ? {
+                  background: '#225D59',
+                  color: 'white',
+                  border: 'none',
+                  fontWeight: 600,
+                  textAlign: 'center',
+                }
+              : {
+                  border: `1px solid ${isDark ? 'rgba(168,197,195,0.28)' : 'rgba(34,93,89,0.22)'}`,
+                  background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.95)',
+                  color: isDark ? '#FAFAFA' : '#1A1A1A',
+                }
+          }
+        >
+          {opt.label}
+        </button>
+      ))}
+    </motion.div>
+  )
+}
+
+function InlineChatUrlInput({
+  isDark,
+  urlInput,
+  onChange,
+  onSubmit,
+}: {
+  isDark: boolean
+  urlInput: string
+  onChange: (value: string) => void
+  onSubmit: () => void
+}) {
+  return (
+    <motion.div
+      className="w-full mt-2.5"
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, ease: 'easeOut' }}
+    >
+      <div className="flex gap-2">
+        <input
+          autoFocus
+          type="url"
+          value={urlInput}
+          onChange={e => onChange(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') onSubmit()
+          }}
+          placeholder="https://your-website.com"
+          className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg border focus:outline-none transition-colors"
+          style={{
+            borderColor: isDark ? 'rgba(168,197,195,0.35)' : '#E5E5E5',
+            background: isDark ? 'rgba(255,255,255,0.08)' : 'white',
+            color: isDark ? '#FAFAFA' : '#1A1A1A',
+          }}
+        />
+        <button
+          type="button"
+          onClick={onSubmit}
+          className="flex-shrink-0 px-4 py-2 rounded-lg text-sm font-semibold text-white"
+          style={{ background: '#225D59' }}
+        >
+          Analyze
+        </button>
+      </div>
+    </motion.div>
+  )
+}
+
+function InlineChatEmailInput({
+  isDark,
+  emailInput,
+  onChange,
+  onSubmit,
+}: {
+  isDark: boolean
+  emailInput: string
+  onChange: (value: string) => void
+  onSubmit: () => void
+}) {
+  return (
+    <motion.div
+      className="w-full mt-2.5"
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, ease: 'easeOut' }}
+    >
+      <div className="flex gap-2">
+        <input
+          autoFocus
+          type="email"
+          value={emailInput}
+          onChange={e => onChange(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') onSubmit() }}
+          placeholder="you@company.com"
+          className="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg border focus:outline-none transition-colors"
+          style={{
+            borderColor: isDark ? 'rgba(168,197,195,0.35)' : '#E5E5E5',
+            background: isDark ? 'rgba(255,255,255,0.08)' : 'white',
+            color: isDark ? '#FAFAFA' : '#1A1A1A',
+          }}
+        />
+        <button
+          type="button"
+          onClick={onSubmit}
+          className="flex-shrink-0 px-4 py-2 rounded-lg text-sm font-semibold text-white"
+          style={{ background: '#225D59' }}
+        >
+          Get report
+        </button>
+      </div>
+    </motion.div>
+  )
+}
+
+/** Hero v2 uses fixed per-bubble timing so auto message chains feel even. */
+const HERO_V2_TYPEWRITER_MS = 1400
+const HERO_V2_MESSAGE_PAUSE_MS = 900
+const HERO_V2_PAUSE_BEFORE_PILLS_MS = 400
+const HERO_V2_INLINE_PILLS_SKELETON_MS = 650
+const DEFAULT_CHAR_TYPEWRITER_MS = 18
+
+type InlinePillsPhase = 'hidden' | 'skeleton' | 'ready'
+
+function isHeroFlowV2(flow: AgentStep[]): boolean {
+  return flow[0]?.id === 'v2-welcome'
+}
+
+function personaForCortexPath(key: CortexPathKey): AgentPersona {
+  if (key === 'opt_1') return 'brand'
+  return null
+}
+
 function detectFlowName(flow: AgentStep[]): string {
   if (flow === HERO_FLOW) return 'HERO_FLOW'
+  if (flow === HERO_FLOW_V2) return 'HERO_FLOW_V2'
+  if (isCortexConversationFlow(flow)) {
+    const id = flow[0]?.id
+    if (id === 's1a-industry') return 'CORTEX_BRAND'
+    if (id === 's2a-content') return 'CORTEX_MEDIA'
+    if (id === 's3a-developer') return 'CORTEX_DEVELOPER'
+    if (id === 's4a-aeo') return 'CORTEX_AEO_EDU'
+    return 'CORTEX_S0'
+  }
   if (flow === READER_FLOW) return 'READER_FLOW'
   if (flow === PUBLISHER_FLOW) return 'PUBLISHER_FLOW'
   if (flow === BRAND_FLOW) return 'BRAND_FLOW'
@@ -49,8 +241,14 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
   const [showInput, setShowInput] = useState(false)
   const [urlInput, setUrlInput] = useState('')
   const [showUrlInput, setShowUrlInput] = useState(false)
+  const [emailInput, setEmailInput] = useState('')
+  const [showEmailInput, setShowEmailInput] = useState(false)
+  const [showBrandsCta, setShowBrandsCta] = useState(false)
+  const [analysisCard, setAnalysisCard] = useState<{ brandName: string } | null>(null)
+  const analysisCardInsertAfterIdxRef = useRef(-1)
   const [demoComplete, setDemoComplete] = useState(false)
   const [readerQuestionId, setReaderQuestionId] = useState<string>('')
+  const [optionSelectionId, setOptionSelectionId] = useState<string>('')
   const [readerProduct, setReaderProduct] = useState<ReaderProduct | null>(null)
   // Index in messages[] after which ArticleQnADemo is inserted (fixed once set)
   const readerArticleInsertAfterIdxRef = useRef(-1)
@@ -67,6 +265,7 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
   // dynamicMaxH is used as maxHeight when idle, and as height+maxHeight when engaged
   const [dynamicMaxH, setDynamicMaxH] = useState<string>('60vh')
   const [engaged, setEngaged] = useState(false)
+  const [inlinePillsPhase, setInlinePillsPhase] = useState<InlinePillsPhase>('hidden')
 
   const scrollBodyRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -148,6 +347,9 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
     if (step.readerMessages && readerQuestionId) {
       return step.readerMessages[readerQuestionId] ?? step.agentMessage
     }
+    if (step.optionMessages && optionSelectionId) {
+      return step.optionMessages[optionSelectionId] ?? step.agentMessage
+    }
     if (step.personalizedMessages && persona) {
       return step.personalizedMessages[persona] ?? step.agentMessage
     }
@@ -172,6 +374,24 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
 
     const msg = resolveMessage(currentStep)
 
+    // CTA / footer-only pill steps — never overwrite the previous agent bubble
+    if (currentStep.inputType === 'cta') {
+      setShowInput(true)
+      return
+    }
+
+    if (currentStep.inputType === 'pills' && !msg) {
+      setMessages(prev => {
+        const last = prev[prev.length - 1]
+        if (last?.role === 'agent' && last.isTyping && !last.text) {
+          return prev.slice(0, -1)
+        }
+        return prev
+      })
+      setShowInput(true)
+      return
+    }
+
     if (!msg) {
       setMessages(prev => {
         const next = [...prev]
@@ -180,6 +400,43 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
       })
       setShowInput(true)
       return
+    }
+    const uniformPacing =
+      isHeroFlowV2(originalFlowRef.current) || isCortexConversationFlow(originalFlowRef.current)
+    const fixedDurationMs =
+      currentStep.typewriterDurationMs ??
+      (uniformPacing ? HERO_V2_TYPEWRITER_MS : undefined)
+
+    if (fixedDurationMs != null) {
+      let cancelled = false
+      const startedAt = performance.now()
+
+      const tick = (now: number) => {
+        if (cancelled) return
+        const progress = Math.min((now - startedAt) / fixedDurationMs, 1)
+        const charCount = Math.max(1, Math.floor(progress * msg.length))
+        const done = progress >= 1
+        setMessages(prev => {
+          const next = [...prev]
+          next[next.length - 1] = {
+            role: 'agent',
+            text: done ? msg : msg.slice(0, charCount),
+            isTyping: !done,
+          }
+          return next
+        })
+        if (done) {
+          setShowInput(true)
+          addHistory({ role: 'agent', content: msg })
+        } else {
+          requestAnimationFrame(tick)
+        }
+      }
+
+      requestAnimationFrame(tick)
+      return () => {
+        cancelled = true
+      }
     }
 
     let i = 0
@@ -196,9 +453,28 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
         setShowInput(true)
         addHistory({ role: 'agent', content: msg })
       }
-    }, 18)
+    }, DEFAULT_CHAR_TYPEWRITER_MS)
     return () => clearInterval(interval)
   }, [stepIdx, flowVersion]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reset in-chat pill reveal when the step changes
+  useEffect(() => {
+    setInlinePillsPhase('hidden')
+  }, [stepIdx, flowVersion])
+
+  // After prompt text finishes: skeleton → reveal in-chat buttons
+  useEffect(() => {
+    if (!showInput || showUrlInput) return
+    if (currentStep.inputType !== 'pills' && currentStep.inputType !== 'cta') return
+    setInlinePillsPhase('skeleton')
+    const timer = setTimeout(() => setInlinePillsPhase('ready'), HERO_V2_INLINE_PILLS_SKELETON_MS)
+    return () => clearTimeout(timer)
+  }, [showInput, showUrlInput, stepIdx, flowVersion, currentStep.inputType])
+
+  useEffect(() => {
+    if (inlinePillsPhase === 'hidden' && !showUrlInput) return
+    requestAnimationFrame(() => scrollToBottom())
+  }, [inlinePillsPhase, showUrlInput]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // True when user has intentionally scrolled up (pauses auto-scroll)
   const userScrolledUpRef = useRef(false)
@@ -288,22 +564,53 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
     return () => clearTimeout(timer)
   }, [demoComplete]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-advance for 'message' steps — no user interaction needed
+  // Auto-advance for 'message' steps when the next step needs user action (CTA / pills)
   useEffect(() => {
     if (currentStep.inputType !== 'message' || !showInput) return
-    const delay = currentStep.autoAdvanceDelay ?? 500
+
+    const nextStep = currentFlow[stepIdx + 1]
+    if (!nextStep) return
+
+    const uniformPacing =
+      isHeroFlowV2(originalFlowRef.current) || isCortexConversationFlow(originalFlowRef.current)
+
+    let delay: number | null = currentStep.autoAdvanceDelay ?? null
+
+    if (delay == null && uniformPacing) {
+      if (nextStep.inputType === 'cta') {
+        delay = HERO_V2_MESSAGE_PAUSE_MS
+      } else if (nextStep.inputType === 'pills') {
+        delay = HERO_V2_PAUSE_BEFORE_PILLS_MS
+      }
+    }
+
+    if (delay == null) return
+
     const timer = setTimeout(() => {
       const next = stepIdx + 1
-      if (next < currentFlow.length) {
-        setMessages(prev => [
-          ...prev,
-          { role: 'agent', text: '', isTyping: true },
-        ])
+      if (next >= currentFlow.length) return
+
+      const nextStepDef = currentFlow[next]
+      const nextHasNoAgentCopy =
+        nextStepDef.inputType === 'cta' ||
+        (nextStepDef.inputType === 'pills' && !nextStepDef.agentMessage?.trim())
+
+      if (nextHasNoAgentCopy) {
+        // Footer CTA / pill buttons only — no empty agent bubble
         setStepIdx(next)
+        setShowInput(true)
+        setInlinePillsPhase('hidden')
+        return
       }
+
+      setMessages(prev => [
+        ...prev,
+        { role: 'agent', text: '', isTyping: true },
+      ])
+      setStepIdx(next)
     }, delay)
     return () => clearTimeout(timer)
-  }, [showInput, stepIdx]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [showInput, stepIdx, flowVersion, currentFlow]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-advance for 'thinking' steps — remove the dots bubble then start the next message
   useEffect(() => {
@@ -363,12 +670,22 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
     }
   }, [showInput, stepIdx, currentMode]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Expand into chat mode after the first agent message finishes typing.
+  useEffect(() => {
+    if (!showInput || engaged || stepIdx !== 0) return
+    const firstStep = originalFlowRef.current[0]
+    if (firstStep?.inputType === 'message' || firstStep?.inputType === 'pills') {
+      engageAndScroll()
+    }
+  }, [showInput, stepIdx, engaged]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // When the demo step's typewriter finishes (showInput becomes true on the demo step),
   // record the message index and mark the demo as permanently visible.
   useEffect(() => {
     if (currentStep.inputType === 'demo' && showInput && !demoVisible) {
       demoInsertAfterIdxRef.current = messages.length - 1
       setDemoVisible(true)
+      if (!engaged) engageAndScroll()
     }
   }, [showInput]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -407,16 +724,23 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
     setShowInput(false)
     setShowUrlInput(false)
     setUrlInput('')
+    setShowEmailInput(false)
+    setEmailInput('')
+    setShowBrandsCta(false)
+    setAnalysisCard(null)
+    analysisCardInsertAfterIdxRef.current = -1
     setDemoComplete(false)
     setDemoVisible(false)
     demoInsertAfterIdxRef.current = -1
     productCardInsertAfterIdxRef.current = -1
     setReaderQuestionId('')
+    setOptionSelectionId('')
     setReaderProduct(null)
     readerArticleInsertAfterIdxRef.current = -1
     readerAnswerInsertAfterIdxRef.current = -1
     readerProductCardInsertAfterIdxRef.current = -1
     setEngaged(false)
+    setInlinePillsPhase('hidden')
     setDynamicMaxH('60vh')
     // Reset analytics tracking state for fresh session
     flowCompletedRef.current = false
@@ -532,17 +856,57 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
       return
     }
 
+    if (userValue === '__url__') {
+      engageAndScroll()
+      addHistory({ role: 'user', content: userLabel })
+      setMessages(prev => [...prev, { role: 'user', text: userLabel }])
+      setShowUrlInput(true)
+      setShowInput(true)
+      setInlinePillsPhase('hidden')
+      return
+    }
+
+    if (currentStep.id === 's0-opening' && userValue in CORTEX_PATH_FLOWS) {
+      const pathKey = userValue as CortexPathKey
+      const targetFlow = CORTEX_PATH_FLOWS[pathKey]
+      const p = personaForCortexPath(pathKey)
+      engageAndScroll()
+      setShowInput(false)
+      setInlinePillsPhase('hidden')
+      addHistory({ role: 'user', content: userLabel })
+      if (p) {
+        setPersona(p)
+        selectedPersonaRef.current = p
+      }
+      setOptionSelectionId('')
+      setMessages(prev => [
+        ...prev,
+        { role: 'user', text: userLabel },
+        { role: 'agent', text: '', isTyping: true },
+      ])
+      setCurrentFlow(targetFlow)
+      currentFlowNameRef.current = CORTEX_PATH_FLOW_NAMES[pathKey]
+      setFlowVersion(v => v + 1)
+      setStepIdx(0)
+      return
+    }
+
     engageAndScroll()
     setShowInput(false)
+    setInlinePillsPhase('hidden')
     addHistory({ role: 'user', content: userLabel })
 
-    if (currentStep.id === 'step1-persona') {
+    if (currentStep.collectsPersona) {
       setPersona(userValue as AgentPersona)
       selectedPersonaRef.current = userValue
       // Split analytics flow by persona so GA4 filters don't need a separate persona dimension
       if (userValue === 'publisher') currentFlowNameRef.current = 'PUBLISHER_FLOW'
       else if (userValue === 'brand') currentFlowNameRef.current = 'BRAND_FLOW'
       else if (userValue === 'developer') currentFlowNameRef.current = 'DEVELOPER_FLOW'
+    }
+
+    if (currentStep.collectsOption) {
+      setOptionSelectionId(userValue)
     }
 
     // Reader flow: capture selected question id from reader-article step
@@ -567,6 +931,21 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
       }
       if (userValue.startsWith('/')) router.push(userValue)
       else if (currentStep.options?.[0]?.value.startsWith('/')) router.push(currentStep.options[0].value)
+      return
+    }
+
+    // Terminal navigation from pill CTAs (brand / developer paths)
+    if (userValue.startsWith('/') && currentStep.inputType === 'pills') {
+      setMessages(prev => [...prev, { role: 'user', text: userLabel }])
+      setHeroCompleted()
+      if (!flowCompletedRef.current) {
+        flowCompletedRef.current = true
+        trackAG('agentdialog_flow_complete', {
+          flow: currentFlowNameRef.current,
+          persona: selectedPersonaRef.current || persona || '',
+        })
+      }
+      router.push(userValue)
       return
     }
 
@@ -595,20 +974,60 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
   function handleUrlSubmit() {
     const url = urlInput.trim()
     if (!url) return
+
+    // Extract brand name from domain
+    const domain = url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]
+    const brandSlug = domain.split('.')[0]
+    const brandName = brandSlug.charAt(0).toUpperCase() + brandSlug.slice(1)
+
     addHistory({ role: 'user', content: url })
-    setMessages(prev => [
-      ...prev,
-      { role: 'user', text: url },
-      {
-        role: 'agent',
-        text: "We'll run a real-time analysis on your article. Our team will use this as the starting point for your POC.",
-        isTyping: false,
-      },
-    ])
+    setMessages(prev => [...prev, { role: 'user', text: url }, { role: 'agent', text: '', isThinking: true }])
     setShowUrlInput(false)
     setUrlInput('')
     setShowInput(false)
-    setTimeout(() => router.push('/book-a-demo'), 400)
+
+    // Step 1: replace thinking with analysis card
+    setTimeout(() => {
+      setMessages(prev => {
+        const filtered = prev.filter(m => !m.isThinking)
+        analysisCardInsertAfterIdxRef.current = filtered.length
+        return [...filtered, { role: 'agent', text: '', isTyping: false }]
+      })
+      setAnalysisCard({ brandName })
+
+      // Step 2: follow-up message + email input
+      setTimeout(() => {
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'agent',
+            text: `Want to see the full picture for ${brandName}? Let's discover your gap and possibilities.`,
+            isTyping: false,
+          },
+        ])
+        setShowEmailInput(true)
+      }, 800)
+    }, 2200)
+  }
+
+  function handleEmailSubmit() {
+    const email = emailInput.trim()
+    if (!email) return
+    addHistory({ role: 'user', content: email })
+    setMessages(prev => [...prev, { role: 'user', text: email }])
+    setShowEmailInput(false)
+    setEmailInput('')
+    setTimeout(() => {
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'agent',
+          text: `Report sent to ${email}.\n\nWhile you wait — see how brands like yours are already showing up inside AI answers.`,
+          isTyping: false,
+        },
+      ])
+      setShowBrandsCta(true)
+    }, 600)
   }
 
   // ── Derived ───────────────────────────────────────────────────────────────
@@ -619,22 +1038,170 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
   const headerBg = isDark ? 'rgba(34,93,89,0.45)' : '#225D59'
 
   const ctaStep = currentStep.inputType === 'cta'
-  const ctaOption = currentStep.options?.find(o => {
-    if (persona === 'publisher') return o.value === '/content-owners'
-    if (persona === 'brand') return o.value === '/brands'
-    if (persona === 'developer') return o.value === '/developers'
-    return false
-  }) ?? currentStep.options?.[0]
 
   const stepOptions =
     (persona && currentStep.personalizedOptions?.[persona]) ?? currentStep.options
 
-  const showPills = showInput && currentStep.inputType === 'pills' && !showUrlInput
-  const showCta = showInput && ctaStep && ctaOption && !showUrlInput
-  const hasInputContent = showPills || showCta || showUrlInput
+  const inlineChoiceOptions = ctaStep ? (currentStep.options ?? []) : (stepOptions ?? [])
+
+  const showInlinePills =
+    showInput && currentStep.inputType === 'pills' && !showUrlInput && inlineChoiceOptions.length > 0
+  const showInlineCta =
+    showInput && ctaStep && !showUrlInput && inlineChoiceOptions.length > 0
+  const showInlineChoiceUi = showInlinePills || showInlineCta
+  const showInlineSkeleton = showInlineChoiceUi && inlinePillsPhase === 'skeleton'
+  const showInlineChoices = showInlineChoiceUi && inlinePillsPhase === 'ready'
+
+  const agentBubbleStyle = {
+    background: isDark ? 'rgba(34,93,89,0.25)' : 'rgba(34,93,89,0.06)',
+    color: isDark ? '#FAFAFA' : '#1A1A1A',
+  }
+
+  function renderInlineActions() {
+    if (showInlineSkeleton) {
+      return <InlineChatPillSkeleton count={inlineChoiceOptions.length} isDark={isDark} />
+    }
+    if (showInlineChoices) {
+      return (
+        <InlineChatPillChoices
+          options={inlineChoiceOptions}
+          isDark={isDark}
+          onSelect={advance}
+          variant={ctaStep ? 'primary' : 'outline'}
+        />
+      )
+    }
+    return null
+  }
+
+  function renderAnalysisCardBlock() {
+    if (!analysisCard) return null
+    const { brandName } = analysisCard
+    const cardBg = isDark ? 'rgba(255,255,255,0.04)' : 'white'
+    const cardBorder = isDark ? 'rgba(255,255,255,0.1)' : '#E5E5E5'
+    const textPrimary = isDark ? '#FAFAFA' : '#1A1A1A'
+    const textSecondary = isDark ? 'rgba(250,250,250,0.5)' : '#6B6B6B'
+    const divider = isDark ? 'rgba(255,255,255,0.08)' : '#F0F0F0'
+    const competitors = [
+      { name: 'Category Leader A', pct: 91 },
+      { name: 'Category Leader B', pct: 84 },
+      { name: 'Rising Challenger', pct: 76 },
+    ]
+    return (
+      <motion.div
+        className="rounded-xl overflow-hidden w-full"
+        style={{ border: `1px solid ${cardBorder}`, background: cardBg, boxShadow: isDark ? 'none' : '0 2px 16px rgba(0,0,0,0.08)' }}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+      >
+        {/* Brand confirmed header */}
+        <div className="px-3 pt-3 pb-2.5">
+          <div className="flex items-center gap-1.5 mb-2.5">
+            <span style={{ fontSize: 9, color: '#225D59' }}>✓</span>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#225D59' }}>Brand Confirmed</span>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#225D59' }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: 'white' }}>{brandName[0].toUpperCase()}</span>
+            </div>
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 700, color: textPrimary, lineHeight: 1.2 }}>{brandName}</p>
+              <p style={{ fontSize: 10, color: textSecondary, marginTop: 1 }}>{brandName.toLowerCase()}.com</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1.5 mt-2.5">
+            <span style={{ fontSize: 10, background: isDark ? 'rgba(34,93,89,0.3)' : 'rgba(34,93,89,0.08)', color: '#225D59', borderRadius: 20, padding: '2px 8px', fontWeight: 500 }}>
+              Consumer / E-commerce
+            </span>
+            {['Taiwan', 'SE Asia'].map(m => (
+              <span key={m} style={{ fontSize: 10, background: isDark ? 'rgba(255,255,255,0.08)' : '#F5F5F5', color: textSecondary, borderRadius: 20, padding: '2px 8px' }}>{m}</span>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ height: 1, background: divider }} />
+
+        {/* Network reach */}
+        <div className="px-3 pt-2.5 pb-2">
+          <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: textSecondary, marginBottom: 6 }}>Your media network reach</p>
+          <p style={{ fontSize: 28, fontWeight: 800, color: '#225D59', letterSpacing: '-0.04em', lineHeight: 1 }}>143K</p>
+          <p style={{ fontSize: 10, color: textSecondary, marginTop: 2, marginBottom: 10 }}>weekly readers across the network</p>
+          <div className="flex gap-3">
+            {[{ label: 'Media outlets', value: '11' }, { label: 'Topic categories', value: '38' }].map(s => (
+              <div key={s.label} style={{ flex: 1, background: isDark ? 'rgba(255,255,255,0.05)' : '#F8F8F8', borderRadius: 8, padding: '6px 8px' }}>
+                <p style={{ fontSize: 15, fontWeight: 800, color: '#225D59', letterSpacing: '-0.02em' }}>{s.value}</p>
+                <p style={{ fontSize: 9, color: textSecondary, marginTop: 1 }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ height: 1, background: divider }} />
+
+        {/* Competitor relevance */}
+        <div className="px-3 pt-2.5 pb-3">
+          <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: textSecondary, marginBottom: 8 }}>Competitor relevance</p>
+          <div className="flex flex-col gap-2">
+            {competitors.map(c => (
+              <div key={c.name} className="flex items-center gap-2">
+                <p style={{ fontSize: 10, color: textPrimary, width: 110, flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</p>
+                <div style={{ flex: 1, height: 5, borderRadius: 99, background: isDark ? 'rgba(255,255,255,0.1)' : '#EEE', overflow: 'hidden' }}>
+                  <div style={{ width: `${c.pct}%`, height: '100%', background: '#225D59', borderRadius: 99 }} />
+                </div>
+                <p style={{ fontSize: 10, fontWeight: 600, color: '#225D59', width: 28, textAlign: 'right', flexShrink: 0 }}>{c.pct}%</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    )
+  }
+
+  function renderUrlInputBlock() {
+    if (!showUrlInput) return null
+    return (
+      <div className="flex justify-start">
+        <div
+          className="max-w-[85%] w-full rounded-xl px-3 py-2.5 text-sm leading-relaxed text-left"
+          style={agentBubbleStyle}
+        >
+          <p className="mb-2" style={{ color: isDark ? '#FAFAFA' : '#1A1A1A' }}>Paste your website URL</p>
+          <InlineChatUrlInput
+            isDark={isDark}
+            urlInput={urlInput}
+            onChange={setUrlInput}
+            onSubmit={handleUrlSubmit}
+          />
+        </div>
+      </div>
+    )
+  }
+
+
+  function renderEmailInputBlock() {
+    if (!showEmailInput) return null
+    return (
+      <div className="flex justify-start">
+        <div
+          className="max-w-[85%] w-full rounded-xl px-3 py-2.5 text-sm leading-relaxed text-left"
+          style={agentBubbleStyle}
+        >
+          <p className="mb-2" style={{ color: isDark ? '#FAFAFA' : '#1A1A1A' }}>Enter your work email</p>
+          <InlineChatEmailInput
+            isDark={isDark}
+            emailInput={emailInput}
+            onChange={setEmailInput}
+            onSubmit={handleEmailSubmit}
+          />
+        </div>
+      </div>
+    )
+  }
 
   // Last agent message (used in initial/idle layout)
   const lastMsg = messages[messages.length - 1]
+  const lastAgentIdx = messages.reduce((idx, m, i) => (m.role === 'agent' ? i : idx), -1)
 
   return (
     <div
@@ -701,25 +1268,13 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
                   {lastMsg?.isTyping && (
                     <span className="cursor-blink ml-0.5 opacity-70">|</span>
                   )}
+                  {!lastMsg?.isTyping && renderInlineActions()}
                 </>
               )}
             </div>
           </div>
-
-          {/* Pills inline in the initial view */}
-          {showPills && (
-            <div className="px-4 pb-4 flex flex-wrap gap-2">
-              {stepOptions?.map(opt => (
-                <button
-                  key={opt.label}
-                  onClick={() => advance(opt.label, opt.value)}
-                  className={opt.value === '__reader__' ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          )}
+          {renderUrlInputBlock()}
+          {renderEmailInputBlock()}
 
         </div>
       ) : (
@@ -732,7 +1287,12 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
             {messages.map((msg, i) => (
               <Fragment key={i}>
                 {/* Skip rendering an empty agent bubble when the Answer Page card fills that slot */}
-                <div className={`flex ${(isReader && i === readerAnswerInsertAfterIdxRef.current && msg.role === 'agent' && !msg.text && !msg.isTyping) ? 'hidden' : (msg.role === 'user' ? 'justify-end' : 'justify-start')}`}>
+                <div className={`flex ${
+                  (isReader && i === readerAnswerInsertAfterIdxRef.current && msg.role === 'agent' && !msg.text && !msg.isTyping) ||
+                  (analysisCard && i === analysisCardInsertAfterIdxRef.current && msg.role === 'agent' && !msg.text && !msg.isTyping)
+                    ? 'hidden'
+                    : (msg.role === 'user' ? 'justify-end' : 'justify-start')
+                }`}>
                   <div
                     className="max-w-[85%] rounded-xl px-3 py-2 text-sm leading-relaxed text-left"
                     style={
@@ -761,10 +1321,37 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
                         {msg.isTyping && (
                           <span className="cursor-blink ml-0.5 opacity-70">|</span>
                         )}
+                        {msg.role === 'agent' &&
+                          i === lastAgentIdx &&
+                          !msg.isTyping &&
+                          renderInlineActions()}
+                        {msg.role === 'agent' &&
+                          i === lastAgentIdx &&
+                          !msg.isTyping &&
+                          showBrandsCta && (
+                            <motion.button
+                              type="button"
+                              onClick={() => router.push('/brands')}
+                              className="w-full mt-2 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors hover:opacity-90 active:scale-[0.99]"
+                              style={{ background: '#225D59', color: 'white', textAlign: 'center' }}
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.28, ease: 'easeOut' }}
+                            >
+                              See how brands use Cortex
+                            </motion.button>
+                          )}
                       </>
                     )}
                   </div>
                 </div>
+
+                {/* Brand analysis card — pinned at the placeholder bubble index */}
+                {analysisCard && i === analysisCardInsertAfterIdxRef.current && (
+                  <div className="mt-1">
+                    {renderAnalysisCardBlock()}
+                  </div>
+                )}
 
                 {/* ArticleScanDemo is rendered after its trigger message and stays
                     mounted permanently (demoInsertAfterIdxRef never changes once set),
@@ -936,77 +1523,11 @@ export function AgentDialog({ flow, onComplete, variant = 'hero', bottomPadding 
               </Fragment>
             ))}
 
+            {renderUrlInputBlock()}
+            {renderEmailInputBlock()}
+
             <div className="h-1" /* scroll anchor */ />
           </div>
-
-          {/* ── Pinned input area ── */}
-          <AnimatePresence>
-            {hasInputContent && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-                className="flex-shrink-0 border-t"
-                style={{ borderColor }}
-              >
-                  {showPills && (
-                  <div className="px-4 py-3 flex flex-wrap gap-2">
-                    {stepOptions?.map(opt => (
-                      <button
-                        key={opt.label}
-                        onClick={() => advance(opt.label, opt.value)}
-                        className={opt.value === '__reader__' ? 'pill-btn pill-btn--stylist' : (isDark ? 'pill-btn pill-btn--dark' : 'pill-btn')}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {showUrlInput && (
-                  <div className="px-4 py-3 flex gap-2">
-                    <input
-                      autoFocus
-                      type="url"
-                      value={urlInput}
-                      onChange={e => setUrlInput(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') handleUrlSubmit()
-                      }}
-                      placeholder="https://your-article-url.com/..."
-                      className="flex-1 px-3 py-2 text-sm rounded-lg border focus:outline-none transition-colors"
-                      style={{
-                        borderColor: isDark ? 'rgba(34,93,89,0.5)' : '#E5E5E5',
-                        background: isDark ? 'rgba(255,255,255,0.06)' : 'white',
-                        color: isDark ? '#FAFAFA' : '#1A1A1A',
-                      }}
-                    />
-                    <button
-                      onClick={handleUrlSubmit}
-                      className="px-4 py-2 rounded-lg text-sm font-semibold text-white"
-                      style={{ background: '#225D59' }}
-                    >
-                      Analyze
-                    </button>
-                  </div>
-                )}
-
-                {showCta && ctaOption && (
-                  <div className="px-4 py-3">
-                    <button
-                      onClick={() => advance(ctaOption.label, ctaOption.value)}
-                      className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                      style={{ background: '#225D59' }}
-                    >
-                      {ctaOption.label}
-                    </button>
-                  </div>
-                )}
-
-              </motion.div>
-            )}
-          </AnimatePresence>
         </>
       )}
     </div>

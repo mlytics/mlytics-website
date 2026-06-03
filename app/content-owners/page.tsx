@@ -5,7 +5,7 @@ import { LayerOverview } from '@/components/pages/publishers/LayerOverview'
 import { ContentOwnerVerticals } from '@/components/pages/publishers/ContentOwnerVerticals'
 import { PublisherPageCTA } from '@/components/pages/publishers/PublisherPageCTA'
 
-export const metadata = { title: 'For Content Owners — Mlytics Cortex' }
+export const metadata = { title: 'For Media and Content — Mlytics Cortex' }
 
 export default function PublishersPage() {
   return (
@@ -17,7 +17,7 @@ export default function PublishersPage() {
             className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
             style={{ background: 'rgba(34,93,89,0.4)', color: '#A8C5C3', border: '1px solid rgba(34,93,89,0.6)' }}
           >
-            For Content Owners &amp; Media Platforms
+            For Media and Content
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
             Every layer earns.

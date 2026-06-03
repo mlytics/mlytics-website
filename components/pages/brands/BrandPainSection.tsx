@@ -147,7 +147,7 @@ export function BrandPainSection() {
               Zero-Click Reality
             </p>
             <p className="text-sm leading-relaxed mb-5" style={{ color: '#6B6B6B' }}>
-              The audiences you need are increasingly consuming content through AI experiences — where traditional ads simply don't exist.
+              SEO drives clicks. Media AEO drives AI citations. The audiences you need now get answers without clicking — where is your brand?
             </p>
             {/* Stat pills */}
             <div className="space-y-3">
@@ -209,8 +209,8 @@ export function BrandPainSection() {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.8, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
-            The problem isn't your budget.
-            <span className="block" style={{ color: '#B45309' }}>It's your buying model.</span>
+            Where is your brand
+            <span className="block" style={{ color: '#B45309' }}>when people ask AI?</span>
           </motion.h3>
         </div>
       </div>

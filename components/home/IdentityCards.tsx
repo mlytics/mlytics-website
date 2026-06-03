@@ -16,7 +16,7 @@ const CARDS: Array<{
   accent: string
 }> = [
   {
-    persona: 'Content Owner',
+    persona: 'Media and Content',
     Icon: Newspaper,
     hook: 'Your content produces reader intent signals every day. Right now, every single one is leaking away.',
     products: 'AI Q&A Widget · CPL Revenue',
@@ -24,7 +24,7 @@ const CARDS: Array<{
       { label: 'Content cost', value: '$0.10/piece' },
       { label: 'vs. human writing', value: '$250/piece' },
     ],
-    cta: 'See content owner plan',
+    cta: 'See media and content plan',
     href: '/content-owners',
     accent: '#225D59',
   },

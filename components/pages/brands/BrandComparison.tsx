@@ -8,7 +8,7 @@ const ROWS = [
   { label: 'User intent',   cpm: 'Unknown — hope-based targeting',    mlytics: 'Verified — real-time intent classification' },
   { label: 'What you get',  cpm: 'Eyeballs that may or may not care', mlytics: 'Readers actively researching your category' },
   { label: 'ROI model',     cpm: 'Spend first, measure later',        mlytics: 'Outcome-based — pay for verified engagement' },
-  { label: 'Discovery',     cpm: 'You run SEO / GEO yourself',        mlytics: 'Mlytics GEO places your brand across 15M+ MAU network' },
+  { label: 'Discovery',     cpm: 'You run SEO / open-web AEO yourself', mlytics: 'Media AEO places your brand in AI answers across 15M+ MAU' },
 ]
 
 export function BrandComparison() {
