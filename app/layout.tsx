@@ -13,11 +13,11 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.mlytics.com'),
-  title: 'Mlytics',
-  description: 'Mlytics (摩速科技) is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
+  title: 'Mlytics — AI Answer Monetization Platform',
+  description: 'Mlytics is the AI answer monetization platform for brands, publishers, and developers. Get your brand cited in AI answers, monetize publisher AI traffic, and power AI agents at scale.',
   openGraph: {
-    title: 'Mlytics',
-    description: 'Mlytics (摩速科技) is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
+    title: 'Mlytics — AI Answer Monetization Platform',
+    description: 'Mlytics is the AI answer monetization platform for brands, publishers, and developers. Get your brand cited in AI answers, monetize publisher AI traffic, and power AI agents at scale.',
     url: 'https://www.mlytics.com',
     siteName: 'Mlytics',
     images: [{ url: 'https://storage.googleapis.com/mlytics-website/og-image.png', width: 1200, height: 630 }],
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mlytics',
-    description: 'Mlytics (摩速科技) is AI-powered Answer Engine that empower Media and Content Business get discovered and chosen by right customers.',
+    title: 'Mlytics — AI Answer Monetization Platform',
+    description: 'Mlytics is the AI answer monetization platform for brands, publishers, and developers. Get your brand cited in AI answers, monetize publisher AI traffic, and power AI agents at scale.',
     images: ['https://storage.googleapis.com/mlytics-website/og-image.png'],
   },
 }
@@ -36,6 +36,7 @@ const organizationSchema = {
   '@type': 'Organization',
   name: 'Mlytics',
   alternateName: '摩速科技',
+  description: 'Mlytics is the AI answer monetization platform for brands, publishers, and developers. We put your brand inside the AI answers your buyers trust and turn content into revenue.',
   url: 'https://www.mlytics.com',
   logo: 'https://storage.googleapis.com/mlytics-website/og-image.png',
   sameAs: ['https://www.linkedin.com/company/mlytics/'],

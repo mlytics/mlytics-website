@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion, useScroll, useMotionValueEvent } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { type AgentPersona, HERO_FLOW } from '@/lib/agent-data'
 import { CORTEX_FLOW_S0 } from '@/lib/cortex-conversation-flow'
 import { AgentDialog } from '@/components/agent/AgentDialog'
@@ -13,31 +13,15 @@ import { LogoMarquee } from './LogoMarquee'
 import { trackCTA } from '@/lib/analytics'
 
 const ROTATING_WORDS = [
-  'building your brand',
-  'growing your audience',
-  'driving more revenue',
+  'for Brands',
+  'for Publishers',
+  'for Developers',
 ]
-
-// Total scroll zone height = viewport + demo scroll distance
-const HERO_SCROLL_HEIGHT = 'calc(100dvh + 360vh)'
 
 export function HeroSection() {
   const router = useRouter()
-  const heroScrollRef = useRef<HTMLDivElement>(null)
   const [dialogEngaged, setDialogEngaged] = useState(false)
   const [wordIdx, setWordIdx] = useState(0)
-
-  const { scrollYProgress } = useScroll({
-    target: heroScrollRef,
-    offset: ['start start', 'end end'],
-  })
-
-  const [marqueeVisible, setMarqueeVisible] = useState(true)
-
-  useMotionValueEvent(scrollYProgress, 'change', progress => {
-    // Hide while scrolling through demo; show again when hero zone is nearly complete
-    setMarqueeVisible(progress < 0.05 || progress > 0.88)
-  })
 
   function handleComplete(persona: AgentPersona) {
     const routes: Record<NonNullable<AgentPersona>, string> = {
@@ -57,13 +41,10 @@ export function HeroSection() {
   }, [])
 
   return (
-    // Outer scroll zone — creates scroll distance that drives the demo
-    <div ref={heroScrollRef} style={{ position: 'relative', height: HERO_SCROLL_HEIGHT }}>
-      {/* Sticky hero panel — stays fixed in viewport while user scrolls through demo */}
-      <section
-        className="section-white flex flex-col"
-        style={{ position: 'sticky', top: 0, height: '100dvh', overflow: 'hidden' }}
-      >
+    <section
+      className="section-white flex flex-col"
+      style={{ position: 'relative', height: '100dvh', overflow: 'hidden' }}
+    >
         {/* Background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <WorldMapDots variant="light" />
@@ -92,7 +73,7 @@ export function HeroSection() {
               className="font-bold leading-tight tracking-tight text-[28px] sm:text-[40px] md:text-[52px] lg:text-[64px] mb-4 text-center w-full"
               style={{ color: '#1A1A1A' }}
             >
-              Your investment<br />
+              AI answer monetization<br />
               <span
                 style={{
                   display: 'block',
@@ -129,7 +110,7 @@ export function HeroSection() {
               className="text-sm md:text-base font-normal tracking-wide mb-8 mt-2"
               style={{ color: '#7A7A7A', letterSpacing: '0.04em' }}
             >
-              Intelligent reach.&nbsp;&nbsp;Measurable outcomes.
+              Put your brand inside the AI answers your buyers trust.
             </p>
 
             {/* Legacy dialogs — hidden, kept for rollback */}
@@ -147,22 +128,18 @@ export function HeroSection() {
               />
             </div>
 
-            {/* Scroll-driven Cortex demo */}
+            {/* URL input — direct CTA */}
             <div className="w-full">
-              <CortexLiveDemo scrollYProgress={scrollYProgress} />
+              <CortexLiveDemo />
             </div>
 
           </div>
         </div>
 
-        {/* Logo marquee — slides out when scrolling starts, returns when hero zone completes */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-14 z-10 transition-transform duration-500 ease-in-out"
-          style={{ transform: marqueeVisible ? 'translateY(0)' : 'translateY(100%)' }}
-        >
+        {/* Logo marquee */}
+        <div className="absolute bottom-0 left-0 right-0 h-14 z-10">
           <LogoMarquee isFixed={false} />
         </div>
       </section>
-    </div>
   )
 }
