@@ -3,15 +3,14 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import { type AgentPersona, HERO_FLOW } from '@/lib/agent-data'
 import { CORTEX_FLOW_S0 } from '@/lib/cortex-conversation-flow'
 import { AgentDialog } from '@/components/agent/AgentDialog'
+import { CortexLiveDemo } from '@/components/agent/CortexLiveDemo'
 import { WorldMapDots } from './WorldMapDots'
 import { LogoMarquee } from './LogoMarquee'
 import { trackCTA } from '@/lib/analytics'
-
-const MARQUEE_H = 88
 
 const ROTATING_WORDS = [
   'building your brand',
@@ -19,12 +18,26 @@ const ROTATING_WORDS = [
   'driving more revenue',
 ]
 
+// Total scroll zone height = viewport + demo scroll distance
+const HERO_SCROLL_HEIGHT = 'calc(100dvh + 360vh)'
+
 export function HeroSection() {
   const router = useRouter()
-  const spacerRef = useRef<HTMLDivElement>(null) // keeps layout space for the fixed marquee
-  const [isFixed, setIsFixed] = useState(true)
+  const heroScrollRef = useRef<HTMLDivElement>(null)
   const [dialogEngaged, setDialogEngaged] = useState(false)
   const [wordIdx, setWordIdx] = useState(0)
+
+  const { scrollYProgress } = useScroll({
+    target: heroScrollRef,
+    offset: ['start start', 'end end'],
+  })
+
+  const [marqueeVisible, setMarqueeVisible] = useState(true)
+
+  useMotionValueEvent(scrollYProgress, 'change', progress => {
+    // Hide while scrolling through demo; show again when hero zone is nearly complete
+    setMarqueeVisible(progress < 0.05 || progress > 0.88)
+  })
 
   function handleComplete(persona: AgentPersona) {
     const routes: Record<NonNullable<AgentPersona>, string> = {
@@ -35,16 +48,6 @@ export function HeroSection() {
     if (persona) router.push(routes[persona])
   }
 
-  // Fixed at viewport bottom when at top of page; absolute (natural) once user scrolls
-  useEffect(() => {
-    function recalc() {
-      setIsFixed(window.scrollY === 0)
-    }
-    window.addEventListener('scroll', recalc, { passive: true })
-    recalc()
-    return () => window.removeEventListener('scroll', recalc)
-  }, [])
-
   // Rotate headline words
   useEffect(() => {
     const id = setInterval(() => {
@@ -54,134 +57,112 @@ export function HeroSection() {
   }, [])
 
   return (
-    <section className="relative min-h-screen min-h-[100dvh] section-white flex flex-col">
-      {/* Background elements — clipped to section bounds so they don't bleed into adjacent sections */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <WorldMapDots variant="light" />
-        {/* Central radial overlay */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(ellipse 85% 75% at 50% 45%, rgba(240,248,247,0.97) 0%, rgba(255,255,255,0.65) 65%, transparent 100%)',
-          }}
-        />
-      </div>
-
-      {/* Main content — vertically centred */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-[96px] pb-8">
-        <div className="max-w-[52rem] w-full mx-auto flex flex-col items-center text-center">
-
-          {/* Live badge */}
-          {/* <div className="mb-5">
-            <div
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium"
-              style={{
-                background: 'transparent',
-                border: '1px solid rgba(34,93,89,0.18)',
-                color: '#225D59',
-              }}
-            >
-              <span className="relative flex h-2 w-2 flex-shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
-              </span>
-              4.1M WAU · Asia-Pacific
-            </div>
-          </div> */}
-
-          {/* Headline — fixed-height second line prevents layout shift */}
-          <h1
-            className="font-bold leading-tight tracking-tight text-[28px] sm:text-[40px] md:text-[52px] lg:text-[64px] mb-4 text-center w-full"
-            style={{ color: '#1A1A1A' }}
-          >
-            Your investment<br />
-            {/* Fixed-height container — absolute children overlap so height never shifts */}
-            <span
-              style={{
-                display: 'block',
-                height: '1.25em',
-                position: 'relative',
-                textAlign: 'center',
-              }}
-            >
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={wordIdx}
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -14 }}
-                  transition={{ duration: 0.38, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  style={{
-                    color: '#225D59',
-                    display: 'block',
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    textAlign: 'center',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {ROTATING_WORDS[wordIdx]}
-                </motion.span>
-              </AnimatePresence>
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p
-            className="text-sm md:text-base font-normal tracking-wide mb-8 mt-2"
-            style={{ color: '#7A7A7A', letterSpacing: '0.04em' }}
-          >
-            Intelligent reach.&nbsp;&nbsp;Measurable outcomes.
-          </p>
-
-          {/* CTA button */}
-          <div className="mb-6 md:mb-14">
-            <Link
-              href="/book-a-demo"
-              onClick={() => trackCTA('Get Started', 'hero')}
-              className="px-8 py-3.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-              style={{ background: '#225D59' }}
-            >
-              Get Started
-            </Link>
-          </div>
-
-          {/* Legacy hero AgentDialog (HERO_FLOW) — hidden, kept for rollback */}
-          <div className="hidden" aria-hidden>
-            <AgentDialog
-              flow={HERO_FLOW}
-              onComplete={handleComplete}
-              variant="page"
-              bottomPadding={0}
-            />
-          </div>
-
-          {/* Cortex conversation flow (spec: cortex_conversation_flow.md) */}
-          <div className={dialogEngaged ? 'w-full sticky top-20 lg:top-4 z-20' : 'w-full'}>
-            <AgentDialog
-              flow={CORTEX_FLOW_S0}
-              onComplete={handleComplete}
-              variant="page"
-              bottomPadding={0}
-              onEngage={() => setDialogEngaged(true)}
-              onReset={() => setDialogEngaged(false)}
-            />
-          </div>
-
-        </div>
-      </div>
-
-      {/* Spacer — reserves marquee height so content isn't hidden behind it */}
-      <div ref={spacerRef} className="h-14" />
-
-      {/* Logo marquee — fixed at viewport bottom when at top of page; slides down when dialog is engaged */}
-      <div
-        className={`h-14 transition-transform duration-300 ease-in-out ${dialogEngaged ? 'translate-y-full' : 'translate-y-0'} ${isFixed ? 'fixed bottom-0 left-0 right-0 z-40' : 'absolute bottom-0 left-0 right-0'}`}
+    // Outer scroll zone — creates scroll distance that drives the demo
+    <div ref={heroScrollRef} style={{ position: 'relative', height: HERO_SCROLL_HEIGHT }}>
+      {/* Sticky hero panel — stays fixed in viewport while user scrolls through demo */}
+      <section
+        className="section-white flex flex-col"
+        style={{ position: 'sticky', top: 0, height: '100dvh', overflow: 'hidden' }}
       >
-        <LogoMarquee isFixed={isFixed} />
-      </div>
-    </section>
+        {/* Background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <WorldMapDots variant="light" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse 85% 75% at 50% 45%, rgba(240,248,247,0.97) 0%, rgba(255,255,255,0.65) 65%, transparent 100%)',
+            }}
+          />
+        </div>
+
+        {/* Main content — vertically centred, masked top/bottom so chat items fade gracefully */}
+        <div
+          className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-[96px] pb-14"
+          style={{
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 82%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 82%, transparent 100%)',
+            overflow: 'hidden',
+          }}
+        >
+          <div className="max-w-[52rem] w-full mx-auto flex flex-col items-center text-center">
+
+            {/* Headline */}
+            <h1
+              className="font-bold leading-tight tracking-tight text-[28px] sm:text-[40px] md:text-[52px] lg:text-[64px] mb-4 text-center w-full"
+              style={{ color: '#1A1A1A' }}
+            >
+              Your investment<br />
+              <span
+                style={{
+                  display: 'block',
+                  height: '1.25em',
+                  position: 'relative',
+                  textAlign: 'center',
+                }}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={wordIdx}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -14 }}
+                    transition={{ duration: 0.38, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    style={{
+                      color: '#225D59',
+                      display: 'block',
+                      position: 'absolute',
+                      left: 0,
+                      right: 0,
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {ROTATING_WORDS[wordIdx]}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+            </h1>
+
+            {/* Subtitle */}
+            <p
+              className="text-sm md:text-base font-normal tracking-wide mb-8 mt-2"
+              style={{ color: '#7A7A7A', letterSpacing: '0.04em' }}
+            >
+              Intelligent reach.&nbsp;&nbsp;Measurable outcomes.
+            </p>
+
+            {/* Legacy dialogs — hidden, kept for rollback */}
+            <div className="hidden" aria-hidden>
+              <AgentDialog flow={HERO_FLOW} onComplete={handleComplete} variant="page" bottomPadding={0} />
+            </div>
+            <div className="hidden" aria-hidden>
+              <AgentDialog
+                flow={CORTEX_FLOW_S0}
+                onComplete={handleComplete}
+                variant="page"
+                bottomPadding={0}
+                onEngage={() => setDialogEngaged(true)}
+                onReset={() => setDialogEngaged(false)}
+              />
+            </div>
+
+            {/* Scroll-driven Cortex demo */}
+            <div className="w-full">
+              <CortexLiveDemo scrollYProgress={scrollYProgress} />
+            </div>
+
+          </div>
+        </div>
+
+        {/* Logo marquee — slides out when scrolling starts, returns when hero zone completes */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-14 z-10 transition-transform duration-500 ease-in-out"
+          style={{ transform: marqueeVisible ? 'translateY(0)' : 'translateY(100%)' }}
+        >
+          <LogoMarquee isFixed={false} />
+        </div>
+      </section>
+    </div>
   )
 }
