@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 
 export function CortexLiveDemo() {
@@ -15,10 +14,7 @@ export function CortexLiveDemo() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+    <div
       className="flex items-center gap-2 bg-white border border-[#E5E5E5] rounded-full px-2 py-2 w-full max-w-lg mx-auto"
       style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.07)' }}
     >
@@ -40,6 +36,6 @@ export function CortexLiveDemo() {
       >
         Check AI visibility
       </button>
-    </motion.div>
+    </div>
   )
 }
