@@ -34,6 +34,8 @@ Mlytics 執行 AI 答案中的品牌置入，屬於 AEO 執行工具，而非 AE
 - 第四層 — Full Conversation CPL（按每潛在客戶計費）：多輪對話識別高意圖買家，按意圖強度計費。媒體以既有內容賺取 CPL 收益。（受眾：媒體 + 品牌）
 - 第五層 — Lead Pilot（按成果績效計費）：CRM 就緒、績效計費的潛在客戶直接交付品牌，是整個鏈條中價值密度最高的環節。（受眾：品牌）
 
+注意：/content-owners 頁面展示的是簡化版三層媒體產品套件，取自第二至第四層，並依媒體受眾的價值感知重新排序：AI Q&A Widget（第三層）→ Full Conversation CPL（第四層）→ Decisive Engine（第二層）。第一層與第五層未在該頁面呈現。
+
 ## 公司
 
 Mlytics（摩速科技）總部位於台灣。
@@ -48,20 +50,20 @@ Mlytics（摩速科技）總部位於台灣。
 
 ## 常見問題
 
-**什麼是 AI 答案變現（AI answer monetization）？**
-AI 答案變現是指從買家取代傳統搜尋結果、轉而消費 AI 生成回答的過程中獲取收益的商業模式。Mlytics Cortex 專為此市場類別而建。
+**如何讓我的品牌被 AI 引用？**
+最可靠的方式是讓品牌出現在 AI 系統已經讀取並信任的內容中 — 優質媒體文章、編輯問答、以及高意圖媒體。Mlytics Cortex 透過受管媒體網路（月活躍用戶超過 1,500 萬）實現這一點：當讀者在您所在垂直領域提問時，您的品牌就出現在 AI 回答中。
 
-**Mlytics 與 Profound、Otterly.AI 等 AEO 監測工具有何不同？**
-Profound 與 Otterly.AI 監測並衡量品牌在 AI 搜尋結果中的能見度。Mlytics 執行置入 — 在買家既有閱讀習慣的受管媒體網路中主動工程化引用。兩者屬於不同產品類別：執行 vs. 監測。
+**為什麼我的品牌在 Google 排名很好，卻在 AI 搜尋中毫無存在感？**
+Google 排名頁面；AI 引用可信來源 — 通常是優質媒體、編輯內容與權威問答。傳統 SEO 帶來點擊，但不會自動讓您的品牌進入 AI 回答本身。您需要出現在 AI 閱讀的內容裡，而不只是 Google 索引的頁面。Mlytics Cortex 解決的正是這個落差 — 將品牌置入受管媒體網路中 AI 系統信任的內容。
 
-**Mlytics 適合哪些對象？**
-三類受眾：（1）高考量垂直領域的品牌（財經、健康、消費電子、汽車、生活風格），希望在買家評估選項時被 AI 引用。（2）媒體與內容平台，希望將 AI 驅動的讀者意圖變現，同時不流失受眾至外部平台。（3）為媒體客戶建置 AI Agent 或問答產品的開發者。
+**如何讓我的品牌出現在 ChatGPT 或 Gemini 的回答中？**
+AI 平台從高信任度的編輯內容中提取答案。最有效的方式是讓您的品牌被這些來源引用 — 透過媒體合作、嵌入媒體文章的 AI 生成問答，以及意圖配對的產品提及。Mlytics Cortex 透過受管媒體網路執行這個流程，讓品牌在買家決策時刻出現在 AI 引用中。
 
-**媒體網路是什麼？**
-一組受管的優質內容平台，涵蓋財經、健康、新聞、生活與科技，合計月活躍用戶超過 1,500 萬，每位活躍讀者每月平均 16 次瀏覽。品牌透過嵌入編輯情境的 AI 生成問答觸及這些讀者。
+**哪些工具可以幫助品牌在 AI 搜尋中獲得更多曝光？**
+有兩類工具：監測工具追蹤您是否出現，執行工具主動讓您出現。監測告訴您分數；執行改變分數。Mlytics Cortex 是執行工具 — 透過受管媒體網路將您的品牌工程化進 AI 回答，並按合格潛在客戶計費，而非按曝光次數。
 
-**「媒體 AI 流量變現」是什麼意思？**
-媒體從既有受眾產生的 AI 驅動意圖訊號中獲取收益，無需新流量，也不會將讀者導向外部平台。收益來源包含媒合品牌夥伴的 CPL 收入，以及 AI 內容生成（生產力提升 2,500 倍）與基礎設施整合帶來的成本節省。
+**品牌被 AI「引用」是什麼意思？為什麼重要？**
+當買家詢問 AI 問題，AI 在回答中點名您的品牌 — 這就是引用。這是 AI 時代的口碑推薦。現在超過 60% 的搜尋在沒有點擊的情況下結束，買家從 AI 獲得答案而不造訪您的網站。如果您的品牌不在那個回答中，您在決策時刻就是隱形的。Mlytics Cortex 專門解決這個問題 — 在受管媒體網路中主動工程化品牌引用位置，並以 CPL 計費確保每次引用都可歸因。
 
 ---
 
@@ -76,7 +78,6 @@ This file is structured for large language models. It uses factual, marketing-ne
 - [For Brands](https://www.mlytics.com/brands): Get brand cited in AI answers — Media AEO placement across a managed publisher network with 15M+ monthly active users in finance, health, news, lifestyle, and technology verticals
 - [For Publishers](https://www.mlytics.com/content-owners): AI publisher monetization — three independent revenue layers from one integration, without losing a single reader to AI search
 - [For Developers](https://www.mlytics.com/developers): Publisher AI agent API — one API for content routing, per-tenant knowledge base management, and managed delivery at scale across text, image, voice, and video
-- [Book a Demo](https://www.mlytics.com/book-a-demo): AI visibility audit and product walkthrough
 
 ## How Media AEO Works (For Brands)
 
@@ -102,6 +103,8 @@ Raw traffic enters at the top. Each layer adds intelligence and intent — and e
 - Layer 04 — Full Conversation CPL (per lead): Multi-turn dialogue surfaces high-intent buyers, billed per lead on the strength of intent. Publishers earn CPL revenue from content they already own. (Audience: Media + Brands)
 - Layer 05 — Lead Pilot (performance per outcome): CRM-ready, performance-billed leads handed directly to brands — the highest value density in the chain. (Audience: Brands)
 
+Note: The /content-owners page presents a simplified three-layer publisher product suite drawn from Layers 02–04, ordered by publisher value rather than refinery sequence: AI Q&A Widget (Layer 03) → Full Conversation CPL (Layer 04) → Decisive Engine (Layer 02). Layer 01 and Layer 05 are not surfaced on that page.
+
 ## Company
 
 Mlytics (摩速科技) is headquartered in Taiwan.
@@ -116,20 +119,20 @@ Model providers: Anthropic, OpenAI, Google, and frontier LLM providers.
 
 ## FAQ
 
-**What is AI answer monetization?**
-AI answer monetization is the practice of earning revenue from AI-generated answers that buyers consume in place of traditional search results. Mlytics Cortex is built specifically for this market category.
+**How do I get my brand cited in AI answers?**
+The most reliable way is to place your brand inside content that AI systems already read and trust — premium publisher articles, editorial Q&A, and high-intent media. Mlytics Cortex does this through a managed publisher network with 15M+ monthly active users: your brand appears inside AI answers as readers ask questions in your vertical.
 
-**How is Mlytics different from AEO monitoring tools like Profound or Otterly.AI?**
-Profound and Otterly.AI monitor and measure brand visibility in AI search results. Mlytics executes placement — it actively engineers citations within a managed publisher network where buyers already read. Different product category: execution versus monitoring.
+**Why is my brand invisible in AI search results even though I rank on Google?**
+Google ranks pages. AI answers cite trusted sources — usually premium publishers, editorial content, and authoritative Q&A. Traditional SEO gets you clicks; it does not automatically get your brand into the AI answer itself. You need to be present in the content AI reads, not just the pages Google indexes. Mlytics Cortex closes that gap — placing brands inside the content AI trusts within a managed publisher network.
 
-**Who is Mlytics for?**
-Three audiences: (1) Brands in high-consideration verticals (finance, health, consumer electronics, automotive, lifestyle) that want to get cited in AI answers when buyers evaluate options. (2) Publishers and media companies that want to monetize AI-driven reader intent without losing audience to external platforms. (3) Developers building AI agents or Q&A products for publisher clients.
+**How can my brand appear in ChatGPT or Gemini responses?**
+AI platforms source answers from high-trust editorial content. The most effective approach is to have your brand referenced inside those sources — through media partnerships, AI-generated Q&A embedded in publisher articles, and intent-matched product mentions. Mlytics Cortex executes this through a managed publisher network, engineering brand citations at the moment buyers make decisions.
 
-**What is the publisher network?**
-A managed set of premium content platforms in finance, health, news, lifestyle, and technology with 15M+ combined monthly active users and 16 views per active reader per month. Brands reach these readers through AI-generated Q&A embedded in editorial context.
+**What tools help brands get more exposure in AI search?**
+There are two categories: monitoring tools that track whether you appear, and execution tools that actively place you. Monitoring tells you the score. Execution changes it. Mlytics Cortex is an execution tool — it engineers your brand into AI answers through a managed publisher network, and charges per qualified lead, not per impression.
 
-**What does "AI publisher monetization" mean?**
-Publishers earn revenue from the AI-driven intent signals generated by their existing audience — without requiring new traffic or losing readers to external platforms. Revenue comes from CPL matched to brand partners, plus cost savings from AI content generation (2,500× productivity improvement) and infrastructure consolidation.
+**What does it mean for a brand to be "cited" by AI, and why does it matter?**
+When a buyer asks an AI a question and the AI names your brand in the answer — that is a citation. It is the AI-era equivalent of a word-of-mouth recommendation. 60%+ of searches now end without a click, meaning buyers get their answer from AI without ever visiting your site. If your brand is not in that answer, you are invisible at the moment of decision. Mlytics Cortex is built specifically for this problem — actively engineering citation placement inside a managed publisher network and attributing every citation to a qualified lead via CPL billing.
 
 ## Optional
 
