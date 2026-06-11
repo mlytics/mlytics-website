@@ -2,6 +2,8 @@ import { BrandComparison } from '@/components/pages/brands/BrandComparison'
 import { BrandPainSection } from '@/components/pages/brands/BrandPainSection'
 import { BrandWhoSection } from '@/components/pages/brands/BrandWhoSection'
 import { BrandGEOSection } from '@/components/pages/brands/BrandGEOSection'
+import { BrandAEOVsMonitoring } from '@/components/pages/brands/BrandAEOVsMonitoring'
+import { BrandFAQ } from '@/components/pages/brands/BrandFAQ'
 import { BrandLeadPilot } from '@/components/pages/brands/BrandLeadPilot'
 import { BrandPageCTA } from '@/components/pages/brands/BrandPageCTA'
 
@@ -20,10 +22,10 @@ export default function BrandsPage() {
             For Brands
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
-            Your audience moved to AI.<br />Your ads didn&apos;t.
+            Get your brand cited<br />in AI answers.
           </h1>
           <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
-            Build an AI search moat on premium content platforms — get cited in AI answers where 15M+ MAU already read.
+            Mlytics Cortex places your brand inside the AI answers your buyers already trust — across a managed publisher network with 15M+ monthly active users.
           </p>
         </div>
       </div>
@@ -31,14 +33,20 @@ export default function BrandsPage() {
       {/* Pain */}
       <BrandPainSection />
 
-      {/* Who it's for */}
-      {/* <BrandWhoSection /> */}
-
       {/* Media AEO — network + workflow */}
       <BrandGEOSection />
 
-      {/* Comparison */}
-      <BrandComparison />
+      {/* AEO Execution vs Monitoring + FAQ — same visual block */}
+      <BrandAEOVsMonitoring />
+      <div className="section-white">
+        <div className="max-w-5xl mx-auto px-6">
+          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)' }} />
+        </div>
+      </div>
+      <BrandFAQ />
+
+      {/* Who it's for */}
+      {/* <BrandWhoSection /> */}
 
       {/* Lead Pilot */}
       {/* <BrandLeadPilot /> */}

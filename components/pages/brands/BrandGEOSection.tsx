@@ -7,27 +7,27 @@ const STEPS = [
   {
     num: '01',
     label: 'Brand onboarding',
-    desc: 'Import your brand data into the Mlytics knowledge base — messaging, products, and editorial assets.',
+    desc: 'Your products, claims and positioning ingested into Cortex.',
   },
   {
     num: '02',
     label: 'Reader moments captured',
-    desc: 'We track what audiences read across finance, health, news, lifestyle, and tech — fresh context from live media and content traffic.',
+    desc: 'Intent signals captured across the 15M+ MAU network.',
   },
   {
     num: '03',
-    label: 'News matched to your products',
-    desc: 'The system matches trending stories and reader questions to relevant products in your catalog.',
+    label: 'News matched to products',
+    desc: 'Live content matched to relevant products in real time.',
   },
   {
     num: '04',
     label: 'AI Q&A generated',
-    desc: 'Cortex creates intent-driven Q&A content — natural angles, not one-way ad copy.',
+    desc: 'Grounded answers generated that cite your brand in context.',
   },
   {
     num: '05',
-    label: 'Organic exposure in context',
-    desc: 'Your brand appears inside AI answers and editorial context — citations readers trust, across 15M+ MAU.',
+    label: 'Organic exposure',
+    desc: 'Buyers meet you mid-decision — and the lead is attributed.',
   },
 ]
 
@@ -133,6 +133,28 @@ export function BrandGEOSection() {
           >
             Monthly Active Users across managed media and content properties.
           </motion.p>
+
+          {/* Stat pills */}
+          <motion.div
+            className="flex flex-wrap justify-center gap-4 mt-8"
+            initial={{ opacity: 0, y: 12 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            {[
+              { stat: '4.26%', desc: 'Q&A Widget CTR vs 0.1–0.5% for banner ads' },
+              { stat: '16×',   desc: 'views per active reader per month' },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 px-5 py-3 rounded-xl"
+                style={{ background: 'rgba(168,197,195,0.07)', border: '1px solid rgba(168,197,195,0.12)' }}
+              >
+                <span className="text-xl font-black tabular-nums" style={{ color: '#F59E0B' }}>{item.stat}</span>
+                <span className="text-xs leading-snug text-left max-w-[160px]" style={{ color: 'rgba(168,197,195,0.7)' }}>{item.desc}</span>
+              </div>
+            ))}
+          </motion.div>
         </div>
 
         {/* Inner divider */}
@@ -231,8 +253,11 @@ export function BrandGEOSection() {
 
           {/* Right — copy */}
           <div className="pt-8 pb-4 md:pl-10 flex flex-col justify-center text-left">
-            <p className="text-base leading-relaxed" style={{ color: '#A8C5C3' }}>
+            <p className="text-base leading-relaxed mb-3" style={{ color: '#A8C5C3' }}>
               Premium content platforms in finance, health, news, lifestyle, and technology — your buyers already read here.
+            </p>
+            <p className="text-base leading-relaxed" style={{ color: '#A8C5C3' }}>
+              Every placement comes with first-party intent data — so you can see what readers asked, and prove it converted.
             </p>
           </div>
         </motion.div>
@@ -264,30 +289,34 @@ export function BrandGEOSection() {
           </p>
         </motion.div>
 
-        <div className="space-y-3">
+        {/* Horizontal timeline */}
+        <div className="grid grid-cols-1 sm:grid-cols-5 relative">
+          {/* Connecting line — desktop only */}
+          <div
+            className="hidden sm:block absolute left-0 right-0 pointer-events-none"
+            style={{ height: 1, top: '0.85rem', background: 'rgba(168,197,195,0.15)' }}
+          />
+
           {STEPS.map((step, i) => (
             <motion.div
               key={i}
-              className="rounded-2xl overflow-hidden"
-              style={{
-                border: '1px solid rgba(168,197,195,0.15)',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1), 0 8px 24px rgba(34,93,89,0.15)',
-              }}
-              initial={{ opacity: 0, y: 24 }}
+              className="relative flex flex-col pr-6 pb-8 sm:pb-0"
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.4, delay: i * 0.1, ease: 'easeOut' }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.4, delay: i * 0.08, ease: 'easeOut' }}
             >
+              {/* Dot */}
               <div
-                className="px-5 py-3 border-b flex items-center justify-between"
-                style={{ background: '#1f4f4b', borderColor: 'rgba(168,197,195,0.08)' }}
-              >
-                <span className="text-sm font-bold text-white">{step.label}</span>
-                <span className="text-xs font-bold tabular-nums" style={{ color: 'rgba(168,197,195,0.6)' }}>{step.num}</span>
-              </div>
-              <div className="px-5 py-4" style={{ background: 'rgba(34,93,89,0.25)' }}>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(168,197,195,0.9)' }}>{step.desc}</p>
-              </div>
+                className="w-[10px] h-[10px] rounded-full mb-4 relative z-10 shrink-0"
+                style={{ background: '#A8C5C3', border: '2px solid rgba(168,197,195,0.4)' }}
+              />
+              {/* Number */}
+              <span className="text-xs font-bold tabular-nums mb-2" style={{ color: 'rgba(168,197,195,0.45)' }}>{step.num}</span>
+              {/* Title */}
+              <p className="text-sm font-bold text-white mb-1 leading-snug">{step.label}</p>
+              {/* Desc */}
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(168,197,195,0.6)' }}>{step.desc}</p>
             </motion.div>
           ))}
         </div>

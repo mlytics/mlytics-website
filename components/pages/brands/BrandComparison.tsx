@@ -4,10 +4,10 @@ import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 
 const ROWS = [
-  { label: 'Billing',       cpm: 'Per 1,000 impressions',             mlytics: 'Per qualified intent signal' },
-  { label: 'User intent',   cpm: 'Unknown — hope-based targeting',    mlytics: 'Verified — real-time intent classification' },
-  { label: 'What you get',  cpm: 'Eyeballs that may or may not care', mlytics: 'Readers actively researching your category' },
-  { label: 'ROI model',     cpm: 'Spend first, measure later',        mlytics: 'Outcome-based — pay for verified engagement' },
+  { label: 'Targeting',     cpm: 'Hope-based audience segments',      mlytics: 'Real-time intent — readers actively researching your category' },
+  { label: 'User intent',   cpm: 'Unknown — you pay and hope',        mlytics: 'Verified — captured at the moment of reading' },
+  { label: 'What you get',  cpm: 'Eyeballs that may or may not care', mlytics: 'Buyers mid-research, inside content they already trust' },
+  { label: 'ROI model',     cpm: 'Spend first, measure later',        mlytics: 'Outcome-based — pay per qualified lead, not per impression' },
   { label: 'Discovery',     cpm: 'You run SEO / open-web AEO yourself', mlytics: 'Media AEO places your brand in AI answers across 15M+ MAU' },
 ]
 

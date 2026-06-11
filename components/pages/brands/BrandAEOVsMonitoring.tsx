@@ -1,0 +1,114 @@
+'use client'
+
+import { motion } from 'framer-motion'
+
+const ROWS = [
+  {
+    label: 'What it does',
+    monitoring: 'Tracks whether your brand appears in AI answers',
+    mlytics: 'Engineers your brand into AI answers',
+  },
+  {
+    label: 'What you get',
+    monitoring: 'Visibility reports and dashboards',
+    mlytics: 'Actual citations inside AI answers buyers trust',
+  },
+  {
+    label: 'You control',
+    monitoring: 'Your measurement',
+    mlytics: 'Your placement',
+  },
+  {
+    label: 'Billing',
+    monitoring: 'Monthly SaaS subscription',
+    mlytics: 'CPL — pay per qualified lead, not per impression',
+  },
+  {
+    label: 'Category',
+    monitoring: 'AEO monitoring',
+    mlytics: 'AEO execution',
+  },
+]
+
+export function BrandAEOVsMonitoring() {
+  return (
+    <section className="section-white pt-16 lg:pt-20 pb-8">
+      <div className="max-w-5xl mx-auto px-6">
+
+        {/* Section header */}
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.5 }}
+        >
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
+            Execution vs. Monitoring
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: '#1A1A1A' }}>
+            Other tools measure if you appear.<br />
+            <span style={{ color: '#225D59' }}>Mlytics makes you appear.</span>
+          </h2>
+          <p className="text-base max-w-xl mx-auto mt-4" style={{ color: '#6B6B6B' }}>
+            AEO monitoring tools tell you your AI search score. Mlytics changes it — by placing your brand inside the AI answers your buyers already trust.
+          </p>
+        </motion.div>
+
+        {/* Column headers */}
+        <div className="grid grid-cols-2 mb-3">
+          <div className="px-5 py-4 text-center">
+            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(26,26,26,0.35)' }}>
+              AEO Monitoring
+            </p>
+            <p className="text-xs mt-1" style={{ color: 'rgba(26,26,26,0.25)' }}>tracking & reporting tools</p>
+          </div>
+          <div className="px-5 py-4 text-center">
+            <p className="text-base font-bold uppercase tracking-widest" style={{ color: '#225D59' }}>
+              Mlytics Cortex
+            </p>
+            <p className="text-xs mt-1" style={{ color: 'rgba(34,93,89,0.5)' }}>AEO Execution</p>
+          </div>
+        </div>
+
+        {/* Data rows */}
+        {ROWS.map((row, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.4, delay: i * 0.08 }}
+          >
+            <div
+              className="px-5 py-3 rounded-lg"
+              style={{ background: 'rgba(34,93,89,0.08)' }}
+            >
+              <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#225D59' }}>
+                {row.label}
+              </span>
+            </div>
+
+            <div
+              className="grid grid-cols-2 items-center py-5"
+              style={{ borderBottom: i < ROWS.length - 1 ? '1px solid rgba(0,0,0,0.06)' : undefined }}
+            >
+              <div className="px-5 text-center">
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(26,26,26,0.45)' }}>
+                  {row.monitoring}
+                </p>
+              </div>
+              <div className="px-5 text-center">
+                <p className="text-sm leading-relaxed font-medium" style={{ color: '#1A1A1A' }}>
+                  {row.mlytics}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+
+
+      </div>
+    </section>
+  )
+}
