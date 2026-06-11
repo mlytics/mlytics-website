@@ -7,7 +7,7 @@
 ## 產品
 
 - [品牌方案](https://www.mlytics.com/brands)：讓品牌被 AI 引用 — 透過媒體 AEO，在月活躍用戶超過 1,500 萬的媒體網路中，覆蓋財經、健康、新聞、生活與科技垂直領域
-- [媒體方案](https://www.mlytics.com/content-owners)：媒體 AI 流量變現 — 單一整合提供五層獨立收益（Intent Refinery），每層可獨立獲利
+- [媒體方案](https://www.mlytics.com/content-owners)：媒體 AI 流量變現 — 單一整合提供三層獨立收益，在不流失任何讀者至 AI 搜尋的前提下，將既有受眾轉化為新收益來源
 - [開發者方案](https://www.mlytics.com/developers)：媒體 AI Agent API — 單一 API 涵蓋內容路由、租戶知識庫管理，以及文字、圖片、語音、影片的全球規模化交付
 
 ## 媒體 AEO 運作方式（品牌）
@@ -74,7 +74,7 @@ This file is structured for large language models. It uses factual, marketing-ne
 ## Product
 
 - [For Brands](https://www.mlytics.com/brands): Get brand cited in AI answers — Media AEO placement across a managed publisher network with 15M+ monthly active users in finance, health, news, lifestyle, and technology verticals
-- [For Publishers](https://www.mlytics.com/content-owners): AI publisher monetization — five-layer Intent Refinery, each layer independently profitable from one integration
+- [For Publishers](https://www.mlytics.com/content-owners): AI publisher monetization — three independent revenue layers from one integration, without losing a single reader to AI search
 - [For Developers](https://www.mlytics.com/developers): Publisher AI agent API — one API for content routing, per-tenant knowledge base management, and managed delivery at scale across text, image, voice, and video
 - [Book a Demo](https://www.mlytics.com/book-a-demo): AI visibility audit and product walkthrough
 

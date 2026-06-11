@@ -20,10 +20,10 @@ export default function PublishersPage() {
             For Media and Content
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
-            Every layer earns.
+            Turn your audience into<br />three new revenue layers.
           </h1>
           <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
-            Not just cost savings — three independent revenue and savings layers, all from one integration.
+            Mlytics Cortex connects your AI-engaged audience to brand partners across three independent revenue layers — without losing a single reader to AI search.
           </p>
         </div>
       </div>

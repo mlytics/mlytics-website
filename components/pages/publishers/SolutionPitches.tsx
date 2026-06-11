@@ -5,23 +5,23 @@ import { motion } from 'framer-motion'
 const PITCHES = [
   {
     num: '01',
-    label: 'Own the relationship.',
-    them: { who: 'LLM search engines', desc: 'Summarize your content, answer the user, and keep them. Your readers never arrive.' },
-    us: 'Deploy AI experiences on your site. Readers stay, engage longer, and generate intent signals you monetize.',
+    label: 'Intent signals are revenue signals.',
+    them: { who: 'Traditional ad model', desc: 'Sell impressions to brands who hope the right person sees the ad. Revenue tied to pageviews, not outcomes.' },
+    us: 'Every question your readers ask is an intent signal. Mlytics matches those signals to brand partners who pay per qualified lead.',
     accent: '#225D59',
   },
   {
     num: '02',
-    label: "We add traffic. We don't steal it.",
-    them: { who: 'AI-powered search', desc: 'Extracts your content, generates an answer, keeps the user. Your analytics show decline.' },
-    us: 'Brings AI experiences to your domain. More engagement, not less. Your content, your audience, your data.',
+    label: "AI search takes traffic. We take it back.",
+    them: { who: 'AI search engines', desc: 'Extract your content, generate an answer, keep the user. Your analytics show decline. Your revenue drops.' },
+    us: 'Your content powers AI answers inside your own domain. Readers stay, brands pay CPL for the intent they generate. You earn from both.',
     accent: '#225D59',
   },
   {
     num: '03',
-    label: "Reach demographics your site can't.",
-    them: { who: 'Traditional SEO & social', desc: "Under-35 cohorts live in AI chat and agent-curated feeds — unreachable by current strategy." },
-    us: "Distributes your content into AI-powered surfaces. New demographics, without changing your editorial workflow.",
+    label: "One integration. Three revenue layers.",
+    them: { who: 'Content monetization today', desc: "Banner ads, affiliate links, sponsored posts — each requires a separate deal, separate integration, separate team." },
+    us: "One API unlocks AI Q&A Widget revenue, full-conversation CPL, and infrastructure cost savings. Start with one layer, add the next when ready.",
     accent: '#225D59',
   },
 ]
@@ -45,7 +45,7 @@ export function SolutionPitches() {
             The Solution
           </span>
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
-            We&apos;re built to keep your audience, not steal it.
+            AI traffic is already happening.<br />The question is who gets paid.
           </h2>
         </motion.div>
 

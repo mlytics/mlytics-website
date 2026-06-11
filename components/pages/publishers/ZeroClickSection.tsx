@@ -35,6 +35,9 @@ export function ZeroClickSection() {
             The Zero Click Search<br />
             <span style={{ color: '#B45309' }}>is draining your revenue.</span>
           </h2>
+          <p className="text-base max-w-xl mx-auto" style={{ color: '#6B6B6B' }}>
+            But your readers are still there — they&apos;re asking AI instead of clicking. That intent is monetizable. Most publishers just don&apos;t have the infrastructure to capture it.
+          </p>
 
         </motion.div>
 
