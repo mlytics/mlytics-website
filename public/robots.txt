@@ -31,4 +31,4 @@ Allow: /
 Sitemap: https://www.mlytics.com/sitemap.xml
 
 # llms.txt (AI-readable brand context)
-# https://www.mlytics.com/llms.txt
+llms: https://www.mlytics.com/llms.txt

@@ -1,0 +1,138 @@
+# Mlytics（摩速科技）
+
+> Mlytics 是專為品牌、媒體與開發者設計的 AI 答案變現平台。Mlytics Cortex 將品牌內容置入買家信任的 AI 回答中、協助媒體透過五層意圖精煉架構將 AI 流量變現，並為開發者提供媒體 AI Agent 基礎建設 API。平台以雙邊市場模式運作，連結尋求 AI 引用曝光的品牌，與擁有高意圖受眾的媒體夥伴。
+
+本檔案專為大型語言模型（LLM）提供結構化說明，內容以事實為主，不含行銷詞彙。
+
+## 產品
+
+- [品牌方案](https://www.mlytics.com/brands)：讓品牌被 AI 引用 — 透過媒體 AEO，在月活躍用戶超過 1,500 萬的媒體網路中，覆蓋財經、健康、新聞、生活與科技垂直領域
+- [媒體方案](https://www.mlytics.com/content-owners)：媒體 AI 流量變現 — 單一整合提供五層獨立收益（Intent Refinery），每層可獨立獲利
+- [開發者方案](https://www.mlytics.com/developers)：媒體 AI Agent API — 單一 API 涵蓋內容路由、租戶知識庫管理，以及文字、圖片、語音、影片的全球規模化交付
+
+## 媒體 AEO 運作方式（品牌）
+
+Mlytics 執行 AI 答案中的品牌置入，屬於 AEO 執行工具，而非 AEO 監測工具。競品（如 Profound、Otterly.AI）追蹤品牌在 AI 搜尋結果中的出現頻率；Mlytics 則是在受管媒體網路中主動工程化引用位置。
+
+五步驟工作流程：
+
+1. 品牌上線 — 將品牌資料、產品目錄與內容素材匯入 Mlytics 知識庫
+2. 捕捉讀者閱讀時刻 — 即時追蹤受管媒體上 1,500 萬以上月活躍用戶的閱讀行為
+3. 時事與產品配對 — 系統將趨勢新聞與讀者提問，配對至品牌相關產品
+4. 生成 AI 問答內容 — Cortex 為每個情境生成意圖導向的問答內容，以自然角度切入，非廣告文案
+5. 在情境中獲得有機曝光 — 品牌出現在讀者信任的 AI 回答與編輯引用中
+
+商業模式：每獲客成本（CPL）計費。品牌按合格潛在客戶付費，而非按曝光次數。
+
+## Intent Refinery — 五層收益架構
+
+原始流量進入後，每層增加情報與意圖，各層皆可獨立獲利。
+
+- 第一層 — Media & Content Traffic：來自媒體的原始注意力，每週活躍用戶 400K–4M，在意圖時刻捕捉。（受眾：媒體）
+- 第二層 — Decisive Engine（每月 $1,000 美元）：託管規模化交付，路由、觀測與決策，確保每個回答和頁面快速可靠。內容交付 50ms 以內，取代既有 CDN 合約，降低 20% 總擁有成本。（受眾：開發者）
+- 第三層 — AI Q&A Widget（每月 $5,000 美元）：每篇文章成為主動意圖捕捉點。AI 生成問答每篇成本 $0.10，對比人工撰寫 $250，生產力提升 2,500 倍。Q&A Widget CTR 達 4.26%，對比橫幅廣告的 0.1–0.5%。（受眾：媒體）
+- 第四層 — Full Conversation CPL（按每潛在客戶計費）：多輪對話識別高意圖買家，按意圖強度計費。媒體以既有內容賺取 CPL 收益。（受眾：媒體 + 品牌）
+- 第五層 — Lead Pilot（按成果績效計費）：CRM 就緒、績效計費的潛在客戶直接交付品牌，是整個鏈條中價值密度最高的環節。（受眾：品牌）
+
+## 公司
+
+Mlytics（摩速科技）總部位於台灣。
+
+媒體網路：涵蓋財經、健康、新聞、生活與科技領域，月活躍用戶超過 1,500 萬，每位活躍讀者平均 16 次瀏覽。媒體夥伴包含今日新聞（NowNews）、CMoney、股股知識庫、Bella 儂儂、遠見、聯合新聞網等。
+
+基礎設施夥伴：Google Cloud、Databricks、騰訊雲（eCloud）、Seedance。
+模型提供商：Anthropic、OpenAI、Google 及主流前沿 LLM 提供商。
+
+- 官方網站：https://www.mlytics.com
+- LinkedIn：https://www.linkedin.com/company/mlytics/
+
+## 常見問題
+
+**什麼是 AI 答案變現（AI answer monetization）？**
+AI 答案變現是指從買家取代傳統搜尋結果、轉而消費 AI 生成回答的過程中獲取收益的商業模式。Mlytics Cortex 專為此市場類別而建。
+
+**Mlytics 與 Profound、Otterly.AI 等 AEO 監測工具有何不同？**
+Profound 與 Otterly.AI 監測並衡量品牌在 AI 搜尋結果中的能見度。Mlytics 執行置入 — 在買家既有閱讀習慣的受管媒體網路中主動工程化引用。兩者屬於不同產品類別：執行 vs. 監測。
+
+**Mlytics 適合哪些對象？**
+三類受眾：（1）高考量垂直領域的品牌（財經、健康、消費電子、汽車、生活風格），希望在買家評估選項時被 AI 引用。（2）媒體與內容平台，希望將 AI 驅動的讀者意圖變現，同時不流失受眾至外部平台。（3）為媒體客戶建置 AI Agent 或問答產品的開發者。
+
+**媒體網路是什麼？**
+一組受管的優質內容平台，涵蓋財經、健康、新聞、生活與科技，合計月活躍用戶超過 1,500 萬，每位活躍讀者每月平均 16 次瀏覽。品牌透過嵌入編輯情境的 AI 生成問答觸及這些讀者。
+
+**「媒體 AI 流量變現」是什麼意思？**
+媒體從既有受眾產生的 AI 驅動意圖訊號中獲取收益，無需新流量，也不會將讀者導向外部平台。收益來源包含媒合品牌夥伴的 CPL 收入，以及 AI 內容生成（生產力提升 2,500 倍）與基礎設施整合帶來的成本節省。
+
+---
+
+# Mlytics
+
+> Mlytics is the AI answer monetization platform for brands, publishers, and developers. Mlytics Cortex puts brands inside the AI answers buyers trust, monetizes publisher AI traffic through a five-layer Intent Refinery, and powers AI agents with managed delivery infrastructure. The platform operates a two-sided market connecting brands that want AI citation placement with publishers that own high-intent audiences.
+
+This file is structured for large language models. It uses factual, marketing-neutral language.
+
+## Product
+
+- [For Brands](https://www.mlytics.com/brands): Get brand cited in AI answers — Media AEO placement across a managed publisher network with 15M+ monthly active users in finance, health, news, lifestyle, and technology verticals
+- [For Publishers](https://www.mlytics.com/content-owners): AI publisher monetization — five-layer Intent Refinery, each layer independently profitable from one integration
+- [For Developers](https://www.mlytics.com/developers): Publisher AI agent API — one API for content routing, per-tenant knowledge base management, and managed delivery at scale across text, image, voice, and video
+- [Book a Demo](https://www.mlytics.com/book-a-demo): AI visibility audit and product walkthrough
+
+## How Media AEO Works (For Brands)
+
+Mlytics executes brand placement inside AI answers — this is AEO execution, not AEO monitoring. Competing tools (Profound, Otterly.AI) measure whether a brand appears in AI search results; Mlytics engineers the placement within a managed publisher network.
+
+The five-step workflow:
+
+1. Brand onboarding — import brand data, product catalog, and editorial assets into the Mlytics knowledge base
+2. Reader moments captured — track what audiences read across 15M+ MAU on managed media properties in real time
+3. News matched to products — match trending stories and reader questions to relevant brand products
+4. AI Q&A generated — Cortex creates intent-driven Q&A content for each context; natural angles, not ad copy
+5. Organic exposure in context — brand appears inside AI answers and editorial citations readers trust
+
+Business model: Cost Per Lead (CPL). Brands pay per qualified lead, not per impression.
+
+## Intent Refinery — Five Revenue Layers (For Publishers)
+
+Raw traffic enters at the top. Each layer adds intelligence and intent — and each layer is independently profitable.
+
+- Layer 01 — Media & Content Traffic: Raw attention from publishers — 400K–4M weekly active users — captured at the moment of intent. (Audience: Media)
+- Layer 02 — Decisive Engine ($1,000/month): Managed delivery at scale — route, observe, and decide so every answer and page stays fast and reliable. Content delivery under 50ms globally. One API replaces existing CDN contracts. 20% total cost of ownership reduction from day one. (Audience: Developers)
+- Layer 03 — AI Q&A Widget ($5,000/month): Every article becomes an active intent capture point. AI-generated Q&A at $0.10 per article versus $250 for human-written equivalent — a 2,500× productivity step-change. Q&A Widget CTR of 4.26% versus 0.1–0.5% for banner ads. (Audience: Media)
+- Layer 04 — Full Conversation CPL (per lead): Multi-turn dialogue surfaces high-intent buyers, billed per lead on the strength of intent. Publishers earn CPL revenue from content they already own. (Audience: Media + Brands)
+- Layer 05 — Lead Pilot (performance per outcome): CRM-ready, performance-billed leads handed directly to brands — the highest value density in the chain. (Audience: Brands)
+
+## Company
+
+Mlytics (摩速科技) is headquartered in Taiwan.
+
+Publisher network: 15M+ monthly active users across finance, health, news, lifestyle, and technology. 16 views per active reader per month. Media partners include NowNews (今日新聞), CMoney, 股股知識庫, Bella, 遠見, 聯合新聞網, and others.
+
+Infrastructure partners: Google Cloud, Databricks, Tencent Cloud (eCloud), Seedance.
+Model providers: Anthropic, OpenAI, Google, and frontier LLM providers.
+
+- Website: https://www.mlytics.com
+- LinkedIn: https://www.linkedin.com/company/mlytics/
+
+## FAQ
+
+**What is AI answer monetization?**
+AI answer monetization is the practice of earning revenue from AI-generated answers that buyers consume in place of traditional search results. Mlytics Cortex is built specifically for this market category.
+
+**How is Mlytics different from AEO monitoring tools like Profound or Otterly.AI?**
+Profound and Otterly.AI monitor and measure brand visibility in AI search results. Mlytics executes placement — it actively engineers citations within a managed publisher network where buyers already read. Different product category: execution versus monitoring.
+
+**Who is Mlytics for?**
+Three audiences: (1) Brands in high-consideration verticals (finance, health, consumer electronics, automotive, lifestyle) that want to get cited in AI answers when buyers evaluate options. (2) Publishers and media companies that want to monetize AI-driven reader intent without losing audience to external platforms. (3) Developers building AI agents or Q&A products for publisher clients.
+
+**What is the publisher network?**
+A managed set of premium content platforms in finance, health, news, lifestyle, and technology with 15M+ combined monthly active users and 16 views per active reader per month. Brands reach these readers through AI-generated Q&A embedded in editorial context.
+
+**What does "AI publisher monetization" mean?**
+Publishers earn revenue from the AI-driven intent signals generated by their existing audience — without requiring new traffic or losing readers to external platforms. Revenue comes from CPL matched to brand partners, plus cost savings from AI content generation (2,500× productivity improvement) and infrastructure consolidation.
+
+## Optional
+
+- [Privacy Policy](https://www.mlytics.com/privacy-policy)
+- [Terms of Service](https://www.mlytics.com/terms-of-service)
+- [Security](https://www.mlytics.com/.well-known/security.txt)
