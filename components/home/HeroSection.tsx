@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { type AgentPersona, HERO_FLOW } from '@/lib/agent-data'
+import { type AgentPersona, HERO_FLOW, HERO_FLOW_V2 } from '@/lib/agent-data'
 import { CORTEX_FLOW_S0 } from '@/lib/cortex-conversation-flow'
 import { AgentDialog } from '@/components/agent/AgentDialog'
 import { CortexLiveDemo } from '@/components/agent/CortexLiveDemo'
@@ -113,9 +113,22 @@ export function HeroSection() {
               Put your brand inside the AI answers your buyers trust.
             </p>
 
+            {/* Book a Demo CTA */}
+            <Link
+              href="/book-a-demo"
+              onClick={() => trackCTA('Book a Demo', 'hero')}
+              className="inline-flex items-center px-7 py-3.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]"
+              style={{ background: '#225D59', color: 'white' }}
+            >
+              Book a Demo
+            </Link>
+
             {/* Legacy dialogs — hidden, kept for rollback */}
             <div className="hidden" aria-hidden>
               <AgentDialog flow={HERO_FLOW} onComplete={handleComplete} variant="page" bottomPadding={0} />
+            </div>
+            <div className="hidden" aria-hidden>
+              <AgentDialog flow={HERO_FLOW_V2} onComplete={handleComplete} variant="page" bottomPadding={0} />
             </div>
             <div className="hidden" aria-hidden>
               <AgentDialog
@@ -127,9 +140,7 @@ export function HeroSection() {
                 onReset={() => setDialogEngaged(false)}
               />
             </div>
-
-            {/* URL input — direct CTA */}
-            <div className="w-full">
+            <div className="hidden" aria-hidden>
               <CortexLiveDemo />
             </div>
 
