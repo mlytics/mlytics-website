@@ -3,6 +3,7 @@ import { SolutionPitches } from '@/components/pages/publishers/SolutionPitches'
 import { KnowledgeBaseSection } from '@/components/pages/publishers/KnowledgeBaseSection'
 import { LayerOverview } from '@/components/pages/publishers/LayerOverview'
 import { ContentOwnerVerticals } from '@/components/pages/publishers/ContentOwnerVerticals'
+import { ContentOwnerFAQ } from '@/components/pages/publishers/ContentOwnerFAQ'
 import { PublisherPageCTA } from '@/components/pages/publishers/PublisherPageCTA'
 
 export const metadata = { title: 'For Media and Content — Mlytics Cortex' }
@@ -42,6 +43,8 @@ export default function PublishersPage() {
 
       {/* Proof — verticals + client names */}
       <ContentOwnerVerticals />
+
+      <ContentOwnerFAQ />
 
       <PublisherPageCTA />
     </>

@@ -48,7 +48,7 @@ Mlytics（摩速科技）總部位於台灣。
 - 官方網站：https://www.mlytics.com
 - LinkedIn：https://www.linkedin.com/company/mlytics/
 
-## 常見問題
+## 常見問題（品牌）
 
 **如何讓我的品牌被 AI 引用？**
 最可靠的方式是讓品牌出現在 AI 系統已經讀取並信任的內容中 — 優質媒體文章、編輯問答、以及高意圖媒體。Mlytics Cortex 透過受管媒體網路（月活躍用戶超過 1,500 萬）實現這一點：當讀者在您所在垂直領域提問時，您的品牌就出現在 AI 回答中。
@@ -64,6 +64,23 @@ AI 平台從高信任度的編輯內容中提取答案。最有效的方式是�
 
 **品牌被 AI「引用」是什麼意思？為什麼重要？**
 當買家詢問 AI 問題，AI 在回答中點名您的品牌 — 這就是引用。這是 AI 時代的口碑推薦。現在超過 60% 的搜尋在沒有點擊的情況下結束，買家從 AI 獲得答案而不造訪您的網站。如果您的品牌不在那個回答中，您在決策時刻就是隱形的。Mlytics Cortex 專門解決這個問題 — 在受管媒體網路中主動工程化品牌引用位置，並以 CPL 計費確保每次引用都可歸因。
+
+## 常見問題（內容媒體）
+
+**大家都改去問 AI 了，導致我的網站流量一直在掉、收益降低，這個問題該怎麼解決？**
+流量在掉是因為讀者停止點擊，而不是停止閱讀。他們仍然在你的文章上瀏覽、產生意圖訊號。那個意圖是可以變現的，但大多數內容主沒有基礎設施去捕捉它。Mlytics Cortex 有 — 它在讀者瀏覽時即時捕捉意圖訊號，配對品牌夥伴，轉換為 CPL 收益，不需要讀者點擊離開。
+
+**AI 搜尋引擎用了我的文章內容來生成答案，我有辦法從中獲利嗎？**
+AI 搜尋引擎擷取你的內容、生成答案、留住用戶。你的流量掉，廣告收益跟著掉。Mlytics Cortex 翻轉這個模式 — 你的內容驅動的 AI 回答發生在你自己的平台上，讀者留在你的域名，品牌為他們產生的意圖支付 CPL，你從兩端同時獲益。
+
+**我的讀者在瀏覽文章時有明確的購買意圖，但橫幅廣告只算曝光，有沒有辦法把這個意圖直接轉成收益？**
+橫幅廣告把曝光賣給品牌，再由品牌自己去賭對的人有沒有看到。讀者的提問是意圖訊號，不是印象。Mlytics Cortex 將這些訊號配對給相關品牌，品牌按合格潛在客戶付費，而非按頁面瀏覽量。你的收益來自意圖的強度，不再受流量規模限制。
+
+**我不想把讀者送離我的平台，還能跟品牌合作變現嗎？**
+可以。Mlytics Cortex 的所有收益層都在你自己的域名內運作。AI Q&A Widget 嵌入在你的文章中，對話也在你的屬性上發生。讀者不會被導向 Mlytics 或任何品牌頁面。第一方受眾資料的所有權保留在你手中。
+
+**我可以用自己現有的文章內容建立 AI 知識庫嗎？**
+可以 — Mlytics Cortex 從你現有的內容庫建起。文章經過分塊嵌入並保留編輯情境，透過知識圖譜建立跨文章的主題關聯，所有回答有引用要求和品質把關。你的內容不離開你的環境。
 
 ---
 
@@ -117,7 +134,7 @@ Model providers: Anthropic, OpenAI, Google, and frontier LLM providers.
 - Website: https://www.mlytics.com
 - LinkedIn: https://www.linkedin.com/company/mlytics/
 
-## FAQ
+## FAQ (For Brands)
 
 **How do I get my brand cited in AI answers?**
 The most reliable way is to place your brand inside content that AI systems already read and trust — premium publisher articles, editorial Q&A, and high-intent media. Mlytics Cortex does this through a managed publisher network with 15M+ monthly active users: your brand appears inside AI answers as readers ask questions in your vertical.
@@ -133,6 +150,23 @@ There are two categories: monitoring tools that track whether you appear, and ex
 
 **What does it mean for a brand to be "cited" by AI, and why does it matter?**
 When a buyer asks an AI a question and the AI names your brand in the answer — that is a citation. It is the AI-era equivalent of a word-of-mouth recommendation. 60%+ of searches now end without a click, meaning buyers get their answer from AI without ever visiting your site. If your brand is not in that answer, you are invisible at the moment of decision. Mlytics Cortex is built specifically for this problem — actively engineering citation placement inside a managed publisher network and attributing every citation to a qualified lead via CPL billing.
+
+## FAQ (For Media and Content)
+
+**AI search is pulling readers away from my site. My traffic and revenue keep dropping. What can I do?**
+Traffic drops because readers stopped clicking — not because they stopped reading. They are still on your articles, generating intent. That intent is monetizable. Most content owners do not have the infrastructure to capture it. Mlytics Cortex does — it captures intent signals as readers browse, matches them to brand partners, and converts them to CPL revenue without sending your readers anywhere.
+
+**AI search engines are using my article content to generate answers. Can I get paid for that?**
+AI search engines extract your content, generate an answer, and keep the user. Your traffic drops. Your ad revenue follows. Mlytics Cortex flips the model — your content powers AI answers inside your own domain. Readers stay, brands pay CPL for the intent they generate, and you earn from both.
+
+**My readers show clear purchase intent while browsing articles, but banner ads only count impressions. Is there a way to turn that intent directly into revenue?**
+Banner ads sell impressions to brands that hope the right person sees them. Reader questions are intent signals, not impressions. Mlytics Cortex matches those signals to brand partners who pay per qualified lead — not per pageview. Your revenue scales with the strength of reader intent, not the volume of page traffic.
+
+**I don't want to send readers off my platform. Can I still monetize through brand partnerships?**
+Yes. Every Mlytics Cortex revenue layer operates inside your own domain. The AI Q&A Widget is embedded in your articles. Conversations happen on your properties. Readers are never redirected to Mlytics or any brand page. First-party audience data stays yours.
+
+**Can I build an AI knowledge base using my existing article content?**
+Yes — Mlytics Cortex builds the knowledge base from your existing content library. Articles are chunked and embedded with editorial context preserved, cross-referenced into a knowledge graph, and governed by citation requirements and quality guardrails. Your content never leaves your environment.
 
 ## Optional
 
