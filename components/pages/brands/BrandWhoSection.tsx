@@ -81,7 +81,7 @@ export function BrandWhoSection() {
             Who this is for
           </span>
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
-            For brand marketers tired of paying for impressions that don't convert.
+            Which industries are most exposed to AI search disrupting ad performance?
           </h2>
         </motion.div>
 

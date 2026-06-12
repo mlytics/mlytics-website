@@ -58,8 +58,7 @@ export function BrandPainSection() {
             The Problem
           </span>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: '#1A1A1A' }}>
-            The CPM model is broken.<br />
-            <span style={{ color: '#B45309' }}>And zero-click is making it worse.</span>
+            Why is the CPM model failing brand marketers?
           </h2>
         </motion.div>
 

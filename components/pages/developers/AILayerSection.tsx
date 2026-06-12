@@ -77,7 +77,7 @@ export function AILayerSection() {
             AI-Era Infrastructure
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            You already need CDN routing.
+            How does AI intent scoring integrate with content delivery infrastructure?
           </h2>
           <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
             With Mlytics, every routing decision also feeds an AI intelligence layer — same cost, more value.

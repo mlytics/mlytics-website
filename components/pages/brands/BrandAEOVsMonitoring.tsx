@@ -47,10 +47,9 @@ export function BrandAEOVsMonitoring() {
             Execution vs. Monitoring
           </span>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: '#1A1A1A' }}>
-            Other tools measure if you appear.<br />
-            <span style={{ color: '#225D59' }}>Mlytics makes you appear.</span>
+            What's the difference between AEO monitoring and AEO execution?
           </h2>
-          <p className="text-base max-w-xl mx-auto mt-4" style={{ color: '#6B6B6B' }}>
+          <p className="text-base max-w-3xl mx-auto mt-4" style={{ color: '#6B6B6B' }}>
             AEO monitoring tools tell you your AI search score. Mlytics changes it — by placing your brand inside the AI answers your buyers already trust.
           </p>
         </motion.div>

@@ -45,7 +45,7 @@ export function SolutionPitches() {
             The Solution
           </span>
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
-            AI traffic is already happening.<br />The question is who gets paid.
+            Who gets paid when AI uses your content?
           </h2>
         </motion.div>
 

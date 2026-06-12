@@ -53,7 +53,7 @@ export function BrandComparison() {
             The Difference
           </span>
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
-            Traditional CPM vs. Mlytics Cortex
+            How does intent-based buying compare to traditional CPM advertising?
           </h2>
         </motion.div>
 

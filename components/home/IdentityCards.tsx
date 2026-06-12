@@ -70,7 +70,7 @@ export function IdentityCards() {
           <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
             Who are you?
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1A1A1A' }}>Find your entry point</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1A1A1A' }}>How do brands, publishers, and developers each use AI content infrastructure?</h2>
           <p className="text-base max-w-xl mx-auto" style={{ color: '#6B6B6B' }}>
             Three types of customers, one Mlytics Cortex. Choose your role to see what it means for you specifically.
           </p>

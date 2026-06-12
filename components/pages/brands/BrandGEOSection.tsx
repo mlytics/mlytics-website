@@ -281,8 +281,7 @@ export function BrandGEOSection() {
             Media AEO — Answer Engine Optimization
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
-            Open-web AEO is a lottery.<br />
-            <span>Our network is where your buyers already read.</span>
+            How does managed media AEO differ from open-web AEO strategies?
           </h2>
           <p className="text-base max-w-xl" style={{ color: '#A8C5C3' }}>
             SEO drives clicks. Media AEO drives AI citations — your brand referenced when readers ask AI-powered questions in your vertical.
@@ -294,7 +293,7 @@ export function BrandGEOSection() {
           {/* Connecting line — desktop only */}
           <div
             className="hidden sm:block absolute left-0 right-0 pointer-events-none"
-            style={{ height: 1, top: '0.85rem', background: 'rgba(168,197,195,0.15)' }}
+            style={{ height: 1, top: '4px', background: 'rgba(168,197,195,0.15)' }}
           />
 
           {STEPS.map((step, i) => (

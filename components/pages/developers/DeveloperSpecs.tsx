@@ -30,7 +30,7 @@ export function DeveloperSpecs() {
             Performance Specs
           </span>
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
-            Built for production-grade infrastructure.
+            What does production-grade AI content delivery infrastructure actually require?
           </h2>
         </motion.div>
 

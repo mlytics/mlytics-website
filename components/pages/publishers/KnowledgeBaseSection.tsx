@@ -107,9 +107,9 @@ export function KnowledgeBaseSection() {
             AI Infrastructure
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Your Knowledge Base, Engineered.
+            How should a publisher's content be structured for AI retrieval and citation?
           </h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
+          <p className="text-base max-w-3xl mx-auto" style={{ color: '#A8C5C3' }}>
             Custom-built from your content. Structured, cross-referenced, and governed by your editorial standards.
           </p>
         </div>

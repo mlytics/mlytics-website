@@ -124,7 +124,7 @@ export function ContentOwnerVerticals() {
             Trusted By
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#1A1A1A' }}>
-            Content owners across every vertical
+            Which media categories are losing the most revenue to zero-click AI search?
           </h2>
           <p className="text-base leading-relaxed" style={{ color: '#6B6B6B' }}>
             Find someone like you — already running on Mlytics Cortex.

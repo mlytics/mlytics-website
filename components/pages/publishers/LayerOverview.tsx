@@ -103,9 +103,9 @@ export function LayerOverview() {
           <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#A8C5C3' }}>
             Product Suite
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Three layers. One integration.</h2>
-          <p className="text-base max-w-lg mx-auto" style={{ color: '#A8C5C3' }}>
-            Start with infrastructure. Add AI. Unlock monetization. Each layer compounds the last.
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">What does a complete AI monetization stack look like for publishers?</h2>
+          <p className="text-base max-w-3xl mx-auto" style={{ color: '#A8C5C3' }}>
+            Three independently profitable layers — infrastructure routing, AI Q&A, and outcome-based CPL — each compounding the last from a single API integration.
           </p>
         </motion.div>
 

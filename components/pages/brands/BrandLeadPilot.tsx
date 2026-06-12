@@ -26,7 +26,7 @@ export function BrandLeadPilot() {
             Lead Pilot
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1A1A1A' }}>
-            Intent found. We handle the rest.
+            How does intent-based lead generation through publisher networks work?
           </h2>
           <p className="text-base max-w-xl mx-auto" style={{ color: '#6B6B6B' }}>
             Lead Pilot qualifies, scores, and delivers ready-to-close leads to your sales team — in your CRM format.

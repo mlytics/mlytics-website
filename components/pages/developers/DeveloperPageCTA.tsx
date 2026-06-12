@@ -8,7 +8,7 @@ export function DeveloperPageCTA() {
     <section className="section-dark py-16 text-center" style={{ background: '#1A3D3A' }}>
       <div className="w-fit mx-auto px-6">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-          See what Cortex can optimize for your site
+          What can Cortex optimize in your stack?
         </h2>
         <p className="text-base mb-8" style={{ color: '#A8C5C3' }}>
           Built around your stack — no generic pitch.

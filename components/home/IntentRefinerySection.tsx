@@ -20,12 +20,10 @@ export function IntentRefinerySection() {
               The Intent Refinery
             </span>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4" style={{ color: '#1A1A1A' }}>
-              Your attention is the raw material.<br />
-              <span style={{ color: '#225D59' }}>We refine it into commercial transactions.</span>
+              How does AI convert content engagement into commercial transactions?
             </h2>
             <p className="text-base leading-relaxed" style={{ color: '#6B6B6B' }}>
-              A five-layer refinery chain. Each layer independently profitable. Each layer increasing value density for the next.
-              Enter at the layer that matches your needs — all layers feed the same engine.
+              Through five independently profitable layers, each reader intent signal is refined into a qualified brand lead — from raw traffic to commercial transaction. Enter at the layer that matches your needs.
             </p>
           </motion.div>
 
