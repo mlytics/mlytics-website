@@ -6,7 +6,20 @@ import { ContentOwnerVerticals } from '@/components/pages/publishers/ContentOwne
 import { ContentOwnerFAQ } from '@/components/pages/publishers/ContentOwnerFAQ'
 import { PublisherPageCTA } from '@/components/pages/publishers/PublisherPageCTA'
 
-export const metadata = { title: 'For Media and Content — Mlytics Cortex' }
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Turn Your Audience Into Three New AI Revenue Layers | Mlytics Cortex',
+  description: 'Mlytics Cortex connects your AI-engaged audience to brand partners across three independent revenue layers — without losing a single reader to AI search.',
+  openGraph: {
+    title: 'Turn Your Audience Into Three New AI Revenue Layers | Mlytics Cortex',
+    description: 'Mlytics Cortex connects your AI-engaged audience to brand partners across three independent revenue layers — without losing a single reader to AI search.',
+  },
+  twitter: {
+    title: 'Turn Your Audience Into Three New AI Revenue Layers | Mlytics Cortex',
+    description: 'Mlytics Cortex connects your AI-engaged audience to brand partners across three independent revenue layers — without losing a single reader to AI search.',
+  },
+}
 
 export default function PublishersPage() {
   return (

@@ -3,7 +3,20 @@ import { DeveloperSpecs } from '@/components/pages/developers/DeveloperSpecs'
 import { InfraPartners } from '@/components/pages/developers/InfraPartners'
 import { AILayerSection } from '@/components/pages/developers/AILayerSection'
 
-export const metadata = { title: 'For Developers — Mlytics Cortex' }
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'One API to Route Your AI Content at Scale | Mlytics Cortex',
+  description: 'Integrated with leading model providers. One workflow from content generation to global delivery — text, image, voice, and video.',
+  openGraph: {
+    title: 'One API to Route Your AI Content at Scale | Mlytics Cortex',
+    description: 'Integrated with leading model providers. One workflow from content generation to global delivery — text, image, voice, and video.',
+  },
+  twitter: {
+    title: 'One API to Route Your AI Content at Scale | Mlytics Cortex',
+    description: 'Integrated with leading model providers. One workflow from content generation to global delivery — text, image, voice, and video.',
+  },
+}
 
 export default function DevelopersPage() {
   return (

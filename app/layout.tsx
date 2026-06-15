@@ -13,11 +13,11 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.mlytics.com'),
-  title: 'Mlytics — AI Answer Monetization Platform',
-  description: 'Mlytics is the AI answer monetization platform for brands, publishers, and developers. Get your brand cited in AI answers, monetize publisher AI traffic, and power AI agents at scale.',
+  title: 'AI Answer Monetization for Brands & Publishers | Mlytics Cortex',
+  description: 'Mlytics Cortex puts brands inside the AI answers buyers trust and monetizes publisher AI traffic through a five-layer Intent Refinery.',
   openGraph: {
-    title: 'Mlytics — AI Answer Monetization Platform',
-    description: 'Mlytics is the AI answer monetization platform for brands, publishers, and developers. Get your brand cited in AI answers, monetize publisher AI traffic, and power AI agents at scale.',
+    title: 'AI Answer Monetization for Brands & Publishers | Mlytics Cortex',
+    description: 'Mlytics Cortex puts brands inside the AI answers buyers trust and monetizes publisher AI traffic through a five-layer Intent Refinery.',
     url: 'https://www.mlytics.com',
     siteName: 'Mlytics',
     images: [{ url: 'https://storage.googleapis.com/mlytics-website/og-image.png', width: 1200, height: 630 }],
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mlytics — AI Answer Monetization Platform',
-    description: 'Mlytics is the AI answer monetization platform for brands, publishers, and developers. Get your brand cited in AI answers, monetize publisher AI traffic, and power AI agents at scale.',
+    title: 'AI Answer Monetization for Brands & Publishers | Mlytics Cortex',
+    description: 'Mlytics Cortex puts brands inside the AI answers buyers trust and monetizes publisher AI traffic through a five-layer Intent Refinery.',
     images: ['https://storage.googleapis.com/mlytics-website/og-image.png'],
   },
 }

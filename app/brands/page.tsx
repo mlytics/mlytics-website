@@ -7,7 +7,20 @@ import { BrandFAQ } from '@/components/pages/brands/BrandFAQ'
 import { BrandLeadPilot } from '@/components/pages/brands/BrandLeadPilot'
 import { BrandPageCTA } from '@/components/pages/brands/BrandPageCTA'
 
-export const metadata = { title: 'For Brands — Media AEO | Mlytics' }
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Get Your Brand Cited in AI Answers — Media AEO | Mlytics Cortex',
+  description: 'Mlytics Cortex places your brand inside the AI answers your buyers already trust — across a managed publisher network with 15M+ monthly active users.',
+  openGraph: {
+    title: 'Get Your Brand Cited in AI Answers — Media AEO | Mlytics Cortex',
+    description: 'Mlytics Cortex places your brand inside the AI answers your buyers already trust — across a managed publisher network with 15M+ monthly active users.',
+  },
+  twitter: {
+    title: 'Get Your Brand Cited in AI Answers — Media AEO | Mlytics Cortex',
+    description: 'Mlytics Cortex places your brand inside the AI answers your buyers already trust — across a managed publisher network with 15M+ monthly active users.',
+  },
+}
 
 export default function BrandsPage() {
   return (
