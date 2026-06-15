@@ -14,8 +14,7 @@ import { trackCTA } from '@/lib/analytics'
 
 const ROTATING_WORDS = [
   'for Brands',
-  'for Publishers',
-  'for Developers',
+  'for Media and Content',
 ]
 
 export function HeroSection() {
