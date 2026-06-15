@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 
 const ROWS = [
   {
@@ -31,6 +32,31 @@ const ROWS = [
 ]
 
 export function BrandAEOVsMonitoring() {
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const [isStuck, setIsStuck] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    setIsDesktop(mq.matches)
+    const mqHandler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', mqHandler)
+    return () => mq.removeEventListener('change', mqHandler)
+  }, [])
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsStuck(!entry.isIntersecting),
+      { rootMargin: '-65px 0px 0px 0px', threshold: 0 }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [])
+
+  const showBackdrop = isStuck && !isDesktop
+
   return (
     <section className="section-white pt-16 lg:pt-20 pb-8">
       <div className="max-w-5xl mx-auto px-6">
@@ -54,8 +80,21 @@ export function BrandAEOVsMonitoring() {
           </p>
         </motion.div>
 
+        {/* Sentinel */}
+        <div ref={sentinelRef} />
+
         {/* Column headers */}
-        <div className="grid grid-cols-2 mb-3">
+        <div
+          className="grid grid-cols-2 mb-3 z-20 transition-colors duration-200"
+          style={{
+            position: isDesktop ? 'static' : 'sticky',
+            top: 64,
+            ...(showBackdrop ? {
+              background: '#FFFFFF',
+              borderBottom: '1px solid rgba(0,0,0,0.06)',
+            } : {}),
+          }}
+        >
           <div className="px-5 py-4 text-center">
             <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(26,26,26,0.35)' }}>
               AEO Monitoring

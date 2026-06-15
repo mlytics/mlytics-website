@@ -136,7 +136,7 @@ export function BrandGEOSection() {
 
           {/* Stat pills */}
           <motion.div
-            className="flex flex-wrap justify-center gap-4 mt-8"
+            className="flex flex-col sm:items-center lg:flex-row lg:flex-wrap lg:justify-center gap-4 mt-8"
             initial={{ opacity: 0, y: 12 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.5 }}
@@ -147,11 +147,11 @@ export function BrandGEOSection() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 px-5 py-3 rounded-xl"
+                className="flex items-center gap-3 px-5 py-3 rounded-xl w-full sm:w-[400px] lg:w-auto"
                 style={{ background: 'rgba(168,197,195,0.07)', border: '1px solid rgba(168,197,195,0.12)' }}
               >
-                <span className="text-xl font-black tabular-nums" style={{ color: '#F59E0B' }}>{item.stat}</span>
-                <span className="text-xs leading-snug text-left max-w-[160px]" style={{ color: 'rgba(168,197,195,0.7)' }}>{item.desc}</span>
+                <span className="text-xl font-black tabular-nums w-16 shrink-0" style={{ color: '#F59E0B' }}>{item.stat}</span>
+                <span className="text-xs leading-snug text-left flex-1" style={{ color: 'rgba(168,197,195,0.7)' }}>{item.desc}</span>
               </div>
             ))}
           </motion.div>
@@ -307,7 +307,7 @@ export function BrandGEOSection() {
             >
               {/* Dot */}
               <div
-                className="w-[10px] h-[10px] rounded-full mb-4 relative z-10 shrink-0"
+                className="hidden sm:block w-[10px] h-[10px] rounded-full mb-4 relative z-10 shrink-0"
                 style={{ background: '#A8C5C3', border: '2px solid rgba(168,197,195,0.4)' }}
               />
               {/* Number */}
