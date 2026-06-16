@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { label: 'Media and Content', href: '/content-owners' },
   { label: 'Brands', href: '/brands' },
   { label: 'Developers', href: '/developers' },
+  { label: 'Partnership', href: '/partnership' },
 ]
 
 export function Nav() {
