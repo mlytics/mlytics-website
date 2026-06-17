@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 const MLYTICS_HANDLES = [
   'AI experience platform and infrastructure',
   'Answer page generation and optimization',
-  'Brand Knowledge Base and content management',
+  'Brand Knowledge Base and digital asset management',
   'JSON-LD, sitemap, and hosting support',
   'Campaign delivery and brand coordination',
   'Reporting dashboard and revenue tracking',
@@ -13,7 +13,7 @@ const MLYTICS_HANDLES = [
 ]
 
 const YOU_BRING = [
-  'Your content library',
+  'Your digital asset library',
   'Your publishing environment',
   'Your audience',
   'Your brand relationships, if available',

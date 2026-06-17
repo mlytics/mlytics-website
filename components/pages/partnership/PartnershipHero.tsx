@@ -12,10 +12,10 @@ export function PartnershipHero() {
           Media Partner Program
         </span>
         <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
-          Turn your content into an<br />AI monetization channel.
+          Turn your digital assets into an<br />AI monetization channel.
         </h1>
         <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
-          Publishers that activate their content early can create new inventory for brand participation,
+          Media and content partners that activate their digital assets early can create new inventory for brand participation,
           AI-powered engagement, and AEO monetization.
         </p>
       </div>

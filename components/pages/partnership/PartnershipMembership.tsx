@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 const INCLUDES = [
   'Access to Mlytics Media Partner Program',
   'AEO platform capabilities',
-  'Content activation workflow',
+  'Digital asset activation workflow',
   'Reporting dashboard',
   'Revenue participation opportunities',
   'Up to 10,000 Answer pages activated',
@@ -133,7 +133,7 @@ export function PartnershipMembership() {
             </div>
 
             <p className="text-sm leading-relaxed" style={{ color: '#6B6B6B' }}>
-              Mlytics can recommend the right activation scale based on your content inventory,
+              Mlytics can recommend the right activation scale based on your digital asset inventory,
               audience profile, and brand category opportunities.
             </p>
           </motion.div>
@@ -147,7 +147,7 @@ export function PartnershipMembership() {
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: 0.3 }}
         >
-          Revenue is earned only when qualified brand activity occurs within your content environment.
+          Revenue is earned only when qualified brand activity occurs within your digital asset environment.
         </motion.p>
       </div>
     </section>

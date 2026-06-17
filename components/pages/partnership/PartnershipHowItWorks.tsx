@@ -6,7 +6,7 @@ const STEPS = [
   {
     num: '01',
     label: 'Turn your Answer Engine on',
-    desc: 'Your content library becomes structured Answer pages — AI-ready inventory for brand participation.',
+    desc: 'Your digital asset library becomes structured Answer pages — AI-ready inventory for brand participation.',
   },
   {
     num: '02',
@@ -16,7 +16,7 @@ const STEPS = [
   {
     num: '03',
     label: 'Earn from qualified brand interactions',
-    desc: 'Qualified brand activity within your content earns revenue share, tracked transparently.',
+    desc: 'Qualified brand activity within your digital assets earns revenue share, tracked transparently.',
   },
 ]
 
@@ -41,7 +41,7 @@ export function PartnershipHowItWorks() {
             How do media partners activate and earn?
           </h2>
           <p className="text-base max-w-xl mx-auto" style={{ color: '#6B6B6B' }}>
-            AI search is reshaping how audiences find content — publishers who activate early unlock new inventory for brand participation and AEO monetization.
+            AI search is reshaping how audiences find content — media and content partners who activate early unlock new inventory for brand participation and AEO monetization.
           </p>
         </motion.div>
 

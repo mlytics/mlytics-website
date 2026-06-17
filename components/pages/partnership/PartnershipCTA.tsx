@@ -11,7 +11,7 @@ export function PartnershipCTA() {
           Ready to activate?
         </h2>
         <p className="text-base mb-8" style={{ color: '#A8C5C3' }}>
-          Tell us about your content platform and audience.
+          Tell us about your digital asset platform and audience.
         </p>
         <Link
           href="/book-a-demo"

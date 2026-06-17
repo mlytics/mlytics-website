@@ -18,7 +18,7 @@ const EARNINGS: EarningItem[] = [
     tag: 'Revenue Share',
     title: 'Brand Interaction Revenue Share',
     value: 'Up to 25% revenue share',
-    desc: 'Earned on qualified interactions within your content. Branded Answers is the first supported format.',
+    desc: 'Earned on qualified interactions within your digital assets. Branded Answers is the first supported format.',
   },
   {
     num: '03',

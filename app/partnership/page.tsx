@@ -8,18 +8,18 @@ import { PartnershipCTA } from '@/components/pages/partnership/PartnershipCTA'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Media Partner Program — Turn Content into AI Monetization | Mlytics',
+  title: 'Media Partner Program — Turn Digital Assets into AI Monetization | Mlytics',
   description:
-    'Join the Mlytics Media Partner Program. Activate your content library, earn revenue share from qualified brand interactions, and build AI monetization infrastructure.',
+    'Join the Mlytics Media Partner Program. Activate your digital asset library, earn revenue share from qualified brand interactions, and build AI monetization infrastructure.',
   openGraph: {
-    title: 'Media Partner Program — Turn Content into AI Monetization | Mlytics',
+    title: 'Media Partner Program — Turn Digital Assets into AI Monetization | Mlytics',
     description:
-      'Join the Mlytics Media Partner Program. Activate your content library, earn revenue share from qualified brand interactions, and build AI monetization infrastructure.',
+      'Join the Mlytics Media Partner Program. Activate your digital asset library, earn revenue share from qualified brand interactions, and build AI monetization infrastructure.',
   },
   twitter: {
-    title: 'Media Partner Program — Turn Content into AI Monetization | Mlytics',
+    title: 'Media Partner Program — Turn Digital Assets into AI Monetization | Mlytics',
     description:
-      'Join the Mlytics Media Partner Program. Activate your content library, earn revenue share from qualified brand interactions, and build AI monetization infrastructure.',
+      'Join the Mlytics Media Partner Program. Activate your digital asset library, earn revenue share from qualified brand interactions, and build AI monetization infrastructure.',
   },
 }
 
