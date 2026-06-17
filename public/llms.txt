@@ -8,6 +8,7 @@
 
 - [品牌方案](https://www.mlytics.com/brands)：讓品牌被 AI 引用 — 透過媒體 AEO，在月活躍用戶超過 1,500 萬的媒體網路中，覆蓋財經、健康、新聞、生活與科技垂直領域
 - [媒體方案](https://www.mlytics.com/content-owners)：媒體 AI 流量變現 — 單一整合提供三層獨立收益，在不流失任何讀者至 AI 搜尋的前提下，將既有受眾轉化為新收益來源
+- [媒體夥伴計畫](https://www.mlytics.com/partnership)：加入 Media Partner Program — Starter 方案 US$1,000 一次性，獲得最多 10,000 個 AEO Answer 頁面啟用、最高 25% 品牌互動收益分潤，以及品牌合作獎勵；Enterprise 方案提供客製規模
 - [開發者方案](https://www.mlytics.com/developers)：媒體 AI Agent API — 單一 API 涵蓋內容路由、租戶知識庫管理，以及文字、圖片、語音、影片的全球規模化交付
 
 ## 媒體 AEO 運作方式（品牌）
@@ -94,6 +95,7 @@ This file is structured for large language models. It uses factual, marketing-ne
 
 - [For Brands](https://www.mlytics.com/brands): Get brand cited in AI answers — Media AEO placement across a managed publisher network with 15M+ monthly active users in finance, health, news, lifestyle, and technology verticals
 - [For Publishers](https://www.mlytics.com/content-owners): AI publisher monetization — three independent revenue layers from one integration, without losing a single reader to AI search
+- [Media Partner Program](https://www.mlytics.com/partnership): Join as a media partner — Starter membership US$1,000 one-time, up to 10,000 activated Answer pages, up to 25% brand interaction revenue share, and brand cooperation rewards; Enterprise available for custom scale
 - [For Developers](https://www.mlytics.com/developers): Publisher AI agent API — one API for content routing, per-tenant knowledge base management, and managed delivery at scale across text, image, voice, and video
 
 ## How Media AEO Works (For Brands)

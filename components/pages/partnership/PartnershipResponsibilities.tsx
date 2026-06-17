@@ -37,7 +37,7 @@ export function PartnershipResponsibilities() {
             What Mlytics handles
           </span>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: '#1A1A1A' }}>
-            So you do not have to.
+            What does Mlytics handle so you don't have to?
           </h2>
         </motion.div>
 
