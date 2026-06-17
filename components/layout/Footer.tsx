@@ -30,6 +30,7 @@ export function Footer() {
               <Link href="/content-owners" className="hover:text-white transition-colors" style={isActive('/content-owners') ? { color: '#fff', fontWeight: 600 } : {}}>Media and Content</Link>
               <Link href="/brands" className="hover:text-white transition-colors" style={isActive('/brands') ? { color: '#fff', fontWeight: 600 } : {}}>Brands</Link>
               <Link href="/developers" className="hover:text-white transition-colors" style={isActive('/developers') ? { color: '#fff', fontWeight: 600 } : {}}>Developers</Link>
+              <Link href="/partnership" className="hover:text-white transition-colors" style={isActive('/partnership') ? { color: '#fff', fontWeight: 600 } : {}}>Media Partner Program</Link>
               <Link href="/book-a-demo" className="hover:text-white transition-colors" style={isActive('/book-a-demo') ? { color: '#fff', fontWeight: 600 } : {}}>Contact</Link>
             </div>
             <div className="flex flex-col gap-2">
