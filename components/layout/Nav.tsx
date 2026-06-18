@@ -107,6 +107,8 @@ export function Nav() {
         <button
           className={`lg:hidden transition-colors ${logoColor}`}
           onClick={() => setMobileOpen(v => !v)}
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>

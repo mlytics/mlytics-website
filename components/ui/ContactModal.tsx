@@ -56,6 +56,9 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
         onClick={() => setOpen(o => !o)}
         className="flex items-center gap-1 px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors bg-white whitespace-nowrap"
         style={{ minWidth: 90 }}
+        aria-label="Select country code"
+        aria-expanded={open}
+        aria-haspopup="listbox"
       >
         <span>{isoToFlag(value.iso2)}</span>
         <span className="text-gray-700">+{value.dialCode}</span>
@@ -135,7 +138,7 @@ export function ContactModal() {
     e.preventDefault()
     try {
       await fetch(
-        'https://api.hsforms.com/submissions/v3/integration/submit/4284310/b9751670-5043-401f-b789-22ef2d735f89',
+        `https://api.hsforms.com/submissions/v3/integration/submit/${process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID}/${process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
