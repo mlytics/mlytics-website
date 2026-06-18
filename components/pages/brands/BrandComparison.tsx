@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const ROWS = [
   { label: 'Targeting',     cpm: 'Hope-based audience segments',      mlytics: 'Real-time intent — readers actively researching your category' },
@@ -49,9 +50,9 @@ export function BrandComparison() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
+          <Eyebrow className="mb-3">
             The Difference
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold text-ink">
             How does intent-based buying compare to traditional CPM advertising?
           </h2>
@@ -97,9 +98,9 @@ export function BrandComparison() {
             <div
               className="px-5 py-3 rounded-lg bg-primary/8"
             >
-              <span className="text-[11px] font-semibold uppercase tracking-widest text-primary">
+              <Eyebrow>
                 {row.label}
-              </span>
+              </Eyebrow>
             </div>
 
             {/* Two-column values */}

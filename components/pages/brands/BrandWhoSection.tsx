@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Landmark, ShoppingBag, Heart, Car, Monitor } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const VERTICALS: { num: string; Icon: LucideIcon; label: string; desc: string }[] = [
   { num: '01', Icon: Landmark,    label: 'Financial Services', desc: 'Banks, insurance, investment funds — audiences actively researching before committing.' },
@@ -50,7 +51,7 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[0]; i: number }) {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col flex-1">
-        <p className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: '#C0C0C0' }}>
+        <p className="label-eyebrow mb-3" style={{ color: '#C0C0C0' }}>
           {item.num} · Who this is for
         </p>
         <div className="mb-3 w-9 h-9 rounded-lg flex items-center justify-center bg-primary/8">
@@ -76,9 +77,9 @@ export function BrandWhoSection() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#A0A0A0' }}>
+          <Eyebrow color="#A0A0A0" className="mb-3">
             Who this is for
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold text-ink">
             Which industries are most exposed to AI search disrupting ad performance?
           </h2>

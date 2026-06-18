@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const COMPARISONS = [
   {
@@ -73,9 +74,9 @@ export function AILayerSection() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(168,197,195,0.55)' }}>
+          <Eyebrow className="mb-3 text-on-dark/55">
             AI-Era Infrastructure
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             How does AI intent scoring integrate with content delivery infrastructure?
           </h2>
@@ -94,7 +95,7 @@ export function AILayerSection() {
             position: isDesktop ? 'static' : 'sticky',
             top: 64,
             ...(showBackdrop ? {
-              background: '#1A3D3A',
+              background: 'var(--color-primary-dark)',
               borderBottom: '1px solid rgba(168,197,195,0.1)',
             } : {}),
           }}
@@ -125,9 +126,9 @@ export function AILayerSection() {
               className="px-5 py-3 rounded-lg"
               style={{ background: 'rgba(34,93,89,0.25)' }}
             >
-              <span className="text-[11px] font-semibold uppercase tracking-widest text-on-dark/60">
+              <Eyebrow className="text-on-dark/60">
                 {item.label}
-              </span>
+              </Eyebrow>
             </div>
 
             {/* Two-column values */}
@@ -165,8 +166,7 @@ export function AILayerSection() {
           />
 
           <motion.p
-            className="text-xs font-semibold uppercase tracking-widest mb-6"
-            style={{ color: 'rgba(168,197,195,0.5)' }}
+            className="label-eyebrow mb-6 text-on-dark/50"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-40px' }}

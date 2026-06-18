@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { IntentPipeline } from './IntentPipeline'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 export function IntentRefinerySection() {
   return (
@@ -16,9 +17,9 @@ export function IntentRefinerySection() {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.5 }}
           >
-            <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 text-primary">
+            <Eyebrow className="mb-4">
               The Intent Refinery
-            </span>
+            </Eyebrow>
             <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-ink">
               How does AI convert content engagement into commercial transactions?
             </h2>

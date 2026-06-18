@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 type Layer = { num: string; name: string; price: string; tag: string; desc: string }
 
@@ -45,7 +46,7 @@ function LayerCard({ item, i }: { item: Layer; i: number }) {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col flex-1">
-        <p className="text-[10px] font-semibold uppercase tracking-widest mb-3 text-on-dark/60">
+        <p className="label-eyebrow mb-3 text-on-dark/60">
           {item.num} · {item.tag}
         </p>
         <h3 className="text-xl font-bold text-white leading-snug mb-2">{item.name}</h3>
@@ -100,9 +101,9 @@ export function LayerOverview() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-on-dark">
+          <Eyebrow dark className="mb-3">
             Product Suite
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">What does a complete AI monetization stack look like for publishers?</h2>
           <p className="text-base max-w-3xl mx-auto text-on-dark">
             Three independently profitable layers — infrastructure routing, AI Q&A, and outcome-based CPL — each compounding the last from a single API integration.

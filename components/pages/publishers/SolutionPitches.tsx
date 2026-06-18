@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const PITCHES = [
   {
@@ -8,27 +9,27 @@ const PITCHES = [
     label: 'Intent signals are revenue signals.',
     them: { who: 'Traditional ad model', desc: 'Sell impressions to brands who hope the right person sees the ad. Revenue tied to pageviews, not outcomes.' },
     us: 'Every question your readers ask is an intent signal. Mlytics matches those signals to brand partners who pay per qualified lead.',
-    accent: '#225D59',
+    accent: 'var(--color-primary)',
   },
   {
     num: '02',
     label: "AI search takes traffic. We take it back.",
     them: { who: 'AI search engines', desc: 'Extract your content, generate an answer, keep the user. Your analytics show decline. Your revenue drops.' },
     us: 'Your content powers AI answers inside your own domain. Readers stay, brands pay CPL for the intent they generate. You earn from both.',
-    accent: '#225D59',
+    accent: 'var(--color-primary)',
   },
   {
     num: '03',
     label: "One integration. Three revenue layers.",
     them: { who: 'Content monetization today', desc: "Banner ads, affiliate links, sponsored posts — each requires a separate deal, separate integration, separate team." },
     us: "One API unlocks AI Q&A Widget revenue, full-conversation CPL, and infrastructure cost savings. Start with one layer, add the next when ready.",
-    accent: '#225D59',
+    accent: 'var(--color-primary)',
   },
 ]
 
 export function SolutionPitches() {
   return (
-    <section className="section-white py-16 lg:py-20" style={{ borderTop: '1px solid #E5E5E5' }}>
+    <section className="section-white py-16 lg:py-20 border-t border-line">
       <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <motion.div
@@ -38,11 +39,9 @@ export function SolutionPitches() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary"
-          >
+          <Eyebrow className="mb-3">
             The Solution
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold text-ink">
             Who gets paid when AI uses your content?
           </h2>
@@ -78,9 +77,9 @@ export function SolutionPitches() {
               <div className="grid md:grid-cols-[1fr_40px_1fr]">
                 {/* Left — Them (muted) */}
                 <div className="p-5 flex flex-col gap-2" style={{ background: '#F7F7F7' }}>
-                  <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#CCCCCC' }}>
+                  <Eyebrow color="#CCCCCC">
                     {pitch.them.who}
-                  </span>
+                  </Eyebrow>
                   <p className="text-sm leading-relaxed" style={{ color: '#BBBBBB' }}>
                     {pitch.them.desc}
                   </p>
@@ -98,9 +97,9 @@ export function SolutionPitches() {
                   className="p-5 flex flex-col gap-2 border-t md:border-t-0 md:border-l"
                   style={{ background: 'rgba(34,93,89,0.04)', borderColor: 'rgba(34,93,89,0.12)' }}
                 >
-                  <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: pitch.accent }}>
+                  <Eyebrow color={pitch.accent}>
                     Mlytics
-                  </span>
+                  </Eyebrow>
                   <p className="text-sm leading-relaxed text-ink">
                     {pitch.us}
                   </p>

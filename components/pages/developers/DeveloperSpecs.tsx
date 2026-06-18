@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Zap, TrendingDown, ShieldCheck, Plug, Globe } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const SPECS: { stat: string; label: string; Icon: LucideIcon }[] = [
   { stat: '< 50ms',  label: 'P99 decision latency',           Icon: Zap },
@@ -26,9 +27,9 @@ export function DeveloperSpecs() {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
+          <Eyebrow className="mb-3">
             Performance Specs
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold text-ink">
             What does production-grade AI content delivery infrastructure actually require?
           </h2>

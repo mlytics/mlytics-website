@@ -166,7 +166,7 @@ export function WorldMapDots({ variant = 'dark' }: WorldMapDotsProps) {
               cy={ping.y}
               r={ping.isStrong ? 8 : 5}
               fill="none"
-              stroke={ping.isStrong ? '#F59E0B' : '#225D59'}
+              stroke={ping.isStrong ? 'var(--color-gold)' : 'var(--color-primary)'}
               strokeWidth={1}
               className="ping-ring"
               style={{ transformOrigin: `${ping.x}px ${ping.y}px` }}
@@ -176,7 +176,7 @@ export function WorldMapDots({ variant = 'dark' }: WorldMapDotsProps) {
               cx={ping.x}
               cy={ping.y}
               r={ping.isStrong ? 3 : 2}
-              fill={ping.isStrong ? '#F59E0B' : '#2d7a74'}
+              fill={ping.isStrong ? 'var(--color-gold)' : 'var(--color-primary-light)'}
             />
           </g>
         ))}

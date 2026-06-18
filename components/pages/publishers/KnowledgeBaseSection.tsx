@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const INTERVAL = 6000
 
@@ -100,12 +101,7 @@ export function KnowledgeBaseSection() {
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-10">
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3"
-            style={{ color: 'rgba(168,197,195,0.55)' }}
-          >
-            AI Infrastructure
-          </span>
+          <Eyebrow dark className="mb-3">AI Infrastructure</Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             How should a publisher's content be structured for AI retrieval and citation?
           </h2>
@@ -178,7 +174,7 @@ export function KnowledgeBaseSection() {
                   <div className="flex flex-col md:overflow-hidden md:h-[170px]">
                     <div className="flex flex-col gap-1.5 mb-4 md:mb-5">
                       <span>{step.icon}</span>
-                      <span className="text-xs font-semibold uppercase tracking-widest">{step.sub}</span>
+                      <Eyebrow>{step.sub}</Eyebrow>
                     </div>
                     <p className="text-lg md:text-xl font-bold leading-snug mb-2">{step.label}</p>
                     <p className="text-sm leading-relaxed">{step.desc}</p>
@@ -205,9 +201,7 @@ export function KnowledgeBaseSection() {
                   <div className="flex flex-col md:overflow-hidden md:h-[170px]">
                     <div className="flex flex-col gap-1.5 mb-4 md:mb-5">
                       <span className="text-primary">{STEPS[active].icon}</span>
-                      <span className="text-xs font-semibold uppercase tracking-widest text-on-dark">
-                        {STEPS[active].sub}
-                      </span>
+                      <Eyebrow dark>{STEPS[active].sub}</Eyebrow>
                     </div>
                     <p className="text-lg md:text-xl font-bold leading-snug mb-2 text-ink">
                       {STEPS[active].label}
@@ -229,7 +223,7 @@ export function KnowledgeBaseSection() {
                           style={{
                             width: active === i ? 18 : 5,
                             height: 5,
-                            background: active === i ? '#225D59' : 'rgba(34,93,89,0.15)',
+                            background: active === i ? 'var(--color-primary)' : 'rgba(34,93,89,0.15)',
                           }}
                         />
                       ))}

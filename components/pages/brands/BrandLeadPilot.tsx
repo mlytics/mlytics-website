@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Target, BarChart2, Package, Coins } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const STEPS: { step: string; label: string; Icon: LucideIcon }[] = [
   { step: '01', label: 'Strong intent detected', Icon: Target },
@@ -22,9 +23,9 @@ export function BrandLeadPilot() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
+          <Eyebrow className="mb-3">
             Lead Pilot
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-ink">
             How does intent-based lead generation through publisher networks work?
           </h2>
@@ -46,9 +47,9 @@ export function BrandLeadPilot() {
               <div className="flex justify-center mb-3">
                 <item.Icon size={22} strokeWidth={1.6} className="text-primary" />
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider block mb-1.5 text-ink-subtle">
+              <Eyebrow className="block mb-1.5 text-ink-subtle">
                 {item.step}
-              </span>
+              </Eyebrow>
               <span className="text-sm font-semibold text-ink">{item.label}</span>
             </motion.div>
           ))}

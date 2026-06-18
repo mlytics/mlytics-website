@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const STEPS = [
   {
@@ -31,11 +32,7 @@ export function PartnershipHowItWorks() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary"
-          >
-            How It Works
-          </span>
+          <Eyebrow className="mb-3">How It Works</Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-ink">
             How do media partners activate and earn?
           </h2>

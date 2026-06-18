@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { trackCTA } from '@/lib/analytics'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const grayFilter = (invert = false, brightness = 1, opacity = 0.5) =>
   `${invert ? 'invert(1) ' : ''}grayscale(1) brightness(${brightness}) opacity(${opacity})`
@@ -79,13 +80,13 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[number]; i: number }
   return (
     <div
       className={`${item.colClass} p-5 rounded-2xl border transition-colors duration-200`}
-      style={{ borderColor: hovered ? '#225D59' : '#E5E5E5' }}
+      style={{ borderColor: hovered ? 'var(--color-primary)' : 'var(--color-line)' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <p
         className="text-xs font-bold uppercase tracking-widest mb-4 transition-colors duration-200"
-        style={{ color: hovered ? '#225D59' : '#BBBBBB' }}
+        style={{ color: hovered ? 'var(--color-primary)' : '#BBBBBB' }}
       >
         {item.vertical}
       </p>
@@ -117,11 +118,7 @@ export function ContentOwnerVerticals() {
     <section className="section-white py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-6">
         <div className="text-center mb-12">
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary"
-          >
-            Trusted By
-          </span>
+          <Eyebrow className="mb-3">Trusted By</Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold mb-2 text-ink">
             Which media categories are losing the most revenue to zero-click AI search?
           </h2>

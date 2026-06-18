@@ -68,15 +68,15 @@ export function FlywheelDiagram() {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <circle cx={CX} cy={CY} r={58} fill="none" stroke="rgba(34,93,89,0.25)" strokeWidth="1" />
-          <circle cx={CX} cy={CY} r={50} fill="#1A3D3A" />
+          <circle cx={CX} cy={CY} r={50} fill="var(--color-primary-dark)" />
           <circle cx={CX} cy={CY} r={43} fill="rgba(34,93,89,0.5)" />
-          <text x={CX} y={CY - 10} textAnchor="middle" fill="#FAFAFA" fontSize="8.5" fontWeight="700" letterSpacing="0.8">
+          <text x={CX} y={CY - 10} textAnchor="middle" fill="var(--color-surface)" fontSize="8.5" fontWeight="700" letterSpacing="0.8">
             DECISION
           </text>
-          <text x={CX} y={CY + 2} textAnchor="middle" fill="#FAFAFA" fontSize="8.5" fontWeight="700" letterSpacing="0.8">
+          <text x={CX} y={CY + 2} textAnchor="middle" fill="var(--color-surface)" fontSize="8.5" fontWeight="700" letterSpacing="0.8">
             ENGINE
           </text>
-          <text x={CX} y={CY + 16} textAnchor="middle" fill="#F59E0B" fontSize="7.5" fontWeight="500">
+          <text x={CX} y={CY + 16} textAnchor="middle" fill="var(--color-gold)" fontSize="7.5" fontWeight="500">
             intent · route · earn
           </text>
         </motion.g>
@@ -90,7 +90,7 @@ export function FlywheelDiagram() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
             >
-              <circle cx={pos.x} cy={pos.y} r={18} fill="#1A3D3A" stroke="rgba(34,93,89,0.6)" strokeWidth="1.5" />
+              <circle cx={pos.x} cy={pos.y} r={18} fill="var(--color-primary-dark)" stroke="rgba(34,93,89,0.6)" strokeWidth="1.5" />
               <circle cx={pos.x} cy={pos.y} r={14} fill="rgba(34,93,89,0.35)" />
               <circle cx={pos.x} cy={pos.y} r={3}  fill="rgba(168,197,195,0.8)" />
             </motion.g>
@@ -98,7 +98,7 @@ export function FlywheelDiagram() {
         })}
 
         {/* ── Travelling particle ── */}
-        <circle r="5" fill="#F59E0B">
+        <circle r="5" fill="var(--color-gold)">
           <animateMotion dur="9s" repeatCount="indefinite" path={ringPath} />
         </circle>
 
@@ -116,7 +116,7 @@ export function FlywheelDiagram() {
               transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
             >
               <text x={textX} y={pos.y - 22} textAnchor={anchor}
-                fill="#FAFAFA" fontSize="9" fontWeight="700">
+                fill="var(--color-surface)" fontSize="9" fontWeight="700">
                 {node.label}
               </text>
               <text x={textX} y={pos.y - 11} textAnchor={anchor}

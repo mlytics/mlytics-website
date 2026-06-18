@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const POINTS = [
   {
@@ -28,12 +29,9 @@ export function PartnershipOpportunity() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3"
-            style={{ color: '#B45309' }}
-          >
+          <Eyebrow color="#B45309" className="mb-3">
             The Opportunity
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
             How is AI search changing content monetization?
           </h2>
@@ -43,8 +41,7 @@ export function PartnershipOpportunity() {
           {POINTS.map((point, i) => (
             <motion.div
               key={i}
-              className="rounded-2xl p-6 bg-surface"
-              style={{ border: '1px solid #E5E5E5' }}
+              className="rounded-2xl p-6 bg-surface border border-line"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}

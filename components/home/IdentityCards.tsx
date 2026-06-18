@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Newspaper, Target, Settings2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const CARDS: Array<{
   persona: string
@@ -26,7 +27,7 @@ const CARDS: Array<{
     ],
     cta: 'See media and content plan',
     href: '/content-owners',
-    accent: '#225D59',
+    accent: 'var(--color-primary)',
   },
   {
     persona: 'Brand',
@@ -39,7 +40,7 @@ const CARDS: Array<{
     ],
     cta: 'See brand plan',
     href: '/brands',
-    accent: '#225D59',
+    accent: 'var(--color-primary)',
   },
   {
     persona: 'Developer',
@@ -52,7 +53,7 @@ const CARDS: Array<{
     ],
     cta: 'See developer plan',
     href: '/developers',
-    accent: '#225D59',
+    accent: 'var(--color-primary)',
   },
 ]
 
@@ -67,9 +68,9 @@ export function IdentityCards() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
+          <Eyebrow className="mb-3">
             Who are you?
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-ink">How do brands, publishers, and developers each use AI content infrastructure?</h2>
           <p className="text-base max-w-xl mx-auto text-ink-muted">
             Three types of customers, one Mlytics Cortex. Choose your role to see what it means for you specifically.
@@ -103,8 +104,8 @@ export function IdentityCards() {
               {/* Metrics — hidden */}
               {/* <div className="grid grid-cols-2 gap-2">
                 {card.metrics.map((m, j) => (
-                  <div key={j} className="px-3 py-2.5 rounded-xl" style={{ background: '#FAFAFA', border: '1px solid #E5E5E5' }}>
-                    <p className="text-[10px] uppercase tracking-wider mb-0.5 whitespace-nowrap" style={{ color: '#9B9B9B' }}>{m.label}</p>
+                  <div key={j} className="px-3 py-2.5 rounded-xl bg-surface border border-line">
+                    <p className="label-eyebrow mb-0.5 whitespace-nowrap text-ink-subtle">{m.label}</p>
                     <p className="text-sm font-bold" style={{ color: card.accent }}>{m.value}</p>
                   </div>
                 ))}

@@ -52,9 +52,9 @@ export function Nav() {
     ? 'bg-white/80 backdrop-blur-sm border-b border-gray-100/50 shadow-sm'
     : 'bg-white/80 backdrop-blur-sm border-b border-gray-100/50'
 
-  const logoColor = 'text-[#225D59]'
-  const linkColor = 'text-[#6B6B6B] hover:text-[#225D59]'
-  const activeLinkColor = 'text-[#225D59]'
+  const logoColor = 'text-primary'
+  const linkColor = 'text-ink-muted hover:text-primary'
+  const activeLinkColor = 'text-primary'
 
   return (
     <nav
@@ -129,7 +129,7 @@ export function Nav() {
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
                   className={`block text-sm py-1 ${
-                    normalizedPathname === link.href ? 'text-[#225D59] font-semibold' : 'text-[#6B6B6B] font-medium'
+                    normalizedPathname === link.href ? 'text-primary font-semibold' : 'text-ink-muted font-medium'
                   }`}
                 >
                   {link.label}

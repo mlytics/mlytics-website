@@ -87,6 +87,16 @@
   line-height: 1.5;
 }
 
+/* Eyebrow medium — same as label-eyebrow but text-sm (14px) for larger callouts
+   Usage: <span className="label-eyebrow-md">Monthly Active Users</span>  */
+.label-eyebrow-md {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+}
+
 /* Eyebrow pill — label-eyebrow inside a rounded pill badge
    Usage: <span className="label-eyebrow-pill">FOR BRANDS</span>        */
 .label-eyebrow-pill {

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 type EarningItem = { num: string; tag: string; title: string; value: string; desc: string }
 
@@ -70,7 +71,7 @@ function EarningCard({ item, i }: { item: EarningItem; i: number }) {
       {/* Content */}
       <div className="relative z-10 flex flex-col flex-1">
         <p
-          className="text-[10px] font-semibold uppercase tracking-widest mb-3 text-on-dark/60"
+          className="label-eyebrow mb-3 text-on-dark/60"
         >
           {item.num} · {item.tag}
         </p>
@@ -111,11 +112,9 @@ export function PartnershipEarnings() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-on-dark"
-          >
+          <Eyebrow dark className="mb-3">
             Partner Benefits
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             What do media partners get — and how do they earn?
           </h2>

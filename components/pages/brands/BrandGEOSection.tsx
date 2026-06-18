@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const STEPS = [
   {
@@ -97,8 +98,7 @@ export function BrandGEOSection() {
 
         <div className="max-w-5xl mx-auto px-6 relative z-10 text-center">
           <motion.p
-            className="text-sm font-semibold uppercase tracking-widest mb-8"
-            style={{ color: 'rgba(168,197,195,0.5)' }}
+            className="label-eyebrow-md mb-8 text-primary"
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6 }}
@@ -177,8 +177,8 @@ export function BrandGEOSection() {
             <svg viewBox={`0 0 ${SVG_W / 2} ${SVG_H}`} className="w-full" style={{ overflow: 'visible' }}>
               <defs>
                 <linearGradient id="geo-mau-fill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#F59E0B" stopOpacity="0" />
+                  <stop offset="0%" stopColor="var(--color-gold)" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="var(--color-gold)" stopOpacity="0" />
                 </linearGradient>
                 <clipPath id="geo-mau-clip">
                   <motion.rect
@@ -212,7 +212,7 @@ export function BrandGEOSection() {
                   const x = PAD_L + (i / (DATA_POINTS.length - 1)) * (SVG_W / 2 - PAD_L - PAD_R)
                   return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${vToY(p.v).toFixed(1)}`
                 }).join(' ')}
-                fill="none" stroke="#F59E0B" strokeWidth="2.5"
+                fill="none" stroke="var(--color-gold)" strokeWidth="2.5"
                 strokeLinecap="round" strokeLinejoin="round"
                 style={pathLen > 0 ? {
                   strokeDasharray: pathLen,
@@ -226,8 +226,8 @@ export function BrandGEOSection() {
                 return (
                   <motion.circle
                     cx={ex} cy={vToY(100)} r={6}
-                    fill="#F59E0B"
-                    style={{ filter: 'drop-shadow(0 0 8px #F59E0B)' }}
+                    fill="var(--color-gold)"
+                    style={{ filter: 'drop-shadow(0 0 8px var(--color-gold))' }}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={inView ? { opacity: 1, scale: 1 } : {}}
                     transition={{ duration: 0.25, delay: 2.45 }}
@@ -275,9 +275,9 @@ export function BrandGEOSection() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'rgba(168,197,195,0.55)' }}>
+          <Eyebrow className="mb-3 text-on-dark/55">
             Media AEO — Answer Engine Optimization
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
             How does managed media AEO differ from open-web AEO strategies?
           </h2>
@@ -306,7 +306,7 @@ export function BrandGEOSection() {
               {/* Dot */}
               <div
                 className="hidden sm:block w-[10px] h-[10px] rounded-full mb-4 relative z-10 shrink-0"
-                style={{ background: '#A8C5C3', border: '2px solid rgba(168,197,195,0.4)' }}
+                style={{ background: 'var(--color-on-dark)', border: '2px solid rgba(168,197,195,0.4)' }}
               />
               {/* Number */}
               <span className="text-xs font-bold tabular-nums mb-2" style={{ color: 'rgba(168,197,195,0.45)' }}>{step.num}</span>

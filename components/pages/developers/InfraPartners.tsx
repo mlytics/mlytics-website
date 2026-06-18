@@ -101,7 +101,7 @@ export function InfraPartners() {
     <section className="section-white py-16 border-t border-line">
       <div className="max-w-4xl mx-auto px-6">
         <motion.p
-          className="text-center text-xs font-semibold uppercase tracking-widest mb-10"
+          className="label-eyebrow text-center mb-10 text-on-dark"
           style={{ color: '#C8C8C8' }}
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ export function InfraPartners() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.05 }}
         >
-          <p className="text-[11px] uppercase tracking-wider mb-4 text-center" style={{ color: '#C8C8C8' }}>
+          <p className="label-eyebrow text-center mb-4" style={{ color: '#C8C8C8' }}>
             Cloud Platforms
           </p>
           <div className="flex flex-wrap items-center justify-center gap-10">
@@ -139,7 +139,7 @@ export function InfraPartners() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <p className="text-[11px] uppercase tracking-wider mb-4 text-center" style={{ color: '#C8C8C8' }}>
+          <p className="label-eyebrow text-center mb-4" style={{ color: '#C8C8C8' }}>
             AI Model Providers
           </p>
           <div className="flex flex-wrap items-center justify-center gap-10">
@@ -158,7 +158,7 @@ export function InfraPartners() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.15 }}
         >
-          <p className="text-[11px] uppercase tracking-wider mb-5 text-center" style={{ color: '#C8C8C8' }}>
+          <p className="label-eyebrow text-center mb-5" style={{ color: '#C8C8C8' }}>
             Integrated CDN Networks — 12 providers
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8">

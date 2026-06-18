@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const INCLUDES = [
   'Access to Mlytics Media Partner Program',
@@ -22,11 +23,9 @@ export function PartnershipMembership() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary"
-          >
+          <Eyebrow className="mb-3">
             Partner Membership
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
             What does the Starter Membership include?
           </h2>
@@ -42,8 +41,7 @@ export function PartnershipMembership() {
             transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
           >
             <div
-              className="flex items-start justify-between gap-4 mb-6 pb-6"
-              style={{ borderBottom: '1px solid #E5E5E5' }}
+              className="flex items-start justify-between gap-4 mb-6 pb-6 border-b border-line"
             >
               <div>
                 <p className="text-sm font-semibold mb-1 text-ink-subtle">
@@ -80,7 +78,7 @@ export function PartnershipMembership() {
                     <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
                       <path
                         d="M1 3l2 2 4-4"
-                        stroke="#225D59"
+                        stroke="var(--color-primary)"
                         strokeWidth="1.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"

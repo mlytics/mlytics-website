@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 // CPM ROAS decline — normalised (100 = peak performance, declining right)
 const CPM_POINTS = [
@@ -54,9 +55,9 @@ export function BrandPainSection() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#B45309' }}>
+          <Eyebrow color="#B45309" className="mb-3">
             The Problem
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
             Why is the CPM model failing brand marketers?
           </h2>
@@ -66,14 +67,13 @@ export function BrandPainSection() {
         <div className="grid md:grid-cols-2 gap-6 mb-14">
           {/* Card 1 — CPM */}
           <motion.div
-            className="rounded-2xl p-6 bg-surface"
-            style={{ border: '1px solid #E5E5E5' }}
+            className="rounded-2xl p-6 bg-surface border border-line"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-ink-subtle">
+            <p className="label-eyebrow mb-3 text-ink-subtle">
               CPM Performance
             </p>
             <p className="text-sm leading-relaxed mb-5 text-ink-muted">
@@ -135,14 +135,13 @@ export function BrandPainSection() {
 
           {/* Card 2 — Zero-click */}
           <motion.div
-            className="rounded-2xl p-6 bg-surface"
-            style={{ border: '1px solid #E5E5E5' }}
+            className="rounded-2xl p-6 bg-surface border border-line"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-ink-subtle">
+            <p className="label-eyebrow mb-3 text-ink-subtle">
               Zero-Click Reality
             </p>
             <p className="text-sm leading-relaxed mb-5 text-ink-muted">
@@ -157,8 +156,7 @@ export function BrandPainSection() {
               ].map((item, i) => (
                 <motion.div
                   key={i}
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl bg-surface"
-                  style={{ border: '1px solid #E5E5E5' }}
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl bg-surface border border-line"
                   initial={{ opacity: 0, x: -12 }}
                   animate={inView ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.35, delay: 0.7 + i * 0.1 }}
@@ -190,7 +188,7 @@ export function BrandPainSection() {
           />
 
           <motion.p
-            className="text-xs font-semibold uppercase tracking-widest mb-6 text-ink-subtle"
+            className="label-eyebrow mb-6 text-ink-subtle"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-40px' }}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const FAQS = [
   {
@@ -56,9 +57,9 @@ export function BrandFAQ() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
+          <Eyebrow className="mb-3">
             FAQ
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
             Common questions.
           </h2>
@@ -89,7 +90,7 @@ export function BrandFAQ() {
                   }}
                 >
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                    <path d="M5 1v8M1 5h8" stroke="#225D59" strokeWidth="1.5" strokeLinecap="round" />
+                    <path d="M5 1v8M1 5h8" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
                 </span>
               </button>

@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { NumberTicker } from '@/components/ui/NumberTicker'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const STATS = [
   { value: 60, suffix: '%', desc: 'searches end without a click', source: 'SparkToro / Datos 2024' },
@@ -25,12 +26,7 @@ export function ZeroClickSection() {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
         >
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-4"
-            style={{ color: '#B45309' }}
-          >
-            The Problem
-          </span>
+          <Eyebrow color="#B45309" className="mb-4">The Problem</Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-ink">
             How is zero-click search affecting your content revenue?
           </h2>
@@ -45,8 +41,7 @@ export function ZeroClickSection() {
           {STATS.map((item, i) => (
             <motion.div
               key={i}
-              className="text-center p-5 rounded-2xl flex flex-col gap-2 bg-surface"
-              style={{ border: '1px solid #E5E5E5' }}
+              className="text-center p-5 rounded-2xl flex flex-col gap-2 bg-surface border border-line"
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.45, delay: 0.15 + i * 0.08, ease: 'easeOut' }}

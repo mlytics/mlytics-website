@@ -71,8 +71,7 @@ export function BrandMAUSection() {
 
         {/* Narrative bridge */}
         <motion.p
-          className="text-sm font-semibold uppercase tracking-widest mb-8"
-          style={{ color: 'rgba(168,197,195,0.5)' }}
+          className="label-eyebrow-md mb-8 text-primary"
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6 }}
@@ -136,8 +135,8 @@ export function BrandMAUSection() {
           >
             <defs>
               <linearGradient id="mau-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.2" />
-                <stop offset="100%" stopColor="#F59E0B" stopOpacity="0" />
+                <stop offset="0%" stopColor="var(--color-gold)" stopOpacity="0.2" />
+                <stop offset="100%" stopColor="var(--color-gold)" stopOpacity="0" />
               </linearGradient>
               <clipPath id="mau-clip">
                 <motion.rect
@@ -171,7 +170,7 @@ export function BrandMAUSection() {
                 const x = PAD_L + (i / (DATA_POINTS.length - 1)) * (SVG_W / 2 - PAD_L - PAD_R)
                 return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${vToY(p.v).toFixed(1)}`
               }).join(' ')}
-              fill="none" stroke="#F59E0B" strokeWidth="2.5"
+              fill="none" stroke="var(--color-gold)" strokeWidth="2.5"
               strokeLinecap="round" strokeLinejoin="round"
               style={pathLen > 0 ? {
                 strokeDasharray: pathLen,
@@ -185,8 +184,8 @@ export function BrandMAUSection() {
               return (
                 <motion.circle
                   cx={ex} cy={vToY(100)} r={6}
-                  fill="#F59E0B"
-                  style={{ filter: 'drop-shadow(0 0 8px #F59E0B)' }}
+                  fill="var(--color-gold)"
+                  style={{ filter: 'drop-shadow(0 0 8px var(--color-gold))' }}
                   initial={{ opacity: 0, scale: 0 }}
                   animate={inView ? { opacity: 1, scale: 1 } : {}}
                   transition={{ duration: 0.4, delay: 2.6 }}

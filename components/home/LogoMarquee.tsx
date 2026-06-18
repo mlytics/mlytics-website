@@ -74,12 +74,12 @@ export function LogoMarquee({ isFixed = false }: { isFixed?: boolean }) {
       {/* Label — above on mobile, left on desktop */}
       <div className="flex-shrink-0 flex flex-col items-center md:flex-row md:items-center md:gap-3 md:px-5 mb-1.5 md:mb-0">
         <p
-          className="text-[11px] font-medium uppercase tracking-widest whitespace-nowrap"
+          className="label-eyebrow font-medium whitespace-nowrap"
           style={{ color: '#C8C8C8' }}
         >
           Trusted by
         </p>
-        <div className="hidden md:block w-px h-4" style={{ background: 'rgba(34,93,89,0.12)' }} />
+        <div className="hidden md:block w-px h-4 bg-primary/12" />
       </div>
 
       {/* Scrolling logos */}

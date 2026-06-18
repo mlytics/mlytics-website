@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const MLYTICS_HANDLES = [
   'AI experience platform and infrastructure',
@@ -30,11 +31,9 @@ export function PartnershipResponsibilities() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary"
-          >
+          <Eyebrow className="mb-3">
             What Mlytics handles
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
             What does Mlytics handle so you don't have to?
           </h2>
@@ -43,14 +42,13 @@ export function PartnershipResponsibilities() {
         <div className="grid md:grid-cols-2 gap-5 max-w-4xl mx-auto">
           {/* Mlytics handles */}
           <motion.div
-            className="rounded-2xl p-8 bg-white"
-            style={{ border: '1px solid #E5E5E5' }}
+            className="rounded-2xl p-8 bg-white border border-line"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-5 text-primary">
+            <p className="label-eyebrow mb-5 text-primary">
               What Mlytics handles
             </p>
             <ul className="space-y-3">
@@ -68,7 +66,7 @@ export function PartnershipResponsibilities() {
                     style={{ background: 'rgba(34,93,89,0.1)' }}
                   >
                     <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                      <path d="M1 3l2 2 4-4" stroke="#225D59" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M1 3l2 2 4-4" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </span>
                   {item}
@@ -86,7 +84,7 @@ export function PartnershipResponsibilities() {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-5 text-ink-subtle">
+            <p className="label-eyebrow mb-5 text-ink-subtle">
               What you bring
             </p>
             <ul className="space-y-3">
@@ -104,7 +102,7 @@ export function PartnershipResponsibilities() {
                     style={{ background: 'rgba(34,93,89,0.1)' }}
                   >
                     <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                      <path d="M1 3l2 2 4-4" stroke="#225D59" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M1 3l2 2 4-4" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </span>
                   {item}

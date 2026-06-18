@@ -6,7 +6,7 @@ export function PartnershipHero() {
     >
       <div className="max-w-3xl mx-auto px-6">
         <span
-          className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full bg-primary/40 text-on-dark"
+          className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark"
           style={{ border: '1px solid rgba(34,93,89,0.6)' }}
         >
           Media Partner Program

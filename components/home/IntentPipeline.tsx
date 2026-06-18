@@ -22,7 +22,7 @@ const LAYERS: Array<{
     sublabel: 'Raw attention',
     audience: 'Raw material',
     price: '400K–4M WAU',
-    priceColor: '#A8C5C3',
+    priceColor: 'var(--color-on-dark)',
     desc: 'Every page view across media platforms is raw intent signal — unrefined, unmonetized, waiting to be captured.',
     color: 'rgba(168,197,195,0.15)',
     borderColor: 'rgba(168,197,195,0.25)',
@@ -33,7 +33,7 @@ const LAYERS: Array<{
     sublabel: 'Route · Observe · Decide',
     audience: 'Developers / Tech',
     price: '$1,000/mo',
-    priceColor: '#A8C5C3',
+    priceColor: 'var(--color-on-dark)',
     desc: 'Content delivery in <50ms. Every request routed optimally, every decision feeding the intent system. 20% TCO reduction.',
     color: 'rgba(34,93,89,0.2)',
     borderColor: 'rgba(34,93,89,0.5)',
@@ -44,7 +44,7 @@ const LAYERS: Array<{
     sublabel: 'Capture weak intent',
     audience: 'Media and Content',
     price: '$5,000/mo',
-    priceColor: '#F59E0B',
+    priceColor: 'var(--color-gold)',
     desc: '$0.10/article vs $250 human cost. 2,500× productivity. Every article becomes an intent capture point.',
     color: 'rgba(245,158,11,0.08)',
     borderColor: 'rgba(245,158,11,0.3)',
@@ -55,7 +55,7 @@ const LAYERS: Array<{
     sublabel: 'Capture strong intent',
     audience: 'Media and Content + Brands',
     price: 'CPL billing',
-    priceColor: '#F59E0B',
+    priceColor: 'var(--color-gold)',
     desc: 'Readers move from browsing to decision. Strong intent captured, qualified, and matched to relevant brands.',
     color: 'rgba(245,158,11,0.1)',
     borderColor: 'rgba(245,158,11,0.4)',
@@ -66,7 +66,7 @@ const LAYERS: Array<{
     sublabel: 'Qualify · Deliver · Convert',
     audience: 'Brands',
     price: 'Performance billing',
-    priceColor: '#F59E0B',
+    priceColor: 'var(--color-gold)',
     desc: 'Verified strong intent, delivered CRM-ready. Replaces junior SDR workflow at a fraction of the cost.',
     color: 'rgba(245,158,11,0.12)',
     borderColor: 'rgba(245,158,11,0.5)',
@@ -117,14 +117,14 @@ export function IntentPipeline() {
       {/* Vertical flow line */}
       <div
         className="absolute left-[28px] top-8 bottom-8 w-px"
-        style={{ background: 'linear-gradient(to bottom, transparent, #225D59 10%, #F59E0B 90%, transparent)' }}
+        style={{ background: 'linear-gradient(to bottom, transparent, var(--color-primary) 10%, var(--color-gold) 90%, transparent)' }}
       />
 
       {/* Animated particle */}
       <div className="absolute left-[25px] top-0 bottom-0 overflow-hidden pointer-events-none">
         <div
           className="w-1.5 h-1.5 rounded-full absolute bg-gold"
-          style={{ animation: 'flow-particle 3s linear infinite', boxShadow: '0 0 6px #F59E0B' }}
+          style={{ animation: 'flow-particle 3s linear infinite', boxShadow: '0 0 6px var(--color-gold)' }}
         />
       </div>
 

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
 const ROWS = [
   {
@@ -69,9 +70,9 @@ export function BrandAEOVsMonitoring() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
+          <Eyebrow className="mb-3">
             Execution vs. Monitoring
-          </span>
+          </Eyebrow>
           <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
             What's the difference between AEO monitoring and AEO execution?
           </h2>
@@ -121,9 +122,9 @@ export function BrandAEOVsMonitoring() {
             <div
               className="px-5 py-3 rounded-lg bg-primary/8"
             >
-              <span className="text-[11px] font-semibold uppercase tracking-widest text-primary">
+              <Eyebrow>
                 {row.label}
-              </span>
+              </Eyebrow>
             </div>
 
             <div
