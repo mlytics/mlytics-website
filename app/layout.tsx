@@ -13,20 +13,18 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.mlytics.com'),
-  title: 'AI Answer Monetization for Brands & Publishers | Mlytics Cortex',
+  title: {
+    template: '%s | Mlytics Cortex',
+    default: 'AI Answer Monetization for Brands & Publishers | Mlytics Cortex',
+  },
   description: 'Mlytics Cortex puts brands inside the AI answers buyers trust and monetizes publisher AI traffic through a five-layer Intent Refinery.',
   openGraph: {
-    title: 'AI Answer Monetization for Brands & Publishers | Mlytics Cortex',
-    description: 'Mlytics Cortex puts brands inside the AI answers buyers trust and monetizes publisher AI traffic through a five-layer Intent Refinery.',
-    url: 'https://www.mlytics.com',
     siteName: 'Mlytics',
     images: [{ url: 'https://storage.googleapis.com/mlytics-website/og-image.png', width: 1200, height: 630 }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Answer Monetization for Brands & Publishers | Mlytics Cortex',
-    description: 'Mlytics Cortex puts brands inside the AI answers buyers trust and monetizes publisher AI traffic through a five-layer Intent Refinery.',
     images: ['https://storage.googleapis.com/mlytics-website/og-image.png'],
   },
 }

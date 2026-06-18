@@ -9,16 +9,18 @@ import { PublisherPageCTA } from '@/components/pages/publishers/PublisherPageCTA
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Turn Your Audience Into Three New AI Revenue Layers | Mlytics Cortex',
+  title: 'Turn Your Audience Into Three New AI Revenue Layers',
   description: 'Mlytics Cortex connects your AI-engaged audience to brand partners across three independent revenue layers — without losing a single reader to AI search.',
   openGraph: {
     title: 'Turn Your Audience Into Three New AI Revenue Layers | Mlytics Cortex',
     description: 'Mlytics Cortex connects your AI-engaged audience to brand partners across three independent revenue layers — without losing a single reader to AI search.',
+    url: 'https://www.mlytics.com/content-owners/',
   },
   twitter: {
     title: 'Turn Your Audience Into Three New AI Revenue Layers | Mlytics Cortex',
     description: 'Mlytics Cortex connects your AI-engaged audience to brand partners across three independent revenue layers — without losing a single reader to AI search.',
   },
+  alternates: { canonical: '/content-owners/' },
 }
 
 export default function PublishersPage() {

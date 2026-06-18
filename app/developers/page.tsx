@@ -6,16 +6,18 @@ import { AILayerSection } from '@/components/pages/developers/AILayerSection'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'One API to Route Your AI Content at Scale | Mlytics Cortex',
+  title: 'One API to Route Your AI Content at Scale',
   description: 'Integrated with leading model providers. One workflow from content generation to global delivery — text, image, voice, and video.',
   openGraph: {
     title: 'One API to Route Your AI Content at Scale | Mlytics Cortex',
     description: 'Integrated with leading model providers. One workflow from content generation to global delivery — text, image, voice, and video.',
+    url: 'https://www.mlytics.com/developers/',
   },
   twitter: {
     title: 'One API to Route Your AI Content at Scale | Mlytics Cortex',
     description: 'Integrated with leading model providers. One workflow from content generation to global delivery — text, image, voice, and video.',
   },
+  alternates: { canonical: '/developers/' },
 }
 
 export default function DevelopersPage() {

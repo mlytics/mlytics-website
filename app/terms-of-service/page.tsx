@@ -1,4 +1,10 @@
-export const metadata = { title: 'Terms of Service — Mlytics' }
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: { absolute: 'Terms of Service — Mlytics' },
+  description: 'Read the Mlytics Master Subscription Terms governing the use of our services.',
+  alternates: { canonical: '/terms-of-service/' },
+}
 
 export default function TermsOfServicePage() {
   return (

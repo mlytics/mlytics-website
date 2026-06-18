@@ -3,8 +3,18 @@ import { Suspense } from 'react'
 import { BookADemoForm } from './BookADemoForm'
 
 export const metadata: Metadata = {
-  title: 'Book a Demo — Mlytics',
+  title: { absolute: 'Book a Demo — Mlytics' },
   description: 'Schedule a personalized demo and see how Mlytics Cortex can work with your actual data.',
+  openGraph: {
+    title: 'Book a Demo — Mlytics',
+    description: 'Schedule a personalized demo and see how Mlytics Cortex can work with your actual data.',
+    url: 'https://www.mlytics.com/book-a-demo/',
+  },
+  twitter: {
+    title: 'Book a Demo — Mlytics',
+    description: 'Schedule a personalized demo and see how Mlytics Cortex can work with your actual data.',
+  },
+  alternates: { canonical: '/book-a-demo/' },
 }
 
 export default function BookADemoPage() {
