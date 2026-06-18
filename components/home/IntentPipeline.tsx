@@ -123,8 +123,8 @@ export function IntentPipeline() {
       {/* Animated particle */}
       <div className="absolute left-[25px] top-0 bottom-0 overflow-hidden pointer-events-none">
         <div
-          className="w-1.5 h-1.5 rounded-full absolute"
-          style={{ background: '#F59E0B', animation: 'flow-particle 3s linear infinite', boxShadow: '0 0 6px #F59E0B' }}
+          className="w-1.5 h-1.5 rounded-full absolute bg-gold"
+          style={{ animation: 'flow-particle 3s linear infinite', boxShadow: '0 0 6px #F59E0B' }}
         />
       </div>
 
@@ -145,20 +145,20 @@ export function IntentPipeline() {
                 }}
               >
                 <div
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-10"
-                  style={{ background: '#1A3D3A', border: `2px solid ${layer.borderColor}` }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-10 bg-primary-dark"
+                  style={{ border: `2px solid ${layer.borderColor}` }}
                 >
-                  <layer.Icon size={15} strokeWidth={1.8} style={{ color: '#A8C5C3' }} />
+                  <layer.Icon size={15} strokeWidth={1.8} className="text-on-dark" />
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center flex-wrap gap-2">
-                    <span className="text-sm font-semibold" style={{ color: '#FAFAFA' }}>{layer.name}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.08)', color: '#A8C5C3' }}>
+                    <span className="text-sm font-semibold text-white">{layer.name}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/8 text-on-dark">
                       {layer.audience}
                     </span>
                   </div>
-                  <p className="text-xs mt-0.5" style={{ color: '#A8C5C3' }}>{layer.sublabel}</p>
+                  <p className="text-xs mt-0.5 text-on-dark">{layer.sublabel}</p>
                 </div>
 
                 <span className="shrink-0 text-xs font-semibold" style={{ color: layer.priceColor }}>{layer.price}</span>

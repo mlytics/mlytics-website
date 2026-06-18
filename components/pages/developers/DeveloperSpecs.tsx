@@ -26,10 +26,10 @@ export function DeveloperSpecs() {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
             Performance Specs
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-ink">
             What does production-grade AI content delivery infrastructure actually require?
           </h2>
         </motion.div>
@@ -38,17 +38,16 @@ export function DeveloperSpecs() {
           {SPECS.map((item, i) => (
             <motion.div
               key={item.label}
-              className="text-center p-5 rounded-2xl border last:col-span-2 lg:last:col-span-1"
-              style={{ borderColor: '#E5E5E5', background: '#FAFAFA' }}
+              className="text-center p-5 rounded-2xl border last:col-span-2 lg:last:col-span-1 border-line bg-surface"
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.45, delay: 0.15 + i * 0.08, ease: 'easeOut' }}
             >
               <div className="flex justify-center mb-2">
-                <item.Icon size={22} strokeWidth={1.6} style={{ color: '#225D59' }} />
+                <item.Icon size={22} strokeWidth={1.6} className="text-primary" />
               </div>
-              <p className="text-xl font-bold mb-1" style={{ color: '#225D59' }}>{item.stat}</p>
-              <p className="text-xs" style={{ color: '#6B6B6B' }}>{item.label}</p>
+              <p className="text-xl font-bold mb-1 text-primary">{item.stat}</p>
+              <p className="text-xs text-ink-muted">{item.label}</p>
             </motion.div>
           ))}
         </div>

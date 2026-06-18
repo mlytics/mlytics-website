@@ -118,15 +118,14 @@ export function ContentOwnerVerticals() {
       <div className="max-w-5xl mx-auto px-6">
         <div className="text-center mb-12">
           <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3"
-            style={{ color: '#225D59' }}
+            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary"
           >
             Trusted By
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold mb-2 text-ink">
             Which media categories are losing the most revenue to zero-click AI search?
           </h2>
-          <p className="text-base leading-relaxed" style={{ color: '#6B6B6B' }}>
+          <p className="text-base leading-relaxed text-ink-muted">
             Find someone like you — already running on Mlytics Cortex.
           </p>
         </div>
@@ -145,8 +144,7 @@ export function ContentOwnerVerticals() {
           <Link
             href="/book-a-demo"
             onClick={() => trackCTA('Get Started', 'content_owners_section')}
-            className="p-5 rounded-2xl flex flex-col items-start justify-between w-full h-full text-left relative"
-            style={{ background: '#225D59', display: 'flex' }}
+            className="p-5 rounded-2xl flex flex-col items-start justify-between w-full h-full text-left relative bg-primary"
           >
             <div className="flex items-center justify-between w-full">
               <p className="text-base font-bold text-white leading-snug">

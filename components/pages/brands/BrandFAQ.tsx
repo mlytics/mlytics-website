@@ -56,10 +56,10 @@ export function BrandFAQ() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
             FAQ
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
             Common questions.
           </h2>
         </motion.div>
@@ -79,13 +79,12 @@ export function BrandFAQ() {
                 className="w-full flex items-center justify-between gap-4 py-5 text-left"
                 onClick={() => setOpen(open === i ? null : i)}
               >
-                <span className="text-base font-semibold leading-snug" style={{ color: '#1A1A1A' }}>
+                <span className="text-base font-semibold leading-snug text-ink">
                   {faq.q}
                 </span>
                 <span
-                  className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-transform duration-200"
+                  className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-transform duration-200 bg-primary/8"
                   style={{
-                    background: 'rgba(34,93,89,0.08)',
                     transform: open === i ? 'rotate(45deg)' : 'rotate(0deg)',
                   }}
                 >
@@ -105,7 +104,7 @@ export function BrandFAQ() {
                     transition={{ duration: 0.25, ease: 'easeInOut' }}
                     style={{ overflow: 'hidden' }}
                   >
-                    <p className="pb-5 text-sm leading-relaxed" style={{ color: '#6B6B6B' }}>
+                    <p className="pb-5 text-sm leading-relaxed text-ink-muted">
                       {faq.a}
                     </p>
                   </motion.div>

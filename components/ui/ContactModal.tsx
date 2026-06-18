@@ -217,7 +217,7 @@ export function ContactModal() {
                   >
                     <div className="w-14 h-14 rounded-full flex items-center justify-center"
                       style={{ background: 'rgba(34,93,89,0.1)' }}>
-                      <CheckCircle size={28} style={{ color: '#225D59' }} />
+                      <CheckCircle size={28} className="text-primary" />
                     </div>
                     <div>
                       <p className="text-lg font-semibold text-gray-900">Request received.</p>
@@ -225,8 +225,7 @@ export function ContactModal() {
                     </div>
                     <button
                       onClick={close}
-                      className="mt-2 px-6 py-2 rounded-full text-sm font-medium text-white"
-                      style={{ background: '#225D59' }}
+                      className="mt-2 px-6 py-2 rounded-full text-sm font-medium text-white bg-primary"
                     >
                       Close
                     </button>
@@ -299,8 +298,8 @@ export function ContactModal() {
 
                     <button
                       type="submit"
-                      className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-                      style={{ background: '#225D59', border: '1.5px solid transparent' }}
+                      className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98] bg-primary"
+                      style={{ border: '1.5px solid transparent' }}
                     >
                       Get a Personalized Demo
                     </button>

@@ -67,11 +67,11 @@ export function IdentityCards() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
             Who are you?
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1A1A1A' }}>How do brands, publishers, and developers each use AI content infrastructure?</h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: '#6B6B6B' }}>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-ink">How do brands, publishers, and developers each use AI content infrastructure?</h2>
+          <p className="text-base max-w-xl mx-auto text-ink-muted">
             Three types of customers, one Mlytics Cortex. Choose your role to see what it means for you specifically.
           </p>
         </motion.div>
@@ -80,8 +80,7 @@ export function IdentityCards() {
           {CARDS.map((card, i) => (
             <motion.div
               key={i}
-              className="bg-white rounded-2xl p-6 flex flex-col gap-5 border transition-shadow duration-300 hover:shadow-lg"
-              style={{ borderColor: '#E5E5E5' }}
+              className="bg-white rounded-2xl p-6 flex flex-col gap-5 border border-line transition-shadow duration-300 hover:shadow-lg"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
@@ -90,16 +89,16 @@ export function IdentityCards() {
               {/* Header */}
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="mb-2 w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(34,93,89,0.08)' }}>
-                    <card.Icon size={17} strokeWidth={1.8} style={{ color: '#225D59' }} />
+                  <div className="mb-2 w-8 h-8 rounded-lg flex items-center justify-center bg-primary/8">
+                    <card.Icon size={17} strokeWidth={1.8} className="text-primary" />
                   </div>
-                  <h3 className="text-lg font-bold" style={{ color: '#1A1A1A' }}>{card.persona}</h3>
-                  <p className="text-xs mt-0.5" style={{ color: '#9B9B9B' }}>{card.products}</p>
+                  <h3 className="text-lg font-bold text-ink">{card.persona}</h3>
+                  <p className="text-xs mt-0.5 text-ink-subtle">{card.products}</p>
                 </div>
               </div>
 
               {/* Hook */}
-              <p className="text-sm leading-relaxed flex-1" style={{ color: '#6B6B6B', backfaceVisibility: 'hidden' }}>{card.hook}</p>
+              <p className="text-sm leading-relaxed flex-1 text-ink-muted" style={{ backfaceVisibility: 'hidden' }}>{card.hook}</p>
 
               {/* Metrics — hidden */}
               {/* <div className="grid grid-cols-2 gap-2">

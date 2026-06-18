@@ -20,7 +20,7 @@ function CountUp({ target, duration, active }: { target: number; duration: numbe
   }, [active, target, duration])
   return (
     <span>
-      {value.toLocaleString()}<span style={{ color: '#F59E0B' }}>+</span>
+      {value.toLocaleString()}<span className="text-gold">+</span>
     </span>
   )
 }
@@ -50,8 +50,7 @@ export function FlywheelSection() {
               The Flywheel
             </motion.span>
             <motion.h2
-              className="text-3xl md:text-4xl font-bold leading-tight mb-5"
-              style={{ color: '#FAFAFA' }}
+              className="text-3xl md:text-4xl font-bold leading-tight mb-5 text-white"
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -82,8 +81,7 @@ export function FlywheelSection() {
 
               {/* Label above number */}
               <motion.p
-                className="text-sm font-semibold mb-2"
-                style={{ color: '#F59E0B' }}
+                className="text-sm font-semibold mb-2 text-gold"
                 initial={{ opacity: 0 }}
                 animate={inView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.6, delay: 0.35 }}
@@ -98,11 +96,10 @@ export function FlywheelSection() {
                 transition={{ duration: 0.6, delay: 0.45 }}
               >
                 <div
-                  className="font-black tabular-nums leading-none"
+                  className="font-black tabular-nums leading-none text-white"
                   style={{
                     fontSize: 'clamp(2.5rem, 7vw, 4.5rem)',
                     letterSpacing: '-0.04em',
-                    color: '#FAFAFA',
                     lineHeight: 1,
                   }}
                 >

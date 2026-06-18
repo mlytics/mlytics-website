@@ -65,9 +65,8 @@ export function LogoMarquee({ isFixed = false }: { isFixed?: boolean }) {
 
   return (
     <div
-      className="h-full flex flex-col justify-center md:flex-row md:items-center"
+      className="h-full flex flex-col justify-center md:flex-row md:items-center bg-white"
       style={{
-        background: '#FFFFFF',
         paddingBottom: 0,
         paddingTop: 0,
       }}

@@ -96,8 +96,7 @@ export function Nav() {
           <Link
             href="/book-a-demo"
             onClick={() => trackCTA('Book a Demo', 'nav')}
-            className="px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
-            style={{ background: '#225D59' }}
+            className="px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 bg-primary"
           >
             Book a Demo
           </Link>
@@ -139,8 +138,7 @@ export function Nav() {
               <Link
                 href="/book-a-demo"
                 onClick={() => { trackCTA('Book a Demo', 'nav_mobile'); setMobileOpen(false) }}
-                className="block w-full mt-2 py-2.5 rounded-full text-sm font-semibold text-white text-center"
-                style={{ background: '#225D59' }}
+                className="block w-full mt-2 py-2.5 rounded-full text-sm font-semibold text-white text-center bg-primary"
               >
                 Book a Demo
               </Link>

@@ -57,7 +57,7 @@ export function BrandPainSection() {
           <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#B45309' }}>
             The Problem
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
             Why is the CPM model failing brand marketers?
           </h2>
         </motion.div>
@@ -66,17 +66,17 @@ export function BrandPainSection() {
         <div className="grid md:grid-cols-2 gap-6 mb-14">
           {/* Card 1 — CPM */}
           <motion.div
-            className="rounded-2xl p-6"
-            style={{ background: '#FAFAFA', border: '1px solid #E5E5E5' }}
+            className="rounded-2xl p-6 bg-surface"
+            style={{ border: '1px solid #E5E5E5' }}
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9B9B9B' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-ink-subtle">
               CPM Performance
             </p>
-            <p className="text-sm leading-relaxed mb-5" style={{ color: '#6B6B6B' }}>
+            <p className="text-sm leading-relaxed mb-5 text-ink-muted">
               You're paying for 1,000 impressions to reach maybe 3 people who care. ROAS is declining quarter over quarter — and you already know it.
             </p>
             {/* Declining line chart */}
@@ -135,17 +135,17 @@ export function BrandPainSection() {
 
           {/* Card 2 — Zero-click */}
           <motion.div
-            className="rounded-2xl p-6"
-            style={{ background: '#FAFAFA', border: '1px solid #E5E5E5' }}
+            className="rounded-2xl p-6 bg-surface"
+            style={{ border: '1px solid #E5E5E5' }}
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#9B9B9B' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-ink-subtle">
               Zero-Click Reality
             </p>
-            <p className="text-sm leading-relaxed mb-5" style={{ color: '#6B6B6B' }}>
+            <p className="text-sm leading-relaxed mb-5 text-ink-muted">
               SEO drives clicks. Media AEO drives AI citations. The audiences you need now get answers without clicking — where is your brand?
             </p>
             {/* Stat pills */}
@@ -157,14 +157,14 @@ export function BrandPainSection() {
               ].map((item, i) => (
                 <motion.div
                   key={i}
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl"
-                  style={{ background: '#FAFAFA', border: '1px solid #E5E5E5' }}
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl bg-surface"
+                  style={{ border: '1px solid #E5E5E5' }}
                   initial={{ opacity: 0, x: -12 }}
                   animate={inView ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.35, delay: 0.7 + i * 0.1 }}
                 >
                   <span className="text-xl font-black shrink-0" style={{ color: '#D97706' }}>{item.stat}</span>
-                  <span className="text-xs leading-relaxed" style={{ color: '#6B6B6B' }}>{item.desc}</span>
+                  <span className="text-xs leading-relaxed text-ink-muted">{item.desc}</span>
                 </motion.div>
               ))}
             </div>
@@ -190,8 +190,7 @@ export function BrandPainSection() {
           />
 
           <motion.p
-            className="text-xs font-semibold uppercase tracking-widest mb-6"
-            style={{ color: '#9B9B9B' }}
+            className="text-xs font-semibold uppercase tracking-widest mb-6 text-ink-subtle"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-40px' }}
@@ -201,8 +200,7 @@ export function BrandPainSection() {
           </motion.p>
 
           <motion.h3
-            className="text-4xl md:text-6xl font-bold leading-tight relative"
-            style={{ color: '#1A1A1A' }}
+            className="text-4xl md:text-6xl font-bold leading-tight relative text-ink"
             initial={{ opacity: 0, y: 32, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             viewport={{ once: true, margin: '-40px' }}

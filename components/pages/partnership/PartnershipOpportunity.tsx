@@ -34,7 +34,7 @@ export function PartnershipOpportunity() {
           >
             The Opportunity
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
             How is AI search changing content monetization?
           </h2>
         </motion.div>
@@ -43,8 +43,8 @@ export function PartnershipOpportunity() {
           {POINTS.map((point, i) => (
             <motion.div
               key={i}
-              className="rounded-2xl p-6"
-              style={{ background: '#FAFAFA', border: '1px solid #E5E5E5' }}
+              className="rounded-2xl p-6 bg-surface"
+              style={{ border: '1px solid #E5E5E5' }}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
@@ -56,10 +56,10 @@ export function PartnershipOpportunity() {
               >
                 0{i + 1}
               </span>
-              <p className="text-sm font-semibold mb-2 leading-snug" style={{ color: '#1A1A1A' }}>
+              <p className="text-sm font-semibold mb-2 leading-snug text-ink">
                 {point.title}
               </p>
-              <p className="text-sm leading-relaxed" style={{ color: '#6B6B6B' }}>
+              <p className="text-sm leading-relaxed text-ink-muted">
                 {point.desc}
               </p>
             </motion.div>

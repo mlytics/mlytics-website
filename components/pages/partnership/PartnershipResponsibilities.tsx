@@ -31,12 +31,11 @@ export function PartnershipResponsibilities() {
           transition={{ duration: 0.5 }}
         >
           <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3"
-            style={{ color: '#225D59' }}
+            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary"
           >
             What Mlytics handles
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
             What does Mlytics handle so you don't have to?
           </h2>
         </motion.div>
@@ -44,22 +43,21 @@ export function PartnershipResponsibilities() {
         <div className="grid md:grid-cols-2 gap-5 max-w-4xl mx-auto">
           {/* Mlytics handles */}
           <motion.div
-            className="rounded-2xl p-8"
-            style={{ background: '#FFFFFF', border: '1px solid #E5E5E5' }}
+            className="rounded-2xl p-8 bg-white"
+            style={{ border: '1px solid #E5E5E5' }}
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-5" style={{ color: '#225D59' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-5 text-primary">
               What Mlytics handles
             </p>
             <ul className="space-y-3">
               {MLYTICS_HANDLES.map((item, i) => (
                 <motion.li
                   key={i}
-                  className="flex items-start gap-3 text-sm"
-                  style={{ color: '#1A1A1A' }}
+                  className="flex items-start gap-3 text-sm text-ink"
                   initial={{ opacity: 0, x: -8 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
@@ -88,15 +86,14 @@ export function PartnershipResponsibilities() {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest mb-5" style={{ color: '#9B9B9B' }}>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-5 text-ink-subtle">
               What you bring
             </p>
             <ul className="space-y-3">
               {YOU_BRING.map((item, i) => (
                 <motion.li
                   key={i}
-                  className="flex items-start gap-3 text-sm"
-                  style={{ color: '#1A1A1A' }}
+                  className="flex items-start gap-3 text-sm text-ink"
                   initial={{ opacity: 0, x: -8 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}

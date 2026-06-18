@@ -69,8 +69,7 @@ export function HeroSection() {
 
             {/* Headline */}
             <h1
-              className="font-bold leading-tight tracking-tight text-[28px] sm:text-[40px] md:text-[52px] lg:text-[64px] mb-4 text-center w-full"
-              style={{ color: '#1A1A1A' }}
+              className="font-bold leading-tight tracking-tight text-[28px] sm:text-[40px] md:text-[52px] lg:text-[64px] mb-4 text-center w-full text-ink"
             >
               AI answer monetization<br />
               <span
@@ -88,8 +87,8 @@ export function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -14 }}
                     transition={{ duration: 0.38, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="text-primary"
                     style={{
-                      color: '#225D59',
                       display: 'block',
                       position: 'absolute',
                       left: 0,
@@ -116,8 +115,7 @@ export function HeroSection() {
             <Link
               href="/book-a-demo"
               onClick={() => trackCTA('Book a Demo', 'hero')}
-              className="inline-flex items-center px-7 py-3.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]"
-              style={{ background: '#225D59', color: 'white' }}
+              className="inline-flex items-center px-7 py-3.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] bg-primary text-white"
             >
               Book a Demo
             </Link>

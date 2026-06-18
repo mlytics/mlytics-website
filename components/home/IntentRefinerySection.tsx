@@ -16,13 +16,13 @@ export function IntentRefinerySection() {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.5 }}
           >
-            <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: '#225D59' }}>
+            <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 text-primary">
               The Intent Refinery
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4" style={{ color: '#1A1A1A' }}>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-ink">
               How does AI convert content engagement into commercial transactions?
             </h2>
-            <p className="text-base leading-relaxed" style={{ color: '#6B6B6B' }}>
+            <p className="text-base leading-relaxed text-ink-muted">
               Through five independently profitable layers, each reader intent signal is refined into a qualified brand lead — from raw traffic to commercial transaction. Enter at the layer that matches your needs.
             </p>
           </motion.div>

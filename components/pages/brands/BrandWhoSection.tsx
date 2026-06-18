@@ -18,9 +18,8 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[0]; i: number }) {
 
   return (
     <motion.div
-      className="relative rounded-2xl p-6 flex flex-col overflow-hidden cursor-default"
+      className="relative rounded-2xl p-6 flex flex-col overflow-hidden cursor-default bg-white"
       style={{
-        background: '#FFFFFF',
         border: '1px solid #E8E8E8',
       }}
       initial={{ opacity: 0, y: 32 }}
@@ -54,11 +53,11 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[0]; i: number }) {
         <p className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: '#C0C0C0' }}>
           {item.num} · Who this is for
         </p>
-        <div className="mb-3 w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'rgba(34,93,89,0.08)' }}>
-          <item.Icon size={18} strokeWidth={1.7} style={{ color: '#225D59' }} />
+        <div className="mb-3 w-9 h-9 rounded-lg flex items-center justify-center bg-primary/8">
+          <item.Icon size={18} strokeWidth={1.7} className="text-primary" />
         </div>
-        <h3 className="text-base font-bold leading-snug" style={{ color: '#1A1A1A' }}>{item.label}</h3>
-        <p className="text-xs leading-relaxed mt-4 pt-4" style={{ color: '#6B6B6B', borderTop: '1px solid #EFEFEF' }}>
+        <h3 className="text-base font-bold leading-snug text-ink">{item.label}</h3>
+        <p className="text-xs leading-relaxed mt-4 pt-4 text-ink-muted" style={{ borderTop: '1px solid #EFEFEF' }}>
           {item.desc}
         </p>
       </div>
@@ -80,7 +79,7 @@ export function BrandWhoSection() {
           <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#A0A0A0' }}>
             Who this is for
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-ink">
             Which industries are most exposed to AI search disrupting ad performance?
           </h2>
         </motion.div>

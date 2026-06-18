@@ -10,14 +10,13 @@ export function FinalCTA() {
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
           What does Mlytics Cortex mean for your business?
         </h2>
-        <p className="text-base mb-8" style={{ color: '#A8C5C3' }}>
+        <p className="text-base mb-8 text-on-dark">
           Real analysis from your actual data — not a template.
         </p>
         <Link
           href="/book-a-demo"
           onClick={() => trackCTA('Get a Personalized Demo', 'home_cta')}
-          className="inline-flex items-center px-7 py-3.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]"
-          style={{ background: 'white', color: '#225D59' }}
+          className="inline-flex items-center px-7 py-3.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] bg-white text-primary"
         >
           Get a Personalized Demo
         </Link>

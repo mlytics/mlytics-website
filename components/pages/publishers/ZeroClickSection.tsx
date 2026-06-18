@@ -31,10 +31,10 @@ export function ZeroClickSection() {
           >
             The Problem
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-ink">
             How is zero-click search affecting your content revenue?
           </h2>
-          <p className="text-base max-w-3xl mx-auto" style={{ color: '#6B6B6B' }}>
+          <p className="text-base max-w-3xl mx-auto text-ink-muted">
             But your readers are still there — they&apos;re asking AI instead of clicking. That intent is monetizable. Most publishers just don&apos;t have the infrastructure to capture it.
           </p>
 
@@ -45,8 +45,8 @@ export function ZeroClickSection() {
           {STATS.map((item, i) => (
             <motion.div
               key={i}
-              className="text-center p-5 rounded-2xl flex flex-col gap-2"
-              style={{ background: '#FAFAFA', border: '1px solid #E5E5E5' }}
+              className="text-center p-5 rounded-2xl flex flex-col gap-2 bg-surface"
+              style={{ border: '1px solid #E5E5E5' }}
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.45, delay: 0.15 + i * 0.08, ease: 'easeOut' }}
@@ -56,8 +56,8 @@ export function ZeroClickSection() {
                   ? <NumberTicker value={item.value} suffix={item.suffix} duration={900} />
                   : `0${item.suffix}`}
               </p>
-              <p className="text-xs leading-relaxed" style={{ color: '#1A1A1A' }}>{item.desc}</p>
-              <p className="text-xs mt-auto" style={{ color: '#9B9B9B' }}>{item.source}</p>
+              <p className="text-xs leading-relaxed text-ink">{item.desc}</p>
+              <p className="text-xs mt-auto text-ink-subtle">{item.source}</p>
             </motion.div>
           ))}
         </div>

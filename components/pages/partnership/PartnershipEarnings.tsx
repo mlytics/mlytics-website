@@ -70,19 +70,17 @@ function EarningCard({ item, i }: { item: EarningItem; i: number }) {
       {/* Content */}
       <div className="relative z-10 flex flex-col flex-1">
         <p
-          className="text-[10px] font-semibold uppercase tracking-widest mb-3"
-          style={{ color: 'rgba(168,197,195,0.6)' }}
+          className="text-[10px] font-semibold uppercase tracking-widest mb-3 text-on-dark/60"
         >
           {item.num} · {item.tag}
         </p>
         <h3 className="text-xl font-bold text-white leading-snug mb-2">{item.title}</h3>
-        <p className="text-sm font-bold mb-6" style={{ color: '#F59E0B' }}>
+        <p className="text-sm font-bold mb-6 text-gold">
           {item.value}
         </p>
         <p
-          className="text-sm leading-relaxed mt-auto"
+          className="text-sm leading-relaxed mt-auto text-on-dark"
           style={{
-            color: '#A8C5C3',
             borderTop: '1px solid rgba(168,197,195,0.1)',
             paddingTop: 16,
           }}
@@ -114,8 +112,7 @@ export function PartnershipEarnings() {
           transition={{ duration: 0.5 }}
         >
           <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3"
-            style={{ color: '#A8C5C3' }}
+            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-on-dark"
           >
             Partner Benefits
           </span>

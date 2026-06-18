@@ -22,13 +22,13 @@ export function BrandLeadPilot() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
             Lead Pilot
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-ink">
             How does intent-based lead generation through publisher networks work?
           </h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: '#6B6B6B' }}>
+          <p className="text-base max-w-xl mx-auto text-ink-muted">
             Lead Pilot qualifies, scores, and delivers ready-to-close leads to your sales team — in your CRM format.
           </p>
         </motion.div>
@@ -37,20 +37,19 @@ export function BrandLeadPilot() {
           {STEPS.map((item, i) => (
             <motion.div
               key={item.step}
-              className="text-center p-5 rounded-2xl border"
-              style={{ borderColor: '#E5E5E5' }}
+              className="text-center p-5 rounded-2xl border border-line"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.4, delay: i * 0.1, ease: 'easeOut' }}
             >
               <div className="flex justify-center mb-3">
-                <item.Icon size={22} strokeWidth={1.6} style={{ color: '#225D59' }} />
+                <item.Icon size={22} strokeWidth={1.6} className="text-primary" />
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider block mb-1.5" style={{ color: '#9B9B9B' }}>
+              <span className="text-[10px] font-bold uppercase tracking-wider block mb-1.5 text-ink-subtle">
                 {item.step}
               </span>
-              <span className="text-sm font-semibold" style={{ color: '#1A1A1A' }}>{item.label}</span>
+              <span className="text-sm font-semibold text-ink">{item.label}</span>
             </motion.div>
           ))}
         </div>

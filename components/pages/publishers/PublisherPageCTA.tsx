@@ -10,14 +10,13 @@ export function PublisherPageCTA() {
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
           Want to see your site's real intent data?
         </h2>
-        <p className="text-base mb-8" style={{ color: '#A8C5C3' }}>
+        <p className="text-base mb-8 text-on-dark">
           See what your readers' intent is already worth.
         </p>
         <Link
           href="/book-a-demo"
           onClick={() => trackCTA('Get a Personalized Demo', 'content_owners_cta')}
-          className="inline-flex items-center px-7 py-3.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]"
-          style={{ background: 'white', color: '#225D59' }}
+          className="inline-flex items-center px-7 py-3.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] bg-white text-primary"
         >
           Get a Personalized Demo
         </Link>

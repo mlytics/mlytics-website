@@ -49,10 +49,10 @@ export function BrandComparison() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#225D59' }}>
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary">
             The Difference
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-ink">
             How does intent-based buying compare to traditional CPM advertising?
           </h2>
         </motion.div>
@@ -78,7 +78,7 @@ export function BrandComparison() {
             </p>
           </div>
           <div className="px-5 py-4 text-center">
-            <p className="text-base font-bold uppercase tracking-widest" style={{ color: '#225D59' }}>
+            <p className="text-base font-bold uppercase tracking-widest text-primary">
               Mlytics Cortex
             </p>
           </div>
@@ -95,10 +95,9 @@ export function BrandComparison() {
           >
             {/* Category label */}
             <div
-              className="px-5 py-3 rounded-lg"
-              style={{ background: 'rgba(34,93,89,0.08)' }}
+              className="px-5 py-3 rounded-lg bg-primary/8"
             >
-              <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#225D59' }}>
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-primary">
                 {row.label}
               </span>
             </div>
@@ -114,7 +113,7 @@ export function BrandComparison() {
                 </p>
               </div>
               <div className="px-5 text-center">
-                <p className="text-sm leading-relaxed font-medium" style={{ color: '#1A1A1A' }}>
+                <p className="text-sm leading-relaxed font-medium text-ink">
                   {row.mlytics}
                 </p>
               </div>

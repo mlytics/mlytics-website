@@ -112,21 +112,19 @@ export function BrandGEOSection() {
             transition={{ duration: 0.6, delay: 0.15 }}
           >
             <div
-              className="font-black tabular-nums leading-none"
+              className="font-black tabular-nums leading-none text-white"
               style={{
                 fontSize: 'clamp(2rem, 11vw, 9rem)',
                 letterSpacing: '-0.04em',
-                color: '#FAFAFA',
                 lineHeight: 1,
               }}
             >
-              {count.toLocaleString()}<span style={{ color: '#F59E0B' }}>+</span>
+              {count.toLocaleString()}<span className="text-gold">+</span>
             </div>
           </motion.div>
 
           <motion.p
-            className="text-base mt-4"
-            style={{ color: '#F59E0B' }}
+            className="text-base mt-4 text-gold"
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.35 }}
@@ -150,8 +148,8 @@ export function BrandGEOSection() {
                 className="flex items-center gap-3 px-5 py-3 rounded-xl w-full sm:w-[400px] lg:w-auto"
                 style={{ background: 'rgba(168,197,195,0.07)', border: '1px solid rgba(168,197,195,0.12)' }}
               >
-                <span className="text-xl font-black tabular-nums w-16 shrink-0" style={{ color: '#F59E0B' }}>{item.stat}</span>
-                <span className="text-xs leading-snug text-left flex-1" style={{ color: 'rgba(168,197,195,0.7)' }}>{item.desc}</span>
+                <span className="text-xl font-black tabular-nums w-16 shrink-0 text-gold">{item.stat}</span>
+                <span className="text-xs leading-snug text-left flex-1 text-on-dark/70">{item.desc}</span>
               </div>
             ))}
           </motion.div>
@@ -253,10 +251,10 @@ export function BrandGEOSection() {
 
           {/* Right — copy */}
           <div className="pt-8 pb-4 md:pl-10 flex flex-col justify-center text-left">
-            <p className="text-base leading-relaxed mb-3" style={{ color: '#A8C5C3' }}>
+            <p className="text-base leading-relaxed mb-3 text-on-dark">
               Premium content platforms in finance, health, news, lifestyle, and technology — your buyers already read here.
             </p>
-            <p className="text-base leading-relaxed" style={{ color: '#A8C5C3' }}>
+            <p className="text-base leading-relaxed text-on-dark">
               Every placement comes with first-party intent data — so you can see what readers asked, and prove it converted.
             </p>
           </div>
@@ -283,7 +281,7 @@ export function BrandGEOSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
             How does managed media AEO differ from open-web AEO strategies?
           </h2>
-          <p className="text-base max-w-xl" style={{ color: '#A8C5C3' }}>
+          <p className="text-base max-w-xl text-on-dark">
             SEO drives clicks. Media AEO drives AI citations — your brand referenced when readers ask AI-powered questions in your vertical.
           </p>
         </motion.div>
@@ -315,7 +313,7 @@ export function BrandGEOSection() {
               {/* Title */}
               <p className="text-sm font-bold text-white mb-1 leading-snug">{step.label}</p>
               {/* Desc */}
-              <p className="text-xs leading-relaxed" style={{ color: 'rgba(168,197,195,0.6)' }}>{step.desc}</p>
+              <p className="text-xs leading-relaxed text-on-dark/60">{step.desc}</p>
             </motion.div>
           ))}
         </div>

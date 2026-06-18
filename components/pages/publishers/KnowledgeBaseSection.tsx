@@ -109,7 +109,7 @@ export function KnowledgeBaseSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             How should a publisher's content be structured for AI retrieval and citation?
           </h2>
-          <p className="text-base max-w-3xl mx-auto" style={{ color: '#A8C5C3' }}>
+          <p className="text-base max-w-3xl mx-auto text-on-dark">
             Custom-built from your content. Structured, cross-referenced, and governed by your editorial standards.
           </p>
         </div>
@@ -166,7 +166,7 @@ export function KnowledgeBaseSection() {
             </div>
 
             {/* Right: content */}
-            <div className="relative overflow-hidden" style={{ background: '#FFFFFF' }}>
+            <div className="relative overflow-hidden bg-white">
               {/* Invisible sizer */}
               {STEPS.map((step, si) => (
                 <div
@@ -204,15 +204,15 @@ export function KnowledgeBaseSection() {
                 >
                   <div className="flex flex-col md:overflow-hidden md:h-[170px]">
                     <div className="flex flex-col gap-1.5 mb-4 md:mb-5">
-                      <span style={{ color: '#225D59' }}>{STEPS[active].icon}</span>
-                      <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#A8C5C3' }}>
+                      <span className="text-primary">{STEPS[active].icon}</span>
+                      <span className="text-xs font-semibold uppercase tracking-widest text-on-dark">
                         {STEPS[active].sub}
                       </span>
                     </div>
-                    <p className="text-lg md:text-xl font-bold leading-snug mb-2" style={{ color: '#1A1A1A' }}>
+                    <p className="text-lg md:text-xl font-bold leading-snug mb-2 text-ink">
                       {STEPS[active].label}
                     </p>
-                    <p className="text-sm leading-relaxed" style={{ color: '#6B6B6B' }}>
+                    <p className="text-sm leading-relaxed text-ink-muted">
                       {STEPS[active].desc}
                     </p>
                   </div>

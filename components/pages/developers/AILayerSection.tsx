@@ -79,7 +79,7 @@ export function AILayerSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             How does AI intent scoring integrate with content delivery infrastructure?
           </h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
+          <p className="text-base max-w-xl mx-auto text-on-dark">
             With Mlytics, every routing decision also feeds an AI intelligence layer — same cost, more value.
           </p>
         </motion.div>
@@ -125,7 +125,7 @@ export function AILayerSection() {
               className="px-5 py-3 rounded-lg"
               style={{ background: 'rgba(34,93,89,0.25)' }}
             >
-              <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'rgba(168,197,195,0.6)' }}>
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-on-dark/60">
                 {item.label}
               </span>
             </div>

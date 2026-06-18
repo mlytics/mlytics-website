@@ -39,12 +39,11 @@ export function SolutionPitches() {
           transition={{ duration: 0.5 }}
         >
           <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3"
-            style={{ color: '#225D59' }}
+            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary"
           >
             The Solution
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-ink">
             Who gets paid when AI uses your content?
           </h2>
         </motion.div>
@@ -70,7 +69,7 @@ export function SolutionPitches() {
                 style={{ background: '#1f4f4b', borderColor: 'rgba(168,197,195,0.08)' }}
               >
                 <span className="text-sm font-bold text-white">{pitch.label}</span>
-                <span className="text-xs font-bold tabular-nums" style={{ color: 'rgba(168,197,195,0.6)' }}>
+                <span className="text-xs font-bold tabular-nums text-on-dark/60">
                   {pitch.num}
                 </span>
               </div>
@@ -88,7 +87,7 @@ export function SolutionPitches() {
                 </div>
 
                 {/* Arrow divider */}
-                <div className="hidden md:flex items-center justify-center border-l border-r" style={{ background: '#FAFAFA', borderColor: '#EEEEEE' }}>
+                <div className="hidden md:flex items-center justify-center border-l border-r bg-surface" style={{ borderColor: '#EEEEEE' }}>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M2 7h10M7.5 3L12 7l-4.5 4" stroke={pitch.accent} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -102,7 +101,7 @@ export function SolutionPitches() {
                   <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: pitch.accent }}>
                     Mlytics
                   </span>
-                  <p className="text-sm leading-relaxed" style={{ color: '#1A1A1A' }}>
+                  <p className="text-sm leading-relaxed text-ink">
                     {pitch.us}
                   </p>
                 </div>

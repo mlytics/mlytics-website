@@ -87,23 +87,21 @@ export function BrandMAUSection() {
           transition={{ duration: 0.6, delay: 0.15 }}
         >
           <div
-            className="font-black tabular-nums leading-none"
+            className="font-black tabular-nums leading-none text-white"
             style={{
               fontSize: 'clamp(2rem, 11vw, 9rem)',
               letterSpacing: '-0.04em',
-              color: '#FAFAFA',
               lineHeight: 1,
             }}
           >
             {count.toLocaleString()}
-            <span style={{ color: '#F59E0B' }}>+</span>
+            <span className="text-gold">+</span>
           </div>
         </motion.div>
 
         {/* Subline under number */}
         <motion.p
-          className="text-base mt-4"
-          style={{ color: '#F59E0B' }}
+          className="text-base mt-4 text-gold"
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.35 }}
@@ -130,7 +128,7 @@ export function BrandMAUSection() {
         transition={{ duration: 0.6, delay: 0.55 }}
       >
         {/* Left — chart */}
-        <div className="pt-8 pb-4 lg:border-r" style={{ borderColor: 'rgba(168,197,195,0.12)' }}>
+        <div className="pt-8 pb-4 lg:border-r border-on-dark/12">
           <svg
             viewBox={`0 0 ${SVG_W / 2} ${SVG_H}`}
             className="w-full"
@@ -212,7 +210,7 @@ export function BrandMAUSection() {
 
         {/* Right — copy */}
         <div className="pt-8 pb-4 md:pl-10 flex flex-col justify-center text-left">
-          <p className="text-base leading-relaxed" style={{ color: '#A8C5C3' }}>
+          <p className="text-base leading-relaxed text-on-dark">
             Your audience is already part of our network — across 15M+ MAU on managed content properties in finance, health, lifestyle, news, and technology.
           </p>
         </div>

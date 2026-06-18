@@ -1,32 +1,130 @@
 @import "tailwindcss";
 
+/* ============================================================
+   DESIGN SYSTEM — Single source of truth
+   ============================================================
+   Layer 1: Design Tokens  (@theme  → Tailwind utility classes)
+   Layer 2: Semantic Utilities  (reusable component patterns)
+   Layer 3: Base defaults  (html/body)
+   ============================================================ */
+
 @theme {
-  /* Design system breakpoints:
+  /* --- Breakpoints ---
      sm  = 480px  (large phone)
      md  = 768px  (tablet)
-     lg  = 1024px (desktop)
-  */
-  --breakpoint-sm: 30rem; /* 480px */
+     lg  = 1024px (desktop)        */
+  --breakpoint-sm: 30rem;
+
+  /* --- Brand colors ---
+     Usage: bg-primary / text-primary / border-primary
+            bg-primary/40  (opacity variant)              */
+  --color-primary:        #225D59;
+  --color-primary-dark:   #1A3D3A;
+  --color-primary-light:  #2d7a74;
+  --color-gold:           #F59E0B;
+  --color-gold-light:     #FCD34D;
+
+  /* --- Surface ---
+     Usage: bg-surface                                    */
+  --color-surface:        #FAFAFA;
+
+  /* --- Text (semantic) ---
+     Usage: text-ink / text-ink-muted / text-ink-subtle
+            text-on-dark (for text on dark backgrounds)  */
+  --color-ink:            #1A1A1A;
+  --color-ink-muted:      #6B6B6B;
+  --color-ink-subtle:     #9B9B9B;
+  --color-on-dark:        #A8C5C3;
+
+  /* --- Border ---
+     Usage: border-line                                   */
+  --color-line:           #E5E5E5;
+
+  /* --- Typography scale ---
+     Usage: text-display / text-h1 / text-h2 / text-h3
+            text-small / text-caption
+     (text-base = 1rem already exists in Tailwind)       */
+  --font-size-display:    4rem;     /* 64px — hero headline  */
+  --font-size-h1:         3rem;     /* 48px                  */
+  --font-size-h2:         2.25rem;  /* 36px — section title  */
+  --font-size-h3:         1.25rem;  /* 20px — card title     */
+  --font-size-small:      0.875rem; /* 14px                  */
+  --font-size-caption:    0.75rem;  /* 12px — minimum size   */
 }
 
+/* --- Legacy CSS variables (kept for .section-*, .pill-btn compatibility) --- */
 :root {
-  --primary: #225D59;
-  --primary-dark: #1A3D3A;
-  --primary-light: #2d7a74;
-  --gold: #F59E0B;
-  --gold-light: #FCD34D;
-  --bg-light: #FAFAFA;
-  --bg-white: #FFFFFF;
-  --bg-dark: #1A3D3A;
-  --bg-dark-alt: #225D59;
-  --text-primary: #1A1A1A;
-  --text-secondary: #6B6B6B;
-  --text-muted: #9B9B9B;
-  --text-dark-primary: #FAFAFA;
-  --text-dark-secondary: #A8C5C3;
-  --border: #E5E5E5;
-  --border-dark: rgba(255,255,255,0.12);
+  --primary:            #225D59;
+  --primary-dark:       #1A3D3A;
+  --primary-light:      #2d7a74;
+  --gold:               #F59E0B;
+  --gold-light:         #FCD34D;
+  --bg-light:           #FAFAFA;
+  --bg-white:           #FFFFFF;
+  --bg-dark:            #1A3D3A;
+  --bg-dark-alt:        #225D59;
+  --text-primary:       #1A1A1A;
+  --text-secondary:     #6B6B6B;
+  --text-muted:         #9B9B9B;
+  --text-dark-primary:  #FAFAFA;
+  --text-dark-secondary:#A8C5C3;
+  --border:             #E5E5E5;
+  --border-dark:        rgba(255,255,255,0.12);
 }
+
+/* ============================================================
+   LAYER 2: Semantic Utilities
+   Reusable patterns extracted from repeated component code.
+   ============================================================ */
+
+/* Eyebrow label — uppercase section tag (was repeated 55+ times inline)
+   Usage: <span className="label-eyebrow">FOR BRANDS</span>             */
+.label-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+}
+
+/* Eyebrow pill — label-eyebrow inside a rounded pill badge
+   Usage: <span className="label-eyebrow-pill">FOR BRANDS</span>        */
+.label-eyebrow-pill {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+}
+
+/* Section heading — standardised h2 across all page sections
+   Usage: <h2 className="section-heading">Title</h2>                    */
+.section-heading {
+  font-size: 1.875rem;        /* text-3xl */
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+@media (min-width: 768px) {
+  .section-heading { font-size: 2.25rem; }  /* md:text-4xl */
+}
+@media (min-width: 1024px) {
+  .section-heading { font-size: 3rem; }     /* lg:text-5xl */
+}
+
+/* Dark card — semi-transparent brand-coloured card on dark backgrounds
+   Usage: <div className="card-dark">...</div>                          */
+.card-dark {
+  background: rgba(34, 93, 89, 0.2);
+  border: 1px solid rgba(168, 197, 195, 0.15);
+  border-radius: 0.75rem;
+}
+
+/* ============================================================
+   LAYER 3: Base Defaults
+   ============================================================ */
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }

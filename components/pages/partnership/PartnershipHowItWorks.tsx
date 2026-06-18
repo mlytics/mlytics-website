@@ -32,15 +32,14 @@ export function PartnershipHowItWorks() {
           transition={{ duration: 0.5 }}
         >
           <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3"
-            style={{ color: '#225D59' }}
+            className="inline-block text-xs font-semibold uppercase tracking-widest mb-3 text-primary"
           >
             How It Works
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4" style={{ color: '#1A1A1A' }}>
+          <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-ink">
             How do media partners activate and earn?
           </h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: '#6B6B6B' }}>
+          <p className="text-base max-w-xl mx-auto text-ink-muted">
             AI search is reshaping how audiences find content — media and content partners who activate early unlock new inventory for brand participation and AEO monetization.
           </p>
         </motion.div>
@@ -63,8 +62,7 @@ export function PartnershipHowItWorks() {
             >
               {/* Dot */}
               <div
-                className="hidden md:block w-[10px] h-[10px] rounded-full mb-6 relative z-10 shrink-0"
-                style={{ background: '#225D59' }}
+                className="hidden md:block w-[10px] h-[10px] rounded-full mb-6 relative z-10 shrink-0 bg-primary"
               />
               <span
                 className="text-xs font-bold tabular-nums mb-2"
@@ -72,8 +70,8 @@ export function PartnershipHowItWorks() {
               >
                 {step.num}
               </span>
-              <p className="text-base font-bold mb-2 leading-snug" style={{ color: '#1A1A1A' }}>{step.label}</p>
-              <p className="text-sm leading-relaxed" style={{ color: '#6B6B6B' }}>
+              <p className="text-base font-bold mb-2 leading-snug text-ink">{step.label}</p>
+              <p className="text-sm leading-relaxed text-ink-muted">
                 {step.desc}
               </p>
             </motion.div>

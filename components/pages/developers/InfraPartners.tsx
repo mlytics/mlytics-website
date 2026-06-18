@@ -46,7 +46,7 @@ function HoverLogo({ name, src, height = 28 }: { name: string; src: string | nul
 
   if (!src || failed) {
     return (
-      <span className="text-xs font-semibold whitespace-nowrap" style={{ color: '#9B9B9B' }}>
+      <span className="text-xs font-semibold whitespace-nowrap text-ink-subtle">
         {name}
       </span>
     )
@@ -98,7 +98,7 @@ function MarqueeRow({ items, reverse = false }: { items: { name: string; src: st
 
 export function InfraPartners() {
   return (
-    <section className="section-white py-16 border-t" style={{ borderColor: '#E5E5E5' }}>
+    <section className="section-white py-16 border-t border-line">
       <div className="max-w-4xl mx-auto px-6">
         <motion.p
           className="text-center text-xs font-semibold uppercase tracking-widest mb-10"
@@ -129,7 +129,7 @@ export function InfraPartners() {
           </div>
         </motion.div>
 
-        <div className="border-t my-8" style={{ borderColor: '#E5E5E5' }} />
+        <div className="border-t my-8 border-line" />
 
         {/* Model providers */}
         <motion.div
@@ -149,7 +149,7 @@ export function InfraPartners() {
           </div>
         </motion.div>
 
-        <div className="border-t my-8" style={{ borderColor: '#E5E5E5' }} />
+        <div className="border-t my-8 border-line" />
 
         {/* CDN partners — dual alternating marquee */}
         <motion.div
