@@ -158,7 +158,7 @@ export function IntentPipeline() {
                       {layer.audience}
                     </span>
                   </div>
-                  <p className="text-xs mt-0.5 text-on-dark">{layer.sublabel}</p>
+                  <p className="text-sm mt-0.5 text-on-dark">{layer.sublabel}</p>
                 </div>
 
                 <span className="shrink-0 text-xs font-semibold" style={{ color: layer.priceColor }}>{layer.price}</span>
@@ -173,7 +173,7 @@ export function IntentPipeline() {
                 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
               >
-                <p className="text-xs py-2 leading-relaxed" style={{ color: 'rgba(168,197,195,0.85)' }}>
+                <p className="text-sm py-2 leading-relaxed" style={{ color: 'rgba(168,197,195,0.85)' }}>
                   {layer.desc}
                 </p>
               </motion.div>

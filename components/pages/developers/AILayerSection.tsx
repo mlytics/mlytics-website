@@ -77,7 +77,7 @@ export function AILayerSection() {
           <Eyebrow className="mb-3 text-on-dark/55">
             AI-Era Infrastructure
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="section-heading text-white mb-4">
             How does AI intent scoring integrate with content delivery infrastructure?
           </h2>
           <p className="text-base max-w-xl mx-auto text-on-dark">
@@ -138,12 +138,12 @@ export function AILayerSection() {
             >
               {/* Before */}
               <div className="px-5 text-center">
-                <p className="text-sm leading-relaxed text-white">{item.before}</p>
+                <p className="text-sm md:text-base leading-relaxed text-white">{item.before}</p>
               </div>
 
               {/* With Mlytics */}
               <div className="px-5 text-center">
-                <p className="text-sm leading-relaxed text-white">{item.after}</p>
+                <p className="text-sm md:text-base leading-relaxed text-white">{item.after}</p>
               </div>
             </div>
           </motion.div>

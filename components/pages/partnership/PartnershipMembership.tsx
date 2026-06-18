@@ -26,7 +26,7 @@ export function PartnershipMembership() {
           <Eyebrow className="mb-3">
             Partner Membership
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
+          <h2 className="section-heading text-ink">
             What does the Starter Membership include?
           </h2>
         </motion.div>
@@ -123,7 +123,7 @@ export function PartnershipMembership() {
               </div>
             </div>
 
-            <p className="text-sm leading-relaxed text-ink-muted">
+            <p className="text-sm md:text-base leading-relaxed text-ink-muted">
               Mlytics can recommend the right activation scale based on your digital asset inventory,
               audience profile, and brand category opportunities.
             </p>

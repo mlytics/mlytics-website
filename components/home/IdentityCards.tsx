@@ -71,7 +71,7 @@ export function IdentityCards() {
           <Eyebrow className="mb-3">
             Who are you?
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-ink">How do brands, publishers, and developers each use AI content infrastructure?</h2>
+          <h2 className="section-heading mb-4 text-ink">How do brands, publishers, and developers each use AI content infrastructure?</h2>
           <p className="text-base max-w-xl mx-auto text-ink-muted">
             Three types of customers, one Mlytics Cortex. Choose your role to see what it means for you specifically.
           </p>
@@ -94,12 +94,12 @@ export function IdentityCards() {
                     <card.Icon size={17} strokeWidth={1.8} className="text-primary" />
                   </div>
                   <h3 className="text-lg font-bold text-ink">{card.persona}</h3>
-                  <p className="text-xs mt-0.5 text-ink-subtle">{card.products}</p>
+                  <p className="text-sm mt-0.5 text-ink-subtle">{card.products}</p>
                 </div>
               </div>
 
               {/* Hook */}
-              <p className="text-sm leading-relaxed flex-1 text-ink-muted" style={{ backfaceVisibility: 'hidden' }}>{card.hook}</p>
+              <p className="text-sm md:text-base leading-relaxed flex-1 text-ink-muted" style={{ backfaceVisibility: 'hidden' }}>{card.hook}</p>
 
               {/* Metrics — hidden */}
               {/* <div className="grid grid-cols-2 gap-2">

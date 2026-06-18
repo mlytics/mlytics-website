@@ -49,9 +49,9 @@ function LayerCard({ item, i }: { item: Layer; i: number }) {
         <p className="label-eyebrow mb-3 text-on-dark/60">
           {item.num} · {item.tag}
         </p>
-        <h3 className="text-xl font-bold text-white leading-snug mb-2">{item.name}</h3>
+        <h3 className="text-h3 font-bold text-white leading-snug mb-2">{item.name}</h3>
         <p className="text-sm font-bold mb-6 text-gold">{item.price}</p>
-        <p className="text-sm leading-relaxed mt-auto text-on-dark" style={{ borderTop: '1px solid rgba(168,197,195,0.1)', paddingTop: 16 }}>
+        <p className="text-sm md:text-base leading-relaxed mt-auto text-on-dark" style={{ borderTop: '1px solid rgba(168,197,195,0.1)', paddingTop: 16 }}>
           {item.desc}
         </p>
       </div>
@@ -104,7 +104,7 @@ export function LayerOverview() {
           <Eyebrow dark className="mb-3">
             Product Suite
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">What does a complete AI monetization stack look like for publishers?</h2>
+          <h2 className="section-heading text-white mb-4">What does a complete AI monetization stack look like for publishers?</h2>
           <p className="text-base max-w-3xl mx-auto text-on-dark">
             Three independently profitable layers — infrastructure routing, AI Q&A, and outcome-based CPL — each compounding the last from a single API integration.
           </p>

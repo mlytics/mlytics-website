@@ -53,7 +53,7 @@ export function BrandComparison() {
           <Eyebrow className="mb-3">
             The Difference
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold text-ink">
+          <h2 className="section-heading text-ink">
             How does intent-based buying compare to traditional CPM advertising?
           </h2>
         </motion.div>
@@ -109,12 +109,12 @@ export function BrandComparison() {
               style={{ borderBottom: i < ROWS.length - 1 ? '1px solid rgba(0,0,0,0.06)' : undefined }}
             >
               <div className="px-5 text-center">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(26,26,26,0.45)' }}>
+                <p className="text-sm md:text-base leading-relaxed" style={{ color: 'rgba(26,26,26,0.45)' }}>
                   {row.cpm}
                 </p>
               </div>
               <div className="px-5 text-center">
-                <p className="text-sm leading-relaxed font-medium text-ink">
+                <p className="text-sm md:text-base leading-relaxed font-medium text-ink">
                   {row.mlytics}
                 </p>
               </div>

@@ -149,7 +149,7 @@ export function BrandGEOSection() {
                 style={{ background: 'rgba(168,197,195,0.07)', border: '1px solid rgba(168,197,195,0.12)' }}
               >
                 <span className="text-xl font-black tabular-nums w-16 shrink-0 text-gold">{item.stat}</span>
-                <span className="text-xs leading-snug text-left flex-1 text-on-dark/70">{item.desc}</span>
+                <span className="text-sm leading-snug text-left flex-1 text-on-dark/70">{item.desc}</span>
               </div>
             ))}
           </motion.div>
@@ -278,7 +278,7 @@ export function BrandGEOSection() {
           <Eyebrow className="mb-3 text-on-dark/55">
             Media AEO — Answer Engine Optimization
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
+          <h2 className="section-heading text-white mb-4">
             How does managed media AEO differ from open-web AEO strategies?
           </h2>
           <p className="text-base max-w-xl text-on-dark">
@@ -313,7 +313,7 @@ export function BrandGEOSection() {
               {/* Title */}
               <p className="text-sm font-bold text-white mb-1 leading-snug">{step.label}</p>
               {/* Desc */}
-              <p className="text-xs leading-relaxed text-on-dark/60">{step.desc}</p>
+              <p className="text-sm leading-relaxed text-on-dark/60">{step.desc}</p>
             </motion.div>
           ))}
         </div>

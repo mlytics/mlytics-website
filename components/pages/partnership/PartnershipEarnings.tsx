@@ -75,7 +75,7 @@ function EarningCard({ item, i }: { item: EarningItem; i: number }) {
         >
           {item.num} · {item.tag}
         </p>
-        <h3 className="text-xl font-bold text-white leading-snug mb-2">{item.title}</h3>
+        <h3 className="text-h3 font-bold text-white leading-snug mb-2">{item.title}</h3>
         <p className="text-sm font-bold mb-6 text-gold">
           {item.value}
         </p>
@@ -115,7 +115,7 @@ export function PartnershipEarnings() {
           <Eyebrow dark className="mb-3">
             Partner Benefits
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="section-heading text-white mb-4">
             What do media partners get — and how do they earn?
           </h2>
         </motion.div>

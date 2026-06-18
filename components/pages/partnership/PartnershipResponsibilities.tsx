@@ -34,7 +34,7 @@ export function PartnershipResponsibilities() {
           <Eyebrow className="mb-3">
             What Mlytics handles
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
+          <h2 className="section-heading text-ink">
             What does Mlytics handle so you don't have to?
           </h2>
         </motion.div>

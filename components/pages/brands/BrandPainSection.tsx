@@ -58,7 +58,7 @@ export function BrandPainSection() {
           <Eyebrow color="#B45309" className="mb-3">
             The Problem
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
+          <h2 className="section-heading text-ink">
             Why is the CPM model failing brand marketers?
           </h2>
         </motion.div>
@@ -76,7 +76,7 @@ export function BrandPainSection() {
             <p className="label-eyebrow mb-3 text-ink-subtle">
               CPM Performance
             </p>
-            <p className="text-sm leading-relaxed mb-5 text-ink-muted">
+            <p className="text-sm md:text-base leading-relaxed mb-5 text-ink-muted">
               You're paying for 1,000 impressions to reach maybe 3 people who care. ROAS is declining quarter over quarter — and you already know it.
             </p>
             {/* Declining line chart */}
@@ -144,7 +144,7 @@ export function BrandPainSection() {
             <p className="label-eyebrow mb-3 text-ink-subtle">
               Zero-Click Reality
             </p>
-            <p className="text-sm leading-relaxed mb-5 text-ink-muted">
+            <p className="text-sm md:text-base leading-relaxed mb-5 text-ink-muted">
               SEO drives clicks. Media AEO drives AI citations. The audiences you need now get answers without clicking — where is your brand?
             </p>
             {/* Stat pills */}
@@ -162,7 +162,7 @@ export function BrandPainSection() {
                   transition={{ duration: 0.35, delay: 0.7 + i * 0.1 }}
                 >
                   <span className="text-xl font-black shrink-0" style={{ color: '#D97706' }}>{item.stat}</span>
-                  <span className="text-xs leading-relaxed text-ink-muted">{item.desc}</span>
+                  <span className="text-sm leading-relaxed text-ink-muted">{item.desc}</span>
                 </motion.div>
               ))}
             </div>

@@ -73,7 +73,7 @@ export function BrandAEOVsMonitoring() {
           <Eyebrow className="mb-3">
             Execution vs. Monitoring
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
+          <h2 className="section-heading text-ink">
             What's the difference between AEO monitoring and AEO execution?
           </h2>
           <p className="text-base max-w-3xl mx-auto mt-4 text-ink-muted">
@@ -100,13 +100,13 @@ export function BrandAEOVsMonitoring() {
             <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(26,26,26,0.35)' }}>
               AEO Monitoring
             </p>
-            <p className="text-xs mt-1" style={{ color: 'rgba(26,26,26,0.25)' }}>tracking & reporting tools</p>
+            <p className="text-sm mt-1" style={{ color: 'rgba(26,26,26,0.25)' }}>tracking & reporting tools</p>
           </div>
           <div className="px-5 py-4 text-center">
             <p className="text-base font-bold uppercase tracking-widest text-primary">
               Mlytics Cortex
             </p>
-            <p className="text-xs mt-1" style={{ color: 'rgba(34,93,89,0.5)' }}>AEO Execution</p>
+            <p className="text-sm mt-1" style={{ color: 'rgba(34,93,89,0.5)' }}>AEO Execution</p>
           </div>
         </div>
 
@@ -132,12 +132,12 @@ export function BrandAEOVsMonitoring() {
               style={{ borderBottom: i < ROWS.length - 1 ? '1px solid rgba(0,0,0,0.06)' : undefined }}
             >
               <div className="px-5 text-center">
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(26,26,26,0.45)' }}>
+                <p className="text-sm md:text-base leading-relaxed" style={{ color: 'rgba(26,26,26,0.45)' }}>
                   {row.monitoring}
                 </p>
               </div>
               <div className="px-5 text-center">
-                <p className="text-sm leading-relaxed font-medium text-ink">
+                <p className="text-sm md:text-base leading-relaxed font-medium text-ink">
                   {row.mlytics}
                 </p>
               </div>

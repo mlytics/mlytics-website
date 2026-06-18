@@ -42,7 +42,7 @@ export function SolutionPitches() {
           <Eyebrow className="mb-3">
             The Solution
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold text-ink">
+          <h2 className="section-heading text-ink">
             Who gets paid when AI uses your content?
           </h2>
         </motion.div>
@@ -80,7 +80,7 @@ export function SolutionPitches() {
                   <Eyebrow color="#CCCCCC">
                     {pitch.them.who}
                   </Eyebrow>
-                  <p className="text-sm leading-relaxed" style={{ color: '#BBBBBB' }}>
+                  <p className="text-sm md:text-base leading-relaxed" style={{ color: '#BBBBBB' }}>
                     {pitch.them.desc}
                   </p>
                 </div>
@@ -100,7 +100,7 @@ export function SolutionPitches() {
                   <Eyebrow color={pitch.accent}>
                     Mlytics
                   </Eyebrow>
-                  <p className="text-sm leading-relaxed text-ink">
+                  <p className="text-sm md:text-base leading-relaxed text-ink">
                     {pitch.us}
                   </p>
                 </div>

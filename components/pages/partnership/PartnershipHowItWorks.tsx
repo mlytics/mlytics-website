@@ -33,7 +33,7 @@ export function PartnershipHowItWorks() {
           transition={{ duration: 0.5 }}
         >
           <Eyebrow className="mb-3">How It Works</Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-ink">
+          <h2 className="section-heading mb-4 text-ink">
             How do media partners activate and earn?
           </h2>
           <p className="text-base max-w-xl mx-auto text-ink-muted">
@@ -68,7 +68,7 @@ export function PartnershipHowItWorks() {
                 {step.num}
               </span>
               <p className="text-base font-bold mb-2 leading-snug text-ink">{step.label}</p>
-              <p className="text-sm leading-relaxed text-ink-muted">
+              <p className="text-sm md:text-base leading-relaxed text-ink-muted">
                 {step.desc}
               </p>
             </motion.div>

@@ -26,7 +26,7 @@ export function BrandLeadPilot() {
           <Eyebrow className="mb-3">
             Lead Pilot
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-ink">
+          <h2 className="section-heading mb-4 text-ink">
             How does intent-based lead generation through publisher networks work?
           </h2>
           <p className="text-base max-w-xl mx-auto text-ink-muted">

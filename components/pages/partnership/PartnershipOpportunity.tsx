@@ -32,7 +32,7 @@ export function PartnershipOpportunity() {
           <Eyebrow color="#B45309" className="mb-3">
             The Opportunity
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
+          <h2 className="section-heading text-ink">
             How is AI search changing content monetization?
           </h2>
         </motion.div>
@@ -56,7 +56,7 @@ export function PartnershipOpportunity() {
               <p className="text-sm font-semibold mb-2 leading-snug text-ink">
                 {point.title}
               </p>
-              <p className="text-sm leading-relaxed text-ink-muted">
+              <p className="text-sm md:text-base leading-relaxed text-ink-muted">
                 {point.desc}
               </p>
             </motion.div>

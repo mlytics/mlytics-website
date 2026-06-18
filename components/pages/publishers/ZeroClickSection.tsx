@@ -27,7 +27,7 @@ export function ZeroClickSection() {
           transition={{ duration: 0.5 }}
         >
           <Eyebrow color="#B45309" className="mb-4">The Problem</Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-ink">
+          <h2 className="section-heading mb-4 text-ink">
             How is zero-click search affecting your content revenue?
           </h2>
           <p className="text-base max-w-3xl mx-auto text-ink-muted">
@@ -51,7 +51,7 @@ export function ZeroClickSection() {
                   ? <NumberTicker value={item.value} suffix={item.suffix} duration={900} />
                   : `0${item.suffix}`}
               </p>
-              <p className="text-xs leading-relaxed text-ink">{item.desc}</p>
+              <p className="text-sm leading-relaxed text-ink">{item.desc}</p>
               <p className="text-xs mt-auto text-ink-subtle">{item.source}</p>
             </motion.div>
           ))}

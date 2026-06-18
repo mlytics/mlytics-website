@@ -119,7 +119,7 @@ export function ContentOwnerVerticals() {
       <div className="max-w-5xl mx-auto px-6">
         <div className="text-center mb-12">
           <Eyebrow className="mb-3">Trusted By</Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold mb-2 text-ink">
+          <h2 className="section-heading mb-2 text-ink">
             Which media categories are losing the most revenue to zero-click AI search?
           </h2>
           <p className="text-base leading-relaxed text-ink-muted">

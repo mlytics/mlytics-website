@@ -58,7 +58,7 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[0]; i: number }) {
           <item.Icon size={18} strokeWidth={1.7} className="text-primary" />
         </div>
         <h3 className="text-base font-bold leading-snug text-ink">{item.label}</h3>
-        <p className="text-xs leading-relaxed mt-4 pt-4 text-ink-muted" style={{ borderTop: '1px solid #EFEFEF' }}>
+        <p className="text-sm leading-relaxed mt-4 pt-4 text-ink-muted" style={{ borderTop: '1px solid #EFEFEF' }}>
           {item.desc}
         </p>
       </div>
@@ -80,7 +80,7 @@ export function BrandWhoSection() {
           <Eyebrow color="#A0A0A0" className="mb-3">
             Who this is for
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold text-ink">
+          <h2 className="section-heading text-ink">
             Which industries are most exposed to AI search disrupting ad performance?
           </h2>
         </motion.div>

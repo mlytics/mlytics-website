@@ -20,7 +20,7 @@ export function IntentRefinerySection() {
             <Eyebrow className="mb-4">
               The Intent Refinery
             </Eyebrow>
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-ink">
+            <h2 className="section-heading mb-4 text-ink">
               How does AI convert content engagement into commercial transactions?
             </h2>
             <p className="text-base leading-relaxed text-ink-muted">

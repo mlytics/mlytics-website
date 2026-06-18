@@ -102,7 +102,7 @@ export function KnowledgeBaseSection() {
         {/* Header */}
         <div className="text-center mb-10">
           <Eyebrow dark className="mb-3">AI Infrastructure</Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="section-heading text-white mb-4">
             How should a publisher's content be structured for AI retrieval and citation?
           </h2>
           <p className="text-base max-w-3xl mx-auto text-on-dark">
@@ -141,7 +141,7 @@ export function KnowledgeBaseSection() {
                     >
                       0{i + 1}
                     </span>
-                    <span className="block text-xs font-semibold leading-snug" style={{ color: isActive ? '#FFFFFF' : 'rgba(168,197,195,0.7)' }}>
+                    <span className="block text-sm font-semibold leading-snug" style={{ color: isActive ? '#FFFFFF' : 'rgba(168,197,195,0.7)' }}>
                       {step.label}
                     </span>
                     {isActive && (
@@ -177,7 +177,7 @@ export function KnowledgeBaseSection() {
                       <Eyebrow>{step.sub}</Eyebrow>
                     </div>
                     <p className="text-lg md:text-xl font-bold leading-snug mb-2">{step.label}</p>
-                    <p className="text-sm leading-relaxed">{step.desc}</p>
+                    <p className="text-sm md:text-base leading-relaxed">{step.desc}</p>
                   </div>
                   <div className="flex items-center justify-between pt-4 mt-6 md:mt-8" style={{ borderTop: '1px solid rgba(168,197,195,0.1)' }}>
                     <div className="flex items-center gap-1.5">
@@ -206,7 +206,7 @@ export function KnowledgeBaseSection() {
                     <p className="text-lg md:text-xl font-bold leading-snug mb-2 text-ink">
                       {STEPS[active].label}
                     </p>
-                    <p className="text-sm leading-relaxed text-ink-muted">
+                    <p className="text-sm md:text-base leading-relaxed text-ink-muted">
                       {STEPS[active].desc}
                     </p>
                   </div>

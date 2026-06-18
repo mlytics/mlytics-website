@@ -60,7 +60,7 @@ export function BrandFAQ() {
           <Eyebrow className="mb-3">
             FAQ
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold leading-tight text-ink">
+          <h2 className="section-heading text-ink">
             Common questions.
           </h2>
         </motion.div>
@@ -105,7 +105,7 @@ export function BrandFAQ() {
                     transition={{ duration: 0.25, ease: 'easeInOut' }}
                     style={{ overflow: 'hidden' }}
                   >
-                    <p className="pb-5 text-sm leading-relaxed text-ink-muted">
+                    <p className="pb-5 text-sm md:text-base leading-relaxed text-ink-muted">
                       {faq.a}
                     </p>
                   </motion.div>

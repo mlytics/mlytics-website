@@ -30,7 +30,7 @@ export function DeveloperSpecs() {
           <Eyebrow className="mb-3">
             Performance Specs
           </Eyebrow>
-          <h2 className="text-3xl md:text-4xl font-bold text-ink">
+          <h2 className="section-heading text-ink">
             What does production-grade AI content delivery infrastructure actually require?
           </h2>
         </motion.div>
@@ -48,7 +48,7 @@ export function DeveloperSpecs() {
                 <item.Icon size={22} strokeWidth={1.6} className="text-primary" />
               </div>
               <p className="text-xl font-bold mb-1 text-primary">{item.stat}</p>
-              <p className="text-xs text-ink-muted">{item.label}</p>
+              <p className="text-sm text-ink-muted">{item.label}</p>
             </motion.div>
           ))}
         </div>
