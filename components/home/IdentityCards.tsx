@@ -17,9 +17,9 @@ const CARDS: Array<{
   accent: string
 }> = [
   {
-    persona: 'Media and Content',
+    persona: 'Media and Content Owner',
     Icon: Newspaper,
-    hook: 'Your content produces reader intent signals every day. Right now, every single one is leaking away.',
+    hook: "85% of searches end without a click — Mlytics Cortex captures your readers' intent and turns it into three new revenue streams.",
     products: 'AI Q&A Widget · CPL Revenue',
     metrics: [
       { label: 'Content cost', value: '$0.10/piece' },
@@ -32,7 +32,7 @@ const CARDS: Array<{
   {
     persona: 'Brand',
     Icon: Target,
-    hook: 'How much of your ad budget hits people with zero purchase intent? You can stop guessing.',
+    hook: "60%+ of buyers get answers from AI without clicking through — Mlytics Cortex places your brand inside the answers they trust.",
     products: 'Full Conversation CPL · Lead Pilot',
     metrics: [
       { label: 'Lower CAC', value: '60%+' },
@@ -45,7 +45,7 @@ const CARDS: Array<{
   {
     persona: 'Developer',
     Icon: Settings2,
-    hook: 'Your content delivery infrastructure costs more than it should. One API call changes that.',
+    hook: "Fragmented CDN contracts and rising infra costs don't have to be trade-offs — Mlytics Cortex cuts TCO by 20% and routes every request in under 50ms, through one API.",
     products: 'Decisive Engine API',
     metrics: [
       { label: 'TCO reduction', value: '20%' },
@@ -71,7 +71,7 @@ export function IdentityCards() {
           <Eyebrow className="mb-3">
             Who are you?
           </Eyebrow>
-          <h2 className="section-heading mb-4 text-ink">How do brands, publishers, and developers each use AI content infrastructure?</h2>
+          <h2 className="section-heading mb-4 text-ink">What does Mlytics Cortex offer brands, media and content owners, and developers?</h2>
           <p className="text-base max-w-xl mx-auto text-ink-muted">
             Three types of customers, one Mlytics Cortex. Choose your role to see what it means for you specifically.
           </p>
