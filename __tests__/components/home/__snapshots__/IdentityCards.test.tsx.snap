@@ -1,0 +1,250 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`IdentityCards > snapshot > matches snapshot 1`] = `
+<div>
+  <section
+    class="section-light py-20 lg:py-28"
+  >
+    <div
+      class="max-w-6xl mx-auto px-6"
+    >
+      <div
+        class="text-center mb-12"
+        initial="[object Object]"
+        transition="[object Object]"
+        viewport="[object Object]"
+        whileinview="[object Object]"
+      >
+        <span
+          class="label-eyebrow text-primary mb-3"
+        >
+          Who are you?
+        </span>
+        <h2
+          class="section-heading mb-4 text-ink"
+        >
+          What does Mlytics Cortex offer brands, media and content owners, and developers?
+        </h2>
+        <p
+          class="text-base max-w-xl mx-auto text-ink-muted"
+        >
+          Three types of customers, one Mlytics Cortex. Choose your role to see what it means for you specifically.
+        </p>
+      </div>
+      <div
+        class="grid md:grid-cols-3 gap-6"
+      >
+        <div
+          class="bg-white rounded-2xl p-6 flex flex-col gap-5 border border-line transition-shadow duration-300 hover:shadow-lg"
+          initial="[object Object]"
+          transition="[object Object]"
+          viewport="[object Object]"
+          whileinview="[object Object]"
+        >
+          <div
+            class="flex items-start justify-between"
+          >
+            <div>
+              <div
+                class="mb-2 w-8 h-8 rounded-lg flex items-center justify-center bg-primary/8"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-newspaper text-primary"
+                  fill="none"
+                  height="17"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                  width="17"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15 18h-5"
+                  />
+                  <path
+                    d="M18 14h-8"
+                  />
+                  <path
+                    d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2"
+                  />
+                  <rect
+                    height="4"
+                    rx="1"
+                    width="8"
+                    x="10"
+                    y="6"
+                  />
+                </svg>
+              </div>
+              <h3
+                class="text-lg font-bold text-ink"
+              >
+                Media and Content Owner
+              </h3>
+              <p
+                class="text-sm mt-0.5 text-ink-subtle"
+              >
+                AI Q&A Widget · CPL Revenue
+              </p>
+            </div>
+          </div>
+          <p
+            class="text-sm md:text-base leading-relaxed flex-1 text-ink-muted"
+            style="backface-visibility: hidden;"
+          >
+            85% of searches end without a click — Mlytics Cortex captures your readers' intent and turns it into three new revenue streams.
+          </p>
+          <a
+            class="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            href="/content-owners"
+          >
+            See media and content plan
+          </a>
+        </div>
+        <div
+          class="bg-white rounded-2xl p-6 flex flex-col gap-5 border border-line transition-shadow duration-300 hover:shadow-lg"
+          initial="[object Object]"
+          transition="[object Object]"
+          viewport="[object Object]"
+          whileinview="[object Object]"
+        >
+          <div
+            class="flex items-start justify-between"
+          >
+            <div>
+              <div
+                class="mb-2 w-8 h-8 rounded-lg flex items-center justify-center bg-primary/8"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-target text-primary"
+                  fill="none"
+                  height="17"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                  width="17"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                  />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="6"
+                  />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="2"
+                  />
+                </svg>
+              </div>
+              <h3
+                class="text-lg font-bold text-ink"
+              >
+                Brand
+              </h3>
+              <p
+                class="text-sm mt-0.5 text-ink-subtle"
+              >
+                Full Conversation CPL · Lead Pilot
+              </p>
+            </div>
+          </div>
+          <p
+            class="text-sm md:text-base leading-relaxed flex-1 text-ink-muted"
+            style="backface-visibility: hidden;"
+          >
+            60%+ of buyers get answers from AI without clicking through — Mlytics Cortex places your brand inside the answers they trust.
+          </p>
+          <a
+            class="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            href="/brands"
+          >
+            See brand plan
+          </a>
+        </div>
+        <div
+          class="bg-white rounded-2xl p-6 flex flex-col gap-5 border border-line transition-shadow duration-300 hover:shadow-lg"
+          initial="[object Object]"
+          transition="[object Object]"
+          viewport="[object Object]"
+          whileinview="[object Object]"
+        >
+          <div
+            class="flex items-start justify-between"
+          >
+            <div>
+              <div
+                class="mb-2 w-8 h-8 rounded-lg flex items-center justify-center bg-primary/8"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-settings2 lucide-settings-2 text-primary"
+                  fill="none"
+                  height="17"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                  width="17"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M14 17H5"
+                  />
+                  <path
+                    d="M19 7h-9"
+                  />
+                  <circle
+                    cx="17"
+                    cy="17"
+                    r="3"
+                  />
+                  <circle
+                    cx="7"
+                    cy="7"
+                    r="3"
+                  />
+                </svg>
+              </div>
+              <h3
+                class="text-lg font-bold text-ink"
+              >
+                Developer
+              </h3>
+              <p
+                class="text-sm mt-0.5 text-ink-subtle"
+              >
+                Decisive Engine API
+              </p>
+            </div>
+          </div>
+          <p
+            class="text-sm md:text-base leading-relaxed flex-1 text-ink-muted"
+            style="backface-visibility: hidden;"
+          >
+            Fragmented CDN contracts and rising infra costs don't have to be trade-offs — Mlytics Cortex cuts TCO by 20% and routes every request in under 50ms, through one API.
+          </p>
+          <a
+            class="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            href="/developers"
+          >
+            See developer plan
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;
