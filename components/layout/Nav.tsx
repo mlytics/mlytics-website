@@ -102,9 +102,9 @@ export function Nav() {
           </Link>
         </div>
 
-        {/* Mobile menu button */}
+        {/* Mobile menu button — 44×44px touch target via padding; -mr offsets right padding so icon stays visually flush */}
         <button
-          className={`lg:hidden transition-colors ${logoColor}`}
+          className={`lg:hidden -mr-[11px] p-[11px] transition-colors ${logoColor}`}
           onClick={() => setMobileOpen(v => !v)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
