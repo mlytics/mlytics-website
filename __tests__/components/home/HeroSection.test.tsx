@@ -10,6 +10,9 @@ vi.mock('framer-motion', () => ({
     span: ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
       <span {...props}>{children}</span>
     ),
+    p: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+      <p {...props}>{children}</p>
+    ),
   },
 }))
 
@@ -85,6 +88,27 @@ describe('HeroSection', () => {
       await userEvent.type(screen.getByPlaceholderText(/enter your email/i), 'test@example.com')
       await userEvent.click(screen.getByRole('button', { name: /get early access/i }))
       expect(await screen.findByText(/you're on the list/i)).toBeInTheDocument()
+    })
+
+    it('shows validation error for invalid email on submit', async () => {
+      render(<HeroSection />)
+      await userEvent.type(screen.getByPlaceholderText(/enter your email/i), 'notanemail')
+      await userEvent.click(screen.getByRole('button', { name: /get early access/i }))
+      expect(screen.getByText(/please enter a valid email address/i)).toBeInTheDocument()
+    })
+
+    it('shows required error when submitting empty input', async () => {
+      render(<HeroSection />)
+      await userEvent.click(screen.getByRole('button', { name: /get early access/i }))
+      expect(screen.getByText(/email is required/i)).toBeInTheDocument()
+    })
+
+    it('clears validation error when user starts typing', async () => {
+      render(<HeroSection />)
+      await userEvent.click(screen.getByRole('button', { name: /get early access/i }))
+      expect(screen.getByText(/email is required/i)).toBeInTheDocument()
+      await userEvent.type(screen.getByPlaceholderText(/enter your email/i), 'a')
+      expect(screen.queryByText(/email is required/i)).not.toBeInTheDocument()
     })
   })
 })
