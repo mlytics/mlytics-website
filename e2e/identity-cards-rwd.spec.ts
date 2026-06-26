@@ -9,6 +9,10 @@ test.describe('IdentityCards RWD', () => {
     const card2 = page.getByRole('heading', { name: 'Brand', exact: true })
     const card3 = page.getByRole('heading', { name: 'Developer', exact: true })
 
+    await expect(card1).toBeVisible()
+    await expect(card2).toBeVisible()
+    await expect(card3).toBeVisible()
+
     const box1 = await card1.boundingBox()
     const box2 = await card2.boundingBox()
     const box3 = await card3.boundingBox()
@@ -29,6 +33,10 @@ test.describe('IdentityCards RWD', () => {
     const card1 = page.getByRole('heading', { name: 'Media and Content Owner', exact: true })
     const card2 = page.getByRole('heading', { name: 'Brand', exact: true })
     const card3 = page.getByRole('heading', { name: 'Developer', exact: true })
+
+    await expect(card1).toBeVisible()
+    await expect(card2).toBeVisible()
+    await expect(card3).toBeVisible()
 
     const box1 = await card1.boundingBox()
     const box2 = await card2.boundingBox()
