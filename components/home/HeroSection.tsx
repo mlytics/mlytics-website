@@ -1,35 +1,20 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { type AgentPersona, HERO_FLOW, HERO_FLOW_V2 } from '@/lib/agent-data'
-import { CORTEX_FLOW_S0 } from '@/lib/cortex-conversation-flow'
-import { AgentDialog } from '@/components/agent/AgentDialog'
-import { CortexLiveDemo } from '@/components/agent/CortexLiveDemo'
 import { WorldMapDots } from './WorldMapDots'
 import { LogoMarquee } from './LogoMarquee'
 import { trackCTA } from '@/lib/analytics'
 
 const ROTATING_WORDS = [
-  'for Brands',
-  'for Media and Content',
+  'that puts your brand inside AI answers',
+  'that turns AI discovery into revenue',
+  'that wins qualified buyers at lower cost',
 ]
 
 export function HeroSection() {
-  const router = useRouter()
-  const [dialogEngaged, setDialogEngaged] = useState(false)
   const [wordIdx, setWordIdx] = useState(0)
-
-  function handleComplete(persona: AgentPersona) {
-    const routes: Record<NonNullable<AgentPersona>, string> = {
-      publisher: '/content-owners',
-      brand: '/brands',
-      developer: '/developers',
-    }
-    if (persona) router.push(routes[persona])
-  }
 
   // Rotate headline words
   useEffect(() => {
@@ -71,7 +56,7 @@ export function HeroSection() {
             <h1
               className="font-bold leading-tight tracking-tight text-[28px] sm:text-[40px] md:text-[52px] lg:text-[64px] mb-4 text-center w-full text-ink"
             >
-              AI answer monetization<br />
+              A Discovery and Answer Engine<br />
               <span
                 style={{
                   display: 'block',
@@ -108,7 +93,7 @@ export function HeroSection() {
               className="text-sm md:text-base font-normal tracking-wide mb-8 mt-2"
               style={{ color: '#7A7A7A', letterSpacing: '0.04em' }}
             >
-              Put your brand inside the AI answers your buyers trust.
+              Built for businesses ready to monetise the AI era.
             </p>
 
             {/* Book a Demo CTA */}
@@ -119,27 +104,6 @@ export function HeroSection() {
             >
               Book a Demo
             </Link>
-
-            {/* Legacy dialogs — hidden, kept for rollback */}
-            <div className="hidden" aria-hidden>
-              <AgentDialog flow={HERO_FLOW} onComplete={handleComplete} variant="page" bottomPadding={0} />
-            </div>
-            <div className="hidden" aria-hidden>
-              <AgentDialog flow={HERO_FLOW_V2} onComplete={handleComplete} variant="page" bottomPadding={0} />
-            </div>
-            <div className="hidden" aria-hidden>
-              <AgentDialog
-                flow={CORTEX_FLOW_S0}
-                onComplete={handleComplete}
-                variant="page"
-                bottomPadding={0}
-                onEngage={() => setDialogEngaged(true)}
-                onReset={() => setDialogEngaged(false)}
-              />
-            </div>
-            <div className="hidden" aria-hidden>
-              <CortexLiveDemo />
-            </div>
 
           </div>
         </div>
