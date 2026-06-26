@@ -31,7 +31,7 @@ export function HeroSection() {
     setStatus('loading')
     try {
       const res = await fetch(
-        `https://api.hsforms.com/submissions/v3/integration/submit/${process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID}/${process.env.NEXT_PUBLIC_HUBSPOT_FORM_GUID}`,
+        'https://api.hsforms.com/submissions/v3/integration/submit/4284310/eacc7796-0d94-42fd-bc9b-4b31e9beb7b7',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
