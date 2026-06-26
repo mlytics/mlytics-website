@@ -79,7 +79,7 @@ export function HeroSection() {
 
             {/* Headline */}
             <h1
-              className="font-bold leading-tight tracking-tight text-[22px] md:text-[40px] lg:text-[52px] mb-4 text-center w-full text-ink"
+              className="font-bold leading-tight tracking-tight text-[22px] md:text-[40px] lg:text-[52px] mb-8 text-center w-full text-ink"
             >
               Discovery and Answer Engine<br />
               <span
@@ -101,14 +101,6 @@ export function HeroSection() {
                 </AnimatePresence>
               </span>
             </h1>
-
-            {/* Subtitle */}
-            <p
-              className="text-sm md:text-base font-normal tracking-wide mb-8 max-w-[52rem]"
-              style={{ color: '#7A7A7A', letterSpacing: '0.04em' }}
-            >
-              Built for businesses ready to monetise the AI era.
-            </p>
 
             {/* Early access CTA */}
             {status === 'success' ? (

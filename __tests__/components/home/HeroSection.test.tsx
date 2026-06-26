@@ -1,5 +1,6 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { HeroSection } from '@/components/home/HeroSection'
 
 // Mock framer-motion — AnimatePresence + motion.span used for rotating words
@@ -63,15 +64,6 @@ describe('HeroSection', () => {
       render(<HeroSection />)
       expect(
         screen.getByText('that puts your brand inside AI answers')
-      ).toBeInTheDocument()
-    })
-  })
-
-  describe('tagline', () => {
-    it('renders the new tagline', () => {
-      render(<HeroSection />)
-      expect(
-        screen.getByText('Built for businesses ready to monetise the AI era.')
       ).toBeInTheDocument()
     })
   })
