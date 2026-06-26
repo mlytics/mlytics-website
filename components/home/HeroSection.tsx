@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { WorldMapDots } from './WorldMapDots'
@@ -13,16 +12,42 @@ const ROTATING_WORDS = [
   'that wins qualified buyers at lower cost',
 ]
 
+type SubmitStatus = 'idle' | 'loading' | 'success' | 'error'
+
 export function HeroSection() {
   const [wordIdx, setWordIdx] = useState(0)
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<SubmitStatus>('idle')
 
-  // Rotate headline words
   useEffect(() => {
     const id = setInterval(() => {
       setWordIdx(i => (i + 1) % ROTATING_WORDS.length)
     }, 2600)
     return () => clearInterval(id)
   }, [])
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setStatus('loading')
+    try {
+      const res = await fetch(
+        `https://api.hsforms.com/submissions/v3/integration/submit/${process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID}/${process.env.NEXT_PUBLIC_HUBSPOT_FORM_GUID}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fields: [{ objectTypeId: '0-1', name: 'email', value: email }],
+            context: { pageUri: window.location.href, pageName: 'Homepage Hero' },
+          }),
+        }
+      )
+      if (!res.ok) throw new Error('HubSpot submission failed')
+      trackCTA('Get Early Access', 'hero')
+      setStatus('success')
+    } catch {
+      setStatus('error')
+    }
+  }
 
   return (
     <section
@@ -43,27 +68,23 @@ export function HeroSection() {
 
         {/* Main content — vertically centred, masked top/bottom so chat items fade gracefully */}
         <div
-          className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-[96px] pb-14"
+          className="relative z-10 flex-1 flex flex-col items-center justify-center px-2 sm:px-6 pt-[96px] pb-14"
           style={{
             maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 82%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 82%, transparent 100%)',
             overflow: 'hidden',
           }}
         >
-          <div className="max-w-[52rem] w-full mx-auto flex flex-col items-center text-center">
+          <div className="max-w-[80rem] w-full mx-auto flex flex-col items-center text-center">
 
             {/* Headline */}
             <h1
-              className="font-bold leading-tight tracking-tight text-[28px] sm:text-[40px] md:text-[52px] lg:text-[64px] mb-4 text-center w-full text-ink"
+              className="font-bold leading-tight tracking-tight text-[22px] md:text-[40px] lg:text-[52px] mb-4 text-center w-full text-ink"
             >
-              A Discovery and Answer Engine<br />
+              Discovery and Answer Engine<br />
               <span
-                style={{
-                  display: 'block',
-                  height: '1.25em',
-                  position: 'relative',
-                  textAlign: 'center',
-                }}
+                className="block relative overflow-hidden max-[420px]:h-[2.5em] md:h-[1.4em]"
+                style={{ textAlign: 'center' }}
               >
                 <AnimatePresence mode="wait">
                   <motion.span
@@ -72,15 +93,8 @@ export function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -14 }}
                     transition={{ duration: 0.38, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="text-primary"
-                    style={{
-                      display: 'block',
-                      position: 'absolute',
-                      left: 0,
-                      right: 0,
-                      textAlign: 'center',
-                      whiteSpace: 'nowrap',
-                    }}
+                    className="text-primary md:absolute md:inset-x-0 md:text-center"
+                    style={{ display: 'block' }}
                   >
                     {ROTATING_WORDS[wordIdx]}
                   </motion.span>
@@ -90,20 +104,48 @@ export function HeroSection() {
 
             {/* Subtitle */}
             <p
-              className="text-sm md:text-base font-normal tracking-wide mb-8 mt-2"
+              className="text-sm md:text-base font-normal tracking-wide mb-8 max-w-[52rem]"
               style={{ color: '#7A7A7A', letterSpacing: '0.04em' }}
             >
               Built for businesses ready to monetise the AI era.
             </p>
 
-            {/* Book a Demo CTA */}
-            <Link
-              href="/book-a-demo"
-              onClick={() => trackCTA('Book a Demo', 'hero')}
-              className="inline-flex items-center px-7 py-3.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] bg-primary text-white"
-            >
-              Book a Demo
-            </Link>
+            {/* Early access CTA */}
+            {status === 'success' ? (
+              <p className="text-sm font-medium text-primary">
+                You&apos;re on the list — we&apos;ll be in touch!
+              </p>
+            ) : (
+              <form onSubmit={handleSubmit} className="flex flex-col items-center gap-2 w-full max-w-md">
+                <div className="flex items-center w-full rounded-full border border-gray-200 bg-white pl-5 pr-1 py-1 focus-within:border-primary transition-colors">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="flex-1 min-w-0 text-base md:text-sm outline-none bg-transparent py-2"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    className="shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap"
+                  >
+                    {status === 'loading' ? 'Sending…' : (
+                      <>
+                        <span className="sm:hidden">Join Early</span>
+                        <span className="hidden sm:inline">Get Early Access</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                {status === 'error' && (
+                  <p className="text-xs text-red-500">
+                    Something went wrong — please try again.
+                  </p>
+                )}
+              </form>
+            )}
 
           </div>
         </div>

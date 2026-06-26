@@ -56,7 +56,7 @@ describe('HeroSection', () => {
       render(<HeroSection />)
       expect(
         screen.getByRole('heading', { level: 1 })
-      ).toHaveTextContent('A Discovery and Answer Engine')
+      ).toHaveTextContent('Discovery and Answer Engine')
     })
 
     it('renders the first rotating word on initial load', () => {
@@ -76,11 +76,23 @@ describe('HeroSection', () => {
     })
   })
 
-  describe('CTA', () => {
-    it('renders Book a Demo link pointing to /book-a-demo', () => {
+  describe('early access form', () => {
+    it('renders email input', () => {
       render(<HeroSection />)
-      const link = screen.getByRole('link', { name: /book a demo/i })
-      expect(link).toHaveAttribute('href', '/book-a-demo')
+      expect(screen.getByPlaceholderText(/enter your email/i)).toBeInTheDocument()
+    })
+
+    it('renders Get Early Access button', () => {
+      render(<HeroSection />)
+      expect(screen.getByRole('button', { name: /get early access/i })).toBeInTheDocument()
+    })
+
+    it('shows success message after successful submission', async () => {
+      global.fetch = vi.fn().mockResolvedValueOnce({ ok: true })
+      render(<HeroSection />)
+      await userEvent.type(screen.getByPlaceholderText(/enter your email/i), 'test@example.com')
+      await userEvent.click(screen.getByRole('button', { name: /get early access/i }))
+      expect(await screen.findByText(/you're on the list/i)).toBeInTheDocument()
     })
   })
 })
