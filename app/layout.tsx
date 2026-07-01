@@ -27,6 +27,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     images: ['https://storage.googleapis.com/mlytics-website/og-image.png'],
   },
+  verification: {
+    google: 'ebn7CeZ3r4W2wJEEjikkQPjSDGkruyy3SVP2NSwcuC4',
+  },
 }
 
 const organizationSchema = {
