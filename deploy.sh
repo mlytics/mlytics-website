@@ -58,6 +58,9 @@ if [ $? -eq 0 ]; then
     echo "✅ [$(echo "$ENV" | tr '[:lower:]' '[:upper:]')] 上傳成功！"
     echo "💡 快取設定: $CACHE_SETTING (約 5 分鐘後生效)"
     echo "📂 已同步目錄: $OUT_DIR"
+
+    # 修正 llms.txt Content-Type，確保瀏覽器以 UTF-8 解讀
+    gsutil setmeta -h "Content-Type:text/plain; charset=utf-8" "$BUCKET/llms.txt"
 else
     echo "❌ 上傳過程中發生錯誤。"
 fi
