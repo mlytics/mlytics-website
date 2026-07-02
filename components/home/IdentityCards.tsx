@@ -59,7 +59,7 @@ const CARDS: Array<{
 
 export function IdentityCards() {
   return (
-    <section className="section-light py-20 lg:py-28">
+    <section className="section-white py-20 lg:py-28">
       <div className="max-w-6xl mx-auto px-6">
         <motion.div
           className="text-center mb-12"
