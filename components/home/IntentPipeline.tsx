@@ -10,8 +10,6 @@ const LAYERS: Array<{
   name: string
   sublabel: string
   audience: string
-  price: string
-  priceColor: string
   desc: string
   color: string
   borderColor: string
@@ -21,8 +19,6 @@ const LAYERS: Array<{
     name: 'Media and Content Traffic',
     sublabel: 'Raw attention',
     audience: 'Raw material',
-    price: '400K–4M WAU',
-    priceColor: 'var(--color-on-dark)',
     desc: 'Every page view across media platforms is raw intent signal — unrefined, unmonetized, waiting to be captured.',
     color: 'rgba(168,197,195,0.15)',
     borderColor: 'rgba(168,197,195,0.25)',
@@ -32,9 +28,7 @@ const LAYERS: Array<{
     name: 'Decisive Engine',
     sublabel: 'Route · Observe · Decide',
     audience: 'Developers / Tech',
-    price: '$1,000/mo',
-    priceColor: 'var(--color-on-dark)',
-    desc: 'Content delivery in <50ms. Every request routed optimally, every decision feeding the intent system. 20% TCO reduction.',
+    desc: 'Every request routed optimally in real time — and every routing decision feeds the intent system.',
     color: 'rgba(34,93,89,0.2)',
     borderColor: 'rgba(34,93,89,0.5)',
   },
@@ -43,9 +37,7 @@ const LAYERS: Array<{
     name: 'AI Q&A Widget',
     sublabel: 'Capture weak intent',
     audience: 'Media and Content',
-    price: '$5,000/mo',
-    priceColor: 'var(--color-gold)',
-    desc: '$0.10/article vs $250 human cost. 2,500× productivity. Every article becomes an intent capture point.',
+    desc: 'AI-generated Q&A at a fraction of human writing cost — every article becomes an intent capture point.',
     color: 'rgba(245,158,11,0.08)',
     borderColor: 'rgba(245,158,11,0.3)',
   },
@@ -54,8 +46,6 @@ const LAYERS: Array<{
     name: 'Full Conversation',
     sublabel: 'Capture strong intent',
     audience: 'Media and Content + Brands',
-    price: 'CPL billing',
-    priceColor: 'var(--color-gold)',
     desc: 'Readers move from browsing to decision. Strong intent captured, qualified, and matched to relevant brands.',
     color: 'rgba(245,158,11,0.1)',
     borderColor: 'rgba(245,158,11,0.4)',
@@ -65,8 +55,6 @@ const LAYERS: Array<{
     name: 'Lead Pilot',
     sublabel: 'Qualify · Deliver · Convert',
     audience: 'Brands',
-    price: 'Performance billing',
-    priceColor: 'var(--color-gold)',
     desc: 'Verified strong intent, delivered CRM-ready. Replaces junior SDR workflow at a fraction of the cost.',
     color: 'rgba(245,158,11,0.12)',
     borderColor: 'rgba(245,158,11,0.5)',
@@ -160,8 +148,6 @@ export function IntentPipeline() {
                   </div>
                   <p className="text-sm mt-0.5 text-on-dark">{layer.sublabel}</p>
                 </div>
-
-                <span className="shrink-0 text-xs font-semibold" style={{ color: layer.priceColor }}>{layer.price}</span>
               </motion.div>
 
               <motion.div
