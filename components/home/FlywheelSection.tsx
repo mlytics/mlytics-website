@@ -63,7 +63,7 @@ export function FlywheelSection() {
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              Every routing decision feeds the intelligence layer. The loop compounds with every request.
+              Every reader interaction feeds the intelligence layer. The loop compounds with every request.
             </motion.p>
 
             {/* Large number callout */}
