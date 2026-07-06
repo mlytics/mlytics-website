@@ -29,14 +29,14 @@ export function FlywheelDiagram() {
     <div className="flex items-center justify-center py-2">
       <svg
         viewBox="-40 0 480 420"
-        className="w-full max-w-sm lg:max-w-none"
+        className="w-full max-w-md lg:max-w-none"
         style={{ overflow: 'visible' }}
       >
         {/* ── Orbit ring ── */}
         <motion.circle
           cx={CX} cy={CY} r={R}
           fill="none"
-          stroke="rgba(34,93,89,0.22)"
+          stroke="rgba(168,197,195,0.4)"
           strokeWidth="1.5"
           strokeDasharray="5 5"
           initial={{ opacity: 0 }}
@@ -52,7 +52,7 @@ export function FlywheelDiagram() {
             <motion.line
               key={i}
               x1={CX} y1={CY} x2={p.x} y2={p.y}
-              stroke="rgba(34,93,89,0.14)"
+              stroke="rgba(168,197,195,0.25)"
               strokeWidth="1"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
@@ -67,16 +67,16 @@ export function FlywheelDiagram() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <circle cx={CX} cy={CY} r={58} fill="none" stroke="rgba(34,93,89,0.25)" strokeWidth="1" />
-          <circle cx={CX} cy={CY} r={50} fill="var(--color-primary-dark)" />
-          <circle cx={CX} cy={CY} r={43} fill="rgba(34,93,89,0.5)" />
-          <text x={CX} y={CY - 10} textAnchor="middle" fill="var(--color-surface)" fontSize="8.5" fontWeight="700" letterSpacing="0.8">
+          <circle cx={CX} cy={CY} r={68} fill="none" stroke="rgba(168,197,195,0.4)" strokeWidth="1" />
+          <circle cx={CX} cy={CY} r={60} fill="var(--color-primary-dark)" />
+          <circle cx={CX} cy={CY} r={52} fill="rgba(34,93,89,0.5)" />
+          <text x={CX} y={CY - 14} textAnchor="middle" fill="var(--color-surface)" fontSize="11" fontWeight="700" letterSpacing="0.8">
             DECISION
           </text>
-          <text x={CX} y={CY + 2} textAnchor="middle" fill="var(--color-surface)" fontSize="8.5" fontWeight="700" letterSpacing="0.8">
+          <text x={CX} y={CY + 2} textAnchor="middle" fill="var(--color-surface)" fontSize="11" fontWeight="700" letterSpacing="0.8">
             ENGINE
           </text>
-          <text x={CX} y={CY + 16} textAnchor="middle" fill="var(--color-gold)" fontSize="7.5" fontWeight="500">
+          <text x={CX} y={CY + 20} textAnchor="middle" fill="var(--color-gold)" fontSize="9.5" fontWeight="500">
             intent · route · earn
           </text>
         </motion.g>
@@ -90,7 +90,7 @@ export function FlywheelDiagram() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
             >
-              <circle cx={pos.x} cy={pos.y} r={18} fill="var(--color-primary-dark)" stroke="rgba(34,93,89,0.6)" strokeWidth="1.5" />
+              <circle cx={pos.x} cy={pos.y} r={18} fill="var(--color-primary-dark)" stroke="rgba(168,197,195,0.55)" strokeWidth="1.5" />
               <circle cx={pos.x} cy={pos.y} r={14} fill="rgba(34,93,89,0.35)" />
               <circle cx={pos.x} cy={pos.y} r={3}  fill="rgba(168,197,195,0.8)" />
             </motion.g>
@@ -107,20 +107,23 @@ export function FlywheelDiagram() {
           const pos = polar(node.angle)
           const isLeft  = pos.x < CX - 20
           const isRight = pos.x > CX + 20
-          const textX   = isLeft ? pos.x - 18 : isRight ? pos.x + 18 : pos.x
-          const anchor  = isLeft ? 'end' : isRight ? 'start' : 'middle'
+          const isBelow = pos.y > CY + 40
+          const textX   = isBelow ? pos.x : isLeft ? pos.x - 26 : isRight ? pos.x + 26 : pos.x
+          const anchor  = isBelow ? 'middle' : isLeft ? 'end' : isRight ? 'start' : 'middle'
+          const labelY  = isBelow ? pos.y + 40 : pos.y - 40
+          const subY    = isBelow ? pos.y + 56 : pos.y - 24
           return (
             <motion.g key={i}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
             >
-              <text x={textX} y={pos.y - 22} textAnchor={anchor}
-                fill="var(--color-surface)" fontSize="9" fontWeight="700">
+              <text x={textX} y={labelY} textAnchor={anchor}
+                fill="var(--color-surface)" fontSize="13" fontWeight="700">
                 {node.label}
               </text>
-              <text x={textX} y={pos.y - 11} textAnchor={anchor}
-                fill="rgba(168,197,195,0.65)" fontSize="7.5">
+              <text x={textX} y={subY} textAnchor={anchor}
+                fill="rgba(168,197,195,0.75)" fontSize="10.5">
                 {node.sub}
               </text>
             </motion.g>
