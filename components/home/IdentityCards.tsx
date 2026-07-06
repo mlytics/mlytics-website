@@ -13,6 +13,7 @@ const CARDS: Array<{
   products: string
   metrics: { label: string; value: string }[]
   cta: string
+  ctaShort?: string
   href: string
   accent: string
 }> = [
@@ -26,6 +27,7 @@ const CARDS: Array<{
       { label: 'vs. human writing', value: '$250/piece' },
     ],
     cta: 'See media and content plan',
+    ctaShort: 'See media & content plan',
     href: '/content-owners',
     accent: 'var(--color-primary)',
   },
@@ -117,7 +119,15 @@ export function IdentityCards() {
                 className="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
                 style={{ background: card.accent }}
               >
-                {card.cta}
+                {card.ctaShort ? (
+                  <>
+                    {/* Tablet (md–lg) squeezes three columns; show the shorter copy there */}
+                    <span className="md:hidden lg:inline">{card.cta}</span>
+                    <span className="hidden md:inline lg:hidden">{card.ctaShort}</span>
+                  </>
+                ) : (
+                  card.cta
+                )}
               </Link>
             </motion.div>
           ))}
