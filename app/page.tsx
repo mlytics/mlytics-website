@@ -25,8 +25,8 @@ export default function HomePage() {
     <>
       <HeroSection />
       <IdentityCards />
-      <IntentRefinerySection />
       <FlywheelSection />
+      <IntentRefinerySection />
       <FinalCTA />
     </>
   )
