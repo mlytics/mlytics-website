@@ -101,7 +101,16 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
             class="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
             href="/content-owners"
           >
-            See media and content plan
+            <span
+              class="md:hidden lg:inline"
+            >
+              See media and content plan
+            </span>
+            <span
+              class="hidden md:inline lg:hidden"
+            >
+              See media & content plan
+            </span>
           </a>
         </div>
         <div
