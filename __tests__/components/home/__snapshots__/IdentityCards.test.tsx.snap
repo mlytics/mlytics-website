@@ -3,7 +3,7 @@
 exports[`IdentityCards > snapshot > matches snapshot 1`] = `
 <div>
   <section
-    class="section-light py-20 lg:py-28"
+    class="section-white py-20 lg:py-28"
   >
     <div
       class="max-w-6xl mx-auto px-6"
