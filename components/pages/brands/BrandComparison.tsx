@@ -74,7 +74,7 @@ export function BrandComparison() {
           }}
         >
           <div className="px-5 py-4 text-center">
-            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(26,26,26,0.35)' }}>
+            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'var(--color-ink-subtle)' }}>
               Traditional CPM
             </p>
           </div>
@@ -109,7 +109,7 @@ export function BrandComparison() {
               style={{ borderBottom: i < ROWS.length - 1 ? '1px solid rgba(0,0,0,0.06)' : undefined }}
             >
               <div className="px-5 text-center">
-                <p className="text-sm md:text-base leading-relaxed" style={{ color: 'rgba(26,26,26,0.45)' }}>
+                <p className="text-sm md:text-base leading-relaxed text-ink-muted">
                   {row.cpm}
                 </p>
               </div>

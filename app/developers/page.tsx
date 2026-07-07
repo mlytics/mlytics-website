@@ -28,7 +28,7 @@ export default function DevelopersPage() {
         <div className="max-w-3xl mx-auto px-6">
           <span
             className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
-            style={{ background: 'rgba(34,93,89,0.4)', color: '#A8C5C3', border: '1px solid rgba(34,93,89,0.6)' }}
+            style={{ background: 'rgba(34,93,89,0.4)', color: 'var(--color-on-dark)', border: '1px solid rgba(34,93,89,0.6)' }}
           >
             For Developers
           </span>
@@ -36,7 +36,7 @@ export default function DevelopersPage() {
             One API.
             <span className="block">Route your AI Content at Scale.</span>
           </h1>
-          <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
+          <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--color-on-dark)' }}>
             Integrated with leading model providers. One workflow from content generation to global delivery — text, image, voice, and video.
           </p>
         </div>

@@ -55,7 +55,7 @@ export function BrandPainSection() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow color="#B45309" className="mb-3">
+          <Eyebrow color="var(--color-amber-deep)" className="mb-3">
             The Problem
           </Eyebrow>
           <h2 className="section-heading text-ink">
@@ -83,8 +83,8 @@ export function BrandPainSection() {
             <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="w-full" style={{ overflow: 'visible' }}>
               <defs>
                 <linearGradient id="cpm-fill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#B45309" stopOpacity="0.12" />
-                  <stop offset="100%" stopColor="#B45309" stopOpacity="0" />
+                  <stop offset="0%" style={{ stopColor: 'var(--color-amber-deep)' }} stopOpacity="0.12" />
+                  <stop offset="100%" style={{ stopColor: 'var(--color-amber-deep)' }} stopOpacity="0" />
                 </linearGradient>
                 <clipPath id="cpm-clip">
                   <motion.rect
@@ -108,17 +108,20 @@ export function BrandPainSection() {
               {/* Line */}
               <path
                 ref={pathRef} d={pathD} fill="none"
-                stroke="#B45309" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                style={pathLen > 0 ? {
-                  strokeDasharray: pathLen,
-                  strokeDashoffset: inView ? 0 : pathLen,
-                  transition: 'stroke-dashoffset 1.6s cubic-bezier(0.22,1,0.36,1) 0.5s',
-                } : {}}
+                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                style={{
+                  stroke: 'var(--color-amber-deep)',
+                  ...(pathLen > 0 ? {
+                    strokeDasharray: pathLen,
+                    strokeDashoffset: inView ? 0 : pathLen,
+                    transition: 'stroke-dashoffset 1.6s cubic-bezier(0.22,1,0.36,1) 0.5s',
+                  } : {}),
+                }}
               />
               {/* End dot */}
               <motion.circle
                 cx={iToX(CPM_POINTS.length - 1)} cy={vToY(14)} r={5}
-                fill="#B45309"
+                style={{ fill: 'var(--color-amber-deep)' }}
                 initial={{ opacity: 0, scale: 0 }}
                 animate={inView ? { opacity: 1, scale: 1 } : {}}
                 transition={{ duration: 0.3, delay: 2.0 }}
@@ -161,7 +164,7 @@ export function BrandPainSection() {
                   animate={inView ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.35, delay: 0.7 + i * 0.1 }}
                 >
-                  <span className="text-xl font-black shrink-0" style={{ color: '#D97706' }}>{item.stat}</span>
+                  <span className="text-xl font-black shrink-0" style={{ color: 'var(--color-amber)' }}>{item.stat}</span>
                   <span className="text-sm leading-relaxed text-ink-muted">{item.desc}</span>
                 </motion.div>
               ))}
@@ -205,7 +208,7 @@ export function BrandPainSection() {
             transition={{ duration: 0.8, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
             Where is your brand
-            <span className="block" style={{ color: '#B45309' }}>when people ask AI?</span>
+            <span className="block" style={{ color: 'var(--color-amber-deep)' }}>when people ask AI?</span>
           </motion.h3>
         </div>
       </div>

@@ -15,9 +15,9 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://www.mlytics.com'),
   title: {
     template: '%s | Mlytics Cortex',
-    default: 'AI Answer Monetization for Brands & Publishers | Mlytics Cortex',
+    default: 'Mlytics | Discovery and Answer Engine for Business',
   },
-  description: 'Mlytics Cortex puts brands inside the AI answers buyers trust and monetizes publisher AI traffic through a five-layer Intent Refinery.',
+  description: 'Mlytics Cortex captures and verifies purchase-intent signals the moment users express them, charges brands only after intent is confirmed, and helps content and media businesses turn reader engagement into sustainably monetizable assets.',
   openGraph: {
     siteName: 'Mlytics',
     images: [{ url: 'https://storage.googleapis.com/mlytics-website/og-image.png', width: 1200, height: 630 }],
@@ -37,7 +37,7 @@ const organizationSchema = {
   '@type': 'Organization',
   name: 'Mlytics',
   alternateName: '摩速科技',
-  description: 'Mlytics is the AI answer monetization platform for brands, publishers, and developers. Mlytics Cortex puts brands inside the AI answers buyers trust, monetizes publisher AI traffic through a five-layer Intent Refinery, and powers AI agents with managed delivery infrastructure.',
+  description: 'Mlytics Cortex captures and verifies purchase-intent signals the moment users express them, charges brands only after intent is confirmed, and helps content and media businesses turn reader engagement into sustainably monetizable assets. Mlytics helps publishers monetize zero-click AI traffic and helps B2B brands generate qualified leads through AI-cited content.',
   url: 'https://www.mlytics.com',
   logo: 'https://storage.googleapis.com/mlytics-website/og-image.png',
   sameAs: ['https://www.linkedin.com/company/mlytics/'],

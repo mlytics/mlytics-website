@@ -65,7 +65,7 @@ export function SolutionPitches() {
               {/* Label bar */}
               <div
                 className="px-5 py-3 flex items-center justify-between border-b"
-                style={{ background: '#1f4f4b', borderColor: 'rgba(168,197,195,0.08)' }}
+                style={{ background: 'var(--color-primary)', borderColor: 'rgba(168,197,195,0.08)' }}
               >
                 <span className="text-sm font-bold text-white">{pitch.label}</span>
                 <span className="text-xs font-bold tabular-nums text-on-dark/60">
@@ -77,16 +77,16 @@ export function SolutionPitches() {
               <div className="grid md:grid-cols-[1fr_40px_1fr]">
                 {/* Left — Them (muted) */}
                 <div className="p-5 flex flex-col gap-2" style={{ background: '#F7F7F7' }}>
-                  <Eyebrow color="#CCCCCC">
+                  <Eyebrow color="var(--color-ink-subtle)">
                     {pitch.them.who}
                   </Eyebrow>
-                  <p className="text-sm md:text-base leading-relaxed" style={{ color: '#BBBBBB' }}>
+                  <p className="text-sm md:text-base leading-relaxed text-ink-muted">
                     {pitch.them.desc}
                   </p>
                 </div>
 
                 {/* Arrow divider */}
-                <div className="hidden md:flex items-center justify-center border-l border-r bg-surface" style={{ borderColor: '#EEEEEE' }}>
+                <div className="hidden md:flex items-center justify-center border-l border-r bg-surface" style={{ borderColor: 'var(--color-line)' }}>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M2 7h10M7.5 3L12 7l-4.5 4" stroke={pitch.accent} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>

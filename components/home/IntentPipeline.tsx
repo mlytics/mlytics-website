@@ -62,20 +62,24 @@ const LAYERS: Array<{
 ]
 
 const CYCLE_INTERVAL = 3000
-// Measured in-browser: all descriptions render at 71px at 512px container width
-// Using 76px to add a small buffer for rounding/subpixel differences
-const DESC_H = 76
 
 export function IntentPipeline() {
   const [expanded, setExpanded] = useState(0)
+  // Shared expanded height: descriptions wrap to 2 or 3 lines depending on
+  // width; sizing every panel to the tallest keeps the container height
+  // constant while the carousel cycles.
+  const [descH, setDescH] = useState<number | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const measureRef = useRef<HTMLDivElement>(null)
   const inViewRef = useRef(false)
+  const hoveringRef = useRef(false)
+  const userTookOverRef = useRef(false)
 
   function startTimer() {
     if (timerRef.current) clearInterval(timerRef.current)
     timerRef.current = setInterval(() => {
-      if (!inViewRef.current) return
+      if (!inViewRef.current || hoveringRef.current || userTookOverRef.current) return
       setExpanded(prev => (prev + 1) % LAYERS.length)
     }, CYCLE_INTERVAL)
   }
@@ -89,19 +93,53 @@ export function IntentPipeline() {
     )
     observer.observe(el)
     startTimer()
+
+    // Pause cycling while the pointer is over the widget (desktop reading)
+    const onEnter = () => { hoveringRef.current = true }
+    const onLeave = () => { hoveringRef.current = false }
+    el.addEventListener('pointerenter', onEnter)
+    el.addEventListener('pointerleave', onLeave)
+
+    const measure = () => {
+      const ghost = measureRef.current
+      if (!ghost) return
+      let max = 0
+      for (const child of Array.from(ghost.children)) {
+        max = Math.max(max, (child as HTMLElement).offsetHeight)
+      }
+      setDescH(max)
+    }
+    measure()
+    const resizeObserver = new ResizeObserver(measure)
+    resizeObserver.observe(el)
+
     return () => {
       observer.disconnect()
+      resizeObserver.disconnect()
+      el.removeEventListener('pointerenter', onEnter)
+      el.removeEventListener('pointerleave', onLeave)
       if (timerRef.current) clearInterval(timerRef.current)
     }
   }, [])
 
   function handleClick(i: number) {
     setExpanded(i)
-    startTimer()
+    // The reader takes over: stop auto-cycling for good
+    userTookOverRef.current = true
+    if (timerRef.current) clearInterval(timerRef.current)
   }
 
   return (
     <div ref={containerRef} className="relative max-w-lg mx-auto">
+      {/* Hidden measurer: the tallest description defines the shared expanded height */}
+      <div ref={measureRef} aria-hidden className="absolute inset-x-0 top-0 invisible pointer-events-none">
+        {LAYERS.map((layer, i) => (
+          <div key={i} className="pl-14 pr-4">
+            <p className="text-sm py-2 leading-relaxed">{layer.desc}</p>
+          </div>
+        ))}
+      </div>
+
       {/* Vertical flow line */}
       <div
         className="absolute left-[28px] top-8 bottom-8 w-px"
@@ -154,7 +192,7 @@ export function IntentPipeline() {
                 className="pl-14 pr-4 overflow-hidden"
                 initial={false}
                 animate={{
-                  height: isOpen ? 'auto' : 0,
+                  height: isOpen ? (descH ?? 'auto') : 0,
                   opacity: isOpen ? 1 : 0,
                 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}

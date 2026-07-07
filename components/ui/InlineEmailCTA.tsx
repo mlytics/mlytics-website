@@ -98,7 +98,7 @@ export function InlineEmailCTA({ ctaLabel, pageName, className }: InlineEmailCTA
 
   return (
     <form onSubmit={handleSubmit} noValidate className={`flex flex-col items-center gap-2 w-full max-w-md ${className ?? ''}`}>
-      <div className={`flex items-center w-full rounded-full border bg-white pl-5 pr-1 py-1 transition-colors focus-within:border-primary ${emailError ? 'border-red-400' : 'border-gray-200'}`}>
+      <div className={`flex items-center w-full rounded-full border bg-white pl-5 pr-1 py-1 transition-colors focus-within:border-primary ${emailError ? 'border-red-400' : 'border-line'}`}>
         <input
           type="email"
           required

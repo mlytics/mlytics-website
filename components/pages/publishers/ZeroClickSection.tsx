@@ -26,7 +26,7 @@ export function ZeroClickSection() {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow color="#B45309" className="mb-4">The Problem</Eyebrow>
+          <Eyebrow color="var(--color-amber-deep)" className="mb-4">The Problem</Eyebrow>
           <h2 className="section-heading mb-4 text-ink">
             How is zero-click search affecting your content revenue?
           </h2>
@@ -46,7 +46,7 @@ export function ZeroClickSection() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.45, delay: 0.15 + i * 0.08, ease: 'easeOut' }}
             >
-              <p className="text-4xl md:text-5xl font-bold" style={{ color: '#D97706' }}>
+              <p className="text-4xl md:text-5xl font-bold" style={{ color: 'var(--color-amber)' }}>
                 {inView
                   ? <NumberTicker value={item.value} suffix={item.suffix} duration={900} />
                   : `0${item.suffix}`}

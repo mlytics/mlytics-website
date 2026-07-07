@@ -19,7 +19,7 @@ interface Country { name: string; iso2: string; dialCode: string }
 
 const COUNTRIES: Country[] = (allCountries as Country[]).filter(c => c.dialCode)
 
-const inputCls = 'w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors'
+const inputCls = 'w-full px-3 py-1.5 text-sm border border-line rounded-lg focus:outline-none focus:border-primary transition-colors'
 const labelCls = 'block text-xs font-medium text-gray-600 mb-0.5'
 
 function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: Country) => void }) {
@@ -54,7 +54,7 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1 px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors bg-white whitespace-nowrap"
+        className="flex items-center gap-1 px-2 py-1.5 text-sm border border-line rounded-lg focus:outline-none focus:border-primary transition-colors bg-white whitespace-nowrap"
         style={{ minWidth: 90 }}
         aria-label="Select country code"
         aria-expanded={open}
@@ -67,7 +67,7 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
 
       {open && (
         <div
-          className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden"
+          className="absolute left-0 top-full mt-1 z-50 bg-white border border-line rounded-xl shadow-xl overflow-hidden"
           style={{ width: 260 }}
         >
           {/* Search */}
@@ -273,7 +273,7 @@ export function ContactModal() {
                       <div>
                         <label className={labelCls}>I am a...</label>
                         <select value={form.role} onChange={set('role')}
-                          className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors bg-white">
+                          className="w-full px-3 py-1.5 text-sm border border-line rounded-lg focus:outline-none focus:border-primary transition-colors bg-white">
                           <option value="content_owner">Media and Content</option>
                           <option value="brand">Brand</option>
                           <option value="developer">Developer</option>
@@ -292,7 +292,7 @@ export function ContactModal() {
                     <div>
                       <label className={labelCls}>What do you want to solve?</label>
                       <textarea rows={2} value={form.message} onChange={set('message')}
-                        className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors resize-none"
+                        className="w-full px-3 py-1.5 text-sm border border-line rounded-lg focus:outline-none focus:border-primary transition-colors resize-none"
                         placeholder="Tell us about your current setup and what you're hoping to achieve..." />
                     </div>
 
