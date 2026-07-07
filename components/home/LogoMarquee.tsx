@@ -35,7 +35,7 @@ function ClientLogo({ name, logo, invert, brightness, opacity, maxWidth, height 
     return (
       <span
         className="text-sm font-semibold whitespace-nowrap select-none"
-        style={{ color: '#CACACA', letterSpacing: '0.01em' }}
+        style={{ color: 'var(--color-ink-subtle)', letterSpacing: '0.01em' }}
       >
         {name}
       </span>
@@ -75,7 +75,7 @@ export function LogoMarquee({ isFixed = false }: { isFixed?: boolean }) {
       <div className="flex-shrink-0 flex flex-col items-center md:flex-row md:items-center md:gap-3 md:px-5 mb-1.5 md:mb-0">
         <p
           className="label-eyebrow font-medium whitespace-nowrap"
-          style={{ color: '#C8C8C8' }}
+          style={{ color: 'var(--color-ink-subtle)' }}
         >
           Trusted by
         </p>

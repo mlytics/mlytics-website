@@ -51,7 +51,7 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[0]; i: number }) {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col flex-1">
-        <p className="label-eyebrow mb-3" style={{ color: '#C0C0C0' }}>
+        <p className="label-eyebrow mb-3" style={{ color: 'var(--color-ink-subtle)' }}>
           {item.num} · Who this is for
         </p>
         <div className="mb-3 w-9 h-9 rounded-lg flex items-center justify-center bg-primary/8">

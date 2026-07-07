@@ -86,7 +86,7 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[number]; i: number }
     >
       <p
         className="text-xs font-bold uppercase tracking-widest mb-4 transition-colors duration-200"
-        style={{ color: hovered ? 'var(--color-primary)' : '#BBBBBB' }}
+        style={{ color: hovered ? 'var(--color-primary)' : 'var(--color-ink-subtle)' }}
       >
         {item.vertical}
       </p>

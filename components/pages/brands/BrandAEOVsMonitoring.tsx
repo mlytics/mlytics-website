@@ -97,16 +97,16 @@ export function BrandAEOVsMonitoring() {
           }}
         >
           <div className="px-5 py-4 text-center">
-            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'rgba(26,26,26,0.35)' }}>
+            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'var(--color-ink-subtle)' }}>
               AEO Monitoring
             </p>
-            <p className="text-sm mt-1" style={{ color: 'rgba(26,26,26,0.25)' }}>tracking & reporting tools</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-ink-subtle)' }}>tracking & reporting tools</p>
           </div>
           <div className="px-5 py-4 text-center">
             <p className="text-base font-bold uppercase tracking-widest text-primary">
               Mlytics Cortex
             </p>
-            <p className="text-sm mt-1" style={{ color: 'rgba(34,93,89,0.5)' }}>AEO Execution</p>
+            <p className="text-sm mt-1" style={{ color: 'rgba(34,93,89,0.75)' }}>AEO Execution</p>
           </div>
         </div>
 
@@ -132,7 +132,7 @@ export function BrandAEOVsMonitoring() {
               style={{ borderBottom: i < ROWS.length - 1 ? '1px solid rgba(0,0,0,0.06)' : undefined }}
             >
               <div className="px-5 text-center">
-                <p className="text-sm md:text-base leading-relaxed" style={{ color: 'rgba(26,26,26,0.45)' }}>
+                <p className="text-sm md:text-base leading-relaxed text-ink-muted">
                   {row.monitoring}
                 </p>
               </div>
