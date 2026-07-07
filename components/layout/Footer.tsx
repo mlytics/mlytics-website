@@ -38,7 +38,7 @@ export function Footer() {
               <a href="https://www.mlytics.com/blog/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Blog</a>
               <a href="https://help.mlytics.com/en/knowledge" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Help Center</a>
               <a href="https://learning.mlytics.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Learning Center</a>
-              <a href="https://www.104.com.tw/company/1a2x6bk3ve" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Careers</a>
+              <a href="https://careers.mlytics.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Careers</a>
             </div>
             <div className="flex flex-col gap-2">
               <Eyebrow color="rgba(168,197,195,0.7)">Legal</Eyebrow>
