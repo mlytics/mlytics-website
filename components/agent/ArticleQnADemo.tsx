@@ -14,13 +14,13 @@ export function ArticleQnADemo({ isDark = true, disabled = false, onSelect }: Ar
   const [selected, setSelected] = useState<string | null>(null)
   const frozen = selected !== null
 
-  const textPrimary = isDark ? '#FAFAFA' : '#1A1A1A'
+  const textPrimary = isDark ? 'var(--color-surface)' : 'var(--color-ink)'
   const textSecondary = isDark ? 'rgba(250,250,250,0.55)' : '#7A7A7A'
   const cardBg = isDark ? 'rgba(255,255,255,0.04)' : 'white'
-  const cardBorder = isDark ? 'rgba(255,255,255,0.1)' : '#E5E5E5'
+  const cardBorder = isDark ? 'rgba(255,255,255,0.1)' : 'var(--color-line)'
   const questionHoverBg = isDark ? 'rgba(34,93,89,0.25)' : 'rgba(34,93,89,0.06)'
   const questionSelectedBg = isDark ? 'rgba(34,93,89,0.4)' : 'rgba(34,93,89,0.1)'
-  const questionBorder = isDark ? 'rgba(34,93,89,0.5)' : '#225D59'
+  const questionBorder = isDark ? 'rgba(34,93,89,0.5)' : 'var(--color-primary)'
 
   function handleClick(q: ReaderQuestion) {
     if (frozen || disabled) return
@@ -70,7 +70,7 @@ export function ArticleQnADemo({ isDark = true, disabled = false, onSelect }: Ar
               style={{
                 fontSize: 10,
                 fontWeight: 600,
-                color: isDark ? '#A8C5C3' : '#225D59',
+                color: isDark ? 'var(--color-on-dark)' : 'var(--color-primary)',
                 textDecoration: 'underline',
                 letterSpacing: '0.01em',
               }}
@@ -115,8 +115,8 @@ export function ArticleQnADemo({ isDark = true, disabled = false, onSelect }: Ar
                   style={{
                     fontSize: 9,
                     fontWeight: 700,
-                    background: isSelected ? '#225D59' : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(34,93,89,0.1)'),
-                    color: isSelected ? 'white' : (isDark ? 'rgba(250,250,250,0.6)' : '#225D59'),
+                    background: isSelected ? 'var(--color-primary)' : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(34,93,89,0.1)'),
+                    color: isSelected ? 'white' : (isDark ? 'rgba(250,250,250,0.6)' : 'var(--color-primary)'),
                     transition: 'background 0.2s, color 0.2s',
                   }}
                 >

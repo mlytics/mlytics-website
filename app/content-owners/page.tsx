@@ -31,14 +31,14 @@ export default function PublishersPage() {
         <div className="max-w-3xl mx-auto px-6">
           <span
             className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
-            style={{ background: 'rgba(34,93,89,0.4)', color: '#A8C5C3', border: '1px solid rgba(34,93,89,0.6)' }}
+            style={{ background: 'rgba(34,93,89,0.4)', color: 'var(--color-on-dark)', border: '1px solid rgba(34,93,89,0.6)' }}
           >
             For Media and Content
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
             Turn your audience into<br />three new revenue layers.
           </h1>
-          <p className="text-base max-w-xl mx-auto" style={{ color: '#A8C5C3' }}>
+          <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--color-on-dark)' }}>
             Mlytics Cortex connects your AI-engaged audience to brand partners across three independent revenue layers — without losing a single reader to AI search.
           </p>
         </div>
