@@ -72,6 +72,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }} />
+      {/* Preconnect hints */}
+      <link rel="preconnect" href="https://js.hscollectedforms.net" />
       {/* HubSpot Tracking Code */}
       <script async defer src="//js.hs-scripts.com/4284310.js" />
       <body className="min-h-full flex flex-col">
