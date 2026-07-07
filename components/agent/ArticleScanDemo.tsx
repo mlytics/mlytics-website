@@ -19,8 +19,8 @@ interface ArticleScanDemoProps {
 }
 
 export function ArticleScanDemo({ articleId = DEFAULT_DEMO_ARTICLE_ID, isDark = true, showIntentStrength = false, showMetadata = true, onComplete, onProgress }: ArticleScanDemoProps) {
-  const textPrimary = isDark ? '#FAFAFA' : '#1A1A1A'
-  const textSecondary = isDark ? '#A8C5C3' : '#5A5A5A'
+  const textPrimary = isDark ? 'var(--color-surface)' : 'var(--color-ink)'
+  const textSecondary = isDark ? 'var(--color-on-dark)' : '#5A5A5A'
   const cardBg = isDark ? 'rgba(34,93,89,0.08)' : 'rgba(34,93,89,0.06)'
   const cardBorder = isDark ? 'rgba(34,93,89,0.3)' : 'rgba(34,93,89,0.2)'
   const tagBg = isDark ? 'rgba(34,93,89,0.2)' : 'rgba(34,93,89,0.12)'
@@ -102,7 +102,7 @@ export function ArticleScanDemo({ articleId = DEFAULT_DEMO_ARTICLE_ID, isDark = 
         <div className="mt-2.5 h-1 rounded-full overflow-hidden" style={{ background: trackBg }}>
           <motion.div
             className="h-full rounded-full"
-            style={{ background: '#F59E0B' }}
+            style={{ background: 'var(--color-gold)' }}
             initial={{ width: 0 }}
             animate={{ width: `${scanProgress}%` }}
             transition={{ duration: prefersReduced ? 0 : 0.08 }}
@@ -148,7 +148,7 @@ export function ArticleScanDemo({ articleId = DEFAULT_DEMO_ARTICLE_ID, isDark = 
                       </span>
                     ) : (
                       <>
-                        <p className="text-xs font-bold" style={{ color: '#F59E0B' }}>{a.cost}</p>
+                        <p className="text-xs font-bold" style={{ color: 'var(--color-gold)' }}>{a.cost}</p>
                         <p className="text-[9px]" style={{ color: textSecondary }}>Cost</p>
                       </>
                     )}

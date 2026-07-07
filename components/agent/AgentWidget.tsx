@@ -30,7 +30,7 @@ export function AgentWidget() {
             exit={{ opacity: 0, scale: 0.9, y: 12 }}
             transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="w-[340px] max-h-[520px] overflow-y-auto rounded-2xl shadow-2xl"
-            style={{ background: '#1A3D3A', border: '1.5px solid rgba(34,93,89,0.6)' }}
+            style={{ background: 'var(--color-primary-dark)', border: '1.5px solid rgba(34,93,89,0.6)' }}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'rgba(34,93,89,0.6)' }}>
               <div className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export function AgentWidget() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className="w-14 h-14 rounded-full shadow-xl flex items-center justify-center relative"
-        style={{ background: '#225D59' }}
+        style={{ background: 'var(--color-primary)' }}
       >
         <AnimatePresence mode="wait">
           {open

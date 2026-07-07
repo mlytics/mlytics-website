@@ -26,13 +26,13 @@ export function CortexLiveDemo() {
         placeholder="yourbrand.com"
         autoComplete="off"
         className="flex-1 bg-transparent text-sm outline-none px-3 min-w-0"
-        style={{ color: '#1A1A1A' }}
+        style={{ color: 'var(--color-ink)' }}
       />
       <button
         type="button"
         onClick={handleSubmit}
         className="flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all active:scale-[0.98] hover:opacity-90"
-        style={{ background: '#225D59', color: 'white' }}
+        style={{ background: 'var(--color-primary)', color: 'white' }}
       >
         Check AI visibility
       </button>

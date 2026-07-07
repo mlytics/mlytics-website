@@ -16,7 +16,7 @@ function isoToFlag(iso2: string) {
 interface Country { name: string; iso2: string; dialCode: string }
 const COUNTRIES: Country[] = (allCountries as Country[]).filter(c => c.dialCode)
 
-const inputCls = 'w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors'
+const inputCls = 'w-full px-3 py-2 text-sm border border-line rounded-lg focus:outline-none focus:border-primary transition-colors'
 const labelCls = 'block text-xs font-medium text-gray-600 mb-1'
 
 function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: Country) => void }) {
@@ -51,7 +51,7 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1 px-2 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#225D59] transition-colors bg-white whitespace-nowrap"
+        className="flex items-center gap-1 px-2 py-2 text-sm border border-line rounded-lg focus:outline-none focus:border-primary transition-colors bg-white whitespace-nowrap"
         style={{ minWidth: 90 }}
       >
         <span>{isoToFlag(value.iso2)}</span>
@@ -59,7 +59,7 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
         <ChevronDown size={12} className="text-gray-400 ml-0.5" />
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden" style={{ width: 260 }}>
+        <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-line rounded-xl shadow-xl overflow-hidden" style={{ width: 260 }}>
           <div className="p-2 border-b border-gray-100 flex items-center gap-2">
             <Search size={13} className="text-gray-400 flex-shrink-0" />
             <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)}
@@ -149,7 +149,7 @@ export function BookADemoForm() {
           className="flex flex-col items-center text-center py-16 gap-4"
         >
           <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: 'rgba(34,93,89,0.1)' }}>
-            <CheckCircle size={32} style={{ color: '#225D59' }} />
+            <CheckCircle size={32} style={{ color: 'var(--color-primary)' }} />
           </div>
           <div>
             <p className="text-xl font-semibold text-gray-900">Request received.</p>
@@ -190,7 +190,7 @@ export function BookADemoForm() {
           <button
             type="submit"
             className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-            style={{ background: '#225D59' }}
+            style={{ background: 'var(--color-primary)' }}
           >
             Get a Personalized Demo
           </button>

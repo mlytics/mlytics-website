@@ -65,7 +65,7 @@ export function SolutionPitches() {
               {/* Label bar */}
               <div
                 className="px-5 py-3 flex items-center justify-between border-b"
-                style={{ background: '#1f4f4b', borderColor: 'rgba(168,197,195,0.08)' }}
+                style={{ background: 'var(--color-primary)', borderColor: 'rgba(168,197,195,0.08)' }}
               >
                 <span className="text-sm font-bold text-white">{pitch.label}</span>
                 <span className="text-xs font-bold tabular-nums text-on-dark/60">
@@ -86,7 +86,7 @@ export function SolutionPitches() {
                 </div>
 
                 {/* Arrow divider */}
-                <div className="hidden md:flex items-center justify-center border-l border-r bg-surface" style={{ borderColor: '#EEEEEE' }}>
+                <div className="hidden md:flex items-center justify-center border-l border-r bg-surface" style={{ borderColor: 'var(--color-line)' }}>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M2 7h10M7.5 3L12 7l-4.5 4" stroke={pitch.accent} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>

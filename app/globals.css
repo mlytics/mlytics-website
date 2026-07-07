@@ -24,6 +24,11 @@
   --color-gold:           #F59E0B;
   --color-gold-light:     #FCD34D;
 
+  /* --- Accent: amber (pain-point / warning sections) ---
+     Usage: text-amber / text-amber-deep                  */
+  --color-amber:          #D97706;
+  --color-amber-deep:     #B45309;
+
   /* --- Surface ---
      Usage: bg-surface                                    */
   --color-surface:        #FAFAFA;
@@ -39,6 +44,13 @@
   /* --- Border ---
      Usage: border-line                                   */
   --color-line:           #E5E5E5;
+
+  /* --- Transparency rule ---
+     Alpha variants are allowed ONLY on the two base colors:
+       rgba(34,93,89,α)    = primary
+       rgba(168,197,195,α) = on-dark
+     Prefer existing steps before inventing new ones:
+       .06 / .08 / .12 / .25 / .4 / .55 / .7               */
 
   /* --- Typography scale ---
      Usage: text-display / text-h1 / text-h2 / text-h3
