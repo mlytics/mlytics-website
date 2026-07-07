@@ -77,10 +77,10 @@ export function SolutionPitches() {
               <div className="grid md:grid-cols-[1fr_40px_1fr]">
                 {/* Left — Them (muted) */}
                 <div className="p-5 flex flex-col gap-2" style={{ background: '#F7F7F7' }}>
-                  <Eyebrow color="#CCCCCC">
+                  <Eyebrow color="var(--color-ink-subtle)">
                     {pitch.them.who}
                   </Eyebrow>
-                  <p className="text-sm md:text-base leading-relaxed" style={{ color: '#BBBBBB' }}>
+                  <p className="text-sm md:text-base leading-relaxed text-ink-muted">
                     {pitch.them.desc}
                   </p>
                 </div>
