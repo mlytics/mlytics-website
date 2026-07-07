@@ -6,16 +6,16 @@ import { IdentityCards } from '@/components/home/IdentityCards'
 import { FinalCTA } from '@/components/home/FinalCTA'
 
 export const metadata: Metadata = {
-  title: 'AI Answer Monetization for Brands & Publishers',
-  description: 'Mlytics Cortex puts brands inside the AI answers buyers trust and monetizes publisher AI traffic through a five-layer Intent Refinery.',
+  title: { absolute: 'Mlytics | Discovery and Answer Engine for Business' },
+  description: 'Mlytics Cortex captures and verifies purchase-intent signals the moment users express them, charges brands only after intent is confirmed, and helps content and media businesses turn reader engagement into sustainably monetizable assets.',
   openGraph: {
-    title: 'AI Answer Monetization for Brands & Publishers | Mlytics Cortex',
-    description: 'Mlytics Cortex puts brands inside the AI answers buyers trust and monetizes publisher AI traffic through a five-layer Intent Refinery.',
+    title: 'Mlytics | Discovery and Answer Engine for Business',
+    description: 'Mlytics Cortex captures and verifies purchase-intent signals the moment users express them, charges brands only after intent is confirmed, and helps content and media businesses turn reader engagement into sustainably monetizable assets.',
     url: 'https://www.mlytics.com/',
   },
   twitter: {
-    title: 'AI Answer Monetization for Brands & Publishers | Mlytics Cortex',
-    description: 'Mlytics Cortex puts brands inside the AI answers buyers trust and monetizes publisher AI traffic through a five-layer Intent Refinery.',
+    title: 'Mlytics | Discovery and Answer Engine for Business',
+    description: 'Mlytics Cortex captures and verifies purchase-intent signals the moment users express them, charges brands only after intent is confirmed, and helps content and media businesses turn reader engagement into sustainably monetizable assets.',
   },
   alternates: { canonical: '/' },
 }
