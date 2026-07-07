@@ -14,7 +14,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-start justify-between gap-8">
           <div>
             <span className="text-lg font-bold text-white">Mlytics</span>
-            <p className="text-sm mt-1 text-on-dark">Mlytics Cortex, AI-Decision Engine - per dollar per intelligent outcome.</p>
+            <p className="text-sm mt-1 text-on-dark">Mlytics Cortex, a Discovery and Answer Engine for Business</p>
             <div className="flex gap-3 mt-3">
               <a href="https://www.linkedin.com/company/mlytics/" target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center p-1.5 -ml-1.5 rounded-lg transition-colors hover:bg-white/10 text-on-dark">
