@@ -19,7 +19,7 @@ const FAQS = [
   },
   {
     q: "I don't want to send readers off my platform. Can I still monetize through brand partnerships?",
-    a: 'Yes. Every Mlytics Cortex revenue layer operates inside your own domain. The AI Q&A Widget is embedded in your articles. Conversations happen on your properties. Readers are never redirected to Mlytics or any brand page. First-party audience data stays yours.',
+    a: 'Yes. Every Mlytics Cortex revenue layer operates inside your own domain. The AI Q&A Widget is embedded in your articles. Conversations happen on your properties. Wherever the interaction happens, your brand attribution and revenue attribution remain clear and traceable. First-party audience data stays yours.',
   },
   {
     q: 'Can I build an AI knowledge base using my existing article content?',
