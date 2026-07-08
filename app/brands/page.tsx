@@ -36,8 +36,8 @@ export default function BrandsPage() {
           >
             For Brands
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
-            Get your brand cited<br />in AI answers.
+          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4 text-balance">
+            Get your brand cited in AI answers.
           </h1>
           <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--color-on-dark)' }}>
             Mlytics Cortex places your brand inside the AI answers your buyers already trust — across a managed publisher network with 15M+ monthly active users.

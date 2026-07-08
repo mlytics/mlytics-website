@@ -35,8 +35,8 @@ export default function PublishersPage() {
           >
             For Media and Content
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
-            Turn your audience into<br />three new revenue layers.
+          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4 text-balance">
+            Turn your audience into three new revenue layers.
           </h1>
           <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--color-on-dark)' }}>
             Mlytics Cortex connects your AI-engaged audience to brand partners across three independent revenue layers — without losing a single reader to AI search.

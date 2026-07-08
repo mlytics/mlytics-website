@@ -11,8 +11,8 @@ export function PartnershipHero() {
         >
           Media Partner Program
         </span>
-        <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
-          Turn your digital assets into an<br />AI monetization channel.
+        <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4 text-balance">
+          Turn your digital assets into an AI monetization channel.
         </h1>
         <p className="text-base max-w-xl mx-auto text-on-dark">
           Media and content partners that activate their digital assets early can create new inventory for brand participation,
