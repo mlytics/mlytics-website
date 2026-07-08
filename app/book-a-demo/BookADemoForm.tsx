@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, ChevronDown, Search } from 'lucide-react'
 import { allCountries } from 'country-telephone-data'
 import { trackAG } from '@/lib/analytics'
+import { useDetectedCountry } from '@/lib/useDetectedCountry'
 
 function isoToFlag(iso2: string) {
   return iso2.toUpperCase().replace(/./g, c =>
@@ -93,6 +94,14 @@ export function BookADemoForm() {
   const [selectedCountry, setSelectedCountry] = useState<Country>(
     COUNTRIES.find(c => c.iso2 === 'tw') ?? COUNTRIES[0]
   )
+  const userChangedCountryRef = useRef(false)
+  const detectedIso2 = useDetectedCountry('tw')
+
+  useEffect(() => {
+    if (userChangedCountryRef.current) return
+    const match = COUNTRIES.find(c => c.iso2 === detectedIso2)
+    if (match) setSelectedCountry(match)
+  }, [detectedIso2])
   const [form, setForm] = useState({
     firstName: '', lastName: '',
     email: '', phone: '',
@@ -175,7 +184,10 @@ export function BookADemoForm() {
           <div>
             <label className={labelCls}>Phone</label>
             <div className="flex gap-2">
-              <CountryCodePicker value={selectedCountry} onChange={setSelectedCountry} />
+              <CountryCodePicker
+                value={selectedCountry}
+                onChange={c => { userChangedCountryRef.current = true; setSelectedCountry(c) }}
+              />
               <input type="tel" value={form.phone} onChange={set('phone')} className={inputCls} placeholder="" />
             </div>
           </div>
