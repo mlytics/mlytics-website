@@ -41,7 +41,7 @@ export function HeroSection() {
 
         {/* Main content — vertically centred, masked top/bottom so chat items fade gracefully */}
         <div
-          className="relative z-10 flex-1 flex flex-col items-center justify-center px-2 sm:px-6 pt-[96px] pb-14"
+          className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-[96px] pb-14"
           style={{
             maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 82%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 82%, transparent 100%)',
@@ -52,11 +52,11 @@ export function HeroSection() {
 
             {/* Headline */}
             <h1
-              className="font-bold leading-tight tracking-tight text-[22px] md:text-[40px] lg:text-[52px] mb-8 text-center w-full text-ink"
+              className="text-4xl md:text-5xl font-bold leading-tight tracking-tight text-balance mb-8 text-center w-full text-ink"
             >
               Discovery and Answer Engine<br />
               <span
-                className="block relative overflow-hidden max-[420px]:h-[2.5em] md:h-[1.4em]"
+                className="block relative overflow-hidden max-[420px]:h-[4em] md:h-[2.6em]"
                 style={{ textAlign: 'center' }}
               >
                 <AnimatePresence mode="wait">
