@@ -34,7 +34,7 @@ export default function DevelopersPage() {
           </span>
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
             One API.
-            <span className="block">Route your AI Content at Scale.</span>
+            <span className="block text-balance">Route your AI Content at Scale.</span>
           </h1>
           <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--color-on-dark)' }}>
             Integrated with leading model providers. One workflow from content generation to global delivery — text, image, voice, and video.
