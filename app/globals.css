@@ -24,10 +24,12 @@
   --color-gold:           #F59E0B;
   --color-gold-light:     #FCD34D;
 
-  /* --- Accent: amber (pain-point / warning sections) ---
-     Usage: text-amber / text-amber-deep                  */
-  --color-amber:          #D97706;
-  --color-amber-deep:     #B45309;
+  /* --- Accent: warn (pain-point / warning sections, amber tone) ---
+     Named "warn" not "amber" — Tailwind v4 reserves the bare "amber"
+     family name internally; a same-named custom token silently fails
+     to compile. Usage: text-warn / text-warn-deep          */
+  --color-warn:          #D97706;
+  --color-warn-deep:     #B45309;
 
   /* --- Surface ---
      Usage: bg-surface                                    */
