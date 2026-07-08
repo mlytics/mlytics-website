@@ -48,6 +48,7 @@ next-env.d.ts
 # tooling / AI agent files
 .superpowers/
 .claude/worktrees/
+/.worktrees/
 .claude/launch.json
 docs/superpowers/
 docs/ux-persona-review-*.md

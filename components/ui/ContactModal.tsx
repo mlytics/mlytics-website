@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, CheckCircle, ChevronDown, Search } from 'lucide-react'
 import { useContactModal } from '@/context/contact-modal-context'
 import { allCountries } from 'country-telephone-data'
+import { useDetectedCountry } from '@/lib/useDetectedCountry'
 
 // Convert ISO2 to flag emoji
 function isoToFlag(iso2: string) {
@@ -111,6 +112,14 @@ export function ContactModal() {
   const [selectedCountry, setSelectedCountry] = useState<Country>(
     COUNTRIES.find(c => c.iso2 === 'tw') ?? COUNTRIES[0]
   )
+  const userChangedCountryRef = useRef(false)
+  const detectedIso2 = useDetectedCountry('tw')
+
+  useEffect(() => {
+    if (userChangedCountryRef.current) return
+    const match = COUNTRIES.find(c => c.iso2 === detectedIso2)
+    if (match) setSelectedCountry(match)
+  }, [detectedIso2])
   const [form, setForm] = useState({
     firstName: '', lastName: '',
     email: '', phone: '',
@@ -257,7 +266,10 @@ export function ContactModal() {
                     <div>
                       <label className={labelCls}>Phone</label>
                       <div className="flex gap-2">
-                        <CountryCodePicker value={selectedCountry} onChange={setSelectedCountry} />
+                        <CountryCodePicker
+                          value={selectedCountry}
+                          onChange={c => { userChangedCountryRef.current = true; setSelectedCountry(c) }}
+                        />
                         <input type="tel" value={form.phone} onChange={set('phone')}
                           className={inputCls} placeholder="" />
                       </div>
