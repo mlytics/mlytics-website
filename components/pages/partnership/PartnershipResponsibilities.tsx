@@ -39,7 +39,7 @@ export function PartnershipResponsibilities() {
           </h2>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-5 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-5">
           {/* Mlytics handles */}
           <motion.div
             className="rounded-2xl p-8 bg-white border border-line"

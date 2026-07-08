@@ -5,7 +5,7 @@ import { InlineEmailCTA } from '@/components/ui/InlineEmailCTA'
 export function PartnershipCTA() {
   return (
     <section className="section-dark py-16 text-center">
-      <div className="max-w-xl mx-auto px-6">
+      <div className="max-w-5xl mx-auto px-6">
         <h2 className="section-heading text-white mb-3">
           Ready to activate?
         </h2>
