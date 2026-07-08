@@ -124,6 +124,7 @@
 /* Section heading — standardised h2 across all page sections
    Usage: <h2 className="section-heading">Title</h2>                    */
 .section-heading {
+  @apply text-balance;        /* avoid orphan words on the last line */
   font-size: 1.875rem;        /* text-3xl */
   font-weight: 700;
   line-height: 1.2;
