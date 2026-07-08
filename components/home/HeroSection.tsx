@@ -52,11 +52,11 @@ export function HeroSection() {
 
             {/* Headline */}
             <h1
-              className="text-4xl md:text-5xl font-bold leading-tight tracking-tight text-balance mb-8 text-center w-full text-ink"
+              className="max-[420px]:text-[27px] text-4xl md:text-5xl font-bold leading-tight tracking-tight text-balance mb-8 text-center w-full text-ink"
             >
               Discovery and Answer Engine<br />
               <span
-                className="block relative overflow-hidden max-[420px]:h-[4em] md:h-[2.6em]"
+                className="flex items-center justify-center relative overflow-hidden max-[420px]:h-[2.6em] md:h-[2.6em]"
                 style={{ textAlign: 'center' }}
               >
                 <AnimatePresence mode="wait">
