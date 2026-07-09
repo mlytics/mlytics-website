@@ -146,12 +146,14 @@ export function IntentPipeline() {
         style={{ background: 'linear-gradient(to bottom, transparent, var(--color-primary) 10%, var(--color-gold) 90%, transparent)' }}
       />
 
-      {/* Animated particle */}
+      {/* Animated particle — full-height wrapper animates translateY so the keyframe's 100% spans the container */}
       <div className="absolute left-[25px] top-0 bottom-0 overflow-hidden pointer-events-none">
-        <div
-          className="w-1.5 h-1.5 rounded-full absolute bg-gold"
-          style={{ animation: 'flow-particle 3s linear infinite', boxShadow: '0 0 6px var(--color-gold)' }}
-        />
+        <div className="h-full" style={{ animation: 'flow-particle 3s linear infinite' }}>
+          <div
+            className="w-1.5 h-1.5 rounded-full bg-gold"
+            style={{ boxShadow: '0 0 6px var(--color-gold)' }}
+          />
+        </div>
       </div>
 
       <div className="space-y-1">
