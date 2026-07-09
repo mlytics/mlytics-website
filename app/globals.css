@@ -227,11 +227,13 @@ body {
   to   { transform: rotate(360deg); }
 }
 
+/* Animates transform (GPU-composited) instead of top; expects a full-height
+   wrapper element so translateY(100%) equals the container height. */
 @keyframes flow-particle {
-  0%   { top: -8px; opacity: 0; }
+  0%   { transform: translateY(-8px); opacity: 0; }
   10%  { opacity: 1; }
   90%  { opacity: 1; }
-  100% { top: calc(100% + 8px); opacity: 0; }
+  100% { transform: translateY(calc(100% + 8px)); opacity: 0; }
 }
 
 @keyframes slide-in {
