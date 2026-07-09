@@ -108,10 +108,15 @@ export function FlywheelDiagram() {
           const isLeft  = pos.x < CX - 20
           const isRight = pos.x > CX + 20
           const isBelow = pos.y > CY + 40
-          const textX   = isBelow ? pos.x : isLeft ? pos.x - 26 : isRight ? pos.x + 26 : pos.x
-          const anchor  = isBelow ? 'middle' : isLeft ? 'end' : isRight ? 'start' : 'middle'
-          const labelY  = isBelow ? pos.y + 40 : pos.y - 40
-          const subY    = isBelow ? pos.y + 56 : pos.y - 24
+          // A below+right node's centered-below label lands on the orbit ring's
+          // lower-right arc — place it diagonally outside the ring instead.
+          const belowRight = isBelow && isRight
+          const textX   = belowRight ? pos.x + 26 : isBelow ? pos.x : isLeft ? pos.x - 26 : isRight ? pos.x + 26 : pos.x
+          const anchor  = belowRight ? 'start' : isBelow ? 'middle' : isLeft ? 'end' : isRight ? 'start' : 'middle'
+          // Centered-below labels sit full-width against the node — +44 gives them
+          // the same ~16-unit clearance the diagonal side labels get.
+          const labelY  = belowRight ? pos.y + 40 : isBelow ? pos.y + 44 : pos.y - 40
+          const subY    = belowRight ? pos.y + 56 : isBelow ? pos.y + 60 : pos.y - 24
           return (
             <motion.g key={i}
               initial={{ opacity: 0 }}
