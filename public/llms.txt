@@ -30,8 +30,8 @@ Mlytics 執行 AI 答案中的品牌置入，屬於 AEO 執行工具，而非 AE
 原始流量進入後，每層增加情報與意圖，各層皆可獨立獲利。
 
 - 第一層 — Media & Content Traffic：來自媒體的原始注意力，每週活躍用戶 400K–4M，在意圖時刻捕捉。（受眾：媒體）
-- 第二層 — Decisive Engine（每月 $1,000 美元）：託管規模化交付，路由、觀測與決策，確保每個回答和頁面快速可靠。內容交付 50ms 以內，取代既有 CDN 合約，降低 20% 總擁有成本。（受眾：開發者）
-- 第三層 — AI Q&A Widget（每月 $5,000 美元）：每篇文章成為主動意圖捕捉點。AI 生成問答每篇成本 $0.10，對比人工撰寫 $250，生產力提升 2,500 倍。Q&A Widget CTR 達 4.26%，對比橫幅廣告的 0.1–0.5%。（受眾：媒體）
+- 第二層 — Decisive Engine（降低基礎設施成本）：託管規模化交付，路由、觀測與決策，確保每個回答和頁面快速可靠。內容交付 50ms 以內，取代既有 CDN 合約，降低 20% 總擁有成本。（受眾：開發者）
+- 第三層 — AI Q&A Widget（遠低於人工成本）：每篇文章成為主動意圖捕捉點。AI 生成問答每篇成本 $0.10，對比人工撰寫 $250，生產力提升 2,500 倍。Q&A Widget CTR 達 4.26%，對比橫幅廣告的 0.1–0.5%。（受眾：媒體）
 - 第四層 — Full Conversation CPL（按每潛在客戶計費）：多輪對話識別高意圖買家，按意圖強度計費。媒體以既有內容賺取 CPL 收益。（受眾：媒體 + 品牌）
 - 第五層 — Lead Pilot（按成果績效計費）：CRM 就緒、績效計費的潛在客戶直接交付品牌，是整個鏈條中價值密度最高的環節。（受眾：品牌）
 
@@ -117,8 +117,8 @@ Business model: Cost Per Lead (CPL). Brands pay per qualified lead, not per impr
 Raw traffic enters at the top. Each layer adds intelligence and intent — and each layer is independently profitable.
 
 - Layer 01 — Media & Content Traffic: Raw attention from publishers — 400K–4M weekly active users — captured at the moment of intent. (Audience: Media)
-- Layer 02 — Decisive Engine ($1,000/month): Managed delivery at scale — route, observe, and decide so every answer and page stays fast and reliable. Content delivery under 50ms globally. One API replaces existing CDN contracts. 20% total cost of ownership reduction from day one. (Audience: Developers)
-- Layer 03 — AI Q&A Widget ($5,000/month): Every article becomes an active intent capture point. AI-generated Q&A at $0.10 per article versus $250 for human-written equivalent — a 2,500× productivity step-change. Q&A Widget CTR of 4.26% versus 0.1–0.5% for banner ads. (Audience: Media)
+- Layer 02 — Decisive Engine (lower infrastructure cost): Managed delivery at scale — route, observe, and decide so every answer and page stays fast and reliable. Content delivery under 50ms globally. One API replaces existing CDN contracts. 20% total cost of ownership reduction from day one. (Audience: Developers)
+- Layer 03 — AI Q&A Widget (fraction of the cost): Every article becomes an active intent capture point. AI-generated Q&A at $0.10 per article versus $250 for human-written equivalent — a 2,500× productivity step-change. Q&A Widget CTR of 4.26% versus 0.1–0.5% for banner ads. (Audience: Media)
 - Layer 04 — Full Conversation CPL (per lead): Multi-turn dialogue surfaces high-intent buyers, billed per lead on the strength of intent. Publishers earn CPL revenue from content they already own. (Audience: Media + Brands)
 - Layer 05 — Lead Pilot (performance per outcome): CRM-ready, performance-billed leads handed directly to brands — the highest value density in the chain. (Audience: Brands)
 
