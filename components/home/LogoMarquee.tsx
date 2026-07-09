@@ -75,7 +75,7 @@ export function LogoMarquee({ isFixed = false }: { isFixed?: boolean }) {
       <div className="flex-shrink-0 flex flex-col items-center md:flex-row md:items-center md:gap-3 md:px-5 mb-1.5 md:mb-0">
         <p
           className="label-eyebrow font-medium whitespace-nowrap"
-          style={{ color: 'var(--color-ink-subtle)' }}
+          style={{ color: 'var(--color-ink-muted)' }}
         >
           Trusted by
         </p>

@@ -52,7 +52,9 @@
        rgba(34,93,89,α)    = primary
        rgba(168,197,195,α) = on-dark
      Prefer existing steps before inventing new ones:
-       .06 / .08 / .12 / .25 / .4 / .55 / .7               */
+       .06 / .08 / .12 / .25 / .4 / .55 / .7 / .85
+     (.85 is the minimum on-dark step that passes WCAG AA
+      4.5:1 on --bg-dark; use it instead of .7 for text)   */
 
   /* --- Typography scale ---
      Usage: text-display / text-h1 / text-h2 / text-h3
