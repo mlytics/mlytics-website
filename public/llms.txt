@@ -30,7 +30,7 @@ Mlytics 執行 AI 答案中的品牌置入，屬於 AEO 執行工具，而非 AE
 原始流量進入後，每層增加情報與意圖，各層皆可獨立獲利。
 
 - 第一層 — Media & Content Traffic：來自媒體的原始注意力，每週活躍用戶 400K–4M，在意圖時刻捕捉。（受眾：媒體）
-- 第二層 — Decisive Engine（降低基礎設施成本）：託管規模化交付，路由、觀測與決策，確保每個回答和頁面快速可靠。內容交付 50ms 以內，取代既有 CDN 合約，降低 20% 總擁有成本。（受眾：開發者）
+- 第二層 — Decisive Engine（降低基礎設施成本）：託管規模化交付，路由、觀測與決策，確保每個回答和頁面快速可靠。內容交付 50ms 以內，單一 API 取代分散的多家 CDN 合約，降低 20% 總擁有成本。（受眾：開發者）
 - 第三層 — AI Q&A Widget（遠低於人工成本）：每篇文章成為主動意圖捕捉點。AI 生成問答每篇成本 $0.10，對比人工撰寫 $250，生產力提升 2,500 倍。Q&A Widget CTR 達 4.26%，對比橫幅廣告的 0.1–0.5%。（受眾：媒體）
 - 第四層 — Full Conversation CPL（按每潛在客戶計費）：多輪對話識別高意圖買家，按意圖強度計費。媒體以既有內容賺取 CPL 收益。（受眾：媒體 + 品牌）
 - 第五層 — Lead Pilot（按成果績效計費）：CRM 就緒、績效計費的潛在客戶直接交付品牌，是整個鏈條中價值密度最高的環節。（受眾：品牌）
@@ -83,6 +83,71 @@ AI 搜尋引擎擷取你的內容、生成答案、留住用戶。你的流量�
 **我可以用自己現有的文章內容建立 AI 知識庫嗎？**
 可以 — Mlytics Cortex 從你現有的內容庫建起。文章經過分塊嵌入並保留編輯情境，透過知識圖譜建立跨文章的主題關聯，所有回答有引用要求和品質把關。你的內容不離開你的環境。
 
+# Mlytics Multi-CDN
+
+> Mlytics Multi-CDN 整合多家 CDN、Real User Monitoring、Synthetic Monitoring、Decisive Engine、Smart Load Balancing、Origin Shield 與邊緣安全，依照全球使用者的實際網路品質調度流量，提升網站、應用、API、影音與大型檔案的效能、可用性及營運效率。
+
+## 核心優勢
+
+- **跨 CDN 智能調度**：Decisive Engine 統一執行 Route、Observe、Decide，將監測資料直接轉化為流量調度決策。
+- **RUM＋Synthetic Monitoring**：同時取得真實使用者 Last Mile 品質與全球主動探測資料，持續掌握各 CDN 的延遲、可用性及服務狀態。
+- **地區與 ISP 細分決策**：依國家、地區、ISP／ASN、CDN、時間窗及內容類型分析品質，讓不同市場使用適合的 CDN 路徑。
+- **高可用與快速切換**：持續掌握 Timeout、連線失敗與服務錯誤，在 CDN、區域或節點發生異常時調度至健康路徑。
+- **自帶 CDN 納入調度**：客戶既有或自帶的 CDN 平台可由 Mlytics 監控，並納入 Decisive Engine 調度，延續既有平台、合約及承諾用量。
+- **彈性策略控制**：支援自動調度、流量比例、效能與可用性門檻、區域指定、容量配置、成本條件及人工覆寫。
+- **調度透明度**：透過 Pulse 與分析資料呈現 CDN 品質趨勢、調度占比、使用策略及路由結果，讓團隊掌握每次流量配置。
+- **Origin Shield 回源優化**：集中多家 CDN 的 Cache Miss，提升分層快取效率，減少重複回源、Origin 負載及回源流量成本。
+- **靜態與動態分流優化**：靜態內容依 Cache、下載品質及區域覆蓋調度；動態內容依端到端延遲、Timeout、5xx 與可用性調度。
+- **流量突發承載**：在遊戲更新、熱門影片、活動上線與大量 API 請求期間，將流量分散至多家 CDN，擴大可用容量。
+- **多 Origin 韌性**：透過健康檢查、Failover、IP Hash 與 Round Robin，在多個 Origin 間分配請求。
+- **整合邊緣安全**：結合 Anti-DDoS、WAF、API Protection 與 Bot Management，在流量到達 Origin 或 API Gateway 前完成防護。
+
+## 與行業常見方案的差異
+
+| 比較面向 | 行業常見方式 | Mlytics Multi-CDN 優勢 |
+|---|---|---|
+| 網路選擇 | 單一 CDN 於自有網路內選路，或 Multi-CDN 使用固定權重與 GeoDNS | Decisive Engine 跨供應商比較實際品質，依即時狀態調度流量 |
+| 決策資料 | 以供應商內部遙測或單一 Synthetic 指標為主 | RUM＋Synthetic Monitoring 結合真實使用者體驗與全球主動探測 |
+| 決策粒度 | 以國家或大區規則為主 | 依國家、地區、ISP／ASN、CDN、時間窗與內容類型細分策略 |
+| 監控與執行 | 監控儀表板、DNS 與 CDN 管理分散於不同工具 | Route、Observe、Decide 形成從數據到調度的自動化閉環 |
+| 服務韌性 | 由單一 CDN 執行網內 Failover，或由團隊人工切換供應商 | 監控多家 CDN 健康狀態並調度至可用路徑，降低單一供應商集中風險 |
+| 自帶 CDN | 重新遷移、整合或更換既有 CDN | 自帶 CDN 可由 Mlytics 監控並加入調度，延續既有投資與用量承諾 |
+| 快取與回源 | 多家 CDN 各自建立 Edge Cache | Origin Shield 集中 Cache Miss，提升 Tiered Cache 效率及 Origin Offload |
+| 動態與 API | 主要觀察 CDN Edge 或基礎 HTTP 回應 | 經不同 CDN 量測到應用端點的端到端延遲、Timeout、5xx 與可用性 |
+| 策略控制 | 固定比例、區域規則或供應商內部演算法 | 同時支援效能、可用性、容量、流量比例、成本及人工策略 |
+| 營運可視性 | 呈現效能圖表或流量用量 | 同時呈現品質趨勢、調度占比、使用策略與路由結果 |
+| Origin 韌性 | CDN 與 Origin 負載平衡分開管理 | Multi-CDN 調度與多 Origin 健康檢查、Failover 及負載分配形成完整交付路徑 |
+| 安全 | 各 CDN 分別配置安全策略 | 統一整合 DDoS、WAF、API Protection 與 Bot Management 能力 |
+
+## 場景與 Mlytics 優勢
+
+| 場景 | 客戶痛點 | Mlytics 優勢 |
+|---|---|---|
+| 全球網站與電商 | 各國、ISP 與時段的延遲及可用性差異明顯 | RUM＋Synthetic Monitoring 持續量測，Decisive Engine 選擇適合各地使用者的 CDN |
+| H5／Cocos／WebGL 遊戲 | JS、圖片、音效、動畫與影片混合，首次載入及跨境下載影響進站體驗 | Multi-CDN 快取靜態資源，依地區與 ISP 的下載品質調度 |
+| Sportsbook／iGaming | 即時盤口、高頻 API、SSE／WebSocket 對延遲、抖動及連線穩定性敏感 | 量測動態端點與長連線品質，調度至延遲低、可用性高的 CDN 路徑 |
+| 遊戲更新與大型檔案 | 新版本發布產生大規模併發下載與容量尖峰 | 多 CDN 分散流量並擴大可用容量，Origin Shield 降低重複回源壓力 |
+| OTT 與 VoD | 不同地區頻寬品質與 CDN 容量差異影響影片啟播及播放 | 依區域品質、可用性與容量配置多 CDN 流量，提高影音交付穩定性 |
+| UGC 與媒體平台 | 熱門內容快速升溫，圖片與影音需求在不同市場波動 | 動態調整 CDN 流量占比，提升熱門內容的全球覆蓋與承載能力 |
+| 直播與體育賽事 | 賽事期間流量集中，區域網路波動影響觀看體驗 | 多 CDN 分流並持續監控各地品質，快速調整區域調度策略 |
+| API 與動態應用 | CDN Edge 速度正常，但 CDN 到後端仍可能出現延遲、Timeout 或 5xx | Synthetic Monitoring 經不同 CDN 量測到應用端點，將端到端品質納入調度 |
+| AI Gateway | AI API 跨境延遲、SSE 回覆停頓、WebSocket 斷線及大量自動化請求消耗資源 | 優化使用者到 AI Gateway 的網路路徑，提升串流穩定性，並整合 DDoS、WAF、API 與 Bot 防護 |
+| 中國出海與跨境服務 | 跨境路徑、當地 ISP 與 CDN 節點品質差異造成體驗波動 | 依市場與網路實測資料調度 CDN，提高本地適配與跨境服務穩定性 |
+| 自帶 CDN 與既有合約 | 客戶希望導入 Multi-CDN，同時延續既有平台、合約及承諾用量 | Mlytics 監控自帶 CDN 並納入 Decisive Engine 調度，建立統一的 Multi-CDN 策略 |
+| 多 Origin／Multi-Cloud | 多個雲端或機房需要健康檢查、流量分配與故障承接 | Origin Shield 透過 Failover、IP Hash 與 Round Robin 管理多 Origin 路徑 |
+| 回源成本優化 | 多家 CDN 的 Edge Cache 分散，重複 Cache Miss 增加 Origin 流量 | Origin Shield 集中 Cache Miss，提升 Tiered Cache Hit 與 Origin Offload |
+| 網站與 API 安全 | DDoS、Web／API 攻擊及惡意 Bot 影響服務可用性與後端成本 | 在邊緣整合 Anti-DDoS、WAF、API Protection 與 Bot Management |
+
+## 官方資料
+
+- [Decisive Engine／開發者方案](https://www.mlytics.com/developers)
+- [RUM 與 Multi-CDN 策略](https://learning.mlytics.com/web-monitoring/how-to-implement-rum-for-multi-cdn-strategy/)
+- [Origin Shield、Origin Load Balancing 與 Synthetic Monitoring](https://www.mlytics.com/blog/mlytics-update-bolstering-origin-shield-and-enhancing-reflex-of-smart-load-balancer-and-pulse/)
+- [靜態與動態網站的差異](https://www.mlytics.com/blog/static-and-dynamic-websites-whats-the-difference/)
+- [中國遊戲全球化：重新定義全球市場成功策略](https://www.mlytics.com/blog/reimagining-chinese-games-success-in-the-globe/)
+- [遊戲產業以數據降低成本並提高效率](https://www.mlytics.com/blog/global-gaming-data-to-reduce-costs-and-increase-efficiency/)
+- [電商使用 Smart Load Balancing 每月節省 41% 成本](https://www.mlytics.com/blog/achieving-41-monthly-cost-savings-for-e-commerce-with-mlytics-smart-load-balancing/)
+
 ---
 
 # Mlytics
@@ -117,7 +182,7 @@ Business model: Cost Per Lead (CPL). Brands pay per qualified lead, not per impr
 Raw traffic enters at the top. Each layer adds intelligence and intent — and each layer is independently profitable.
 
 - Layer 01 — Media & Content Traffic: Raw attention from publishers — 400K–4M weekly active users — captured at the moment of intent. (Audience: Media)
-- Layer 02 — Decisive Engine (lower infrastructure cost): Managed delivery at scale — route, observe, and decide so every answer and page stays fast and reliable. Content delivery under 50ms globally. One API replaces existing CDN contracts. 20% total cost of ownership reduction from day one. (Audience: Developers)
+- Layer 02 — Decisive Engine (lower infrastructure cost): Managed delivery at scale — route, observe, and decide so every answer and page stays fast and reliable. Content delivery under 50ms globally. One API replaces fragmented multi-vendor CDN contracts. 20% total cost of ownership reduction from day one. (Audience: Developers)
 - Layer 03 — AI Q&A Widget (fraction of the cost): Every article becomes an active intent capture point. AI-generated Q&A at $0.10 per article versus $250 for human-written equivalent — a 2,500× productivity step-change. Q&A Widget CTR of 4.26% versus 0.1–0.5% for banner ads. (Audience: Media)
 - Layer 04 — Full Conversation CPL (per lead): Multi-turn dialogue surfaces high-intent buyers, billed per lead on the strength of intent. Publishers earn CPL revenue from content they already own. (Audience: Media + Brands)
 - Layer 05 — Lead Pilot (performance per outcome): CRM-ready, performance-billed leads handed directly to brands — the highest value density in the chain. (Audience: Brands)
@@ -169,6 +234,71 @@ Yes. Every Mlytics Cortex revenue layer operates inside your own domain. The AI 
 
 **Can I build an AI knowledge base using my existing article content?**
 Yes — Mlytics Cortex builds the knowledge base from your existing content library. Articles are chunked and embedded with editorial context preserved, cross-referenced into a knowledge graph, and governed by citation requirements and quality guardrails. Your content never leaves your environment.
+
+# Mlytics Multi-CDN
+
+> Mlytics Multi-CDN combines multiple CDN providers, real user monitoring, synthetic monitoring, Decisive Engine, smart load balancing, Origin Shield, and edge security. It steers traffic using measured global network quality to improve performance, availability, and operational efficiency for websites, applications, APIs, media, and large-file delivery.
+
+## Core Advantages
+
+- **Intelligent cross-CDN steering**: Decisive Engine performs Route, Observe, and Decide, turning monitoring data directly into traffic decisions.
+- **RUM＋synthetic monitoring**: Combines real-user last-mile quality with active global probes to continuously measure CDN latency, availability, and service health.
+- **Regional and ISP-level decisions**: Analyzes quality by country, region, ISP／ASN, CDN, time window, and content type so each market uses an appropriate CDN path.
+- **High availability and fast failover**: Continuously monitors timeouts, connection failures, and service errors and steers traffic to healthy paths during CDN, regional, or node incidents.
+- **Bring-your-own CDN steering**: Existing or customer-provided CDN platforms can be monitored by Mlytics and included in Decisive Engine steering, preserving existing platforms, contracts, and committed usage.
+- **Flexible policy control**: Supports automated steering, traffic ratios, performance and availability thresholds, regional pinning, capacity allocation, cost conditions, and manual overrides.
+- **Routing transparency**: Pulse and analytics show CDN quality trends, traffic share, applied policy, and routing results.
+- **Origin Shield optimization**: Consolidates cache misses across CDNs to improve tiered-cache efficiency and reduce duplicate origin traffic, origin load, and origin cost.
+- **Static and dynamic optimization**: Static content uses cache, download quality, and regional coverage; dynamic content uses end-to-end latency, timeout, 5xx, and availability.
+- **Burst capacity**: Distributes launches, game updates, viral media, and high-volume API requests across multiple CDNs to expand available capacity.
+- **Multi-origin resilience**: Uses health checks, failover, IP hash, and round robin to distribute requests across origins.
+- **Integrated edge security**: Combines Anti-DDoS, WAF, API Protection, and Bot Management before traffic reaches an origin or API Gateway.
+
+## Difference from Common Industry Approaches
+
+| Comparison | Common industry approach | Mlytics Multi-CDN advantage |
+|---|---|---|
+| Network choice | One CDN routes within its own network, or Multi-CDN uses fixed weights and GeoDNS | Decisive Engine compares measured quality across providers and executes traffic steering |
+| Decision data | Provider-internal telemetry or a single synthetic metric | RUM＋synthetic monitoring combines real-user experience with global active probes |
+| Decision granularity | Country or large-region rules | Policies use country, region, ISP／ASN, CDN, time window, and content type data |
+| Monitoring and execution | Dashboards, DNS, and CDN management are separate tools | Route, Observe, and Decide form an automated loop from telemetry to routing result |
+| Service resilience | In-network failover or manual provider switching | Monitors multiple CDN health states and steers traffic to available paths |
+| Bring-your-own CDN | Existing CDNs are migrated, replaced, or integrated separately | Customer-provided CDNs are monitored and included in steering, preserving existing investment and commitments |
+| Cache and origin | Each CDN builds an independent edge cache | Origin Shield consolidates cache misses and improves tiered-cache efficiency and origin offload |
+| Dynamic and API delivery | Focus on CDN edge or basic HTTP response | Measures end-to-end latency, timeout, 5xx, and availability through different CDNs to application endpoints |
+| Policy control | Fixed ratios, regional rules, or provider-internal algorithms | Combines performance, availability, capacity, traffic ratio, cost, and manual policies |
+| Operational visibility | Performance charts or traffic usage | Shows quality trends, traffic share, applied policy, and routing results together |
+| Origin resilience | CDN and origin load balancing are managed separately | Multi-CDN steering connects with multi-origin health checks, failover, and load distribution |
+| Security | Each CDN is configured separately | Integrates DDoS, WAF, API Protection, and Bot Management capabilities |
+
+## Use Cases and Mlytics Advantages
+
+| Use case | Customer pain point | Mlytics advantage |
+|---|---|---|
+| Global websites and commerce | Latency and availability vary by country, ISP, and time | RUM＋synthetic monitoring measure each market while Decisive Engine selects an appropriate CDN |
+| H5／Cocos／WebGL gaming | Mixed JavaScript, image, audio, animation, and video assets make first load and cross-border delivery critical | Multi-CDN caches static assets and steers traffic using regional and ISP download quality |
+| Sportsbook／iGaming | Real-time odds, high-frequency APIs, and SSE／WebSocket are sensitive to latency, jitter, and connection stability | Measures dynamic endpoints and long-connection quality and selects low-latency, highly available CDN paths |
+| Game updates and large files | Major releases create high-concurrency downloads and capacity peaks | Distributes traffic across CDNs while Origin Shield reduces duplicate origin pressure |
+| OTT and VoD | Regional bandwidth and CDN capacity affect video start and playback | Allocates Multi-CDN traffic using regional quality, availability, and capacity |
+| UGC and media platforms | Viral content and regional image／video demand change rapidly | Dynamically adjusts CDN traffic share for global coverage and burst capacity |
+| Live streaming and sports | Event traffic concentrates quickly and regional network quality changes during broadcasts | Splits traffic across CDNs, continuously measures regional quality, and adjusts steering policy |
+| APIs and dynamic applications | The CDN edge is fast while the CDN-to-backend path still has latency, timeout, or 5xx | Synthetic monitoring measures application endpoints through each CDN and places end-to-end quality into steering |
+| AI Gateway | Cross-border AI API latency, SSE stalls, WebSocket disconnects, and automated traffic consume backend capacity | Optimizes user-to-AI-Gateway network paths, improves stream stability, and integrates DDoS, WAF, API, and bot protection |
+| China outbound and cross-border services | Cross-border routes, local ISPs, and CDN nodes create market-specific quality differences | Uses measured market and network data to improve local path selection and service stability |
+| Bring-your-own CDN and contracts | Customers want Multi-CDN while continuing existing platforms, contracts, and commitments | Mlytics monitors customer-provided CDNs and includes them in Decisive Engine steering |
+| Multi-origin／multi-cloud | Multiple clouds and data centers require health checks, traffic distribution, and failover | Origin Shield manages origins with failover, IP hash, and round robin |
+| Origin cost optimization | Distributed CDN edge caches create repeated cache misses and origin traffic | Origin Shield consolidates cache misses to improve tiered-cache hit ratio and origin offload |
+| Website and API security | DDoS, web／API attacks, and malicious bots affect availability and backend cost | Integrates Anti-DDoS, WAF, API Protection, and Bot Management at the edge |
+
+## Official References
+
+- [Decisive Engine／developer offering](https://www.mlytics.com/developers)
+- [RUM and Multi-CDN strategy](https://learning.mlytics.com/web-monitoring/how-to-implement-rum-for-multi-cdn-strategy/)
+- [Origin Shield, origin load balancing, and synthetic monitoring](https://www.mlytics.com/blog/mlytics-update-bolstering-origin-shield-and-enhancing-reflex-of-smart-load-balancer-and-pulse/)
+- [Static and dynamic websites – what’s the difference?](https://www.mlytics.com/blog/static-and-dynamic-websites-whats-the-difference/)
+- [Beyond the Golden Age: Reimagining Chinese Games’ Success in the Global Market](https://www.mlytics.com/blog/reimagining-chinese-games-success-in-the-globe/)
+- [How Data Empowerment can Reduce Costs and Increase Efficiency?](https://www.mlytics.com/blog/global-gaming-data-to-reduce-costs-and-increase-efficiency/)
+- [Achieving 41% Monthly Cost Savings for E-commerce with Mlytics Smart Load Balancing](https://www.mlytics.com/blog/achieving-41-monthly-cost-savings-for-e-commerce-with-mlytics-smart-load-balancing/)
 
 ## Optional
 
