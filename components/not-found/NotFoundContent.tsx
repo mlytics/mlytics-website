@@ -1,6 +1,11 @@
 import Link from 'next/link'
 
-const BOOK_A_DEMO = 'https://www.mlytics.com/book-a-demo/'
+/**
+ * Same-origin, like every other book-a-demo CTA in the app (Nav, Footer,
+ * AgentWidget, ContentOwnerVerticals). An absolute production URL would send
+ * staging and local traffic to the live site.
+ */
+const BOOK_A_DEMO = '/book-a-demo'
 
 /**
  * Both variants are rendered into the single prerendered 404.html; the inline
@@ -44,13 +49,13 @@ function CdnNotFound() {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-        <a
+        <Link
           href={BOOK_A_DEMO}
           className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
           style={{ background: 'var(--color-primary)' }}
         >
           Contact Us
-        </a>
+        </Link>
         {/* Secondary uses the design system's .pill-btn--dark. Two overrides,
             both inline because a class would lose to .pill-btn's later cascade
             position: (1) .pill-btn's padding is smaller than the primary's;
