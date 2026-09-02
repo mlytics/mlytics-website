@@ -1,27 +1,26 @@
-'use client'
-
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { isCdnLegacyPath } from './cdnPaths'
 
 const BOOK_A_DEMO = 'https://www.mlytics.com/book-a-demo/'
 
-function PrimaryCta({ href, label }: { href: string; label: string }) {
+/**
+ * Both variants are rendered into the single prerendered 404.html; the inline
+ * script in app/not-found.tsx stamps `data-nf` on <html> before first paint and
+ * the .nf-cdn / .nf-default rules in globals.css reveal the right one. See
+ * ./variantScript for why the choice cannot be made at render time.
+ */
+export default function NotFoundContent() {
   return (
-    <a
-      href={href}
-      className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
-      style={{ background: 'var(--color-primary)' }}
-    >
-      {label}
-    </a>
+    <>
+      <CdnNotFound />
+      <DefaultNotFound />
+    </>
   )
 }
 
 /** Variant shown for legacy CDN / Multi-CDN URLs. */
 function CdnNotFound() {
   return (
-    <div className="max-w-xl mx-auto">
+    <div className="nf-cdn max-w-xl mx-auto">
       {/* Eyebrow styling matches the dark hero pages (developers, brands,
           content-owners, book-a-demo, privacy-policy, terms-of-service). */}
       <span
@@ -45,7 +44,13 @@ function CdnNotFound() {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-        <PrimaryCta href={BOOK_A_DEMO} label="Contact Us" />
+        <a
+          href={BOOK_A_DEMO}
+          className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
+          style={{ background: 'var(--color-primary)' }}
+        >
+          Contact Us
+        </a>
         {/* Secondary uses the design system's .pill-btn--dark. Two overrides,
             both inline because a class would lose to .pill-btn's later cascade
             position: (1) .pill-btn's padding is smaller than the primary's;
@@ -69,7 +74,7 @@ function CdnNotFound() {
 /** Generic variant — unchanged from the original 404. */
 function DefaultNotFound() {
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="nf-default max-w-lg mx-auto">
       <p className="text-7xl font-bold mb-4" style={{ color: 'var(--color-primary)' }}>
         404
       </p>
@@ -86,10 +91,4 @@ function DefaultNotFound() {
       </Link>
     </div>
   )
-}
-
-export default function NotFoundContent() {
-  const pathname = usePathname()
-
-  return isCdnLegacyPath(pathname ?? '') ? <CdnNotFound /> : <DefaultNotFound />
 }

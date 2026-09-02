@@ -170,6 +170,15 @@ body {
 .section-light { background: var(--bg-light); }
 .section-white { background: var(--bg-white); }
 .section-dark { background: var(--bg-dark); color: var(--text-dark-primary); }
+
+/* 404 variant selection.
+   The static export ships a single 404.html carrying both variants; the inline
+   script in app/not-found.tsx stamps data-nf on <html> before first paint.
+   Default (no attribute, e.g. JavaScript unavailable) shows the generic one. */
+.nf-cdn { display: none; }
+[data-nf="cdn"] .nf-cdn { display: block; }
+[data-nf="cdn"] .nf-default { display: none; }
+
 .section-dark-alt { background: var(--bg-dark-alt); color: var(--text-dark-primary); }
 
 .pill-btn {
