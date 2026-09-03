@@ -2,8 +2,8 @@ import Link from 'next/link'
 
 /**
  * Same-origin, like every other book-a-demo CTA in the app (Nav, Footer,
- * AgentWidget, ContentOwnerVerticals). An absolute production URL would send
- * staging and local traffic to the live site.
+ * ContentOwnerVerticals). An absolute production URL would send staging and
+ * local traffic to the live site.
  */
 const BOOK_A_DEMO = '/book-a-demo'
 

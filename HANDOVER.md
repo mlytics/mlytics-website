@@ -89,15 +89,13 @@ mlytics-website/
 │   │   ├── brands/
 │   │   ├── developers/
 │   │   └── publishers/
-│   ├── agent/                  # AI Agent 對話元件
 │   ├── analytics/              # GA 追蹤元件
+│   ├── not-found/              # 404 頁面元件
 │   └── ui/                     # 通用 UI 元件
 │
-├── context/                    # React Context（ContactModal、Agent）
 ├── lib/                        # 工具函式
 ├── public/                     # 靜態資源（圖片、logo、sitemap）
 │   ├── logos/                  # 合作夥伴 Logo
-│   ├── agentdialog_image/      # AI Demo 用圖片
 │   ├── .well-known/
 │   │   └── security.txt        # 安全漏洞回報聯絡資訊
 │   └── og-image.png
