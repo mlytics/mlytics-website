@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
-import { AgentProvider } from '@/lib/agent-context'
 import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
 import { ScrollToTop } from '@/components/layout/ScrollToTop'
@@ -77,14 +76,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {/* HubSpot Tracking Code */}
       <script async defer src="//js.hs-scripts.com/4284310.js" />
       <body className="min-h-full flex flex-col">
-        <AgentProvider>
-          <ScrollToTop />
-          <Nav />
-          <main className="flex-1 flex flex-col">{children}</main>
-          <Footer />
-          <SectionViewTracker />
-          <ScrollDepthTracker />
-        </AgentProvider>
+        <ScrollToTop />
+        <Nav />
+        <main className="flex-1 flex flex-col">{children}</main>
+        <Footer />
+        <SectionViewTracker />
+        <ScrollDepthTracker />
       </body>
     </html>
   )

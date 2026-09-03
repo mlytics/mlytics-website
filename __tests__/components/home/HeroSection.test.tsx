@@ -47,12 +47,6 @@ vi.mock('@/components/home/WorldMapDots', () => ({
 vi.mock('@/components/home/LogoMarquee', () => ({
   LogoMarquee: () => null,
 }))
-vi.mock('@/components/agent/AgentDialog', () => ({
-  AgentDialog: () => null,
-}))
-vi.mock('@/components/agent/CortexLiveDemo', () => ({
-  CortexLiveDemo: () => null,
-}))
 
 describe('HeroSection', () => {
   describe('headline', () => {
