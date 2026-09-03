@@ -76,7 +76,7 @@ export function SolutionPitches() {
               {/* Contrast panels */}
               <div className="grid md:grid-cols-[1fr_40px_1fr]">
                 {/* Left — Them (muted) */}
-                <div className="p-5 flex flex-col gap-2" style={{ background: '#F7F7F7' }}>
+                <div className="p-5 flex flex-col gap-2 bg-surface">
                   <Eyebrow color="var(--color-ink-subtle)">
                     {pitch.them.who}
                   </Eyebrow>
