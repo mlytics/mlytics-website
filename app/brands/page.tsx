@@ -1,10 +1,7 @@
-import { BrandComparison } from '@/components/pages/brands/BrandComparison'
 import { BrandPainSection } from '@/components/pages/brands/BrandPainSection'
-import { BrandWhoSection } from '@/components/pages/brands/BrandWhoSection'
 import { BrandGEOSection } from '@/components/pages/brands/BrandGEOSection'
 import { BrandAEOVsMonitoring } from '@/components/pages/brands/BrandAEOVsMonitoring'
 import { BrandFAQ } from '@/components/pages/brands/BrandFAQ'
-import { BrandLeadPilot } from '@/components/pages/brands/BrandLeadPilot'
 import { BrandPageCTA } from '@/components/pages/brands/BrandPageCTA'
 
 import type { Metadata } from 'next'
@@ -59,12 +56,6 @@ export default function BrandsPage() {
         </div>
       </div>
       <BrandFAQ />
-
-      {/* Who it's for */}
-      {/* <BrandWhoSection /> */}
-
-      {/* Lead Pilot */}
-      {/* <BrandLeadPilot /> */}
 
       <BrandPageCTA />
     </>
