@@ -79,7 +79,7 @@ export function DecisiveEngineHero() {
           {STATS.map((stat) => (
             <div key={stat.label} className="p-5 bg-primary-dark">
               <p className="text-base font-bold text-on-dark mb-1">{stat.label}</p>
-              <p className="text-sm text-on-dark/70">{stat.desc}</p>
+              <p className="text-sm text-on-dark/85">{stat.desc}</p>
             </div>
           ))}
         </div>

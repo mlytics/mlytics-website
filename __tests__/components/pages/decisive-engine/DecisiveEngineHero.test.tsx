@@ -69,4 +69,18 @@ describe('DecisiveEngineHero', () => {
     render(<DecisiveEngineHero />)
     expect(screen.getByTestId('cdn-quality-card')).toBeInTheDocument()
   })
+
+  it('renders the stat descriptions at the /85 on-dark text step, not /70', () => {
+    render(<DecisiveEngineHero />)
+    for (const desc of [
+      'Two complementary data sources',
+      'Decisions across multiple CDNs',
+      'Market and network granularity',
+      'Telemetry converted into action',
+    ]) {
+      const el = screen.getByText(desc)
+      expect(el).toHaveClass('text-on-dark/85')
+      expect(el.className).not.toMatch(/text-on-dark\/70\b/)
+    }
+  })
 })
