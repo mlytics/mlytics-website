@@ -1,4 +1,5 @@
 import { DecisiveEngineHero } from '@/components/pages/decisive-engine/DecisiveEngineHero'
+import { DecisionLoop } from '@/components/pages/decisive-engine/DecisionLoop'
 
 import type { Metadata } from 'next'
 
@@ -25,6 +26,7 @@ export default function DecisiveEnginePage() {
   return (
     <>
       <DecisiveEngineHero />
+      <DecisionLoop />
     </>
   )
 }
