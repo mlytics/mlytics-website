@@ -3,6 +3,7 @@ import { DecisionLoop } from '@/components/pages/decisive-engine/DecisionLoop'
 import { OrchestrationDiagram } from '@/components/pages/decisive-engine/OrchestrationDiagram'
 import { EngineAdvantages } from '@/components/pages/decisive-engine/EngineAdvantages'
 import { EngineComparison } from '@/components/pages/decisive-engine/EngineComparison'
+import { EngineUseCases } from '@/components/pages/decisive-engine/EngineUseCases'
 
 import type { Metadata } from 'next'
 
@@ -33,6 +34,7 @@ export default function DecisiveEnginePage() {
       <OrchestrationDiagram />
       <EngineAdvantages />
       <EngineComparison />
+      <EngineUseCases />
     </>
   )
 }
