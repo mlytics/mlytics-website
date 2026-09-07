@@ -3,13 +3,15 @@
 import { motion } from 'framer-motion'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 
-const OBSERVE = [
+type ArchBox = { title: string; desc: string }
+
+const OBSERVE: ArchBox[] = [
   { title: 'Real users', desc: 'Last-mile experience from actual traffic' },
   { title: 'Synthetic probes', desc: 'Proactive CDN and endpoint measurements' },
   { title: 'Service health', desc: 'Latency, timeout, errors, and availability' },
 ]
 
-const DELIVER = [
+const DELIVER: ArchBox[] = [
   { title: 'Multiple CDNs', desc: 'Provider and regional path diversity' },
   { title: 'Origin Shield', desc: 'Tiered cache and origin offload' },
   { title: 'Applications', desc: 'Web, API, media, gaming, and AI services' },
@@ -22,7 +24,7 @@ const BOX_STYLE = {
   border: '1px solid rgba(168,197,195,0.25)',
 }
 
-function ArchColumn({ label, boxes }: { label: string; boxes: typeof OBSERVE }) {
+function ArchColumn({ label, boxes }: { label: string; boxes: ArchBox[] }) {
   return (
     <div className="grid gap-4 content-start">
       <span className="label-eyebrow text-on-dark/85">{label}</span>
