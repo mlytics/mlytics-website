@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { EngineUseCases } from '@/components/pages/decisive-engine/EngineUseCases'
 
 vi.mock('framer-motion', () => ({
@@ -66,5 +66,66 @@ describe('EngineUseCases', () => {
     expect(
       screen.queryByRole('heading', { level: 3, name: 'Bring-your-own CDN' })
     ).not.toBeInTheDocument()
+  })
+
+  it('pairs each card icon, title, and body together, not just present somewhere on the page', () => {
+    render(<EngineUseCases />)
+    const cards = screen.getAllByRole('heading', { level: 3 }).map((heading) => {
+      const card = heading.closest('article')
+      if (!card) throw new Error('heading is not inside an article card')
+      return card
+    })
+
+    const expected = [
+      {
+        title: 'Gaming & large updates',
+        body: 'Distribute launch peaks and high-concurrency downloads across CDNs while Origin Shield reduces repeated origin pressure.',
+        iconClass: 'lucide-gamepad-2',
+      },
+      {
+        title: 'Sportsbook & iGaming',
+        body: 'Use dynamic endpoint and long-connection quality to steer real-time odds, API, SSE, and WebSocket traffic.',
+        iconClass: 'lucide-dices',
+      },
+      {
+        title: 'OTT, VoD & live events',
+        body: 'Allocate traffic using regional quality, availability, and capacity during media peaks and major broadcasts.',
+        iconClass: 'lucide-tv',
+      },
+      {
+        title: 'Global commerce',
+        body: 'Adapt CDN selection to changing country and ISP conditions across storefront assets and dynamic transactions.',
+        iconClass: 'lucide-shopping-cart',
+      },
+      {
+        title: 'APIs & dynamic apps',
+        body: 'Measure application endpoints through different CDNs and use end-to-end service quality in routing decisions.',
+        iconClass: 'lucide-webhook',
+      },
+      {
+        title: 'AI Gateway',
+        body: 'Improve user-to-gateway network paths and streaming stability while integrating DDoS, WAF, API, and bot protection.',
+        iconClass: 'lucide-bot',
+      },
+      {
+        title: 'China outbound',
+        body: 'Use market and ISP measurements to select delivery paths for cross-border and locally diverse network conditions.',
+        iconClass: 'lucide-globe',
+      },
+    ]
+
+    expect(cards).toHaveLength(expected.length)
+
+    cards.forEach((card, i) => {
+      const scoped = within(card)
+      expect(
+        scoped.getByRole('heading', { level: 3, name: expected[i].title })
+      ).toBeInTheDocument()
+      expect(scoped.getByText(expected[i].body)).toBeInTheDocument()
+
+      const icon = card.querySelector('svg')
+      expect(icon).not.toBeNull()
+      expect(icon).toHaveClass(expected[i].iconClass)
+    })
   })
 })
