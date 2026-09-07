@@ -1,6 +1,7 @@
 import { DecisiveEngineHero } from '@/components/pages/decisive-engine/DecisiveEngineHero'
 import { DecisionLoop } from '@/components/pages/decisive-engine/DecisionLoop'
 import { OrchestrationDiagram } from '@/components/pages/decisive-engine/OrchestrationDiagram'
+import { EngineAdvantages } from '@/components/pages/decisive-engine/EngineAdvantages'
 
 import type { Metadata } from 'next'
 
@@ -29,6 +30,7 @@ export default function DecisiveEnginePage() {
       <DecisiveEngineHero />
       <DecisionLoop />
       <OrchestrationDiagram />
+      <EngineAdvantages />
     </>
   )
 }
