@@ -147,6 +147,7 @@ AI 搜尋引擎擷取你的內容、生成答案、留住用戶。你的流量�
 - [中國遊戲全球化：重新定義全球市場成功策略](https://www.mlytics.com/blog/reimagining-chinese-games-success-in-the-globe/)
 - [遊戲產業以數據降低成本並提高效率](https://www.mlytics.com/blog/global-gaming-data-to-reduce-costs-and-increase-efficiency/)
 - [電商使用 Smart Load Balancing 每月節省 41% 成本](https://www.mlytics.com/blog/achieving-41-monthly-cost-savings-for-e-commerce-with-mlytics-smart-load-balancing/)
+- [Decisive Engine 產品頁](https://www.mlytics.com/decisive-engine/)
 
 ---
 
@@ -299,6 +300,7 @@ Yes — Mlytics Cortex builds the knowledge base from your existing content libr
 - [Beyond the Golden Age: Reimagining Chinese Games’ Success in the Global Market](https://www.mlytics.com/blog/reimagining-chinese-games-success-in-the-globe/)
 - [How Data Empowerment can Reduce Costs and Increase Efficiency?](https://www.mlytics.com/blog/global-gaming-data-to-reduce-costs-and-increase-efficiency/)
 - [Achieving 41% Monthly Cost Savings for E-commerce with Mlytics Smart Load Balancing](https://www.mlytics.com/blog/achieving-41-monthly-cost-savings-for-e-commerce-with-mlytics-smart-load-balancing/)
+- [Decisive Engine product page](https://www.mlytics.com/decisive-engine/)
 
 ## Optional
 
