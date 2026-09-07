@@ -7,6 +7,9 @@ import Link from 'next/link'
  */
 const BOOK_A_DEMO = '/book-a-demo'
 
+/** Destination for the CDN variant's primary CTA (DATAI-553). */
+const DECISIVE_ENGINE = '/decisive-engine'
+
 /**
  * Both variants are rendered into the single prerendered 404.html; the inline
  * script in app/not-found.tsx stamps `data-nf` on <html> before first paint and
@@ -49,12 +52,18 @@ function CdnNotFound() {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+        {/* Primary now leads to the product page: visitors arriving from legacy
+            Multi-CDN URLs want the capability, not the sales form. Contact Us
+            stays one step away, and repeats at the bottom of that page.
+            aria-label supplies the context the bare "Explore More" lacks when a
+            screen reader reads the link out of its heading's context. */}
         <Link
-          href={BOOK_A_DEMO}
+          href={DECISIVE_ENGINE}
+          aria-label="Explore Multi-CDN"
           className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
           style={{ background: 'var(--color-primary)' }}
         >
-          Contact Us
+          Explore More
         </Link>
         {/* Secondary uses the design system's .pill-btn--dark. Two overrides,
             both inline because a class would lose to .pill-btn's later cascade
@@ -62,14 +71,14 @@ function CdnNotFound() {
             (2) its 1.5px border would otherwise make this button 3px taller
             than the borderless primary, so the vertical padding absorbs it. */}
         <Link
-          href="/"
+          href={BOOK_A_DEMO}
           className="pill-btn pill-btn--dark justify-center"
           style={{
             padding: 'calc(0.75rem - 1.5px) calc(1.5rem - 1.5px)',
             fontWeight: 600,
           }}
         >
-          Back to Home
+          Contact Us
         </Link>
       </div>
     </div>
