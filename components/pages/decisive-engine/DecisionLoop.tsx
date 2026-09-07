@@ -66,7 +66,7 @@ export function DecisionLoop() {
                 <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white mb-7">
                   <item.Icon size={22} strokeWidth={1.6} />
                 </span>
-                <h3 className="text-h3 font-bold text-ink mb-3">{item.title}</h3>
+                <h3 className="text-2xl font-bold text-ink mb-3">{item.title}</h3>
                 <p className="text-sm text-ink-muted">{item.body}</p>
               </div>
             </motion.article>

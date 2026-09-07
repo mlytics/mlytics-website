@@ -46,7 +46,7 @@ export function EngineUseCases() {
                 <item.Icon size={22} strokeWidth={1.6} />
               </span>
               <div>
-                <h3 className="text-h3 font-bold text-ink mb-2">{item.title}</h3>
+                <h3 className="text-2xl font-bold text-ink mb-2">{item.title}</h3>
                 <p className="text-sm text-ink-muted">{item.body}</p>
               </div>
             </motion.article>

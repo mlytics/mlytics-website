@@ -34,8 +34,8 @@ export function DecisiveEngineHero() {
               Mlytics Multi-CDN Intelligence
             </Eyebrow>
 
-            <h1 className="text-display font-bold text-white leading-none mb-5">
-              Route. Observe.
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-none mb-5">
+              Route. Observe.{' '}
               <span className="block text-on-dark">Decide.</span>
             </h1>
 

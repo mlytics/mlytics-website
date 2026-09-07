@@ -21,7 +21,7 @@ export function CdnQualityCard() {
       <Eyebrow dark className="mb-2 block">
         Live decision context
       </Eyebrow>
-      <h3 className="text-h3 font-bold text-white mb-6">Regional CDN Quality</h3>
+      <h3 className="text-2xl font-bold text-white mb-6">Regional CDN Quality</h3>
 
       <div className="grid gap-3 mb-7">
         {SIGNALS.map((signal) => (

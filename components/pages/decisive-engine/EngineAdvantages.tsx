@@ -47,7 +47,7 @@ export function EngineAdvantages() {
               transition={{ duration: 0.4, delay: (i % 3) * 0.08, ease: 'easeOut' }}
             >
               <span className="label-eyebrow text-primary font-black">{item.num}</span>
-              <h3 className="text-h3 font-bold text-ink mt-4 mb-2">{item.title}</h3>
+              <h3 className="text-2xl font-bold text-ink mt-4 mb-2">{item.title}</h3>
               <p className="text-sm text-ink-muted">{item.body}</p>
             </motion.article>
           ))}

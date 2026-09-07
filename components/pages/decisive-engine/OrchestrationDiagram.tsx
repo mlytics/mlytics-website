@@ -70,18 +70,14 @@ export function OrchestrationDiagram() {
             <span className="mx-auto grid place-items-center w-20 h-20 rounded-3xl bg-primary text-white text-2xl font-black mb-5">
               DE
             </span>
-            <h3 className="text-h3 font-bold text-white mb-3">Decisive Engine</h3>
+            <h3 className="text-2xl font-bold text-white mb-3">Decisive Engine</h3>
             <p className="text-sm text-on-dark mb-6">
               Cross-CDN decision intelligence that aligns quality, availability, capacity, and
               policy.
             </p>
             <div className="flex flex-wrap gap-2 justify-center">
               {TAGS.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1.5 rounded-full text-xs text-on-dark"
-                  style={{ background: 'rgba(168,197,195,0.12)' }}
-                >
+                <span key={tag} className="px-3 py-1.5 rounded-full text-xs text-on-dark">
                   {tag}
                 </span>
               ))}

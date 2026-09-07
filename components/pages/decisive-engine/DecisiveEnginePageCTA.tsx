@@ -61,28 +61,35 @@ export function DecisiveEnginePageCTA() {
 
       <section className="section-white py-16 lg:py-20">
         <div className="max-w-5xl mx-auto px-6">
-          <Eyebrow className="mb-3 block">Official references</Eyebrow>
-          <h2 className="section-heading text-ink mb-8">
-            Explore the underlying capabilities.
-          </h2>
-          <ul className="grid gap-3 list-none p-0 m-0">
-            {REFERENCES.map((ref) => (
-              <li key={ref.href}>
-                <a
-                  href={ref.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary underline-offset-4 hover:underline"
-                >
-                  {ref.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5 }}
+          >
+            <Eyebrow className="mb-3 block">Official references</Eyebrow>
+            <h2 className="section-heading text-ink mb-8">
+              Explore the underlying capabilities.
+            </h2>
+            <ul className="grid gap-3 list-none p-0 m-0">
+              {REFERENCES.map((ref) => (
+                <li key={ref.href}>
+                  <a
+                    href={ref.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline-offset-4 hover:underline"
+                  >
+                    {ref.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
         </div>
       </section>
 
-      <section className="section-dark bg-primary-dark py-16 text-center">
+      <section className="section-dark py-16 text-center">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="section-heading text-white mb-3">
             Which markets are underperforming today?
