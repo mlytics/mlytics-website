@@ -4,6 +4,7 @@ import { OrchestrationDiagram } from '@/components/pages/decisive-engine/Orchest
 import { EngineAdvantages } from '@/components/pages/decisive-engine/EngineAdvantages'
 import { EngineComparison } from '@/components/pages/decisive-engine/EngineComparison'
 import { EngineUseCases } from '@/components/pages/decisive-engine/EngineUseCases'
+import { DecisiveEnginePageCTA } from '@/components/pages/decisive-engine/DecisiveEnginePageCTA'
 
 import type { Metadata } from 'next'
 
@@ -35,6 +36,7 @@ export default function DecisiveEnginePage() {
       <EngineAdvantages />
       <EngineComparison />
       <EngineUseCases />
+      <DecisiveEnginePageCTA />
     </>
   )
 }
