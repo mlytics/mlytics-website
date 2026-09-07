@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { DecisionLoop } from '@/components/pages/decisive-engine/DecisionLoop'
 
 vi.mock('framer-motion', () => ({
@@ -28,17 +28,38 @@ describe('DecisionLoop', () => {
     }
   })
 
-  it('renders the Observe copy verbatim', () => {
+  it('renders all three body paragraphs verbatim in full', () => {
     render(<DecisionLoop />)
     expect(
-      screen.getByText(/Combine RUM and synthetic measurements across countries, regions, ISPs/)
+      screen.getByText(
+        'Combine RUM and synthetic measurements across countries, regions, ISPs, ASNs, CDN providers, time windows, and content types.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Evaluate availability, latency, TTFB, download performance, capacity, traffic ratios, cost conditions, and customer-defined policy.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Steer traffic through DNS and Multi-CDN orchestration, moving each market toward an appropriate healthy delivery path.'
+      )
     ).toBeInTheDocument()
   })
 
-  it('numbers the steps 1 to 3', () => {
+  it('pairs each hidden step number with its own card heading', () => {
     render(<DecisionLoop />)
-    for (const n of ['1', '2', '3']) {
-      expect(screen.getByText(n)).toBeInTheDocument()
+    const expectations: [string, string][] = [
+      ['Observe', '1'],
+      ['Decide', '2'],
+      ['Route', '3'],
+    ]
+    for (const [title, number] of expectations) {
+      const heading = screen.getByRole('heading', { level: 3, name: title })
+      const card = heading.closest('article')
+      expect(card).not.toBeNull()
+      const scoped = within(card as HTMLElement)
+      expect(scoped.getByText(number)).toHaveAttribute('aria-hidden', 'true')
     }
   })
 })
