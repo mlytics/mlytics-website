@@ -2,6 +2,7 @@ import { DecisiveEngineHero } from '@/components/pages/decisive-engine/DecisiveE
 import { DecisionLoop } from '@/components/pages/decisive-engine/DecisionLoop'
 import { OrchestrationDiagram } from '@/components/pages/decisive-engine/OrchestrationDiagram'
 import { EngineAdvantages } from '@/components/pages/decisive-engine/EngineAdvantages'
+import { EngineComparison } from '@/components/pages/decisive-engine/EngineComparison'
 
 import type { Metadata } from 'next'
 
@@ -31,6 +32,7 @@ export default function DecisiveEnginePage() {
       <DecisionLoop />
       <OrchestrationDiagram />
       <EngineAdvantages />
+      <EngineComparison />
     </>
   )
 }
