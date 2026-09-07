@@ -22,9 +22,36 @@ vi.mock('next/link', () => ({
 describe('NotFoundContent — CDN variant', () => {
   it('points the primary CTA at the Decisive Engine page', () => {
     render(<NotFoundContent />)
-    const cta = screen.getByRole('link', { name: 'Explore Multi-CDN' })
+    const cta = screen.getByRole('link', { name: 'Explore More Multi-CDN' })
     expect(cta).toHaveAttribute('href', '/decisive-engine')
-    expect(cta).toHaveTextContent('Explore More')
+    // Visible label is the anchor's own leading text node, not the sr-only
+    // suffix. It carries one trailing space (invisible to sighted users,
+    // rendered as ordinary trailing whitespace) so the accessible-name
+    // computation joins it to the hidden suffix with a real separator —
+    // trim before comparing so the assertion still reads as "Explore More".
+    expect(cta.firstChild?.textContent?.trim()).toBe('Explore More')
+  })
+
+  it('gives the primary CTA an accessible name that contains its visible label (WCAG 2.5.3)', () => {
+    render(<NotFoundContent />)
+    // Capture the actual runtime-computed accessible name via Testing
+    // Library's own accname implementation (the matcher callback receives
+    // it directly), rather than asserting against a hardcoded literal —
+    // so a regression that changes the computed name still gets caught.
+    let capturedName = ''
+    const cta = screen.getByRole('link', {
+      name: (accessibleName) => {
+        if (accessibleName.startsWith('Explore More')) {
+          capturedName = accessibleName
+          return true
+        }
+        return false
+      },
+    })
+    const visibleLabel = cta.firstChild?.textContent?.trim() ?? ''
+    expect(visibleLabel).toBe('Explore More')
+    expect(capturedName).toBe('Explore More Multi-CDN')
+    expect(capturedName).toContain(visibleLabel)
   })
 
   it('keeps Contact Us as the secondary CTA', () => {

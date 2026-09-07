@@ -55,15 +55,22 @@ function CdnNotFound() {
         {/* Primary now leads to the product page: visitors arriving from legacy
             Multi-CDN URLs want the capability, not the sales form. Contact Us
             stays one step away, and repeats at the bottom of that page.
-            aria-label supplies the context the bare "Explore More" lacks when a
-            screen reader reads the link out of its heading's context. */}
+            The extra context is visually hidden text appended after the visible
+            label, not an aria-label: WCAG 2.5.3 (Label in Name) requires the
+            accessible name to contain the visible label, and an aria-label
+            replaces the accessible name outright rather than extending it — do
+            not "simplify" this back to aria-label. The space before the hidden
+            span is a real separating character (invisible to sighted users,
+            since nothing renders after it): without it the accessible-name
+            computation joins the two text nodes with no separator at all,
+            producing "Explore MoreMulti-CDN" instead of the intended
+            "Explore More Multi-CDN". */}
         <Link
           href={DECISIVE_ENGINE}
-          aria-label="Explore Multi-CDN"
           className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
           style={{ background: 'var(--color-primary)' }}
         >
-          Explore More
+          Explore More <span className="sr-only">Multi-CDN</span>
         </Link>
         {/* Secondary uses the design system's .pill-btn--dark. Two overrides,
             both inline because a class would lose to .pill-btn's later cascade
