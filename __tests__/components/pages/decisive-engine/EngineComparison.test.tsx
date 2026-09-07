@@ -41,6 +41,15 @@ describe('EngineComparison', () => {
     expect(headers[2]).toHaveTextContent('Mlytics Decisive Engine')
   })
 
+  it('marks every column header with scope="col" for header-to-cell association', () => {
+    render(<EngineComparison />)
+    const headers = screen.getAllByRole('columnheader')
+    expect(headers).toHaveLength(3)
+    headers.forEach((header) => {
+      expect(header).toHaveAttribute('scope', 'col')
+    })
+  })
+
   it('renders exactly eight body rows', () => {
     render(<EngineComparison />)
     const body = screen.getAllByRole('rowgroup')[1]

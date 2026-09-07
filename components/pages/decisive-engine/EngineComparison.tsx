@@ -44,13 +44,13 @@ export function EngineComparison() {
           <table className="w-full border-collapse min-w-[46rem]">
             <thead>
               <tr>
-                <th className="label-eyebrow text-left px-5 py-4 bg-primary text-white">
+                <th scope="col" className="label-eyebrow text-left px-5 py-4 bg-primary text-white">
                   Dimension
                 </th>
-                <th className="label-eyebrow text-left px-5 py-4 bg-primary text-white">
+                <th scope="col" className="label-eyebrow text-left px-5 py-4 bg-primary text-white">
                   Common approach
                 </th>
-                <th className="label-eyebrow text-left px-5 py-4 bg-primary text-white">
+                <th scope="col" className="label-eyebrow text-left px-5 py-4 bg-primary text-white">
                   Mlytics Decisive Engine
                 </th>
               </tr>
