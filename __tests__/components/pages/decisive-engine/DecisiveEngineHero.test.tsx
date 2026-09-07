@@ -31,7 +31,9 @@ describe('DecisiveEngineHero', () => {
   it('renders the lead copy verbatim', () => {
     render(<DecisiveEngineHero />)
     expect(
-      screen.getByText(/Decisive Engine turns real-world network data into active Multi-CDN traffic decisions/)
+      screen.getByText(
+        'Decisive Engine turns real-world network data into active Multi-CDN traffic decisions—helping every market use the right delivery path at the right moment.'
+      )
     ).toBeInTheDocument()
   })
 
@@ -52,6 +54,14 @@ describe('DecisiveEngineHero', () => {
     render(<DecisiveEngineHero />)
     for (const stat of ['RUM + Synthetic', 'Cross-provider', 'ISP-aware', 'Closed loop']) {
       expect(screen.getByText(stat)).toBeInTheDocument()
+    }
+    for (const desc of [
+      'Two complementary data sources',
+      'Decisions across multiple CDNs',
+      'Market and network granularity',
+      'Telemetry converted into action',
+    ]) {
+      expect(screen.getByText(desc)).toBeInTheDocument()
     }
   })
 

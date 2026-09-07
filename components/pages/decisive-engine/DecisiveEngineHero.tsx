@@ -71,18 +71,13 @@ export function DecisiveEngineHero() {
         </div>
 
         <div
-          className="grid grid-cols-2 lg:grid-cols-4 mt-14 rounded-2xl overflow-hidden"
+          className="grid grid-cols-2 lg:grid-cols-4 mt-14 rounded-2xl overflow-hidden gap-px p-px"
           style={{
-            background: 'rgba(168,197,195,0.06)',
-            border: '1px solid rgba(168,197,195,0.25)',
+            background: 'rgba(168,197,195,0.25)',
           }}
         >
           {STATS.map((stat) => (
-            <div
-              key={stat.label}
-              className="p-5"
-              style={{ borderBottom: '1px solid rgba(168,197,195,0.12)' }}
-            >
+            <div key={stat.label} className="p-5 bg-primary-dark">
               <p className="text-base font-bold text-on-dark mb-1">{stat.label}</p>
               <p className="text-sm text-on-dark/70">{stat.desc}</p>
             </div>
