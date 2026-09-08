@@ -52,22 +52,25 @@ export function DecisionLoop() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-3 md:grid-rows-[auto_auto] gap-5 md:gap-y-0">
           {STEPS.map((item, i) => (
             <motion.article
               key={item.title}
-              className="flex flex-col rounded-2xl border border-line bg-white p-8"
+              className="flex flex-col md:grid md:row-span-2 md:grid-rows-subgrid rounded-2xl border border-line bg-white p-8"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.45, delay: i * 0.1, ease: 'easeOut' }}
             >
-              {/* Shared min-height keeps the divider below at the same y across
-                  all three cards, regardless of how many lines the body
-                  paragraph wraps to. Pills flow beneath it instead of being
-                  pinned to the card bottom, so a shorter tag block just
-                  leaves trailing space — which reads as deliberate. */}
-              <div className="min-h-[16.5rem]">
+              {/* Subgrid: the icon/title/body block and the divider/pills
+                  block each land on a shared row track (the grid above
+                  defines the two tracks and md:row-span-2 pulls both into
+                  this card). Every card's divider then sits on the same
+                  track boundary with no hard-coded min-height — a track's
+                  height is set by whichever card's content needs it most,
+                  so a shorter body just leaves the genuine difference, not
+                  arbitrary reserved space. */}
+              <div>
                 <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white mb-7">
                   <item.Icon size={22} strokeWidth={1.6} />
                 </span>
