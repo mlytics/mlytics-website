@@ -27,9 +27,9 @@ export function DecisiveEnginePageCTA() {
   return (
     <>
       <section className="section-dark py-16 lg:py-20">
-        <div className="max-w-5xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-5xl mx-auto px-6">
           <motion.div
-            className="text-center max-w-3xl mx-auto"
+            className="text-center max-w-3xl mx-auto mb-11"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
@@ -42,7 +42,7 @@ export function DecisiveEnginePageCTA() {
           </motion.div>
 
           <motion.div
-            className="grid gap-4"
+            className="grid sm:grid-cols-2 gap-x-8 gap-y-4 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}

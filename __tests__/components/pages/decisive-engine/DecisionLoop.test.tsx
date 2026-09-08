@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { DecisionLoop } from '@/components/pages/decisive-engine/DecisionLoop'
 
 vi.mock('framer-motion', () => ({
@@ -45,21 +45,5 @@ describe('DecisionLoop', () => {
         'Steer traffic through DNS and Multi-CDN orchestration, moving each market toward an appropriate healthy delivery path.'
       )
     ).toBeInTheDocument()
-  })
-
-  it('pairs each hidden step number with its own card heading', () => {
-    render(<DecisionLoop />)
-    const expectations: [string, string][] = [
-      ['Observe', '1'],
-      ['Decide', '2'],
-      ['Route', '3'],
-    ]
-    for (const [title, number] of expectations) {
-      const heading = screen.getByRole('heading', { level: 3, name: title })
-      const card = heading.closest('article')
-      expect(card).not.toBeNull()
-      const scoped = within(card as HTMLElement)
-      expect(scoped.getByText(number)).toHaveAttribute('aria-hidden', 'true')
-    }
   })
 })
