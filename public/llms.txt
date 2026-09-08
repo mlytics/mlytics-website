@@ -138,6 +138,23 @@ AI 搜尋引擎擷取你的內容、生成答案、留住用戶。你的流量�
 | 回源成本優化 | 多家 CDN 的 Edge Cache 分散，重複 Cache Miss 增加 Origin 流量 | Origin Shield 集中 Cache Miss，提升 Tiered Cache Hit 與 Origin Offload |
 | 網站與 API 安全 | DDoS、Web／API 攻擊及惡意 Bot 影響服務可用性與後端成本 | 在邊緣整合 Anti-DDoS、WAF、API Protection 與 Bot Management |
 
+## 常見問題
+
+**這跟我們自己簽兩家 CDN 有什麼不同？**
+自行簽約多家 CDN 通常以固定權重或人工調整 DNS 分配流量，效能儀表板、DNS 與 CDN 管理分散在不同工具中。Decisive Engine 的 Observe、Decide、Route 閉環將 RUM 與 Synthetic Monitoring、ISP／ASN 層級量測及策略直接連到路由，流量依實際量測到的跨供應商品質持續調整，而非固定比例。差別在於合約之上多了一層自動化、可依策略運作的調度層，而不只是同時擁有兩家供應商。
+
+**我們必須更換現有的 CDN 供應商嗎？**
+不需要。Decisive Engine 支援自帶 CDN：既有供應商與其他 CDN 一同被監控，並納入調度策略，而非被取代。一般 Multi-CDN 導入往往需要遷移、更換或個別整合每家供應商；Decisive Engine 保留現有 CDN，在其上加一層由 RUM、Synthetic Monitoring 與策略構成的獨立決策層，讓你在不重新議約、也不更換現有服務者的前提下取得跨供應商的調度能力。
+
+**這只對靜態資源有用，還是也涵蓋 API 與動態流量？**
+兩者皆涵蓋。靜態資源依下載與快取品質訊號調度，並由 Origin Shield 在 Cache Miss 時降低重複回源負載。API 與動態應用則以端到端方式量測：延遲、Timeout、5xx 錯誤與可用性一路量到應用端點，而非只看 Edge 或基礎 HTTP 回應。正是這種端到端視角，讓 Decisive Engine 能調度即時盤口、API、SSE 與 WebSocket 等連線，服務 Sportsbook／iGaming 這類場景，而不只是可下載的內容。
+
+**某一家 CDN 在直播進行中劣化時會發生什麼事？**
+以可用性優先的調度會依服務健康狀態、Timeout、連線失敗與錯誤率偵測劣化中的 CDN，並將受影響流量移往健康的交付路徑。在 OTT、VoD 與賽事轉播這類直播與流量尖峰場景中，同一套 Observe、Decide、Route 閉環會依區域品質、可用性與容量，在事件進行當下持續調整流量配置，而不需等到觀眾已受影響才人工切換。
+
+**使用多家 CDN 會比單一供應商更貴嗎？**
+不一定。成本條件是 Decide 評估的輸入之一，與可用性、延遲、容量及流量比例並列，因此在量測品質允許的前提下，流量可以向成本較低的路徑傾斜。Origin Shield 集中多家 CDN 的 Cache Miss，提升 Tiered Cache 效率與 Origin Offload，降低 Origin 負載。此外，由於自帶 CDN 會納入調度策略，既有的承諾用量仍可繼續消化，不會因為新增供應商而閒置。
+
 ## 官方資料
 
 - [Decisive Engine／開發者方案](https://www.mlytics.com/developers)
@@ -147,6 +164,7 @@ AI 搜尋引擎擷取你的內容、生成答案、留住用戶。你的流量�
 - [中國遊戲全球化：重新定義全球市場成功策略](https://www.mlytics.com/blog/reimagining-chinese-games-success-in-the-globe/)
 - [遊戲產業以數據降低成本並提高效率](https://www.mlytics.com/blog/global-gaming-data-to-reduce-costs-and-increase-efficiency/)
 - [電商使用 Smart Load Balancing 每月節省 41% 成本](https://www.mlytics.com/blog/achieving-41-monthly-cost-savings-for-e-commerce-with-mlytics-smart-load-balancing/)
+- [Decisive Engine 產品頁](https://www.mlytics.com/decisive-engine/)
 
 ---
 
@@ -290,6 +308,23 @@ Yes — Mlytics Cortex builds the knowledge base from your existing content libr
 | Origin cost optimization | Distributed CDN edge caches create repeated cache misses and origin traffic | Origin Shield consolidates cache misses to improve tiered-cache hit ratio and origin offload |
 | Website and API security | DDoS, web／API attacks, and malicious bots affect availability and backend cost | Integrates Anti-DDoS, WAF, API Protection, and Bot Management at the edge |
 
+## FAQ
+
+**How is this different from contracting with two CDNs ourselves?**
+Contracting with two CDNs on your own usually means fixed traffic-split weights or manual DNS changes, with performance dashboards, DNS, and CDN management sitting in separate tools. Decisive Engine's Observe, Decide, Route loop connects RUM and synthetic monitoring, ISP- and ASN-level measurement, and policy directly to routing, so traffic moves continuously based on measured cross-provider quality rather than a static split. The difference is an operating layer above the contracts, automated and policy-driven, not just having two providers on the books.
+
+**Do we have to replace our current CDN provider?**
+No. Decisive Engine supports bring-your-own CDN: your existing provider is monitored alongside any others and included in the steering strategy rather than replaced. Where a typical multi-CDN setup means migrating, replacing, or separately integrating each provider, Decisive Engine keeps your current CDN in place and adds an independent decision layer on top, built from RUM, synthetic monitoring, and policy, so you gain cross-provider control without renegotiating or switching who serves your traffic today.
+
+**Does this only help static assets, or also APIs and dynamic traffic?**
+Both. Static assets are optimized using download and cache-performance signals, with Origin Shield reducing repeated origin load on cache misses. APIs and dynamic applications are measured end-to-end: latency, timeouts, 5xx errors, and availability all the way to the application endpoint, not just edge or basic HTTP checks. That end-to-end view is what lets Decisive Engine steer real-time traffic such as odds, API, SSE, and WebSocket connections for use cases like sportsbook and iGaming, not only downloadable content.
+
+**What happens when one CDN degrades in the middle of a live event?**
+Availability-first steering uses service health, timeouts, connection failures, and error rates to detect a degrading CDN and move affected traffic onto a healthy delivery path. For live and media-peak scenarios such as OTT, VoD, and broadcast events, the same Observe, Decide, Route loop allocates traffic by regional quality, availability, and capacity as conditions change during the event itself, rather than requiring a manual failover once viewers are already affected.
+
+**Does running multiple CDNs cost more than a single provider?**
+Not necessarily. Cost conditions are one of the inputs Decide evaluates alongside availability, latency, capacity and traffic ratios, so traffic can be weighted toward less expensive paths when measured quality allows it. Origin Shield consolidates cache misses across providers to improve tiered-cache efficiency and origin offload, lowering origin pressure. And because bring-your-own CDN keeps your existing contracts in the steering strategy, committed spend stays in use rather than being stranded when you add providers.
+
 ## Official References
 
 - [Decisive Engine／developer offering](https://www.mlytics.com/developers)
@@ -299,6 +334,7 @@ Yes — Mlytics Cortex builds the knowledge base from your existing content libr
 - [Beyond the Golden Age: Reimagining Chinese Games’ Success in the Global Market](https://www.mlytics.com/blog/reimagining-chinese-games-success-in-the-globe/)
 - [How Data Empowerment can Reduce Costs and Increase Efficiency?](https://www.mlytics.com/blog/global-gaming-data-to-reduce-costs-and-increase-efficiency/)
 - [Achieving 41% Monthly Cost Savings for E-commerce with Mlytics Smart Load Balancing](https://www.mlytics.com/blog/achieving-41-monthly-cost-savings-for-e-commerce-with-mlytics-smart-load-balancing/)
+- [Decisive Engine product page](https://www.mlytics.com/decisive-engine/)
 
 ## Optional
 
