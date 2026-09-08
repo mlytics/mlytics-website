@@ -15,29 +15,17 @@ const REFERENCE_LINKS: ReferenceLink[] = [
   { label: 'Achieving 41% monthly cost savings for e-commerce', href: 'https://www.mlytics.com/blog/achieving-41-monthly-cost-savings-for-e-commerce-with-mlytics-smart-load-balancing/' },
 ]
 
-const LINKS_INTRO =
-  'This page covers the operating model; the resources below go deeper into the mechanics behind it. They explain how RUM pairs with Multi-CDN strategy, how Origin Shield and load balancing reduce origin load, why static and dynamic traffic need different measurement, and what Multi-CDN steering has produced for real gaming and e-commerce workloads. Read them to understand the mechanics in your own time, then bring specific questions to a conversation with sales.'
-
-// Plain-text rendering of the reference links for the FAQPage JSON-LD, since
-// schema.org Answer.text must be plain text and cannot carry anchor markup.
-// Each link is represented as "Label — URL" so the destination survives in
-// the structured data even though the rendered accordion shows real <a> tags.
-const LINKS_PLAIN_TEXT = REFERENCE_LINKS.map((link) => `${link.label} — ${link.href}`).join('; ')
+const FURTHER_READING_LEAD_IN = 'Go deeper on the mechanics behind this page before talking to sales.'
 
 type Faq = {
   q: string
   a: string
-  links?: ReferenceLink[]
 }
 
 const FAQS: Faq[] = [
   {
     q: 'How is this different from contracting with two CDNs ourselves?',
     a: "Contracting with two CDNs on your own usually means fixed traffic-split weights or manual DNS changes, with performance dashboards, DNS, and CDN management sitting in separate tools. Decisive Engine's Observe, Decide, Route loop connects RUM and synthetic monitoring, ISP- and ASN-level measurement, and policy directly to routing, so traffic moves continuously based on measured cross-provider quality rather than a static split. The difference is an operating layer above the contracts, automated and policy-driven, not just having two providers on the books.",
-  },
-  {
-    q: 'How does Mlytics decide which CDN serves a given user, and how quickly does it react?',
-    a: 'Decisive Engine runs a continuous Observe, Decide, Route loop. Observe combines real user monitoring and synthetic measurements across countries, regions, ISPs, ASNs, CDN providers, time windows, and content types. Decide evaluates availability, latency, TTFB, download performance, capacity, traffic ratios, cost conditions, and your own policy rules. Route then steers traffic through DNS and Multi-CDN orchestration toward the healthiest path for each market. Because the loop is closed and feeds measurement straight into routing, traffic decisions update continuously rather than on a fixed schedule.',
   },
   {
     q: 'Do we have to replace our current CDN provider?',
@@ -52,9 +40,8 @@ const FAQS: Faq[] = [
     a: 'Availability-first steering uses service health, timeouts, connection failures, and error rates to detect a degrading CDN and move affected traffic onto a healthy delivery path. For live and media-peak scenarios such as OTT, VoD, and broadcast events, the same Observe, Decide, Route loop allocates traffic by regional quality, availability, and capacity as conditions change during the event itself, rather than requiring a manual failover once viewers are already affected.',
   },
   {
-    q: 'Where can we go deeper before talking to sales?',
-    a: `${LINKS_INTRO} ${LINKS_PLAIN_TEXT}`,
-    links: REFERENCE_LINKS,
+    q: 'Does running multiple CDNs cost more than a single provider?',
+    a: 'Not necessarily. Cost conditions are one of the inputs Decide evaluates alongside availability, latency, capacity and traffic ratios, so traffic can be weighted toward less expensive paths when measured quality allows it. Origin Shield consolidates cache misses across providers to improve tiered-cache efficiency and origin offload, lowering origin pressure. And because bring-your-own CDN keeps your existing contracts in the steering strategy, committed spend stays in use rather than being stranded when you add providers.',
   },
 ]
 
@@ -136,34 +123,38 @@ export function EngineFAQ() {
                     transition={{ duration: 0.25, ease: 'easeInOut' }}
                     style={{ overflow: 'hidden' }}
                   >
-                    {faq.links ? (
-                      <div className="pb-5 text-sm md:text-base leading-relaxed text-ink-muted">
-                        <p className="mb-4">{LINKS_INTRO}</p>
-                        <ul className="grid gap-3 list-none p-0 m-0">
-                          {faq.links.map((link) => (
-                            <li key={link.href}>
-                              <a
-                                href={link.href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-primary underline-offset-4 hover:underline"
-                              >
-                                {link.label}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : (
-                      <p className="pb-5 text-sm md:text-base leading-relaxed text-ink-muted">
-                        {faq.a}
-                      </p>
-                    )}
+                    <p className="pb-5 text-sm md:text-base leading-relaxed text-ink-muted">
+                      {faq.a}
+                    </p>
                   </motion.div>
                 )}
               </AnimatePresence>
             </motion.div>
           ))}
+        </div>
+
+        {/* Further reading — a quiet tail to the FAQ, not another question */}
+        <div className="mt-10 pt-8" style={{ borderTop: '1px solid rgba(34,93,89,0.12)' }}>
+          <Eyebrow color="var(--color-ink-subtle)" className="mb-2">
+            Further reading
+          </Eyebrow>
+          <p className="text-sm text-ink-muted mb-4 max-w-xl">
+            {FURTHER_READING_LEAD_IN}
+          </p>
+          <ul className="flex flex-wrap gap-x-6 gap-y-2 list-none p-0 m-0">
+            {REFERENCE_LINKS.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary underline-offset-4 hover:underline"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

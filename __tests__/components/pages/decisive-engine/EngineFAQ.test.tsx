@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { EngineFAQ } from '@/components/pages/decisive-engine/EngineFAQ'
 
@@ -14,10 +14,14 @@ vi.mock('framer-motion', () => ({
 
 const QUESTIONS = [
   'How is this different from contracting with two CDNs ourselves?',
-  'How does Mlytics decide which CDN serves a given user, and how quickly does it react?',
   'Do we have to replace our current CDN provider?',
   'Does this only help static assets, or also APIs and dynamic traffic?',
   'What happens when one CDN degrades in the middle of a live event?',
+  'Does running multiple CDNs cost more than a single provider?',
+]
+
+const REMOVED_QUESTIONS = [
+  'How does Mlytics decide which CDN serves a given user, and how quickly does it react?',
   'Where can we go deeper before talking to sales?',
 ]
 
@@ -63,14 +67,21 @@ describe('EngineFAQ', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders all six questions verbatim', () => {
+  it('renders all five questions verbatim', () => {
     render(<EngineFAQ />)
     for (const q of QUESTIONS) {
       expect(screen.getByText(q)).toBeInTheDocument()
     }
   })
 
-  it('renders exactly six accordion questions, no more and no fewer', () => {
+  it('does not render the two removed questions', () => {
+    render(<EngineFAQ />)
+    for (const q of REMOVED_QUESTIONS) {
+      expect(screen.queryByText(q)).not.toBeInTheDocument()
+    }
+  })
+
+  it('renders exactly five accordion questions, no more and no fewer', () => {
     render(<EngineFAQ />)
     const buttons = screen.getAllByRole('button')
     expect(buttons).toHaveLength(QUESTIONS.length)
@@ -78,11 +89,8 @@ describe('EngineFAQ', () => {
 
   it('starts with every answer collapsed', () => {
     render(<EngineFAQ />)
-    for (const label of ["Contracting with two CDNs", 'go deeper into the mechanics']) {
+    for (const label of ['Contracting with two CDNs', 'Cost conditions are one of the inputs']) {
       expect(screen.queryByText(new RegExp(label))).not.toBeInTheDocument()
-    }
-    for (const link of LINKS) {
-      expect(screen.queryByRole('link', { name: link.label })).not.toBeInTheDocument()
     }
   })
 
@@ -113,28 +121,31 @@ describe('EngineFAQ', () => {
     expect(screen.getByText(/fixed traffic-split weights/)).toBeInTheDocument()
 
     await user.click(secondButton)
-    expect(screen.getByText(/Observe combines real user monitoring/)).toBeInTheDocument()
+    expect(screen.getByText(/bring-your-own CDN/)).toBeInTheDocument()
     expect(screen.queryByText(/fixed traffic-split weights/)).not.toBeInTheDocument()
   })
 
-  it('renders all six reference links with correct labels and hrefs once the last answer is opened', async () => {
+  it('renders the fifth question verbatim with its answer reachable via the accordion', async () => {
     const user = userEvent.setup()
     render(<EngineFAQ />)
 
-    const lastButton = screen.getByText(QUESTIONS[5]).closest('button') as HTMLElement
-    await user.click(lastButton)
+    const button = screen.getByText(QUESTIONS[4]).closest('button') as HTMLElement
+    expect(screen.queryByText(/Cost conditions are one of the inputs/)).not.toBeInTheDocument()
+
+    await user.click(button)
+    expect(screen.getByText(/Cost conditions are one of the inputs/)).toBeInTheDocument()
+  })
+
+  it('renders all six reference links, with correct labels and hrefs, outside the accordion without opening anything', () => {
+    render(<EngineFAQ />)
 
     for (const { label, href } of LINKS) {
       expect(screen.getByRole('link', { name: label })).toHaveAttribute('href', href)
     }
   })
 
-  it('opens the six reference links safely in a new tab', async () => {
-    const user = userEvent.setup()
+  it('opens the six reference links safely in a new tab', () => {
     render(<EngineFAQ />)
-
-    const lastButton = screen.getByText(QUESTIONS[5]).closest('button') as HTMLElement
-    await user.click(lastButton)
 
     const external = screen
       .getAllByRole('link')
@@ -146,13 +157,21 @@ describe('EngineFAQ', () => {
     }
   })
 
-  it('embeds a FAQPage JSON-LD schema with all six questions and answers', () => {
+  it('renders the further-reading label and lead-in outside the accordion', () => {
+    render(<EngineFAQ />)
+    expect(screen.getByText('Further reading')).toBeInTheDocument()
+    expect(
+      screen.getByText('Go deeper on the mechanics behind this page before talking to sales.')
+    ).toBeInTheDocument()
+  })
+
+  it('embeds a FAQPage JSON-LD schema with exactly the five questions and answers', () => {
     const { container } = render(<EngineFAQ />)
     const schema = getJsonLd(container)
 
     expect(schema['@context']).toBe('https://schema.org')
     expect(schema['@type']).toBe('FAQPage')
-    expect(schema.mainEntity).toHaveLength(6)
+    expect(schema.mainEntity).toHaveLength(5)
 
     schema.mainEntity.forEach((entity: { '@type': string; name: string; acceptedAnswer: { '@type': string; text: string } }, i: number) => {
       expect(entity['@type']).toBe('Question')
@@ -163,17 +182,16 @@ describe('EngineFAQ', () => {
     })
   })
 
-  it('represents the six reference links as plain text (label and URL) inside the JSON-LD answer, since schema.org text cannot carry markup', () => {
+  it('does not leak reference-link URLs or the removed questions into the JSON-LD', () => {
     const { container } = render(<EngineFAQ />)
     const schema = getJsonLd(container)
-    const lastAnswerText: string = schema.mainEntity[5].acceptedAnswer.text
+    const allText = JSON.stringify(schema)
 
-    // No HTML/JSX ever makes it into the plain-text schema field.
-    expect(lastAnswerText).not.toMatch(/<[a-z][\s\S]*>/i)
-
-    for (const { label, href } of LINKS) {
-      expect(lastAnswerText).toContain(label)
-      expect(lastAnswerText).toContain(href)
+    for (const { href } of LINKS) {
+      expect(allText).not.toContain(href)
+    }
+    for (const q of REMOVED_QUESTIONS) {
+      expect(allText).not.toContain(q)
     }
   })
 })
