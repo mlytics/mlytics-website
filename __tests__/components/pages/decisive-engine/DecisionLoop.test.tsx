@@ -47,17 +47,14 @@ describe('DecisionLoop', () => {
     ).toBeInTheDocument()
   })
 
-  it("renders the Observe card's three absorbed items with verbatim titles and descriptions", () => {
+  it("renders the Observe card's three absorbed tags", () => {
     render(<DecisionLoop />)
     const card = within(
       screen.getByRole('heading', { level: 3, name: 'Observe' }).closest('article') as HTMLElement
     )
     expect(card.getByText('Real users')).toBeInTheDocument()
-    expect(card.getByText('Last-mile experience from actual traffic')).toBeInTheDocument()
     expect(card.getByText('Synthetic probes')).toBeInTheDocument()
-    expect(card.getByText('Proactive CDN and endpoint measurements')).toBeInTheDocument()
     expect(card.getByText('Service health')).toBeInTheDocument()
-    expect(card.getByText('Latency, timeout, errors, and availability')).toBeInTheDocument()
   })
 
   it("renders the Decide card's six absorbed tags", () => {
@@ -77,16 +74,13 @@ describe('DecisionLoop', () => {
     }
   })
 
-  it("renders the Route card's three absorbed items with verbatim titles and descriptions", () => {
+  it("renders the Route card's three absorbed tags", () => {
     render(<DecisionLoop />)
     const card = within(
       screen.getByRole('heading', { level: 3, name: 'Route' }).closest('article') as HTMLElement
     )
     expect(card.getByText('Multiple CDNs')).toBeInTheDocument()
-    expect(card.getByText('Provider and regional path diversity')).toBeInTheDocument()
     expect(card.getByText('Origin Shield')).toBeInTheDocument()
-    expect(card.getByText('Tiered cache and origin offload')).toBeInTheDocument()
     expect(card.getByText('Applications')).toBeInTheDocument()
-    expect(card.getByText('Web, API, media, gaming, and AI services')).toBeInTheDocument()
   })
 })
