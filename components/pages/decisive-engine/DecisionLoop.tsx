@@ -62,13 +62,20 @@ export function DecisionLoop() {
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.45, delay: i * 0.1, ease: 'easeOut' }}
             >
-              <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white mb-7">
-                <item.Icon size={22} strokeWidth={1.6} />
-              </span>
-              <h3 className="text-2xl font-bold text-ink mb-3">{item.title}</h3>
-              <p className="text-sm text-ink-muted">{item.body}</p>
+              {/* Shared min-height keeps the divider below at the same y across
+                  all three cards, regardless of how many lines the body
+                  paragraph wraps to. Pills flow beneath it instead of being
+                  pinned to the card bottom, so a shorter tag block just
+                  leaves trailing space — which reads as deliberate. */}
+              <div className="min-h-[16.5rem]">
+                <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white mb-7">
+                  <item.Icon size={22} strokeWidth={1.6} />
+                </span>
+                <h3 className="text-2xl font-bold text-ink mb-3">{item.title}</h3>
+                <p className="text-sm text-ink-muted">{item.body}</p>
+              </div>
 
-              <div className="mt-auto pt-5 border-t border-line flex flex-wrap gap-2">
+              <div className="mt-5 pt-5 border-t border-line flex flex-wrap gap-2">
                 {item.tags.map((tag) => (
                   <span
                     key={tag}
