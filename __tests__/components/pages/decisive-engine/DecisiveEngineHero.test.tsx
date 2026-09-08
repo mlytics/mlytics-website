@@ -45,20 +45,4 @@ describe('DecisiveEngineHero', () => {
       expect(screen.getByText(pill)).toBeInTheDocument()
     }
   })
-
-  it('renders all four stat items as pills matching the capability pill markup', () => {
-    render(<DecisiveEngineHero />)
-    for (const stat of ['RUM + Synthetic', 'Cross-provider', 'ISP-aware', 'Closed loop']) {
-      const el = screen.getByText(stat)
-      expect(el).toBeInTheDocument()
-      expect(el).toHaveClass(
-        'px-3',
-        'py-1.5',
-        'rounded-full',
-        'text-xs',
-        'font-semibold',
-        'text-on-dark'
-      )
-    }
-  })
 })

@@ -10,8 +10,6 @@ const PILLS = [
   'Origin Optimization',
 ]
 
-const STATS = ['RUM + Synthetic', 'Cross-provider', 'ISP-aware', 'Closed loop']
-
 export function DecisiveEngineHero() {
   return (
     <section className="section-dark pt-32 pb-16">
@@ -48,39 +46,19 @@ export function DecisiveEngineHero() {
             decisions—helping every market use the right delivery path at the right moment.
           </p>
 
-          {/* Two pill groups — capability pills, then stat pills — styled
-              identically so they read as one calm pill block. space-y-3
-              between the rows gives just enough separation to tell the two
-              groups apart without splitting them into competing bands. */}
-          <div className="mt-8 space-y-3">
-            <div className="flex flex-wrap justify-center gap-2">
-              {PILLS.map((pill) => (
-                <span
-                  key={pill}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-on-dark"
-                  style={{
-                    background: 'rgba(168,197,195,0.08)',
-                    border: '1px solid rgba(168,197,195,0.25)',
-                  }}
-                >
-                  {pill}
-                </span>
-              ))}
-            </div>
-            <div className="flex flex-wrap justify-center gap-2">
-              {STATS.map((stat) => (
-                <span
-                  key={stat}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-on-dark"
-                  style={{
-                    background: 'rgba(168,197,195,0.08)',
-                    border: '1px solid rgba(168,197,195,0.25)',
-                  }}
-                >
-                  {stat}
-                </span>
-              ))}
-            </div>
+          <div className="mt-8 flex flex-wrap justify-center gap-2">
+            {PILLS.map((pill) => (
+              <span
+                key={pill}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold text-on-dark"
+                style={{
+                  background: 'rgba(168,197,195,0.08)',
+                  border: '1px solid rgba(168,197,195,0.25)',
+                }}
+              >
+                {pill}
+              </span>
+            ))}
           </div>
         </motion.div>
       </div>
