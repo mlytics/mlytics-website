@@ -21,7 +21,7 @@ export function EngineComparison() {
     <section className="section-light py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
-          className="text-center mb-11"
+          className="text-center max-w-3xl mx-auto mb-11"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -29,7 +29,7 @@ export function EngineComparison() {
         >
           <Eyebrow className="mb-3 block">Industry differentiation</Eyebrow>
           <h2 className="section-heading text-ink mb-4">More than multiple CDN contracts.</h2>
-          <p className="text-base max-w-3xl mx-auto text-ink-muted">
+          <p className="text-base text-ink-muted">
             The difference is the operating system around delivery: independent data, automated
             decisions, origin efficiency, and visible control.
           </p>

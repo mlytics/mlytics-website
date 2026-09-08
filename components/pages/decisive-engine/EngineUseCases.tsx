@@ -20,7 +20,7 @@ export function EngineUseCases() {
     <section className="section-white py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
-          className="text-center mb-11"
+          className="text-center max-w-3xl mx-auto mb-11"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}

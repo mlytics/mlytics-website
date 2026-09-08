@@ -29,7 +29,7 @@ export function DecisiveEnginePageCTA() {
       <section className="section-dark py-16 lg:py-20">
         <div className="max-w-5xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
           <motion.div
-            className="text-center"
+            className="text-center max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
