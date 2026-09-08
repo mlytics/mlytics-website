@@ -13,7 +13,7 @@ const PILLS = [
 export function DecisiveEngineHero() {
   return (
     <section className="section-dark pt-32 pb-16 text-center">
-      <div className="max-w-3xl mx-auto px-6">
+      <div className="max-w-5xl mx-auto px-6">
         {/* Hero — eyebrow, h1, lead, pills. Nothing else. */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -21,28 +21,33 @@ export function DecisiveEngineHero() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          {/* Pill badge — same markup/inline-style as app/developers/page.tsx and
-              components/not-found/NotFoundContent.tsx's .nf-cdn variant. Keep all
-              three identical. */}
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
-            style={{
-              background: 'rgba(34,93,89,0.4)',
-              color: 'var(--color-on-dark)',
-              border: '1px solid rgba(34,93,89,0.6)',
-            }}
-          >
-            Mlytics Multi-CDN Intelligence
-          </span>
+          {/* Prose stays at the site-wide readable measure; only the pill row
+              below gets the wider max-w-5xl measure so five pills can fit on
+              one row at desktop widths. */}
+          <div className="max-w-3xl mx-auto">
+            {/* Pill badge — same markup/inline-style as app/developers/page.tsx and
+                components/not-found/NotFoundContent.tsx's .nf-cdn variant. Keep all
+                three identical. */}
+            <span
+              className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
+              style={{
+                background: 'rgba(34,93,89,0.4)',
+                color: 'var(--color-on-dark)',
+                border: '1px solid rgba(34,93,89,0.6)',
+              }}
+            >
+              Mlytics Multi-CDN Intelligence
+            </span>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4 text-balance">
-            Route. Observe. Decide.
-          </h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4 text-balance">
+              Route. Observe. Decide.
+            </h1>
 
-          <p className="text-base max-w-xl mx-auto text-on-dark">
-            Decisive Engine turns real-world network data into active Multi-CDN traffic
-            decisions—helping every market use the right delivery path at the right moment.
-          </p>
+            <p className="text-base max-w-xl mx-auto text-on-dark">
+              Decisive Engine turns real-world network data into active Multi-CDN traffic
+              decisions—helping every market use the right delivery path at the right moment.
+            </p>
+          </div>
 
           <div className="mt-8 flex flex-wrap justify-center gap-2">
             {PILLS.map((pill) => (
