@@ -37,11 +37,11 @@ const FAQS: Faq[] = [
   },
   {
     q: 'How does Mlytics decide which CDN serves a given user, and how quickly does it react?',
-    a: 'Decisive Engine runs a continuous Observe, Decide, Route loop. Observe combines real user monitoring and synthetic measurements across countries, regions, ISPs, ASNs, CDN providers, time windows, and content types. Decide evaluates availability, latency, TTFB, download performance, capacity, traffic ratios, cost conditions, and your own policy rules. Route then steers traffic through DNS and Multi-CDN orchestration toward the healthiest path for each market. Because the loop is closed, measurement feeding straight into routing, traffic decisions update continuously rather than on a fixed schedule.',
+    a: 'Decisive Engine runs a continuous Observe, Decide, Route loop. Observe combines real user monitoring and synthetic measurements across countries, regions, ISPs, ASNs, CDN providers, time windows, and content types. Decide evaluates availability, latency, TTFB, download performance, capacity, traffic ratios, cost conditions, and your own policy rules. Route then steers traffic through DNS and Multi-CDN orchestration toward the healthiest path for each market. Because the loop is closed and feeds measurement straight into routing, traffic decisions update continuously rather than on a fixed schedule.',
   },
   {
     q: 'Do we have to replace our current CDN provider?',
-    a: 'No. Decisive Engine supports bring-your-own CDN: your existing provider is monitored alongside any others and included in the steering strategy rather than replaced. Where a typical multi-CDN setup means migrating, replacing, or separately integrating each provider, Decisive Engine keeps your current CDN in place and adds an independent decision layer, RUM, synthetic monitoring, and policy, on top, so you gain cross-provider control without renegotiating or switching who serves your traffic today.',
+    a: 'No. Decisive Engine supports bring-your-own CDN: your existing provider is monitored alongside any others and included in the steering strategy rather than replaced. Where a typical multi-CDN setup means migrating, replacing, or separately integrating each provider, Decisive Engine keeps your current CDN in place and adds an independent decision layer on top, built from RUM, synthetic monitoring, and policy, so you gain cross-provider control without renegotiating or switching who serves your traffic today.',
   },
   {
     q: 'Does this only help static assets, or also APIs and dynamic traffic?',
@@ -49,7 +49,7 @@ const FAQS: Faq[] = [
   },
   {
     q: 'What happens when one CDN degrades in the middle of a live event?',
-    a: 'Availability-first steering uses service health, timeouts, connection failures, and error rates to detect a degrading CDN and move affected traffic onto a healthy delivery path. For live and media-peak scenarios, OTT, VoD, and broadcast events, the same Observe, Decide, Route loop allocates traffic by regional quality, availability, and capacity as conditions change during the event itself, rather than requiring a manual failover once viewers are already affected.',
+    a: 'Availability-first steering uses service health, timeouts, connection failures, and error rates to detect a degrading CDN and move affected traffic onto a healthy delivery path. For live and media-peak scenarios such as OTT, VoD, and broadcast events, the same Observe, Decide, Route loop allocates traffic by regional quality, availability, and capacity as conditions change during the event itself, rather than requiring a manual failover once viewers are already affected.',
   },
   {
     q: 'Where can we go deeper before talking to sales?',
