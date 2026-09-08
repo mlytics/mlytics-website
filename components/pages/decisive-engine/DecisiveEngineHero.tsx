@@ -36,8 +36,7 @@ export function DecisiveEngineHero() {
           </span>
 
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4 text-balance">
-            Route. Observe.{' '}
-            <span className="block text-on-dark">Decide.</span>
+            Route. Observe. Decide.
           </h1>
 
           <p className="text-base max-w-xl mx-auto text-on-dark">
