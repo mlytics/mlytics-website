@@ -29,6 +29,7 @@ export function DecisiveEnginePageCTA() {
       <section className="section-dark py-16 lg:py-20">
         <div className="max-w-5xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
           <motion.div
+            className="text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
@@ -67,10 +68,12 @@ export function DecisiveEnginePageCTA() {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.5 }}
           >
-            <Eyebrow className="mb-3 block">Official references</Eyebrow>
-            <h2 className="section-heading text-ink mb-8">
-              Explore the underlying capabilities.
-            </h2>
+            <div className="text-center max-w-3xl mx-auto mb-8">
+              <Eyebrow className="mb-3 block">Official references</Eyebrow>
+              <h2 className="section-heading text-ink">
+                Explore the underlying capabilities.
+              </h2>
+            </div>
             <ul className="grid gap-3 list-none p-0 m-0">
               {REFERENCES.map((ref) => (
                 <li key={ref.href}>

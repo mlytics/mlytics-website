@@ -31,7 +31,7 @@ export function DecisionLoop() {
     <section className="section-light py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
-          className="mb-11"
+          className="text-center mb-11"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -39,7 +39,7 @@ export function DecisionLoop() {
         >
           <Eyebrow className="mb-3 block">The decision loop</Eyebrow>
           <h2 className="section-heading text-ink mb-4">Monitoring becomes routing action.</h2>
-          <p className="text-base max-w-3xl text-ink-muted">
+          <p className="text-base max-w-3xl mx-auto text-ink-muted">
             Decisive Engine connects visibility, policy, and execution in one operating model.
             Traffic decisions continuously reflect real user experience, active tests, service
             health, and business priorities.

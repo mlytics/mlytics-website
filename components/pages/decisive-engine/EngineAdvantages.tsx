@@ -20,7 +20,7 @@ export function EngineAdvantages() {
     <section className="section-white py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
-          className="mb-11"
+          className="text-center mb-11"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -30,7 +30,7 @@ export function EngineAdvantages() {
           <h2 className="section-heading text-ink mb-4">
             Control across providers, markets, and workloads.
           </h2>
-          <p className="text-base max-w-3xl text-ink-muted">
+          <p className="text-base max-w-3xl mx-auto text-ink-muted">
             Mlytics adds an independent decision layer above CDN delivery, giving teams the data
             and control to optimize performance and resilience at global scale.
           </p>
