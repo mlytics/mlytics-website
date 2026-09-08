@@ -5,21 +5,42 @@ import { Radar, Scale, Route } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 
-const STEPS: { title: string; body: string; Icon: LucideIcon }[] = [
+type SubItem = { title: string; desc: string }
+
+type StepDetail = { kind: 'list'; items: SubItem[] } | { kind: 'tags'; items: string[] }
+
+const OBSERVE_ITEMS: SubItem[] = [
+  { title: 'Real users', desc: 'Last-mile experience from actual traffic' },
+  { title: 'Synthetic probes', desc: 'Proactive CDN and endpoint measurements' },
+  { title: 'Service health', desc: 'Latency, timeout, errors, and availability' },
+]
+
+const DECIDE_TAGS = ['Performance', 'Availability', 'Capacity', 'Traffic share', 'Cost', 'Manual control']
+
+const ROUTE_ITEMS: SubItem[] = [
+  { title: 'Multiple CDNs', desc: 'Provider and regional path diversity' },
+  { title: 'Origin Shield', desc: 'Tiered cache and origin offload' },
+  { title: 'Applications', desc: 'Web, API, media, gaming, and AI services' },
+]
+
+const STEPS: { title: string; body: string; Icon: LucideIcon; detail: StepDetail }[] = [
   {
     title: 'Observe',
     body: 'Combine RUM and synthetic measurements across countries, regions, ISPs, ASNs, CDN providers, time windows, and content types.',
     Icon: Radar,
+    detail: { kind: 'list', items: OBSERVE_ITEMS },
   },
   {
     title: 'Decide',
     body: 'Evaluate availability, latency, TTFB, download performance, capacity, traffic ratios, cost conditions, and customer-defined policy.',
     Icon: Scale,
+    detail: { kind: 'tags', items: DECIDE_TAGS },
   },
   {
     title: 'Route',
     body: 'Steer traffic through DNS and Multi-CDN orchestration, moving each market toward an appropriate healthy delivery path.',
     Icon: Route,
+    detail: { kind: 'list', items: ROUTE_ITEMS },
   },
 ]
 
@@ -47,7 +68,7 @@ export function DecisionLoop() {
           {STEPS.map((item, i) => (
             <motion.article
               key={item.title}
-              className="rounded-2xl border border-line bg-white p-8"
+              className="flex flex-col rounded-2xl border border-line bg-white p-8"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
@@ -58,6 +79,30 @@ export function DecisionLoop() {
               </span>
               <h3 className="text-2xl font-bold text-ink mb-3">{item.title}</h3>
               <p className="text-sm text-ink-muted">{item.body}</p>
+
+              <div className="mt-auto pt-5 border-t border-line">
+                {item.detail.kind === 'list' ? (
+                  <ul className="space-y-2.5">
+                    {item.detail.items.map((sub) => (
+                      <li key={sub.title} className="text-xs leading-snug">
+                        <span className="font-semibold text-ink">{sub.title}</span>{' '}
+                        <span className="text-ink-muted">{sub.desc}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {item.detail.items.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/8 text-primary"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </motion.article>
           ))}
         </div>

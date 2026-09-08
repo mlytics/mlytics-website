@@ -1,6 +1,5 @@
 import { DecisiveEngineHero } from '@/components/pages/decisive-engine/DecisiveEngineHero'
 import { DecisionLoop } from '@/components/pages/decisive-engine/DecisionLoop'
-import { OrchestrationDiagram } from '@/components/pages/decisive-engine/OrchestrationDiagram'
 import { EngineAdvantages } from '@/components/pages/decisive-engine/EngineAdvantages'
 import { EngineComparison } from '@/components/pages/decisive-engine/EngineComparison'
 import { EngineUseCases } from '@/components/pages/decisive-engine/EngineUseCases'
@@ -32,7 +31,6 @@ export default function DecisiveEnginePage() {
     <>
       <DecisiveEngineHero />
       <DecisionLoop />
-      <OrchestrationDiagram />
       <EngineAdvantages />
       <EngineComparison />
       <EngineUseCases />

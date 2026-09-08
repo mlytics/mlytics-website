@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { DecisionLoop } from '@/components/pages/decisive-engine/DecisionLoop'
 
 vi.mock('framer-motion', () => ({
@@ -45,5 +45,48 @@ describe('DecisionLoop', () => {
         'Steer traffic through DNS and Multi-CDN orchestration, moving each market toward an appropriate healthy delivery path.'
       )
     ).toBeInTheDocument()
+  })
+
+  it("renders the Observe card's three absorbed items with verbatim titles and descriptions", () => {
+    render(<DecisionLoop />)
+    const card = within(
+      screen.getByRole('heading', { level: 3, name: 'Observe' }).closest('article') as HTMLElement
+    )
+    expect(card.getByText('Real users')).toBeInTheDocument()
+    expect(card.getByText('Last-mile experience from actual traffic')).toBeInTheDocument()
+    expect(card.getByText('Synthetic probes')).toBeInTheDocument()
+    expect(card.getByText('Proactive CDN and endpoint measurements')).toBeInTheDocument()
+    expect(card.getByText('Service health')).toBeInTheDocument()
+    expect(card.getByText('Latency, timeout, errors, and availability')).toBeInTheDocument()
+  })
+
+  it("renders the Decide card's six absorbed tags", () => {
+    render(<DecisionLoop />)
+    const card = within(
+      screen.getByRole('heading', { level: 3, name: 'Decide' }).closest('article') as HTMLElement
+    )
+    for (const tag of [
+      'Performance',
+      'Availability',
+      'Capacity',
+      'Traffic share',
+      'Cost',
+      'Manual control',
+    ]) {
+      expect(card.getByText(tag)).toBeInTheDocument()
+    }
+  })
+
+  it("renders the Route card's three absorbed items with verbatim titles and descriptions", () => {
+    render(<DecisionLoop />)
+    const card = within(
+      screen.getByRole('heading', { level: 3, name: 'Route' }).closest('article') as HTMLElement
+    )
+    expect(card.getByText('Multiple CDNs')).toBeInTheDocument()
+    expect(card.getByText('Provider and regional path diversity')).toBeInTheDocument()
+    expect(card.getByText('Origin Shield')).toBeInTheDocument()
+    expect(card.getByText('Tiered cache and origin offload')).toBeInTheDocument()
+    expect(card.getByText('Applications')).toBeInTheDocument()
+    expect(card.getByText('Web, API, media, gaming, and AI services')).toBeInTheDocument()
   })
 })

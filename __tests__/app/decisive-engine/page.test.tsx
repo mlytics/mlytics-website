@@ -30,7 +30,7 @@ vi.mock('next/link', () => ({
 }))
 
 describe('DecisiveEnginePage', () => {
-  it('assembles all eight sections, each proven by a distinctive rendered string', () => {
+  it('assembles all seven sections, each proven by a distinctive rendered string', () => {
     render(<DecisiveEnginePage />)
 
     // 1. Hero
@@ -44,15 +44,7 @@ describe('DecisiveEnginePage', () => {
       screen.getByRole('heading', { level: 2, name: 'Monitoring becomes routing action.' })
     ).toBeInTheDocument()
 
-    // 3. Orchestration diagram
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: 'From network signals to global delivery.',
-      })
-    ).toBeInTheDocument()
-
-    // 4. Engine advantages
+    // 3. Engine advantages
     expect(
       screen.getByRole('heading', {
         level: 2,
@@ -60,12 +52,12 @@ describe('DecisiveEnginePage', () => {
       })
     ).toBeInTheDocument()
 
-    // 5. Engine comparison
+    // 4. Engine comparison
     expect(
       screen.getByRole('heading', { level: 2, name: 'More than multiple CDN contracts.' })
     ).toBeInTheDocument()
 
-    // 6. Engine use cases
+    // 5. Engine use cases
     expect(
       screen.getByRole('heading', {
         level: 2,
@@ -73,12 +65,12 @@ describe('DecisiveEnginePage', () => {
       })
     ).toBeInTheDocument()
 
-    // 7. CTA — business outcome
+    // 6. CTA — business outcome
     expect(
       screen.getByRole('heading', { level: 2, name: 'One control layer for global delivery.' })
     ).toBeInTheDocument()
 
-    // 8. CTA — official references + final contact CTA
+    // 7. CTA — official references + final contact CTA
     expect(
       screen.getByRole('heading', { level: 2, name: 'Explore the underlying capabilities.' })
     ).toBeInTheDocument()
