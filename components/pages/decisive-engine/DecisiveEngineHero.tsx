@@ -12,11 +12,10 @@ const PILLS = [
 
 export function DecisiveEngineHero() {
   return (
-    <section className="section-dark pt-32 pb-16">
-      <div className="max-w-5xl mx-auto px-6">
+    <section className="section-dark pt-32 pb-16 text-center">
+      <div className="max-w-3xl mx-auto px-6">
         {/* Hero — eyebrow, h1, lead, pills. Nothing else. */}
         <motion.div
-          className="text-center max-w-3xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -36,7 +35,7 @@ export function DecisiveEngineHero() {
             Mlytics Multi-CDN Intelligence
           </span>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-none mb-5">
+          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4 text-balance">
             Route. Observe.{' '}
             <span className="block text-on-dark">Decide.</span>
           </h1>
