@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CdnQualityCard } from '@/components/pages/decisive-engine/CdnQualityCard'
 
 const PILLS = [
   'Real User Monitoring',
@@ -11,12 +10,7 @@ const PILLS = [
   'Origin Optimization',
 ]
 
-const STATS = [
-  { label: 'RUM + Synthetic', desc: 'Two complementary data sources' },
-  { label: 'Cross-provider', desc: 'Decisions across multiple CDNs' },
-  { label: 'ISP-aware', desc: 'Market and network granularity' },
-  { label: 'Closed loop', desc: 'Telemetry converted into action' },
-]
+const STATS = ['RUM + Synthetic', 'Cross-provider', 'ISP-aware', 'Closed loop']
 
 export function DecisiveEngineHero() {
   return (
@@ -54,48 +48,41 @@ export function DecisiveEngineHero() {
             decisions—helping every market use the right delivery path at the right moment.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-2 mt-8">
-            {PILLS.map((pill) => (
-              <span
-                key={pill}
-                className="px-3 py-1.5 rounded-full text-xs font-semibold text-on-dark"
-                style={{
-                  background: 'rgba(168,197,195,0.08)',
-                  border: '1px solid rgba(168,197,195,0.25)',
-                }}
-              >
-                {pill}
-              </span>
-            ))}
+          {/* Two pill groups — capability pills, then stat pills — styled
+              identically so they read as one calm pill block. space-y-3
+              between the rows gives just enough separation to tell the two
+              groups apart without splitting them into competing bands. */}
+          <div className="mt-8 space-y-3">
+            <div className="flex flex-wrap justify-center gap-2">
+              {PILLS.map((pill) => (
+                <span
+                  key={pill}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-on-dark"
+                  style={{
+                    background: 'rgba(168,197,195,0.08)',
+                    border: '1px solid rgba(168,197,195,0.25)',
+                  }}
+                >
+                  {pill}
+                </span>
+              ))}
+            </div>
+            <div className="flex flex-wrap justify-center gap-2">
+              {STATS.map((stat) => (
+                <span
+                  key={stat}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-on-dark"
+                  style={{
+                    background: 'rgba(168,197,195,0.08)',
+                    border: '1px solid rgba(168,197,195,0.25)',
+                  }}
+                >
+                  {stat}
+                </span>
+              ))}
+            </div>
           </div>
         </motion.div>
-
-        {/* Context band — CdnQualityCard + stat strip, kept on the same dark
-            background so it reads as a continuation of the hero rather than a
-            new topic. */}
-        <motion.div
-          className="max-w-md mx-auto mt-14"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-        >
-          <CdnQualityCard />
-        </motion.div>
-
-        <div
-          className="grid grid-cols-2 lg:grid-cols-4 mt-8 rounded-2xl overflow-hidden gap-px p-px"
-          style={{
-            background: 'rgba(168,197,195,0.25)',
-          }}
-        >
-          {STATS.map((stat) => (
-            <div key={stat.label} className="p-5 bg-primary-dark">
-              <p className="text-base font-bold text-on-dark mb-1">{stat.label}</p>
-              <p className="text-sm text-on-dark/85">{stat.desc}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   )

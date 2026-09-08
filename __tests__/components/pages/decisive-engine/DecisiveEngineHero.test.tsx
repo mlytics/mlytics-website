@@ -10,10 +10,6 @@ vi.mock('framer-motion', () => ({
   },
 }))
 
-vi.mock('@/components/pages/decisive-engine/CdnQualityCard', () => ({
-  CdnQualityCard: () => <div data-testid="cdn-quality-card" />,
-}))
-
 describe('DecisiveEngineHero', () => {
   it('renders the H1 with all three verbs', () => {
     render(<DecisiveEngineHero />)
@@ -50,37 +46,19 @@ describe('DecisiveEngineHero', () => {
     }
   })
 
-  it('renders all four stat items', () => {
+  it('renders all four stat items as pills matching the capability pill markup', () => {
     render(<DecisiveEngineHero />)
     for (const stat of ['RUM + Synthetic', 'Cross-provider', 'ISP-aware', 'Closed loop']) {
-      expect(screen.getByText(stat)).toBeInTheDocument()
-    }
-    for (const desc of [
-      'Two complementary data sources',
-      'Decisions across multiple CDNs',
-      'Market and network granularity',
-      'Telemetry converted into action',
-    ]) {
-      expect(screen.getByText(desc)).toBeInTheDocument()
-    }
-  })
-
-  it('embeds the CDN quality card', () => {
-    render(<DecisiveEngineHero />)
-    expect(screen.getByTestId('cdn-quality-card')).toBeInTheDocument()
-  })
-
-  it('renders the stat descriptions at the /85 on-dark text step, not /70', () => {
-    render(<DecisiveEngineHero />)
-    for (const desc of [
-      'Two complementary data sources',
-      'Decisions across multiple CDNs',
-      'Market and network granularity',
-      'Telemetry converted into action',
-    ]) {
-      const el = screen.getByText(desc)
-      expect(el).toHaveClass('text-on-dark/85')
-      expect(el.className).not.toMatch(/text-on-dark\/70\b/)
+      const el = screen.getByText(stat)
+      expect(el).toBeInTheDocument()
+      expect(el).toHaveClass(
+        'px-3',
+        'py-1.5',
+        'rounded-full',
+        'text-xs',
+        'font-semibold',
+        'text-on-dark'
+      )
     }
   })
 })
