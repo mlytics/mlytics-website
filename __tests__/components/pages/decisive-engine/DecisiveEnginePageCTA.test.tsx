@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { DecisiveEnginePageCTA } from '@/components/pages/decisive-engine/DecisiveEnginePageCTA'
 
 vi.mock('framer-motion', () => ({
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div {...props}>{children}</div>
@@ -46,29 +47,10 @@ describe('DecisiveEnginePageCTA', () => {
     }
   })
 
-  it('renders exactly six reference links', () => {
-    render(<DecisiveEnginePageCTA />)
-    const external = screen
-      .getAllByRole('link')
-      .filter((a) => a.getAttribute('href')?.startsWith('http'))
-    expect(external).toHaveLength(6)
-  })
-
   it('does not link to the mislabelled developers page', () => {
     render(<DecisiveEnginePageCTA />)
     const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'))
     expect(hrefs).not.toContain('https://www.mlytics.com/developers')
-  })
-
-  it('opens external references safely in a new tab', () => {
-    render(<DecisiveEnginePageCTA />)
-    const external = screen
-      .getAllByRole('link')
-      .filter((a) => a.getAttribute('href')?.startsWith('http'))
-    for (const link of external) {
-      expect(link).toHaveAttribute('target', '_blank')
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer')
-    }
   })
 
   it('renders the contact CTA pointing at book-a-demo', () => {
@@ -88,15 +70,18 @@ describe('DecisiveEnginePageCTA', () => {
     expect(screen.getByText('The business outcome')).toBeInTheDocument()
   })
 
-  it('renders the references eyebrow verbatim', () => {
+  it('does not render the removed official references section', () => {
     render(<DecisiveEnginePageCTA />)
-    expect(screen.getByText('Official references')).toBeInTheDocument()
+    expect(screen.queryByText('Official references')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'Explore the underlying capabilities.' })
+    ).not.toBeInTheDocument()
   })
 
-  it('renders the references section heading verbatim', () => {
+  it('renders the FAQ section between the business outcome and the contact CTA', () => {
     render(<DecisiveEnginePageCTA />)
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Explore the underlying capabilities.' })
+      screen.getByRole('heading', { level: 2, name: 'Common questions.' })
     ).toBeInTheDocument()
   })
 
@@ -119,37 +104,4 @@ describe('DecisiveEnginePageCTA', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders each reference link label pinned to its own correct href', () => {
-    render(<DecisiveEnginePageCTA />)
-    const expected: { label: string; href: string }[] = [
-      {
-        label: 'RUM and Multi-CDN strategy',
-        href: 'https://learning.mlytics.com/web-monitoring/how-to-implement-rum-for-multi-cdn-strategy/',
-      },
-      {
-        label: 'Origin Shield, origin load balancing, and synthetic monitoring',
-        href: 'https://www.mlytics.com/blog/mlytics-update-bolstering-origin-shield-and-enhancing-reflex-of-smart-load-balancer-and-pulse/',
-      },
-      {
-        label: "Static and dynamic websites — what's the difference?",
-        href: 'https://www.mlytics.com/blog/static-and-dynamic-websites-whats-the-difference/',
-      },
-      {
-        label: "Reimagining Chinese games' success in the globe",
-        href: 'https://www.mlytics.com/blog/reimagining-chinese-games-success-in-the-globe/',
-      },
-      {
-        label: 'Global gaming data to reduce costs and increase efficiency',
-        href: 'https://www.mlytics.com/blog/global-gaming-data-to-reduce-costs-and-increase-efficiency/',
-      },
-      {
-        label: 'Achieving 41% monthly cost savings for e-commerce',
-        href: 'https://www.mlytics.com/blog/achieving-41-monthly-cost-savings-for-e-commerce-with-mlytics-smart-load-balancing/',
-      },
-    ]
-
-    for (const { label, href } of expected) {
-      expect(screen.getByRole('link', { name: label })).toHaveAttribute('href', href)
-    }
-  })
 })

@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import DecisiveEnginePage, { metadata } from '@/app/decisive-engine/page'
 
 vi.mock('framer-motion', () => ({
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div {...props}>{children}</div>
@@ -70,9 +71,9 @@ describe('DecisiveEnginePage', () => {
       screen.getByRole('heading', { level: 2, name: 'One control layer for global delivery.' })
     ).toBeInTheDocument()
 
-    // 7. CTA — official references + final contact CTA
+    // 7. CTA — FAQ + final contact CTA
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Explore the underlying capabilities.' })
+      screen.getByRole('heading', { level: 2, name: 'Common questions.' })
     ).toBeInTheDocument()
     expect(
       screen.getByRole('heading', {
