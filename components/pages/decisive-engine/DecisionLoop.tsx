@@ -78,7 +78,7 @@ export function DecisionLoop() {
                 <p className="text-sm text-ink-muted">{item.body}</p>
               </div>
 
-              <div className="mt-5 pt-5 border-t border-line flex flex-wrap gap-2">
+              <div className="mt-5 pt-5 border-t border-line flex flex-wrap content-start items-start gap-2">
                 {item.tags.map((tag) => (
                   <span
                     key={tag}
