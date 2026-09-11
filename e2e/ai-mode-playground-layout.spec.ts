@@ -136,3 +136,91 @@ test('lens tablist 的 roving tabindex 與方向鍵（實機按鍵）', async ({
   await expect(media).toBeFocused()
   await expect(media).toHaveAttribute('aria-selected', 'true')
 })
+
+// Manual activation, unlike the lens tablist: selecting a mode resets the
+// playground, so arrows must only move focus.
+test('mode tablist 的 manual activation 方向鍵（實機按鍵）', async ({ page }) => {
+  await page.goto('/ai-mode-playground/')
+  const list = page.getByRole('tablist', { name: 'AI Mode experiences' })
+  const chat = list.getByRole('tab', { name: /^Chat/ })
+  const quote = list.getByRole('tab', { name: /Make a quote/ })
+  const listen = list.getByRole('tab', { name: /^Listen/ })
+  const more = list.getByRole('tab', { name: /More to come/ })
+
+  const snapshot = async () => page.evaluate(() => {
+    const tabs = [...document.querySelectorAll('[role="tablist"][aria-label="AI Mode experiences"] [role="tab"]')]
+    return {
+      tabindex: tabs.map((t) => t.getAttribute('tabindex')),
+      selected: tabs.map((t) => t.getAttribute('aria-selected')),
+      focused: tabs.findIndex((t) => t === document.activeElement),
+    }
+  })
+
+  const start = await snapshot()
+  // eslint-disable-next-line no-console
+  console.log('mode initial:', JSON.stringify(start))
+  expect(start.tabindex).toEqual(['0', '-1', '-1', '-1'])
+  expect(start.selected).toEqual(['true', 'false', 'false', 'false'])
+
+  await chat.focus()
+  await page.keyboard.press('ArrowRight')
+  const afterRight = await snapshot()
+  // eslint-disable-next-line no-console
+  console.log('mode after ArrowRight:', JSON.stringify(afterRight))
+  expect(afterRight.focused).toBe(1)
+  expect(afterRight.selected).toEqual(start.selected) // selection unmoved
+  await expect(quote).toBeFocused()
+
+  await page.keyboard.press('ArrowRight')
+  await expect(listen).toBeFocused()
+  // Listen is the last enabled tab: forward wraps past the disabled one.
+  await page.keyboard.press('ArrowRight')
+  await expect(more).not.toBeFocused()
+  await expect(chat).toBeFocused()
+
+  await page.keyboard.press('ArrowLeft')
+  await expect(more).not.toBeFocused()
+  await expect(listen).toBeFocused()
+
+  await page.keyboard.press('Home')
+  await expect(chat).toBeFocused()
+  await page.keyboard.press('End')
+  await expect(listen).toBeFocused()
+
+  const beforeEnter = await snapshot()
+  // eslint-disable-next-line no-console
+  console.log('mode before Enter:', JSON.stringify(beforeEnter))
+  expect(beforeEnter.selected).toEqual(start.selected)
+
+  await page.keyboard.press('Enter')
+  await expect(listen).toHaveAttribute('aria-selected', 'true')
+  const afterEnter = await snapshot()
+  // eslint-disable-next-line no-console
+  console.log('mode after Enter:', JSON.stringify(afterEnter))
+  expect(afterEnter.selected).toEqual(['false', 'false', 'true', 'false'])
+  expect(afterEnter.tabindex).toEqual(['-1', '-1', '0', '-1'])
+
+  // Space activates too.
+  await page.keyboard.press('Home')
+  await expect(chat).toBeFocused()
+  await page.keyboard.press(' ')
+  await expect(chat).toHaveAttribute('aria-selected', 'true')
+})
+
+test('mode 方向鍵不會觸發 reset——已產生的事件留著', async ({ page }) => {
+  await page.goto('/ai-mode-playground/')
+  const rows = () => page.locator("#lens-panel-brands [data-tone]")
+
+  await page.locator('li button').first().click()
+  await expect(rows().first()).toBeVisible()
+  const before = await rows().count()
+
+  await page.getByRole('tablist', { name: 'AI Mode experiences' }).getByRole('tab', { name: /^Chat/ }).focus()
+  for (const key of ['ArrowRight', 'ArrowRight', 'ArrowLeft', 'Home', 'End']) await page.keyboard.press(key)
+
+  const after = await rows().count()
+  // eslint-disable-next-line no-console
+  console.log('ledger rows before/after arrowing:', before, after)
+  expect(after).toBe(before)
+  await expect(page.getByText(/^Grounded in/)).toBeVisible()
+})

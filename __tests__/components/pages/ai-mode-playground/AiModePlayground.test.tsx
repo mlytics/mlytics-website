@@ -790,3 +790,122 @@ describe('右欄首視線與裝飾標籤精簡（Task 11）', () => {
     expect(getByText('MEDIA ARTICLE')).toBeInTheDocument()
   })
 })
+
+// The lens tablist on the right uses automatic activation, which is free
+// there. Here it is not: handleModeChange runs handleReset, so arrowing from
+// Chat to Listen would wipe the playground twice on the way. ARIA APG allows
+// manual activation exactly for this case.
+describe('mode tablist 鍵盤操作（ARIA APG manual activation）', () => {
+  const chat = () => getTab(/^Chat/)
+  const quote = () => getTab(/make a quote/i)
+  const listen = () => getTab(/^Listen/)
+  const more = () => getTab(/more to come/i)
+
+  const selected = () => modeTabs().map((tab) => tab.getAttribute('aria-selected'))
+
+  it('roving tabindex：只有被選取的 tab 進得了 Tab 順序', () => {
+    render(<AiModePlayground />)
+    expect(chat()).toHaveAttribute('tabindex', '0')
+    expect(quote()).toHaveAttribute('tabindex', '-1')
+    expect(listen()).toHaveAttribute('tabindex', '-1')
+    expect(more()).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('方向鍵只移動焦點，aria-selected 不變', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+    chat().focus()
+    const before = selected()
+
+    await user.keyboard('{ArrowRight}')
+    expect(quote()).toHaveFocus()
+    expect(selected()).toEqual(before)
+
+    await user.keyboard('{ArrowRight}')
+    expect(listen()).toHaveFocus()
+    expect(selected()).toEqual(before)
+
+    await user.keyboard('{ArrowLeft}')
+    expect(quote()).toHaveFocus()
+    expect(selected()).toEqual(before)
+
+    // ArrowDown/ArrowUp mirror right/left.
+    await user.keyboard('{ArrowDown}')
+    expect(listen()).toHaveFocus()
+    await user.keyboard('{ArrowUp}')
+    expect(quote()).toHaveFocus()
+    expect(selected()).toEqual(before)
+  })
+
+  it('方向鍵跳過 disabled 的 More to come，並在可用的 tab 之間繞回', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+    listen().focus()
+
+    // Listen is the last enabled tab; forward wraps past More to come.
+    await user.keyboard('{ArrowRight}')
+    expect(more()).not.toHaveFocus()
+    expect(chat()).toHaveFocus()
+
+    await user.keyboard('{ArrowLeft}')
+    expect(more()).not.toHaveFocus()
+    expect(listen()).toHaveFocus()
+  })
+
+  it('Home／End 移到第一個／最後一個可用 tab，且不改變選取', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+    quote().focus()
+    const before = selected()
+
+    await user.keyboard('{End}')
+    expect(listen()).toHaveFocus()
+    expect(selected()).toEqual(before)
+
+    await user.keyboard('{Home}')
+    expect(chat()).toHaveFocus()
+    expect(selected()).toEqual(before)
+  })
+
+  it('Enter 啟用目前有焦點的 tab', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+    chat().focus()
+    await user.keyboard('{ArrowRight}')
+    expect(quote()).toHaveAttribute('aria-selected', 'false')
+
+    await user.keyboard('{Enter}')
+    await waitFor(() => expect(quote()).toHaveAttribute('aria-selected', 'true'))
+    expect(chat()).toHaveAttribute('aria-selected', 'false')
+  })
+
+  it('Space 啟用目前有焦點的 tab', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+    chat().focus()
+    await user.keyboard('{End}')
+    expect(listen()).toHaveAttribute('aria-selected', 'false')
+
+    await user.keyboard('[Space]')
+    await waitFor(() => expect(listen()).toHaveAttribute('aria-selected', 'true'))
+  })
+
+  // The whole reason for manual activation: arrowing past a mode must not
+  // reset the events the user already collected.
+  it('方向鍵不會觸發 reset——已產生的事件不被清空', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<AiModePlayground />)
+    const rows = () => container.querySelectorAll('#lens-panel-brands [data-tone]').length
+
+    await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
+    await waitFor(() => expect(rows()).toBeGreaterThan(0))
+    const before = rows()
+
+    chat().focus()
+    await user.keyboard('{ArrowRight}{ArrowRight}{ArrowLeft}{Home}{End}')
+
+    expect(rows()).toBe(before)
+    expect(screen.getByText(/^Grounded in/)).toBeInTheDocument()
+    expect(chat()).toHaveAttribute('aria-selected', 'true')
+  })
+})

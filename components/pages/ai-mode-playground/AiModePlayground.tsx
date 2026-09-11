@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { AiModePlaygroundWidget } from './AiModePlaygroundWidget'
 import { SignalLedger } from './SignalLedger'
 import {
@@ -60,6 +60,7 @@ export function AiModePlayground() {
   const articleRef = useRef<HTMLElement>(null)
   const playgroundRef = useRef<HTMLElement>(null)
   const widgetRef = useRef<HTMLDivElement>(null)
+  const modeTabRefs = useRef<(HTMLButtonElement | null)[]>([])
   const resetEpochRef = useRef(0)
   const resettingRef = useRef(false)
   const eventSequenceRef = useRef(0)
@@ -271,6 +272,46 @@ export function AiModePlayground() {
     if (nextMode !== mode) handleReset(nextMode)
   }
 
+  // ARIA APG tabs with MANUAL activation, unlike the lens tablist on the
+  // right. Selecting a mode runs handleReset, so automatic activation would
+  // wipe the playground at every tab the user arrows past on the way to the
+  // one they want. Arrows and Home/End move focus only; Enter/Space commits.
+  //
+  // Only MODES get refs, so the disabled `More to come` tab is skipped by
+  // construction — it can never take focus or be activated.
+  function handleModeKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    const focused = modeTabRefs.current.indexOf(document.activeElement as HTMLButtonElement)
+    const current = focused === -1 ? MODES.findIndex((item) => item.id === mode) : focused
+    let next: number
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        next = (current + 1) % MODES.length
+        break
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        next = (current - 1 + MODES.length) % MODES.length
+        break
+      case 'Home':
+        next = 0
+        break
+      case 'End':
+        next = MODES.length - 1
+        break
+      case 'Enter':
+      case ' ':
+        // preventDefault suppresses the button's own click activation, so the
+        // mode changes exactly once rather than once here and once natively.
+        event.preventDefault()
+        if (current !== -1) handleModeChange(MODES[current].id)
+        return
+      default:
+        return
+    }
+    event.preventDefault()
+    modeTabRefs.current[next]?.focus()
+  }
+
   useEffect(() => {
     if (!audioPlaying || resetting) return
     const timerEpoch = resetEpochRef.current
@@ -353,13 +394,22 @@ export function AiModePlayground() {
           <div className={styles.workspace}>
             <div className={styles.modeBar}>
               <span className={styles.modeLabel}>Choose an experience</span>
-              <div className={styles.modeTabs} role="tablist" aria-label="AI Mode experiences">
-                {MODES.map((item) => (
-                  <button key={item.id} type="button" role="tab" aria-selected={mode === item.id} aria-controls="ai-mode-widget" onClick={() => handleModeChange(item.id)}>
+              <div className={styles.modeTabs} role="tablist" aria-label="AI Mode experiences" onKeyDown={handleModeKeyDown}>
+                {MODES.map((item, index) => (
+                  <button
+                    key={item.id}
+                    ref={(node) => { modeTabRefs.current[index] = node }}
+                    type="button"
+                    role="tab"
+                    aria-selected={mode === item.id}
+                    aria-controls="ai-mode-widget"
+                    tabIndex={mode === item.id ? 0 : -1}
+                    onClick={() => handleModeChange(item.id)}
+                  >
                     {item.label}<small>{item.sublabel}</small>
                   </button>
                 ))}
-                <button type="button" role="tab" aria-selected="false" aria-disabled="true" disabled>More to come<small>Coming soon</small></button>
+                <button type="button" role="tab" aria-selected="false" aria-disabled="true" tabIndex={-1} disabled>More to come<small>Coming soon</small></button>
               </div>
             </div>
             <div className={styles.userPanel}>
