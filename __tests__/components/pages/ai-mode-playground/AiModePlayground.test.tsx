@@ -708,3 +708,30 @@ describe('AI Mode Playground 詞彙', () => {
     expect(getByText('MEDIA ARTICLE')).toBeInTheDocument()
   })
 })
+
+describe('右欄首視線與裝飾標籤精簡（Task 11）', () => {
+  it('右欄在未互動時就顯示引導，而不是只有空的 metrics 列', () => {
+    const { getAllByText } = render(<AiModePlayground />)
+    const guides = getAllByText(/nothing captured yet/i)
+    expect(guides.some((node) => node.closest('[hidden]') === null)).toBe(true)
+  })
+
+  it('ledgerPanel 排在 metrics 之上，讓 heading 與引導成為首視線', () => {
+    expect(playgroundCss).toMatch(/\.ledgerPanel\s*\{[^}]*order:\s*0/)
+    expect(playgroundCss).toMatch(/\.metrics\s*\{[^}]*order:\s*1/)
+  })
+
+  it('已移除純裝飾的 Source story 標籤', () => {
+    const { queryByText } = render(<AiModePlayground />)
+    expect(queryByText(/^source story$/i)).not.toBeInTheDocument()
+  })
+
+  it('已移除 LIVE PLAYGROUND 裝飾標籤（由 CSS ::after 產生，DOM 查不到）', () => {
+    expect(playgroundCss).not.toMatch(/live playground/i)
+  })
+
+  it('MEDIA ARTICLE 保留——它說明左欄是媒體方的原生文章', () => {
+    const { getByText } = render(<AiModePlayground />)
+    expect(getByText('MEDIA ARTICLE')).toBeInTheDocument()
+  })
+})

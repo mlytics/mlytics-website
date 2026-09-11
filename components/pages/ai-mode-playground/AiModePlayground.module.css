@@ -141,13 +141,6 @@
   text-transform: uppercase;
 }
 
-.userSubheader::after {
-  color: #2D7A74;
-  content: '●  LIVE PLAYGROUND';
-  font: 10px 'SFMono-Regular', Consolas, monospace;
-  letter-spacing: .1em;
-}
-
 .article {
   min-width: 0;
   border: 1px solid var(--color-line);
@@ -172,10 +165,7 @@
 }
 
 .articleContext span:first-child { display: grid; gap: 2px; }
-.articleContext b,
-.articleContext small { display: block; }
-.articleContext b { color: #1A3D3A; font: 700 10px/1.5 'SFMono-Regular', Consolas, monospace; letter-spacing: .1em; }
-.articleContext small { margin-top: 2px; color: #6B6B6B; font-size: 12px; text-transform: uppercase; }
+.articleContext b { display: block; color: #1A3D3A; font: 700 10px/1.5 'SFMono-Regular', Consolas, monospace; letter-spacing: .1em; }
 .articleContext span:last-child { color: #6B6B6B; font-size: 12px; text-transform: none; }
 
 .articleKicker {
@@ -402,7 +392,7 @@
 .metric:last-child { border-right: 0; }
 .metricLabel { display: block; color: #6B6B6B; font: 10px/1.5 'SFMono-Regular', Consolas, monospace; letter-spacing: .04em; text-transform: uppercase; }
 .metricValue { display: block; margin-top: 5px; color: #1A3D3A; font-size: 19px; line-height: 1.5; font-weight: 700; }
-.ledgerPanel { order: 2; padding-top: 22px; }
+.ledgerPanel { order: 0; padding: 22px 0; }
 .ledgerKicker { color: #6B6B6B; font: 11px/1.5 'SFMono-Regular', Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; }
 .ledgerPanel h2 { margin: 10px 0 8px; color: #1A3D3A; font-size: 25px; font-weight: 400; letter-spacing: -.04em; line-height: 1.08; }
 .ledgerIntro { margin: 0 0 20px; color: #6B6B6B; font-size: 13px; line-height: 1.6; }

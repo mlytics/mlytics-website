@@ -366,7 +366,7 @@ export function AiModePlayground() {
               <div className={styles.userColumn}>
                 <div className={styles.userSubheader}>What the user sees</div>
                 <article ref={articleRef} className={styles.article} aria-labelledby="article-title">
-                  <div className={styles.articleContext}><span><b>MEDIA ARTICLE</b><small>Source story</small></span><span>Mlytics AI Mode extends this story</span></div>
+                  <div className={styles.articleContext}><span><b>MEDIA ARTICLE</b></span><span>Mlytics AI Mode extends this story</span></div>
                   <div className={styles.articleKicker}>{ARTICLE.kicker}</div>
                   <h2 id="article-title">{ARTICLE.title}</h2>
                   <p className={styles.standfirst}>{ARTICLE.standfirst}</p>
