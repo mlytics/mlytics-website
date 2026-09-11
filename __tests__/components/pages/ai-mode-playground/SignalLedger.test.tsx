@@ -7,6 +7,11 @@ import { describe, expect, it, vi } from 'vitest'
 import type { LedgerLens } from '@/components/pages/ai-mode-playground/ai-mode-playground-data'
 import { SignalLedger } from '@/components/pages/ai-mode-playground/SignalLedger'
 
+const css = () => readFileSync(
+  resolve(__dirname, '../../../../components/pages/ai-mode-playground/AiModePlayground.module.css'),
+  'utf8',
+)
+
 const base = {
   mode: 'chat' as const,
   events: [],
@@ -33,9 +38,8 @@ describe('SignalLedger 詞彙', () => {
   })
 
   // The value is renamed to match the site path; the words on screen are not.
-  it('surface label 與 lens 控制項的 id 都改用 content-owners', () => {
+  it('lens 控制項的 id 改用 content-owners', () => {
     render(<SignalLedger lens="content-owners" {...base} />)
-    expect(screen.getByText('Media signal ledger')).toBeInTheDocument()
     const control = screen.getByRole('tab', { name: /media and content/i })
     expect(control).toHaveAttribute('id', 'lens-content-owners')
     expect(document.getElementById('lens-panel-content-owners')).toBeInTheDocument()
@@ -43,10 +47,50 @@ describe('SignalLedger 詞彙', () => {
 
   it('brand 側的 id 改用 brands，顯示標籤仍是 Brand', () => {
     render(<SignalLedger lens="brands" {...base} />)
-    expect(screen.getByText('Brand signal ledger')).toBeInTheDocument()
     const control = screen.getByRole('tab', { name: /^brand/i })
     expect(control).toHaveAttribute('id', 'lens-brands')
     expect(document.getElementById('lens-panel-brands')).toBeInTheDocument()
+  })
+
+  // "This is the Media panel" was said four times inside 130 vertical pixels:
+  // the tab label, its MEDIA VALUE sublabel, `Media signal ledger`, and the
+  // kicker. The third carried no new information, so the row is gone and the
+  // one thing on it that does change — the event count — moved next to the
+  // list it counts.
+  it('surfaceLabel 那一列已整列移除', () => {
+    const { container } = render(<SignalLedger lens="content-owners" {...base} />)
+    expect(container.textContent).not.toMatch(/signal ledger/i)
+    expect(css()).not.toMatch(/\.surfaceLabel/)
+  })
+
+  it('kicker 同一行同時帶 lens · mode 與事件數', () => {
+    render(<SignalLedger lens="content-owners" {...base} />)
+    const kicker = screen.getByText(/MEDIA LENS · CHAT/).closest('[class]')!
+    expect(kicker.textContent).toMatch(/MEDIA LENS · CHAT/)
+    expect(kicker.textContent).toMatch(/00 EVENTS/)
+  })
+
+  it('事件數維持兩位數 padStart 格式，且跟著事件數量走', () => {
+    const events = Array.from({ length: 3 }, (_, i) => ({
+      id: `e${i}`,
+      kind: 'article_scroll',
+      title: 't',
+      detail: 'd',
+      tone: 'raw' as const,
+      lensCopy: {
+        'content-owners': { title: 't', detail: 'd' },
+        brands: { title: 't', detail: 'd' },
+      },
+    }))
+    render(<SignalLedger lens="content-owners" {...base} events={events as never} />)
+    const visible = screen.getAllByText('03 EVENTS').filter((n) => n.closest('[hidden]') === null)
+    expect(visible).toHaveLength(1)
+  })
+
+  it('kicker 為左右兩欄對齊，且保留 mono 樣式', () => {
+    expect(css()).toMatch(/\.ledgerKicker\s*\{[^}]*display:\s*flex/)
+    expect(css()).toMatch(/\.ledgerKicker\s*\{[^}]*justify-content:\s*space-between/)
+    expect(css()).toMatch(/\.ledgerKicker\s*\{[^}]*'SFMono-Regular'/)
   })
 
   // The renamed value must not leak into the kicker: `content-owners`.toUpperCase()
@@ -60,11 +104,6 @@ describe('SignalLedger 詞彙', () => {
 })
 
 describe('SignalLedger lens 控制項形制', () => {
-  const css = () => readFileSync(
-    resolve(__dirname, '../../../../components/pages/ai-mode-playground/AiModePlayground.module.css'),
-    'utf8',
-  )
-
   it('lens 切換回到 tablist 語意，與左側 mode tab 同形制', () => {
     render(<SignalLedger lens="content-owners" {...base} />)
     expect(screen.getByRole('tablist', { name: /ledger lens/i })).toBeInTheDocument()

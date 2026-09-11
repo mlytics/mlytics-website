@@ -23,6 +23,14 @@ function modeTabs() {
   return within(screen.getByRole('tablist', { name: /ai mode experiences/i })).getAllByRole('tab')
 }
 
+// The event count now rides each lens panel's kicker, so it renders once per
+// lens with the inactive panel `hidden`. Assertions want the visible one.
+function visibleEventCount() {
+  const shown = screen.getAllByText(/^\d\d EVENTS$/).filter((node) => node.closest('[hidden]') === null)
+  expect(shown).toHaveLength(1)
+  return shown[0].textContent
+}
+
 let intersectionObserverCallback: IntersectionObserverCallback | null = null
 
 beforeEach(() => {
@@ -113,7 +121,7 @@ describe('AiModePlayground', () => {
     expect(screen.getByRole('button', { name: /which joint-support ingredients/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /is stiffness after walks/i })).toBeInTheDocument()
     expect(getTab(/more to come/i)).toBeDisabled()
-    expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+    expect(visibleEventCount()).toBe('00 EVENTS')
   })
 
   it('keeps More to come desktop-only and makes tablet/mobile mode tabs horizontally scrollable', () => {
@@ -614,7 +622,7 @@ describe('AiModePlayground', () => {
     await user.click(screen.getByRole('button', { name: /start over/i }))
 
     expect(getTab(/^Chat/)).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+    expect(visibleEventCount()).toBe('00 EVENTS')
     expect(screen.getByRole('button', { name: /at what age should a large-breed dog/i })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /generate quote card/i })).not.toBeInTheDocument()
     expect(screen.queryByDisplayValue('An Chou')).not.toBeInTheDocument()
@@ -650,7 +658,7 @@ describe('AiModePlayground', () => {
     fireEvent.click(reset)
 
     expect(reset).toBeDisabled()
-    expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+    expect(visibleEventCount()).toBe('00 EVENTS')
     expect(screen.getByText('0%')).toBeInTheDocument()
     expect(screen.getByText('Waiting')).toBeInTheDocument()
 
@@ -660,7 +668,7 @@ describe('AiModePlayground', () => {
       vi.runOnlyPendingTimers()
     })
 
-    expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+    expect(visibleEventCount()).toBe('00 EVENTS')
     expect(screen.getByText('0%')).toBeInTheDocument()
     expect(screen.getByText('Waiting')).toBeInTheDocument()
   })
@@ -688,7 +696,7 @@ describe('AiModePlayground', () => {
         vi.runAllTimers()
       })
 
-      expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+      expect(visibleEventCount()).toBe('00 EVENTS')
       expect(screen.queryByText(/sponsored attention qualified/i)).not.toBeInTheDocument()
     } finally {
       Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: originalRequestAnimationFrame })
@@ -711,7 +719,7 @@ describe('AiModePlayground', () => {
 
       expect(reset).toBeDisabled()
       expect(getTab(/^Chat/)).toHaveAttribute('aria-selected', 'true')
-      expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+      expect(visibleEventCount()).toBe('00 EVENTS')
       expect(screen.getByText('0%')).toBeInTheDocument()
       expect(screen.getByText('Waiting')).toBeInTheDocument()
 

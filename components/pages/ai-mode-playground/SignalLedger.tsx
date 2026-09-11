@@ -79,7 +79,6 @@ export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression
           </button>
         ))}
       </div>
-      <div className={styles.surfaceLabel}><span>{LENS_SURFACE[lens]} signal ledger</span><span>{String(events.length).padStart(2, '0')} EVENTS</span></div>
       <div className={styles.ledgerBody}>
         <div className={styles.ledgerShared}>
           <div className={styles.metrics} aria-label="Preview metrics">
@@ -91,7 +90,13 @@ export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression
           const panelContent = getLensContent(panelLens)
           return (
             <div key={panelLens} id={`lens-panel-${panelLens}`} className={styles.ledgerPanel} role="tabpanel" aria-labelledby={`lens-${panelLens}`} hidden={lens !== panelLens}>
-              <span className={styles.ledgerKicker}>{LENS_SURFACE[panelLens].toUpperCase()} LENS · {mode.toUpperCase()}</span>
+              {/* The event count rides the kicker rather than a row of its own:
+                  it is the only thing up here that changes as the user
+                  interacts, so it belongs beside the list it counts. */}
+              <div className={styles.ledgerKicker}>
+                <span>{LENS_SURFACE[panelLens].toUpperCase()} LENS · {mode.toUpperCase()}</span>
+                <span>{String(events.length).padStart(2, '0')} EVENTS</span>
+              </div>
               <h2>{panelContent.heading}</h2>
               <p className={styles.ledgerIntro}>{panelContent.intro}</p>
               <div className={styles.eventStream} aria-live="polite">
