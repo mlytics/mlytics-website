@@ -7,7 +7,7 @@
 // "arrive without a deep link and you get the Brand view" promise rests on.
 // Note that at the component level "the effect ran and chose brand" and "the
 // effect never ran" render the same output, so the default-lens test pins the
-// default, not the effect; `?lens=media` is what exercises the effect.
+// default, not the effect; `?lens=content-owners` is what exercises the effect.
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -42,8 +42,8 @@ describe('AiModePlayground lens deep-link', () => {
     expect(screen.getByRole('radio', { name: /media and content/i })).toHaveAttribute('aria-checked', 'false')
   })
 
-  it('selects the Media lens for ?lens=media', async () => {
-    setSearch('?lens=media')
+  it('selects the Media lens for ?lens=content-owners', async () => {
+    setSearch('?lens=content-owners')
     render(<AiModePlayground />)
 
     await waitFor(() => {
@@ -51,12 +51,27 @@ describe('AiModePlayground lens deep-link', () => {
     })
     expect(screen.getByRole('radio', { name: /^brand$/i })).toHaveAttribute('aria-checked', 'false')
   })
+
+  // The parser test covers the alias table in isolation; this covers the wiring
+  // — a link someone shared before the rename still opens on the right lens.
+  it.each([
+    ['?lens=publisher', /media and content/i],
+    ['?lens=media', /media and content/i],
+    ['?lens=brand', /^brand$/i],
+  ])('resolves the legacy value in %s through the component', async (search, selected) => {
+    setSearch(search)
+    render(<AiModePlayground />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('radio', { name: selected })).toHaveAttribute('aria-checked', 'true')
+    })
+  })
 })
 
 describe('AiModePlayground lens URL sync', () => {
   it('rewrites ?lens= when the user switches lens', async () => {
     const user = userEvent.setup()
-    setSearch('?lens=media')
+    setSearch('?lens=content-owners')
     render(<AiModePlayground />)
 
     await waitFor(() => {
@@ -66,14 +81,14 @@ describe('AiModePlayground lens URL sync', () => {
     await user.click(screen.getByRole('radio', { name: /^brand$/i }))
 
     await waitFor(() => {
-      expect(new URLSearchParams(window.location.search).get('lens')).toBe('brand')
+      expect(new URLSearchParams(window.location.search).get('lens')).toBe('brands')
     })
     expect(screen.getByRole('radio', { name: /^brand$/i })).toHaveAttribute('aria-checked', 'true')
   })
 
   it('keeps the other query params and the hash when it rewrites ?lens=', async () => {
     const user = userEvent.setup()
-    setSearch('?utm_source=slack&lens=media#foo')
+    setSearch('?utm_source=slack&lens=content-owners#foo')
     render(<AiModePlayground />)
 
     await waitFor(() => {
@@ -83,7 +98,7 @@ describe('AiModePlayground lens URL sync', () => {
     await user.click(screen.getByRole('radio', { name: /^brand$/i }))
 
     await waitFor(() => {
-      expect(new URLSearchParams(window.location.search).get('lens')).toBe('brand')
+      expect(new URLSearchParams(window.location.search).get('lens')).toBe('brands')
     })
     expect(new URLSearchParams(window.location.search).get('utm_source')).toBe('slack')
     expect(window.location.hash).toBe('#foo')
@@ -91,7 +106,7 @@ describe('AiModePlayground lens URL sync', () => {
 
   it('replaces the history entry instead of pushing one', async () => {
     const user = userEvent.setup()
-    setSearch('?lens=media')
+    setSearch('?lens=content-owners')
     render(<AiModePlayground />)
 
     await waitFor(() => {
@@ -103,7 +118,7 @@ describe('AiModePlayground lens URL sync', () => {
     await user.click(screen.getByRole('radio', { name: /media and content/i }))
 
     await waitFor(() => {
-      expect(new URLSearchParams(window.location.search).get('lens')).toBe('media')
+      expect(new URLSearchParams(window.location.search).get('lens')).toBe('content-owners')
     })
     expect(window.history.length).toBe(lengthBefore)
   })

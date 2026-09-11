@@ -122,7 +122,7 @@ test('playground 互動後狀態所有文字對比 ≥ 4.5', async ({ page }) =>
   await page.getByRole('tab', { name: /ask/i }).click()
   await page.locator('li button').first().click()
   await expect(page.getByText(/^Grounded in/)).toBeVisible()
-  await expect(scope.locator("#lens-panel-brand [data-tone='signal']").first()).toBeVisible()
+  await expect(scope.locator("#lens-panel-brands [data-tone='signal']").first()).toBeVisible()
   await sweep('chat')
 
   // Quote: step labels, the signature hint, and the generated card.
@@ -137,12 +137,12 @@ test('playground 互動後狀態所有文字對比 ≥ 4.5', async ({ page }) =>
   // Listen: playback state plus its own signal rows.
   await page.getByRole('tab', { name: /attend/i }).click()
   await page.getByRole('button', { name: 'Play' }).click()
-  await expect(scope.locator("#lens-panel-brand [data-tone='signal']").first()).toBeVisible()
+  await expect(scope.locator("#lens-panel-brands [data-tone='signal']").first()).toBeVisible()
   await sweep('listen')
 
   // The media lens renders a different copy set through the same rows.
   await page.getByRole('radio', { name: 'Media and Content' }).click()
-  await expect(scope.locator("#lens-panel-media [data-tone='signal']").first()).toBeVisible()
+  await expect(scope.locator("#lens-panel-content-owners [data-tone='signal']").first()).toBeVisible()
   await sweep('media lens')
 
   expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0)

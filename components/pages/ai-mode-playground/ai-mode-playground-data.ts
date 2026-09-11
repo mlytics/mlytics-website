@@ -1,12 +1,18 @@
 export type PlaygroundMode = 'chat' | 'quote' | 'listen'
-const LEDGER_LENSES = ['media', 'brand'] as const
+/** The lens values match the site paths they speak for — `/content-owners/`
+ *  and `/brands/` — so a URL, a DOM id and a copy key all read the same. */
+const LEDGER_LENSES = ['content-owners', 'brands'] as const
 export type LedgerLens = (typeof LEDGER_LENSES)[number]
 
 /** Lens values that used to be valid and are still in circulation as URLs.
- *  DATAI-555 writes the lens into the address bar, so `?lens=publisher` links
- *  exist in the wild; dropping the value outright would fail silently by
- *  falling back to the default lens. */
-const LEGACY_LENS_ALIASES: Record<string, LedgerLens> = { publisher: 'media' }
+ *  DATAI-555 writes the lens into the address bar, so every value this page
+ *  has ever shipped is a link somebody already holds; dropping one outright
+ *  would fail silently by falling back to the default lens. */
+const LEGACY_LENS_ALIASES: Record<string, LedgerLens> = {
+  publisher: 'content-owners', // shipped by DATAI-555
+  media: 'content-owners',     // short-lived, but reached UAT links
+  brand: 'brands',             // shipped by DATAI-555
+}
 
 export function isLedgerLens(value: unknown): value is LedgerLens {
   return typeof value === 'string' && (LEDGER_LENSES as readonly string[]).includes(value)
@@ -127,65 +133,65 @@ type ModeLensCopy = Record<PlaygroundMode, LensCopy>
 
 const ROLE_COPY = {
   widget_impression: {
-    media: { title: 'User reached the next layer', detail: 'The article-end experience earned a visible user moment.' },
-    brand: { title: 'Qualified placement viewed', detail: 'Your brand moment was visible in a context the user chose to reach.' },
+    'content-owners': { title: 'User reached the next layer', detail: 'The article-end experience earned a visible user moment.' },
+    brands: { title: 'Qualified placement viewed', detail: 'Your brand moment was visible in a context the user chose to reach.' },
   },
   widget_click: {
     chat: {
-      media: { title: 'Topic preference captured', detail: 'You can see what the user wants to understand next.' },
-      brand: { title: 'Active need surfaced', detail: 'You can see a specific need behind the interaction.' },
+      'content-owners': { title: 'Topic preference captured', detail: 'You can see what the user wants to understand next.' },
+      brands: { title: 'Active need surfaced', detail: 'You can see a specific need behind the interaction.' },
     },
     quote: {
-      media: { title: 'Editorial resonance captured', detail: 'You can see which claim earns user attention.' },
-      brand: { title: 'Message resonance captured', detail: 'You can see which claim earns attention in context.' },
+      'content-owners': { title: 'Editorial resonance captured', detail: 'You can see which claim earns user attention.' },
+      brands: { title: 'Message resonance captured', detail: 'You can see which claim earns attention in context.' },
     },
     listen: {
-      media: { title: 'Format engagement started', detail: 'You can see the user choose a deeper way to continue.' },
-      brand: { title: 'Audio attention opened', detail: 'You gained a path into the user’s attention.' },
+      'content-owners': { title: 'Format engagement started', detail: 'You can see the user choose a deeper way to continue.' },
+      brands: { title: 'Audio attention opened', detail: 'You gained a path into the user’s attention.' },
     },
   },
   article_scroll: {
-    media: { title: 'Reading depth captured', detail: 'You can see how far the user stayed with the story.' },
-    brand: { title: 'Attention depth captured', detail: 'You can see the user moved beyond a passive view.' },
+    'content-owners': { title: 'Reading depth captured', detail: 'You can see how far the user stayed with the story.' },
+    brands: { title: 'Attention depth captured', detail: 'You can see the user moved beyond a passive view.' },
   },
   declared_intent: {
-    media: { title: 'Topic intent captured', detail: 'You can understand the user’s next information need.' },
-    brand: { title: 'Consideration need surfaced', detail: 'You can see an active need forming around the category.' },
+    'content-owners': { title: 'Topic intent captured', detail: 'You can understand the user’s next information need.' },
+    brands: { title: 'Consideration need surfaced', detail: 'You can see an active need forming around the category.' },
   },
   contextual_placement: {
-    media: { title: 'Contextual engagement created', detail: 'You created a useful in-article moment without interrupting reading.' },
-    brand: { title: 'Relevant placement reached', detail: 'You appeared where the user was actively exploring an answer.' },
+    'content-owners': { title: 'Contextual engagement created', detail: 'You created a useful in-article moment without interrupting reading.' },
+    brands: { title: 'Relevant placement reached', detail: 'You appeared where the user was actively exploring an answer.' },
   },
   content_resonance: {
-    media: { title: 'Editorial resonance captured', detail: 'You can see which claim deserves continued distribution.' },
-    brand: { title: 'Message resonance captured', detail: 'You can see which message earns attention in context.' },
+    'content-owners': { title: 'Editorial resonance captured', detail: 'You can see which claim deserves continued distribution.' },
+    brands: { title: 'Message resonance captured', detail: 'You can see which message earns attention in context.' },
   },
   amplification_ready: {
-    media: { title: 'Share-ready editorial asset', detail: 'You have a format that can extend the story beyond the article.' },
-    brand: { title: 'Branded amplification ready', detail: 'You have a contextual message ready to travel with the user.' },
+    'content-owners': { title: 'Share-ready editorial asset', detail: 'You have a format that can extend the story beyond the article.' },
+    brands: { title: 'Branded amplification ready', detail: 'You have a contextual message ready to travel with the user.' },
   },
   attention_start: {
-    media: { title: 'Audio engagement started', detail: 'You can see a deeper reading format begin.' },
-    brand: { title: 'Brand attention opened', detail: 'You gain a new attention path within the story.' },
+    'content-owners': { title: 'Audio engagement started', detail: 'You can see a deeper reading format begin.' },
+    brands: { title: 'Brand attention opened', detail: 'You gain a new attention path within the story.' },
   },
   sponsored_attention: {
-    media: { title: 'Sponsored media value reached', detail: 'You can see a sponsored placement hold the user through the moment.' },
-    brand: { title: 'Sponsored attention qualified', detail: 'You can see your audio placement hold the user through the moment.' },
+    'content-owners': { title: 'Sponsored media value reached', detail: 'You can see a sponsored placement hold the user through the moment.' },
+    brands: { title: 'Sponsored attention qualified', detail: 'You can see your audio placement hold the user through the moment.' },
   },
   share: {
-    media: { title: 'User amplification completed', detail: 'You can see the selected claim leave the article through a local mock share action.' },
-    brand: { title: 'Content carried outward', detail: 'You can see the selected quote move beyond the article.' },
+    'content-owners': { title: 'User amplification completed', detail: 'You can see the selected claim leave the article through a local mock share action.' },
+    brands: { title: 'Content carried outward', detail: 'You can see the selected quote move beyond the article.' },
   },
 } as const
 
 const LENS_CONTENT = {
-  brand: {
+  brands: {
     heading: 'See the demand behind the interaction.',
     intro: 'A user action becomes a declared need, a purchase stage, and a relevant placement opportunity.',
     projectionTitle: 'Brand projection',
     projection: 'The same user event helps you understand intent, placement, and attributable value.',
   },
-  media: {
+  'content-owners': {
     heading: 'See the user relationship grow.',
     intro: 'A user action becomes a topic preference, an engagement moment, and a clue about what to show next.',
     projectionTitle: 'Media projection',
@@ -218,12 +224,12 @@ export function resolveLensCopy({
     ? (copy as ModeLensCopy)[mode]
     : copy
 
-  if (scoped && 'media' in scoped) return scoped as LensCopy
+  if (scoped && 'content-owners' in scoped) return scoped as LensCopy
   if (copyKey === 'article_scroll' && threshold && threshold >= 25) {
     return ROLE_COPY.article_scroll as LensCopy
   }
   return {
-    media: { title: `Media value captured: ${title}`, detail: `You captured this user event: ${detail}` },
-    brand: { title: `Brand value captured: ${title}`, detail: `You captured this user event: ${detail}` },
+    'content-owners': { title: `Media value captured: ${title}`, detail: `You captured this user event: ${detail}` },
+    brands: { title: `Brand value captured: ${title}`, detail: `You captured this user event: ${detail}` },
   }
 }

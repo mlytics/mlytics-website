@@ -334,14 +334,14 @@ export function BrandGEOSection() {
         <div style={{ height: 1, background: 'rgba(168,197,195,0.12)' }} />
       </motion.div>
 
-      {/* ── Playground entry point — brand lens ───────────────────── */}
+      {/* ── Playground entry point — brands lens ──────────────────── */}
       <PlaygroundCTASection
         variant="embedded"
         eyebrow="Try the experience"
         heading="What does a placement inside an AI answer look like?"
         body="Walk through one media article as a user would, and watch intent, purchase stage, and placement opportunity land on the Brand value ledger."
         ctaLabel="Try AI Mode"
-        lens="brand"
+        lens="brands"
         trackingPosition="brands_playground"
       />
     </section>

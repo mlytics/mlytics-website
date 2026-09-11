@@ -53,11 +53,11 @@ describe('PublishersPage playground entry point', () => {
     )).toBeInTheDocument()
   })
 
-  it('links to the playground with the media lens', () => {
+  it('links to the playground with the content-owners lens', () => {
     render(<PublishersPage />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/ai-mode-playground/?lens=media')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=content-owners')
   })
 
   // Both audience entry points carry the same `Try AI Mode` label, so

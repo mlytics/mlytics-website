@@ -43,7 +43,7 @@ function getSiteHeaderBottom() {
 
 export function AiModePlayground() {
   const [mode, setMode] = useState<PlaygroundMode>('chat')
-  const [lens, setLens] = useState<LedgerLens>('brand')
+  const [lens, setLens] = useState<LedgerLens>('brands')
   const [events, setEvents] = useState<LedgerEvent[]>([])
   const [scrollDepth, setScrollDepth] = useState(0)
   const [widgetImpression, setWidgetImpression] = useState(false)
@@ -390,7 +390,7 @@ export function AiModePlayground() {
                     onQuoteAction={(action) => {
                       setQuoteActionStatus(action === 'download' ? 'quote card downloaded' : `${action.toUpperCase()} share recorded`)
                       if (action !== 'download' && !events.some((event) => event.kind === 'share')) {
-                        const copy = lens === 'brand' ? 'Content carried outward' : 'User amplification completed'
+                        const copy = lens === 'brands' ? 'Content carried outward' : 'User amplification completed'
                         emitEvent({ kind: 'share', title: copy, detail: 'The selected quote moved beyond the article through a local mock share action.', tone: 'raw', context: { mode: 'quote' } })
                       }
                     }}

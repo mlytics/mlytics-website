@@ -264,13 +264,13 @@ describe('AiModePlayground', () => {
 
     await user.click(getLens(/media and content/i))
     expect(getLens(/media and content/i)).toHaveAttribute('aria-checked', 'true')
-    expect(document.getElementById('lens-panel-media')).not.toHaveAttribute('hidden')
+    expect(document.getElementById('lens-panel-content-owners')).not.toHaveAttribute('hidden')
     expect(screen.getByText('Topic preference captured')).toBeInTheDocument()
     expect(screen.getByText(/user relationship grow/i)).toBeInTheDocument()
 
     await user.click(getLens(/^brand$/i))
     expect(getLens(/^brand$/i)).toHaveAttribute('aria-checked', 'true')
-    expect(document.getElementById('lens-panel-brand')).not.toHaveAttribute('hidden')
+    expect(document.getElementById('lens-panel-brands')).not.toHaveAttribute('hidden')
     expect(screen.getByText('Active need surfaced')).toBeInTheDocument()
     expect(screen.getByText(/demand behind the interaction/i)).toBeInTheDocument()
   })
@@ -289,7 +289,7 @@ describe('AiModePlayground', () => {
     await user.click(getTab(/make a quote/i))
     await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
     await user.click(screen.getByRole('button', { name: /weight and cumulative joint load/i }))
-    const activeLedger = within(document.getElementById('lens-panel-brand') as HTMLElement)
+    const activeLedger = within(document.getElementById('lens-panel-brands') as HTMLElement)
 
     expect(activeLedger.getAllByText('CONTENT_RESONANCE')).toHaveLength(1)
     expect(activeLedger.queryByText('AMPLIFICATION_READY')).not.toBeInTheDocument()

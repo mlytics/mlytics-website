@@ -73,11 +73,11 @@ describe('BrandsPage playground entry point', () => {
     )).toBeInTheDocument()
   })
 
-  it('links to the playground with the brand lens', () => {
+  it('links to the playground with the brands lens', () => {
     render(<BrandsPage />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/ai-mode-playground/?lens=brand')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=brands')
   })
 
   // Both audience entry points carry the same `Try AI Mode` label, so

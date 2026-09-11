@@ -12,10 +12,19 @@ type SignalLedgerProps = {
   onLensChange: (lens: LedgerLens) => void
 }
 
+/** `value` is the wire format — it matches the site path the lens speaks for
+ *  (`/content-owners/`, `/brands/`) and travels through the URL, the DOM ids
+ *  and the copy keys. `surface` is the word shown on screen, and is
+ *  deliberately NOT derived from `value`: uppercasing the value would read
+ *  "CONTENT-OWNERS LENS". Renaming the value must not rename the copy. */
 const LENSES = [
-  { value: 'media', id: 'lens-media', label: 'Media and Content' },
-  { value: 'brand', id: 'lens-brand', label: 'Brand' },
-] as const satisfies readonly { value: LedgerLens; id: string; label: string }[]
+  { value: 'content-owners', id: 'lens-content-owners', label: 'Media and Content', surface: 'Media' },
+  { value: 'brands', id: 'lens-brands', label: 'Brand', surface: 'Brand' },
+] as const satisfies readonly { value: LedgerLens; id: string; label: string; surface: string }[]
+
+const LENS_SURFACE: Record<LedgerLens, string> = Object.fromEntries(
+  LENSES.map((item) => [item.value, item.surface]),
+) as Record<LedgerLens, string>
 
 export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression, onLensChange }: SignalLedgerProps) {
   const radioRefs = useRef<(HTMLButtonElement | null)[]>([])
@@ -68,7 +77,7 @@ export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression
           </button>
         ))}
       </div>
-      <div className={styles.surfaceLabel}><span>{lens === 'brand' ? 'Brand' : 'Media'} signal ledger</span><span>{String(events.length).padStart(2, '0')} EVENTS</span></div>
+      <div className={styles.surfaceLabel}><span>{LENS_SURFACE[lens]} signal ledger</span><span>{String(events.length).padStart(2, '0')} EVENTS</span></div>
       <div className={styles.ledgerBody}>
         <div className={styles.ledgerShared}>
           <div className={styles.metrics} aria-label="Preview metrics">
@@ -76,11 +85,11 @@ export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression
             <div className={styles.metric}><span className={styles.metricLabel}>Widget impression</span><span className={styles.metricValue} aria-live="polite">{widgetImpression ? 'Captured' : 'Waiting'}</span></div>
           </div>
         </div>
-        {(['media', 'brand'] as const).map((panelLens) => {
+        {LENSES.map(({ value: panelLens }) => {
           const panelContent = getLensContent(panelLens)
           return (
             <div key={panelLens} id={`lens-panel-${panelLens}`} className={styles.ledgerPanel} hidden={lens !== panelLens}>
-              <span className={styles.ledgerKicker}>{panelLens.toUpperCase()} LENS · {mode.toUpperCase()}</span>
+              <span className={styles.ledgerKicker}>{LENS_SURFACE[panelLens].toUpperCase()} LENS · {mode.toUpperCase()}</span>
               <h2>{panelContent.heading}</h2>
               <p className={styles.ledgerIntro}>{panelContent.intro}</p>
               <div className={styles.eventStream} aria-live="polite">

@@ -34,7 +34,7 @@ const mediaProps = {
   heading: 'What does this look like inside your article?',
   body: 'Walk through one article with the Cortex widget, and watch reader signals land on the Media value ledger as they happen.',
   ctaLabel: 'Try AI Mode',
-  lens: 'media' as const,
+  lens: 'content-owners' as const,
   trackingPosition: 'content_owners_playground',
 }
 
@@ -49,18 +49,18 @@ describe('PlaygroundCTASection', () => {
     expect(screen.getByText(mediaProps.body)).toBeInTheDocument()
   })
 
-  it('links to the playground with the media lens', () => {
+  it('links to the playground with the content-owners lens', () => {
     render(<PlaygroundCTASection {...mediaProps} />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/ai-mode-playground/?lens=media')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=content-owners')
   })
 
-  it('links to the playground with the brand lens', () => {
-    render(<PlaygroundCTASection {...mediaProps} lens="brand" />)
+  it('links to the playground with the brands lens', () => {
+    render(<PlaygroundCTASection {...mediaProps} lens="brands" />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/ai-mode-playground/?lens=brand')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=brands')
   })
 
   it('renders exactly one link', () => {
@@ -142,18 +142,18 @@ describe('PlaygroundCTASection — embedded variant', () => {
   })
 
   it('links and tracks exactly as the standalone variant does', async () => {
-    const { container: light } = render(<PlaygroundCTASection {...mediaProps} lens="brand" />)
+    const { container: light } = render(<PlaygroundCTASection {...mediaProps} lens="brands" />)
     const lightHref = light.querySelector('a')?.getAttribute('href')
     await userEvent.click(screen.getByRole('link', { name: 'Try AI Mode' }))
     const lightCalls = trackCTA.mock.calls.slice()
     cleanup()
     trackCTA.mockClear()
 
-    render(<PlaygroundCTASection {...embeddedProps} lens="brand" />)
+    render(<PlaygroundCTASection {...embeddedProps} lens="brands" />)
     const embeddedLink = screen.getByRole('link', { name: 'Try AI Mode' })
     await userEvent.click(embeddedLink)
 
-    expect(embeddedLink).toHaveAttribute('href', '/ai-mode-playground/?lens=brand')
+    expect(embeddedLink).toHaveAttribute('href', '/ai-mode-playground/?lens=brands')
     expect(embeddedLink.getAttribute('href')).toBe(lightHref)
     expect(trackCTA.mock.calls).toEqual(lightCalls)
     expect(trackCTA).toHaveBeenCalledWith('Try AI Mode', 'content_owners_playground')
