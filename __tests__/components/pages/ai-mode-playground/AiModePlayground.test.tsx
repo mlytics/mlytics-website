@@ -13,7 +13,13 @@ function getTab(name: RegExp) {
 }
 
 function getLens(name: RegExp) {
-  return screen.getByRole('radio', { name })
+  return screen.getByRole('tab', { name })
+}
+
+// Both tablists on the page are made of `role="tab"`, so any count of the mode
+// tabs has to be scoped to the mode tablist rather than the whole document.
+function modeTabs() {
+  return within(screen.getByRole('tablist', { name: /ai mode experiences/i })).getAllByRole('tab')
 }
 
 let intersectionObserverCallback: IntersectionObserverCallback | null = null
@@ -95,12 +101,12 @@ describe('AiModePlayground', () => {
     expect(playgroundCss).not.toMatch(/\.modeTabs button:disabled/)
 
     render(<AiModePlayground />)
-    expect(screen.getAllByRole('tab')).toHaveLength(3)
+    expect(modeTabs()).toHaveLength(3)
   })
 
   it('tab 列不含不可點的佔位 tab', () => {
-    const { getAllByRole } = render(<AiModePlayground />)
-    const tabs = getAllByRole('tab')
+    render(<AiModePlayground />)
+    const tabs = modeTabs()
     expect(tabs).toHaveLength(3)
     expect(tabs.every((t) => !(t as HTMLButtonElement).disabled)).toBe(true)
   })
@@ -263,13 +269,13 @@ describe('AiModePlayground', () => {
     await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
 
     await user.click(getLens(/media and content/i))
-    expect(getLens(/media and content/i)).toHaveAttribute('aria-checked', 'true')
+    expect(getLens(/media and content/i)).toHaveAttribute('aria-selected', 'true')
     expect(document.getElementById('lens-panel-content-owners')).not.toHaveAttribute('hidden')
     expect(screen.getByText('Topic preference captured')).toBeInTheDocument()
     expect(screen.getByText(/user relationship grow/i)).toBeInTheDocument()
 
-    await user.click(getLens(/^brand$/i))
-    expect(getLens(/^brand$/i)).toHaveAttribute('aria-checked', 'true')
+    await user.click(getLens(/^brand/i))
+    expect(getLens(/^brand/i)).toHaveAttribute('aria-selected', 'true')
     expect(document.getElementById('lens-panel-brands')).not.toHaveAttribute('hidden')
     expect(screen.getByText('Active need surfaced')).toBeInTheDocument()
     expect(screen.getByText(/demand behind the interaction/i)).toBeInTheDocument()

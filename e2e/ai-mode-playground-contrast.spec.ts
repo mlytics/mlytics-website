@@ -53,29 +53,35 @@ test('playground 初始畫面所有文字對比 ≥ 4.5', async ({ page }) => {
   expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0)
 })
 
-test('Task 9 逐項：五個指定選擇器的實測對比', async ({ page }) => {
+test('Task 9 逐項：每個 tab 狀態與內文的實測對比', async ({ page }) => {
   await page.goto('/ai-mode-playground/')
 
   // Reach the grounded answer line, which only renders after a prompt is chosen.
-  await page.getByRole('tab', { name: /ask/i }).click()
+  await page.getByRole('tablist', { name: 'AI Mode experiences' }).getByRole('tab', { name: /ask/i }).click()
   await page.locator('li button').first().click()
   await expect(page.getByText(/^Grounded in/)).toBeVisible()
 
   const measured: Record<string, { fg: number[]; bg: number[] }> = await page.evaluate(`(() => {
     ${HELPERS}
     const scope = document.querySelector('${SCOPE}')
-    const tabs = [...scope.querySelectorAll('[role="tab"]')]
-    const unselected = tabs.find((t) => t.getAttribute('aria-selected') === 'false')
-    const selected = tabs.find((t) => t.getAttribute('aria-selected') === 'true')
+    const inList = (label) => [...scope.querySelectorAll('[role="tablist"][aria-label="' + label + '"] [role="tab"]')]
+    const modes = inList('AI Mode experiences').filter((t) => !t.disabled)
+    const lenses = inList('Ledger lens')
+    const modeOff = modes.find((t) => t.getAttribute('aria-selected') === 'false')
+    const modeOn = modes.find((t) => t.getAttribute('aria-selected') === 'true')
+    const lensOff = lenses.find((t) => t.getAttribute('aria-selected') === 'false')
+    const lensOn = lenses.find((t) => t.getAttribute('aria-selected') === 'true')
     const grounded = [...scope.querySelectorAll('p')].find((p) => p.textContent.trim().startsWith('Grounded in'))
-    const radios = [...scope.querySelectorAll('[role="radio"]')]
     return {
-      'modeTab unselected': measure(unselected),
-      'modeTab small': measure(unselected.querySelector('small')),
-      'modeTab selected': measure(selected),
+      'modeTab unselected': measure(modeOff),
+      'modeTab small': measure(modeOff.querySelector('small')),
+      'modeTab selected': measure(modeOn),
+      'modeTab selected small': measure(modeOn.querySelector('small')),
       'answerGrounded': measure(grounded),
-      'lensSwitch unchecked': measure(radios.find((r) => r.getAttribute('aria-checked') === 'false')),
-      'lensSwitch checked': measure(radios.find((r) => r.getAttribute('aria-checked') === 'true')),
+      'lensTab unselected': measure(lensOff),
+      'lensTab unselected small': measure(lensOff.querySelector('small')),
+      'lensTab selected': measure(lensOn),
+      'lensTab selected small': measure(lensOn.querySelector('small')),
     }
   })()`)
 
@@ -87,7 +93,7 @@ test('Task 9 逐項：五個指定選擇器的實測對比', async ({ page }) =>
 
 test('選取中的 mode tab 使用 gold token 作為底線', async ({ page }) => {
   await page.goto('/ai-mode-playground/')
-  const border = await page.evaluate(`getComputedStyle(document.querySelector('${SCOPE} [role="tab"][aria-selected="true"]')).borderBottomColor`)
+  const border = await page.evaluate(`getComputedStyle(document.querySelector('${SCOPE} [role="tablist"][aria-label="AI Mode experiences"] [role="tab"][aria-selected="true"]')).borderBottomColor`)
   expect(border).toBe('rgb(245, 158, 11)') // --color-gold
 })
 
@@ -119,14 +125,16 @@ test('playground 互動後狀態所有文字對比 ≥ 4.5', async ({ page }) =>
   const sweep = async (stage: string) => bad.push(...failures(stage, await page.evaluate(SCAN)))
 
   // Chat: answering a question emits signal-tone ledger rows.
-  await page.getByRole('tab', { name: /ask/i }).click()
+  const modeTab = (name: RegExp) => page.getByRole('tablist', { name: 'AI Mode experiences' }).getByRole('tab', { name })
+
+  await modeTab(/ask/i).click()
   await page.locator('li button').first().click()
   await expect(page.getByText(/^Grounded in/)).toBeVisible()
   await expect(scope.locator("#lens-panel-brands [data-tone='signal']").first()).toBeVisible()
   await sweep('chat')
 
   // Quote: step labels, the signature hint, and the generated card.
-  await page.getByRole('tab', { name: /amplify/i }).click()
+  await modeTab(/amplify/i).click()
   await expect(page.getByText('1 · Choose a line')).toBeVisible()
   await page.getByRole('listitem').filter({ has: page.locator('button') }).first().locator('button').click()
   await page.getByRole('radio', { name: 'Great' }).click()
@@ -135,13 +143,13 @@ test('playground 互動後狀態所有文字對比 ≥ 4.5', async ({ page }) =>
   await sweep('quote')
 
   // Listen: playback state plus its own signal rows.
-  await page.getByRole('tab', { name: /attend/i }).click()
+  await modeTab(/attend/i).click()
   await page.getByRole('button', { name: 'Play' }).click()
   await expect(scope.locator("#lens-panel-brands [data-tone='signal']").first()).toBeVisible()
   await sweep('listen')
 
   // The media lens renders a different copy set through the same rows.
-  await page.getByRole('radio', { name: 'Media and Content' }).click()
+  await page.getByRole('tablist', { name: 'Ledger lens' }).getByRole('tab', { name: /Media and Content/ }).click()
   await expect(scope.locator("#lens-panel-content-owners [data-tone='signal']").first()).toBeVisible()
   await sweep('media lens')
 

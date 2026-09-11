@@ -36,34 +36,35 @@ test('純裝飾的 mono 微標籤已移除', async ({ page }) => {
   expect(decorations.sourceStory).toBe(0)
 })
 
-test('lens radiogroup 的 roving tabindex 與方向鍵（實機按鍵）', async ({ page }) => {
+test('lens tablist 的 roving tabindex 與方向鍵（實機按鍵）', async ({ page }) => {
   await page.goto('/ai-mode-playground/')
-  const media = page.getByRole('radio', { name: 'Media and Content' })
-  const brand = page.getByRole('radio', { name: 'Brand', exact: true })
+  const lens = page.getByRole('tablist', { name: 'Ledger lens' })
+  const media = lens.getByRole('tab', { name: /Media and Content/ })
+  const brand = lens.getByRole('tab', { name: /^Brand/ })
 
   const snapshot = async () => page.evaluate(() => {
-    const radios = [...document.querySelectorAll('[role="radiogroup"][aria-label="Ledger lens"] [role="radio"]')]
+    const tabs = [...document.querySelectorAll('[role="tablist"][aria-label="Ledger lens"] [role="tab"]')]
     return {
-      tabindex: radios.map((r) => r.getAttribute('tabindex')),
-      checked: radios.map((r) => r.getAttribute('aria-checked')),
-      focused: radios.findIndex((r) => r === document.activeElement),
+      tabindex: tabs.map((t) => t.getAttribute('tabindex')),
+      selected: tabs.map((t) => t.getAttribute('aria-selected')),
+      focused: tabs.findIndex((t) => t === document.activeElement),
     }
   })
 
   // The page defaults to the brand lens, so assert the invariant rather than a fixed pair:
-  // exactly one radio is in the tab order, and it is the checked one.
+  // exactly one tab is in the tab order, and it is the selected one.
   const start = await snapshot()
   // eslint-disable-next-line no-console
   console.log('initial:', JSON.stringify(start))
   expect(start.tabindex.filter((t) => t === '0')).toHaveLength(1)
-  expect(start.tabindex.indexOf('0')).toBe(start.checked.indexOf('true'))
+  expect(start.tabindex.indexOf('0')).toBe(start.selected.indexOf('true'))
 
   await media.focus()
   await page.keyboard.press('ArrowRight')
   const afterRight = await snapshot()
   // eslint-disable-next-line no-console
   console.log('after ArrowRight:', JSON.stringify(afterRight))
-  expect(afterRight.checked).toEqual(['false', 'true'])
+  expect(afterRight.selected).toEqual(['false', 'true'])
   expect(afterRight.tabindex).toEqual(['-1', '0'])
   expect(afterRight.focused).toBe(1)
   await expect(brand).toBeFocused()
@@ -72,15 +73,23 @@ test('lens radiogroup 的 roving tabindex 與方向鍵（實機按鍵）', async
   const afterLeft = await snapshot()
   // eslint-disable-next-line no-console
   console.log('after ArrowLeft:', JSON.stringify(afterLeft))
-  expect(afterLeft.checked).toEqual(['true', 'false'])
+  expect(afterLeft.selected).toEqual(['true', 'false'])
   expect(afterLeft.tabindex).toEqual(['0', '-1'])
   await expect(media).toBeFocused()
 
+  await page.keyboard.press('ArrowDown')
+  await expect(brand).toBeFocused()
+  await expect(brand).toHaveAttribute('aria-selected', 'true')
+
+  await page.keyboard.press('ArrowUp')
+  await expect(media).toBeFocused()
+  await expect(media).toHaveAttribute('aria-selected', 'true')
+
   await page.keyboard.press('End')
   await expect(brand).toBeFocused()
-  await expect(brand).toHaveAttribute('aria-checked', 'true')
+  await expect(brand).toHaveAttribute('aria-selected', 'true')
 
   await page.keyboard.press('Home')
   await expect(media).toBeFocused()
-  await expect(media).toHaveAttribute('aria-checked', 'true')
+  await expect(media).toHaveAttribute('aria-selected', 'true')
 })

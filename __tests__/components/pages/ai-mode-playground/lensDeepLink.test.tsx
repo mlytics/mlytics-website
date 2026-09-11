@@ -37,9 +37,9 @@ describe('AiModePlayground lens deep-link', () => {
     render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('radio', { name: /^brand$/i })).toHaveAttribute('aria-checked', 'true')
+      expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'true')
     })
-    expect(screen.getByRole('radio', { name: /media and content/i })).toHaveAttribute('aria-checked', 'false')
+    expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'false')
   })
 
   it('selects the Media lens for ?lens=content-owners', async () => {
@@ -47,9 +47,9 @@ describe('AiModePlayground lens deep-link', () => {
     render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('radio', { name: /media and content/i })).toHaveAttribute('aria-checked', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
-    expect(screen.getByRole('radio', { name: /^brand$/i })).toHaveAttribute('aria-checked', 'false')
+    expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'false')
   })
 
   // The parser test covers the alias table in isolation; this covers the wiring
@@ -57,13 +57,13 @@ describe('AiModePlayground lens deep-link', () => {
   it.each([
     ['?lens=publisher', /media and content/i],
     ['?lens=media', /media and content/i],
-    ['?lens=brand', /^brand$/i],
+    ['?lens=brand', /^brand/i],
   ])('resolves the legacy value in %s through the component', async (search, selected) => {
     setSearch(search)
     render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('radio', { name: selected })).toHaveAttribute('aria-checked', 'true')
+      expect(screen.getByRole('tab', { name: selected })).toHaveAttribute('aria-selected', 'true')
     })
   })
 })
@@ -75,15 +75,15 @@ describe('AiModePlayground lens URL sync', () => {
     render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('radio', { name: /media and content/i })).toHaveAttribute('aria-checked', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
 
-    await user.click(screen.getByRole('radio', { name: /^brand$/i }))
+    await user.click(screen.getByRole('tab', { name: /^brand/i }))
 
     await waitFor(() => {
       expect(new URLSearchParams(window.location.search).get('lens')).toBe('brands')
     })
-    expect(screen.getByRole('radio', { name: /^brand$/i })).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'true')
   })
 
   it('keeps the other query params and the hash when it rewrites ?lens=', async () => {
@@ -92,10 +92,10 @@ describe('AiModePlayground lens URL sync', () => {
     render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('radio', { name: /media and content/i })).toHaveAttribute('aria-checked', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
 
-    await user.click(screen.getByRole('radio', { name: /^brand$/i }))
+    await user.click(screen.getByRole('tab', { name: /^brand/i }))
 
     await waitFor(() => {
       expect(new URLSearchParams(window.location.search).get('lens')).toBe('brands')
@@ -110,12 +110,12 @@ describe('AiModePlayground lens URL sync', () => {
     render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('radio', { name: /media and content/i })).toHaveAttribute('aria-checked', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
     const lengthBefore = window.history.length
 
-    await user.click(screen.getByRole('radio', { name: /^brand$/i }))
-    await user.click(screen.getByRole('radio', { name: /media and content/i }))
+    await user.click(screen.getByRole('tab', { name: /^brand/i }))
+    await user.click(screen.getByRole('tab', { name: /media and content/i }))
 
     await waitFor(() => {
       expect(new URLSearchParams(window.location.search).get('lens')).toBe('content-owners')

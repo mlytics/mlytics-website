@@ -18,22 +18,23 @@ type SignalLedgerProps = {
  *  deliberately NOT derived from `value`: uppercasing the value would read
  *  "CONTENT-OWNERS LENS". Renaming the value must not rename the copy. */
 const LENSES = [
-  { value: 'content-owners', id: 'lens-content-owners', label: 'Media and Content', surface: 'Media' },
-  { value: 'brands', id: 'lens-brands', label: 'Brand', surface: 'Brand' },
-] as const satisfies readonly { value: LedgerLens; id: string; label: string; surface: string }[]
+  { value: 'content-owners', id: 'lens-content-owners', label: 'Media and Content', note: 'Media value', surface: 'Media' },
+  { value: 'brands', id: 'lens-brands', label: 'Brand', note: 'Brand value', surface: 'Brand' },
+] as const satisfies readonly { value: LedgerLens; id: string; label: string; note: string; surface: string }[]
 
 const LENS_SURFACE: Record<LedgerLens, string> = Object.fromEntries(
   LENSES.map((item) => [item.value, item.surface]),
 ) as Record<LedgerLens, string>
 
 export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression, onLensChange }: SignalLedgerProps) {
-  const radioRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
-  // ARIA APG radiogroup: arrows move selection and focus together, and wrap.
-  // Position is taken from the focused radio, not from the selected lens — the
-  // two normally coincide, but a programmatic focus can put them out of step.
+  // ARIA APG tabs with automatic activation: arrows move selection and focus
+  // together, and wrap. Position is taken from the focused tab, not from the
+  // selected lens — the two normally coincide, but a programmatic focus can
+  // put them out of step.
   function handleLensKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    const focused = radioRefs.current.indexOf(document.activeElement as HTMLButtonElement)
+    const focused = tabRefs.current.indexOf(document.activeElement as HTMLButtonElement)
     const current = focused === -1 ? LENSES.findIndex((item) => item.value === lens) : focused
     let next: number
     switch (event.key) {
@@ -55,25 +56,26 @@ export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression
         return
     }
     event.preventDefault()
-    radioRefs.current[next]?.focus()
+    tabRefs.current[next]?.focus()
     if (LENSES[next].value !== lens) onLensChange(LENSES[next].value)
   }
 
   return (
     <aside className={styles.ledger} aria-label="Experience ledger">
-      <div className={styles.lensSwitch} role="radiogroup" aria-label="Ledger lens" onKeyDown={handleLensKeyDown}>
+      <div className={styles.lensTabs} role="tablist" aria-label="Ledger lens" onKeyDown={handleLensKeyDown}>
         {LENSES.map((item, index) => (
           <button
             key={item.value}
-            ref={(node) => { radioRefs.current[index] = node }}
+            ref={(node) => { tabRefs.current[index] = node }}
             id={item.id}
             type="button"
-            role="radio"
-            aria-checked={lens === item.value}
+            role="tab"
+            aria-selected={lens === item.value}
+            aria-controls={`lens-panel-${item.value}`}
             tabIndex={lens === item.value ? 0 : -1}
             onClick={() => onLensChange(item.value)}
           >
-            {item.label}
+            {item.label}<small>{item.note}</small>
           </button>
         ))}
       </div>
@@ -88,7 +90,7 @@ export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression
         {LENSES.map(({ value: panelLens }) => {
           const panelContent = getLensContent(panelLens)
           return (
-            <div key={panelLens} id={`lens-panel-${panelLens}`} className={styles.ledgerPanel} hidden={lens !== panelLens}>
+            <div key={panelLens} id={`lens-panel-${panelLens}`} className={styles.ledgerPanel} role="tabpanel" aria-labelledby={`lens-${panelLens}`} hidden={lens !== panelLens}>
               <span className={styles.ledgerKicker}>{LENS_SURFACE[panelLens].toUpperCase()} LENS · {mode.toUpperCase()}</span>
               <h2>{panelContent.heading}</h2>
               <p className={styles.ledgerIntro}>{panelContent.intro}</p>

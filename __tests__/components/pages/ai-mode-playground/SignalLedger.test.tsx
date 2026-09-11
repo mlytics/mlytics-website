@@ -36,7 +36,7 @@ describe('SignalLedger 詞彙', () => {
   it('surface label 與 lens 控制項的 id 都改用 content-owners', () => {
     render(<SignalLedger lens="content-owners" {...base} />)
     expect(screen.getByText('Media signal ledger')).toBeInTheDocument()
-    const control = screen.getByRole('radio', { name: /media and content/i })
+    const control = screen.getByRole('tab', { name: /media and content/i })
     expect(control).toHaveAttribute('id', 'lens-content-owners')
     expect(document.getElementById('lens-panel-content-owners')).toBeInTheDocument()
   })
@@ -44,7 +44,7 @@ describe('SignalLedger 詞彙', () => {
   it('brand 側的 id 改用 brands，顯示標籤仍是 Brand', () => {
     render(<SignalLedger lens="brands" {...base} />)
     expect(screen.getByText('Brand signal ledger')).toBeInTheDocument()
-    const control = screen.getByRole('radio', { name: /^brand$/i })
+    const control = screen.getByRole('tab', { name: /^brand/i })
     expect(control).toHaveAttribute('id', 'lens-brands')
     expect(document.getElementById('lens-panel-brands')).toBeInTheDocument()
   })
@@ -60,41 +60,65 @@ describe('SignalLedger 詞彙', () => {
 })
 
 describe('SignalLedger lens 控制項形制', () => {
-  it('lens 切換使用 radiogroup 語意，與左側 tablist 區隔', () => {
+  const css = () => readFileSync(
+    resolve(__dirname, '../../../../components/pages/ai-mode-playground/AiModePlayground.module.css'),
+    'utf8',
+  )
+
+  it('lens 切換回到 tablist 語意，與左側 mode tab 同形制', () => {
     render(<SignalLedger lens="content-owners" {...base} />)
-    expect(screen.getByRole('radiogroup', { name: /ledger lens/i })).toBeInTheDocument()
-    expect(screen.getAllByRole('radio')).toHaveLength(2)
-    expect(screen.queryByRole('tablist')).not.toBeInTheDocument()
+    expect(screen.getByRole('tablist', { name: /ledger lens/i })).toBeInTheDocument()
+    expect(screen.getAllByRole('tab')).toHaveLength(2)
+    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument()
+    expect(screen.queryAllByRole('radio')).toHaveLength(0)
   })
 
-  it('radio 反映目前 lens，且不再有 tabpanel', () => {
+  it('tab 反映目前 lens，panel 回到 tabpanel 並與 tab 互相指向', () => {
     render(<SignalLedger lens="content-owners" {...base} />)
-    expect(screen.getByRole('radio', { name: /media and content/i })).toHaveAttribute('aria-checked', 'true')
-    expect(screen.getByRole('radio', { name: /^brand$/i })).toHaveAttribute('aria-checked', 'false')
-    expect(screen.queryAllByRole('tabpanel')).toHaveLength(0)
+    const media = screen.getByRole('tab', { name: /media and content/i })
+    const brand = screen.getByRole('tab', { name: /^brand/i })
+    expect(media).toHaveAttribute('aria-selected', 'true')
+    expect(media).toHaveAttribute('aria-controls', 'lens-panel-content-owners')
+    expect(brand).toHaveAttribute('aria-selected', 'false')
+    expect(brand).toHaveAttribute('aria-controls', 'lens-panel-brands')
+    // Only the selected panel is exposed; the other is `hidden`.
+    expect(screen.getAllByRole('tabpanel')).toHaveLength(1)
+    expect(document.getElementById('lens-panel-content-owners')).toHaveAttribute('aria-labelledby', 'lens-content-owners')
+    expect(document.getElementById('lens-panel-brands')).toHaveAttribute('aria-labelledby', 'lens-brands')
   })
 
-  it('移除 lens 按鈕內的 10px mono 說明文字', () => {
+  it('lens tab 內的 Media value／Brand value 小字加回來', () => {
     render(<SignalLedger lens="content-owners" {...base} />)
-    expect(screen.getByRole('radio', { name: /media and content/i }).querySelector('small')).toBeNull()
-    expect(screen.getByRole('radio', { name: /^brand$/i }).querySelector('small')).toBeNull()
+    expect(screen.getByRole('tab', { name: /media and content/i }).querySelector('small')?.textContent).toBe('Media value')
+    expect(screen.getByRole('tab', { name: /^brand/i }).querySelector('small')?.textContent).toBe('Brand value')
   })
 
-  it('CSS 不再讓 mode tab 與 lens 控制項共用規則', () => {
-    const css = readFileSync(
-      resolve(__dirname, '../../../../components/pages/ai-mode-playground/AiModePlayground.module.css'),
-      'utf8',
-    )
-    expect(css).not.toMatch(/\.lensTabs/)
-    expect(css).not.toMatch(/\.modeTabs button,\s*\.lensTabs button/)
-    expect(css).toMatch(/\.lensSwitch button\s*\{[^}]*min-height:\s*34px/)
-    expect(css).toMatch(/\.modeTabs button\s*\{[^}]*min-height:\s*69px/)
+  it('CSS 讓 lens tab 與 mode tab 共用 tab 形制，膠囊 lensSwitch 已移除', () => {
+    expect(css()).not.toMatch(/\.lensSwitch/)
+    expect(css()).toMatch(/\.modeTabs button,\s*\.lensTabs button/)
+    expect(css()).toMatch(/\.lensTabs button\s*\{[^}]*min-height:\s*69px/)
+    expect(css()).toMatch(/\.modeTabs button\s*\{[^}]*min-height:\s*69px/)
+  })
+
+  // Restoring the tab shape must not restore the contrast failures that came
+  // with it: #9B9B9B on the lens strip measured 2.38, #A8C5C3 measured 1.57.
+  it('還原的 lens tab 顏色一律走 token，不帶回低對比 hex', () => {
+    // Scoped to the lens rules: #A8C5C3 survives elsewhere in the file as the
+    // decorative waveform fill, which is not text and not in scope here.
+    const lensRules = css().match(/^\.lensTabs[^\n]*$/gm)?.join('\n') ?? ''
+    expect(lensRules).not.toBe('')
+    expect(lensRules).not.toMatch(/#[0-9A-Fa-f]{3,8}/)
+    expect(css()).not.toMatch(/#9B9B9B/i)
+    expect(css()).toMatch(/\.lensTabs button\s*\{[^}]*color:\s*var\(--color-ink-muted\)/)
+    expect(css()).toMatch(/\.lensTabs button\[aria-selected='true'\]\s*\{[^}]*border-color:\s*var\(--color-primary\)/)
+    expect(css()).toMatch(/\.lensTabs button\[aria-selected='true'\]\s*\{[^}]*color:\s*var\(--color-primary-dark\)/)
+    expect(css()).toMatch(/\.modeTabs small,\s*\.lensTabs small\s*\{[^}]*color:\s*var\(--color-ink-muted\)/)
   })
 })
 
-describe('lens radiogroup 鍵盤操作（ARIA APG roving tabindex）', () => {
+describe('lens tablist 鍵盤操作（ARIA APG roving tabindex）', () => {
   // A controlled harness: the real page owns lens state, so arrow keys must
-  // move focus AND flip the checked radio, not just fire a callback.
+  // move focus AND flip the selected tab, not just fire a callback.
   function Harness({ initial = 'content-owners' as LedgerLens, onLensChange = vi.fn() }) {
     const [lens, setLens] = useState<LedgerLens>(initial)
     return (
@@ -106,10 +130,10 @@ describe('lens radiogroup 鍵盤操作（ARIA APG roving tabindex）', () => {
     )
   }
 
-  const media = () => screen.getByRole('radio', { name: /media and content/i })
-  const brand = () => screen.getByRole('radio', { name: /^brand$/i })
+  const media = () => screen.getByRole('tab', { name: /media and content/i })
+  const brand = () => screen.getByRole('tab', { name: /^brand/i })
 
-  it('只有被選取的 radio 進得了 Tab 順序', () => {
+  it('只有被選取的 tab 進得了 Tab 順序', () => {
     render(<SignalLedger lens="content-owners" {...base} />)
     expect(media()).toHaveAttribute('tabindex', '0')
     expect(brand()).toHaveAttribute('tabindex', '-1')
@@ -121,7 +145,7 @@ describe('lens radiogroup 鍵盤操作（ARIA APG roving tabindex）', () => {
     expect(media()).toHaveAttribute('tabindex', '-1')
   })
 
-  it('Tab 進入 radiogroup 時落在被選取的那一顆', async () => {
+  it('Tab 進入 tablist 時落在被選取的那一顆', async () => {
     const user = userEvent.setup()
     render(<Harness initial="brands" />)
     await user.tab()
@@ -136,8 +160,8 @@ describe('lens radiogroup 鍵盤操作（ARIA APG roving tabindex）', () => {
     await user.keyboard('{ArrowRight}')
     expect(onLensChange).toHaveBeenCalledWith('brands')
     expect(brand()).toHaveFocus()
-    expect(brand()).toHaveAttribute('aria-checked', 'true')
-    expect(media()).toHaveAttribute('aria-checked', 'false')
+    expect(brand()).toHaveAttribute('aria-selected', 'true')
+    expect(media()).toHaveAttribute('aria-selected', 'false')
   })
 
   it('ArrowDown 同向、ArrowLeft／ArrowUp 反向，且兩端都會繞回', async () => {
@@ -150,12 +174,12 @@ describe('lens radiogroup 鍵盤操作（ARIA APG roving tabindex）', () => {
 
     await user.keyboard('{ArrowLeft}')
     expect(media()).toHaveFocus()
-    expect(media()).toHaveAttribute('aria-checked', 'true')
+    expect(media()).toHaveAttribute('aria-selected', 'true')
 
-    // Wraps backwards past the first radio.
+    // Wraps backwards past the first tab.
     await user.keyboard('{ArrowUp}')
     expect(brand()).toHaveFocus()
-    expect(brand()).toHaveAttribute('aria-checked', 'true')
+    expect(brand()).toHaveAttribute('aria-selected', 'true')
   })
 
   it('Home 選第一顆、End 選最後一顆', async () => {
@@ -165,10 +189,10 @@ describe('lens radiogroup 鍵盤操作（ARIA APG roving tabindex）', () => {
 
     await user.keyboard('{End}')
     expect(brand()).toHaveFocus()
-    expect(brand()).toHaveAttribute('aria-checked', 'true')
+    expect(brand()).toHaveAttribute('aria-selected', 'true')
 
     await user.keyboard('{Home}')
     expect(media()).toHaveFocus()
-    expect(media()).toHaveAttribute('aria-checked', 'true')
+    expect(media()).toHaveAttribute('aria-selected', 'true')
   })
 })
