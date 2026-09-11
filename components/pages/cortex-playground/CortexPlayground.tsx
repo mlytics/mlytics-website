@@ -11,6 +11,7 @@ import {
   CortexMode,
   LISTEN_CONTENT,
   QUOTE_CONTENT,
+  readLensFromSearch,
   resolveLensCopy,
 } from './cortex-playground-data'
 import styles from './CortexPlayground.module.css'
@@ -72,6 +73,45 @@ export function CortexPlayground() {
   const trackingCleanupRef = useRef<(() => void) | null>(null)
   const audioTimerRef = useRef<number | null>(null)
   const resetScheduleRef = useRef<ResetSchedule | null>(null)
+
+  // The deep-linked lens is read from the URL here rather than through
+  // `useSearchParams`: on a prerendered route that hook opts everything below
+  // the nearest Suspense boundary out of prerendering and into client-side
+  // rendering, which would turn the whole playground into CSR. A mount-once
+  // effect keeps the page prerendered; the trade-off is that it does not react
+  // to client-side query changes on the same route (back/forward), and no UI
+  // path here produces one. Reading window during render would break hydration.
+  useEffect(() => {
+    const fromUrl = readLensFromSearch(window.location.search)
+    if (fromUrl) setLens(fromUrl)
+  }, [])
+
+  // Keep the address bar honest: once the reader switches lens by hand, a
+  // copied URL has to reopen on the lens they are looking at. `replaceState`
+  // rather than `pushState` so tab switching does not stack history entries
+  // and trap Back on this page. Every other query param and the hash survive
+  // the switch, but `URLSearchParams.toString()` re-serialises the whole
+  // string, so it comes back normalised rather than byte-for-byte as it
+  // arrived (`~` as `%7E`, a space as `+`, a valueless `?debug` as `debug=`).
+  // The parsed result on the server is the same either way.
+  //
+  // The first argument is `null`, not `window.history.state`: Next patches
+  // `replaceState` and early-returns to the unpatched one whenever the state
+  // handed to it already carries `__NA` — which Next's own `HistoryUpdater`
+  // stamps onto every entry — so passing the current state straight back
+  // would skip Next's canonical-URL sync and leave it on the old lens. With
+  // `null`, Next's `copyNextJsInternalHistoryState` puts `__NA` and the
+  // internal tree back itself and the canonical URL follows the address bar.
+  const handleLensChange = useCallback((nextLens: CortexLens) => {
+    setLens(nextLens)
+    const params = new URLSearchParams(window.location.search)
+    params.set('lens', nextLens)
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}?${params.toString()}${window.location.hash}`,
+    )
+  }, [])
 
   const emitEvent = useCallback((event: Omit<CortexEvent, 'id' | 'lensCopy'>) => {
     if (resettingRef.current || resetEpochRef.current !== resetEpoch) return
@@ -361,7 +401,7 @@ export function CortexPlayground() {
               </div>
             </div>
           </div>
-          <SignalLedger lens={lens} mode={mode} events={events} scrollDepth={scrollDepth} widgetImpression={widgetImpression} onLensChange={setLens} />
+          <SignalLedger lens={lens} mode={mode} events={events} scrollDepth={scrollDepth} widgetImpression={widgetImpression} onLensChange={handleLensChange} />
           <button className={styles.startOver} type="button" aria-label="Start over" disabled={resetting} onClick={() => handleReset()}>
             <span className={styles.startOverIcon} aria-hidden="true">↻</span><span className={styles.startOverLabel}>START OVER</span>
           </button>

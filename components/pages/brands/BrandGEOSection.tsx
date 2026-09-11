@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Eyebrow } from '@/components/ui/Eyebrow'
+import { PlaygroundCTASection } from '@/components/ui/PlaygroundCTASection'
 
 const STEPS = [
   {
@@ -267,7 +268,7 @@ export function BrandGEOSection() {
       </div>
 
       {/* ── Media AEO workflow ────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-6 relative z-10 pt-16 lg:pt-20 pb-20 lg:pb-28">
+      <div className="max-w-5xl mx-auto px-6 relative z-10 pt-16 lg:pt-20 pb-16">
         <motion.div
           className="mb-12"
           initial={{ opacity: 0, y: 20 }}
@@ -275,7 +276,7 @@ export function BrandGEOSection() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow className="mb-3 text-on-dark/55">
+          <Eyebrow className="mb-3 block text-on-dark/55">
             Media AEO — Answer Engine Optimization
           </Eyebrow>
           <h2 className="section-heading text-white mb-4">
@@ -318,6 +319,31 @@ export function BrandGEOSection() {
           ))}
         </div>
       </div>
+
+      {/* ── Thin divider ──────────────────────────────────────────── */}
+      {/* Fades in on the same terms as the CTA below it, so the rule and the
+          block it introduces arrive together rather than the hairline showing
+          up alone on the dark ground. */}
+      <motion.div
+        className="max-w-5xl mx-auto px-6"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: '-80px' }}
+        transition={{ duration: 0.5 }}
+      >
+        <div style={{ height: 1, background: 'rgba(168,197,195,0.12)' }} />
+      </motion.div>
+
+      {/* ── Playground entry point — brand lens ───────────────────── */}
+      <PlaygroundCTASection
+        variant="embedded"
+        eyebrow="Try the experience"
+        heading="What does a placement inside an AI answer look like?"
+        body="Walk through one publisher article as a reader would, and watch intent, purchase stage, and placement opportunity land on the Brand value ledger."
+        ctaLabel="Try AI Mode"
+        lens="brand"
+        trackingPosition="brands_playground"
+      />
     </section>
   )
 }

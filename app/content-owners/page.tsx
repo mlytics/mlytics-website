@@ -5,6 +5,7 @@ import { LayerOverview } from '@/components/pages/publishers/LayerOverview'
 import { ContentOwnerVerticals } from '@/components/pages/publishers/ContentOwnerVerticals'
 import { ContentOwnerFAQ } from '@/components/pages/publishers/ContentOwnerFAQ'
 import { PublisherPageCTA } from '@/components/pages/publishers/PublisherPageCTA'
+import { PlaygroundCTASection } from '@/components/ui/PlaygroundCTASection'
 
 import type { Metadata } from 'next'
 
@@ -49,6 +50,16 @@ export default function PublishersPage() {
 
       {/* Solution — three pitches vs LLM search */}
       <SolutionPitches />
+
+      {/* Playground entry point — publisher lens */}
+      <PlaygroundCTASection
+        eyebrow="Try the experience"
+        heading="What does this look like inside your article?"
+        body="Walk through one article with the Cortex widget, and watch reader signals land on the Media value ledger as they happen."
+        ctaLabel="Try AI Mode"
+        lens="publisher"
+        trackingPosition="content_owners_playground"
+      />
 
       {/* Knowledge base engineering */}
       <KnowledgeBaseSection />
