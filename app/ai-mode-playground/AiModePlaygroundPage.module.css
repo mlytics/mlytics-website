@@ -3,33 +3,10 @@
   overflow-x: clip;
 }
 
+/* The Hero's ground comes from .section-dark; this only keeps it a positioned,
+   self-clipping block. The radial wash that used to sit behind it was built
+   for a white Hero and has no counterpart on the dark one. */
 .hero {
   position: relative;
-  isolation: isolate;
   overflow: hidden;
-  background: var(--bg-white);
-}
-
-.heroBackdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.heroGradient {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    ellipse 85% 75% at 50% 45%,
-    rgba(240, 248, 247, 0.97) 0%,
-    rgba(255, 255, 255, 0.65) 65%,
-    transparent 100%
-  );
-}
-
-.heroContent {
-  position: relative;
-  z-index: 1;
 }

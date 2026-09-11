@@ -7,6 +7,7 @@ import { AiModePlayground } from '@/components/pages/ai-mode-playground/AiModePl
 
 const pageSource = readFileSync('app/ai-mode-playground/page.tsx', 'utf8')
 const playgroundCss = readFileSync('components/pages/ai-mode-playground/AiModePlayground.module.css', 'utf8')
+const pageCss = readFileSync('app/ai-mode-playground/AiModePlaygroundPage.module.css', 'utf8')
 
 function getTab(name: RegExp) {
   return screen.getByRole('tab', { name })
@@ -73,6 +74,28 @@ describe('AiModePlaygroundPage', () => {
       { exact: true },
     )).not.toBeInTheDocument()
     expect(pageSource).not.toMatch(/WorldMapDots/)
+  })
+
+  // The Hero and the "Try the experience" section read as near-duplicates of
+  // each other: same white ground, same centred eyebrow-plus-heading stack, a
+  // short scroll apart. Going dark, the way /content-owners/ does, is what
+  // separates them.
+  it('Hero 走深色底，與 /content-owners/ 同一組 token', () => {
+    render(<AiModePlaygroundPage />)
+    const hero = screen.getByRole('heading', { level: 1, name: 'One signal. Two values.' }).closest('section')
+
+    expect(hero).toHaveClass('section-dark')
+    expect(hero).not.toHaveClass('section-white')
+    expect(screen.getByRole('heading', { level: 1, name: 'One signal. Two values.' })).toHaveClass('text-white', 'text-4xl', 'md:text-5xl')
+    expect(within(hero as HTMLElement).getByText('Mlytics AI Mode', { exact: true })).toHaveStyle({ color: 'var(--color-on-dark)' })
+  })
+
+  it('為淺色 Hero 設計的漸層背景已移除', () => {
+    render(<AiModePlaygroundPage />)
+
+    expect(pageSource).not.toMatch(/heroBackdrop|heroGradient/)
+    expect(pageCss).not.toMatch(/\.heroBackdrop|\.heroGradient/)
+    expect(pageCss).not.toMatch(/\.hero\s*\{[^}]*background:\s*var\(--bg-white\)/)
   })
 })
 
