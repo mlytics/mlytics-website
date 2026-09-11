@@ -81,24 +81,20 @@ describe('PlaygroundCTASection', () => {
     expect(trackCTA).toHaveBeenCalledWith('Try AI Mode', 'content_owners_playground')
   })
 
-  it('renders the light tone when no tone is given', () => {
-    const { container: implicit } = render(<PlaygroundCTASection {...publisherProps} />)
-    const implicitHtml = implicit.innerHTML
-    cleanup()
+  it('defaults to the standalone variant when none is given', () => {
+    const { container } = render(<PlaygroundCTASection {...publisherProps} />)
 
-    const { container: explicit } = render(
-      <PlaygroundCTASection {...publisherProps} tone="light" />,
-    )
-
-    expect(implicitHtml).toBe(explicit.innerHTML)
+    const root = container.firstElementChild
+    expect(root?.tagName).toBe('SECTION')
+    expect(root).toHaveClass('section-white')
   })
 })
 
-describe('PlaygroundCTASection — dark tone', () => {
-  const darkProps = { ...publisherProps, tone: 'dark' as const }
+describe('PlaygroundCTASection — embedded variant', () => {
+  const embeddedProps = { ...publisherProps, variant: 'embedded' as const }
 
   it('renders no section wrapper of its own, so the host section shows through', () => {
-    const { container } = render(<PlaygroundCTASection {...darkProps} />)
+    const { container } = render(<PlaygroundCTASection {...embeddedProps} />)
 
     const root = container.firstElementChild
     expect(root?.tagName).not.toBe('SECTION')
@@ -109,16 +105,16 @@ describe('PlaygroundCTASection — dark tone', () => {
   })
 
   it('renders no mint gradient backdrop of its own', () => {
-    const { container } = render(<PlaygroundCTASection {...darkProps} />)
+    const { container } = render(<PlaygroundCTASection {...embeddedProps} />)
 
     expect(container.querySelector('[aria-hidden="true"]')).toBeNull()
     expect(container.innerHTML).not.toContain('radial-gradient')
   })
 
   it.each([
-    ['light', publisherProps],
-    ['dark', darkProps],
-  ])('gives the %s tone the site-wide primary pill button', (_tone, props) => {
+    ['standalone', publisherProps],
+    ['embedded', embeddedProps],
+  ])('gives the %s variant the site-wide primary pill button', (_variant, props) => {
     render(<PlaygroundCTASection {...props} />)
 
     const link = screen.getByRole('link', { name: 'Try AI Mode' })
@@ -130,25 +126,22 @@ describe('PlaygroundCTASection — dark tone', () => {
     expect(link.getAttribute('style')).toBeNull()
   })
 
-  it('styles the button identically in both tones', () => {
+  it('styles the button identically in both variants', () => {
     render(<PlaygroundCTASection {...publisherProps} />)
-    const lightClass = screen
+    const standaloneClass = screen
       .getByRole('link', { name: 'Try AI Mode' })
       .getAttribute('class')
     cleanup()
 
-    render(<PlaygroundCTASection {...darkProps} />)
-    const darkClass = screen
+    render(<PlaygroundCTASection {...embeddedProps} />)
+    const embeddedClass = screen
       .getByRole('link', { name: 'Try AI Mode' })
       .getAttribute('class')
 
-    expect(darkClass).toBe(lightClass)
-    expect(darkClass).toBe(
-      'inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-all hover:opacity-90',
-    )
+    expect(embeddedClass).toBe(standaloneClass)
   })
 
-  it('links and tracks exactly as the light tone does', async () => {
+  it('links and tracks exactly as the standalone variant does', async () => {
     const { container: light } = render(<PlaygroundCTASection {...publisherProps} lens="brand" />)
     const lightHref = light.querySelector('a')?.getAttribute('href')
     await userEvent.click(screen.getByRole('link', { name: 'Try AI Mode' }))
@@ -156,18 +149,18 @@ describe('PlaygroundCTASection — dark tone', () => {
     cleanup()
     trackCTA.mockClear()
 
-    render(<PlaygroundCTASection {...darkProps} lens="brand" />)
-    const darkLink = screen.getByRole('link', { name: 'Try AI Mode' })
-    await userEvent.click(darkLink)
+    render(<PlaygroundCTASection {...embeddedProps} lens="brand" />)
+    const embeddedLink = screen.getByRole('link', { name: 'Try AI Mode' })
+    await userEvent.click(embeddedLink)
 
-    expect(darkLink).toHaveAttribute('href', '/cortex-playground/?lens=brand')
-    expect(darkLink.getAttribute('href')).toBe(lightHref)
+    expect(embeddedLink).toHaveAttribute('href', '/cortex-playground/?lens=brand')
+    expect(embeddedLink.getAttribute('href')).toBe(lightHref)
     expect(trackCTA.mock.calls).toEqual(lightCalls)
     expect(trackCTA).toHaveBeenCalledWith('Try AI Mode', 'content_owners_playground')
   })
 
   it('keeps the same copy and a single link', () => {
-    render(<PlaygroundCTASection {...darkProps} />)
+    render(<PlaygroundCTASection {...embeddedProps} />)
 
     expect(screen.getByText('Try the experience')).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
@@ -175,5 +168,47 @@ describe('PlaygroundCTASection — dark tone', () => {
     )
     expect(screen.getByText(publisherProps.body)).toBeInTheDocument()
     expect(screen.getAllByRole('link')).toHaveLength(1)
+  })
+})
+
+describe('PlaygroundCTASection — text colour per variant', () => {
+  const embeddedProps = { ...publisherProps, variant: 'embedded' as const }
+
+  it('gives the standalone heading dark ink, never white', () => {
+    render(<PlaygroundCTASection {...publisherProps} />)
+
+    const heading = screen.getByRole('heading', { level: 2 })
+    expect(heading).toHaveClass('text-ink')
+    expect(heading).not.toHaveClass('text-white')
+  })
+
+  it('gives the embedded heading white, never dark ink', () => {
+    render(<PlaygroundCTASection {...embeddedProps} />)
+
+    const heading = screen.getByRole('heading', { level: 2 })
+    expect(heading).toHaveClass('text-white')
+    expect(heading).not.toHaveClass('text-ink')
+  })
+
+  it('gives the standalone body muted ink, never on-dark text', () => {
+    render(<PlaygroundCTASection {...publisherProps} />)
+
+    const body = screen.getByText(publisherProps.body)
+    expect(body).toHaveClass('text-ink-muted')
+    expect(body).not.toHaveClass('text-on-dark')
+  })
+
+  it('gives the embedded body on-dark text, never muted ink', () => {
+    render(<PlaygroundCTASection {...embeddedProps} />)
+
+    const body = screen.getByText(publisherProps.body)
+    expect(body).toHaveClass('text-on-dark')
+    expect(body).not.toHaveClass('text-ink-muted')
+  })
+
+  it('dims the embedded eyebrow against the dark ground', () => {
+    render(<PlaygroundCTASection {...embeddedProps} />)
+
+    expect(screen.getByText('Try the experience')).toHaveClass('text-on-dark/55')
   })
 })

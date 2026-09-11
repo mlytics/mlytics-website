@@ -44,7 +44,6 @@ function getSiteHeaderBottom() {
 export function CortexPlayground() {
   const [mode, setMode] = useState<CortexMode>('chat')
   const [lens, setLens] = useState<CortexLens>('brand')
-  const [lensReady, setLensReady] = useState(false)
   const [events, setEvents] = useState<CortexEvent[]>([])
   const [scrollDepth, setScrollDepth] = useState(0)
   const [widgetImpression, setWidgetImpression] = useState(false)
@@ -75,12 +74,16 @@ export function CortexPlayground() {
   const audioTimerRef = useRef<number | null>(null)
   const resetScheduleRef = useRef<ResetSchedule | null>(null)
 
-  // Static export cannot read the request, so the deep-linked lens is applied
-  // after hydration. Reading window during render would break hydration.
+  // The deep-linked lens is read from the URL here rather than through
+  // `useSearchParams`: on a prerendered route that hook opts everything below
+  // the nearest Suspense boundary out of prerendering and into client-side
+  // rendering, which would turn the whole playground into CSR. A mount-once
+  // effect keeps the page prerendered; the trade-off is that it does not react
+  // to client-side query changes on the same route (back/forward), and no UI
+  // path here produces one. Reading window during render would break hydration.
   useEffect(() => {
     const fromUrl = readLensFromSearch(window.location.search)
     if (fromUrl) setLens(fromUrl)
-    setLensReady(true)
   }, [])
 
   const emitEvent = useCallback((event: Omit<CortexEvent, 'id' | 'lensCopy'>) => {
@@ -371,7 +374,7 @@ export function CortexPlayground() {
               </div>
             </div>
           </div>
-          <SignalLedger lens={lens} lensReady={lensReady} mode={mode} events={events} scrollDepth={scrollDepth} widgetImpression={widgetImpression} onLensChange={setLens} />
+          <SignalLedger lens={lens} mode={mode} events={events} scrollDepth={scrollDepth} widgetImpression={widgetImpression} onLensChange={setLens} />
           <button className={styles.startOver} type="button" aria-label="Start over" disabled={resetting} onClick={() => handleReset()}>
             <span className={styles.startOverIcon} aria-hidden="true">↻</span><span className={styles.startOverLabel}>START OVER</span>
           </button>

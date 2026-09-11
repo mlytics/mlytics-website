@@ -327,7 +327,7 @@ export function BrandGEOSection() {
 
       {/* ── Playground entry point — brand lens ───────────────────── */}
       <PlaygroundCTASection
-        tone="dark"
+        variant="embedded"
         eyebrow="Try the experience"
         heading="What does a placement inside an AI answer look like?"
         body="Walk through one publisher article as a reader would, and watch intent, purchase stage, and placement opportunity land on the Brand value ledger."

@@ -13,10 +13,16 @@ export type PlaygroundCTASectionProps = {
   ctaLabel: string
   lens: CortexLens
   trackingPosition: string
-  /** 'light' (default) renders its own white section. 'dark' renders only the
-   *  inner container, so it can be dropped inside an existing `.section-dark`
-   *  and inherit that section's ground colour and glow. */
-  tone?: 'light' | 'dark'
+  /** How this section is placed on the page — not just a colour.
+   *
+   *  'standalone' (default) renders its own white `<section>` with the mint
+   *  gradient backdrop and dark text, ready to sit between other sections.
+   *
+   *  'embedded' renders only the inner container — no `<section>`, no
+   *  backdrop — with light text, and assumes the host section it is dropped
+   *  into is dark (`.section-dark`), inheriting that ground colour and glow.
+   *  Placing it inside a light host would put white text on a white ground. */
+  variant?: 'standalone' | 'embedded'
 }
 
 export function PlaygroundCTASection({
@@ -26,14 +32,14 @@ export function PlaygroundCTASection({
   ctaLabel,
   lens,
   trackingPosition,
-  tone = 'light',
+  variant = 'standalone',
 }: PlaygroundCTASectionProps) {
-  const isDark = tone === 'dark'
+  const isEmbedded = variant === 'embedded'
 
   const content = (
     <motion.div
       className={
-        isDark
+        isEmbedded
           ? 'max-w-5xl mx-auto px-6 relative z-10 pt-16 lg:pt-20 pb-20 lg:pb-28 text-center'
           : 'relative z-10 max-w-3xl mx-auto px-6 text-center'
       }
@@ -42,13 +48,13 @@ export function PlaygroundCTASection({
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.5 }}
     >
-      <Eyebrow className={isDark ? 'mb-3 text-on-dark/55' : 'mb-3'}>{eyebrow}</Eyebrow>
-      <h2 className={isDark ? 'section-heading text-white mb-4' : 'section-heading mb-4 text-ink'}>
+      <Eyebrow className={isEmbedded ? 'mb-3 text-on-dark/55' : 'mb-3'}>{eyebrow}</Eyebrow>
+      <h2 className={isEmbedded ? 'section-heading text-white mb-4' : 'section-heading mb-4 text-ink'}>
         {heading}
       </h2>
       <p
         className={
-          isDark
+          isEmbedded
             ? 'text-base max-w-xl mx-auto mb-8 text-on-dark'
             : 'text-base max-w-xl mx-auto mb-8 text-ink-muted'
         }
@@ -67,7 +73,7 @@ export function PlaygroundCTASection({
     </motion.div>
   )
 
-  if (isDark) return content
+  if (isEmbedded) return content
 
   return (
     <section className="section-white relative overflow-hidden py-16 lg:py-20">

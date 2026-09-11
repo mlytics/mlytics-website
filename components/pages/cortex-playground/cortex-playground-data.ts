@@ -10,12 +10,8 @@ export function isCortexLens(value: unknown): value is CortexLens {
  *  recovered from the browser URL after hydration. Pure so it can be tested
  *  without a DOM. */
 export function readLensFromSearch(search: string): CortexLens | null {
-  try {
-    const value = new URLSearchParams(search).get('lens')
-    return isCortexLens(value) ? value : null
-  } catch {
-    return null
-  }
+  const value = new URLSearchParams(search).get('lens')
+  return isCortexLens(value) ? value : null
 }
 export type EventTone = 'raw' | 'signal'
 

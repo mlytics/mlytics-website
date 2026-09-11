@@ -59,14 +59,4 @@ describe('CortexPlayground lens deep-link', () => {
       expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'true')
     })
   })
-
-  it('marks the lens tabs ready once the URL lens has been applied', async () => {
-    setSearch('?lens=publisher')
-    render(<CortexPlayground />)
-
-    const tablist = screen.getByRole('tablist', { name: 'Ledger lens' })
-    await waitFor(() => {
-      expect(tablist).toHaveAttribute('data-lens-ready', 'true')
-    })
-  })
 })
