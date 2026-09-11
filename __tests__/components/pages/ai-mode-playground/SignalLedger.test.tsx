@@ -106,13 +106,21 @@ describe('SignalLedger lens 控制項形制', () => {
   it('還原的 lens tab 顏色一律走 token，不帶回低對比 hex', () => {
     // Scoped to the lens rules: the same grey survives elsewhere in the file
     // as the decorative waveform fill, which is not text and not in scope.
+    // Only `color:` is checked — the strip's own surface is the restored UAT
+    // tint, which is a background rather than a text colour.
     const lensRules = css().match(/^\.lensTabs[^\n]*$/gm)?.join('\n') ?? ''
     expect(lensRules).not.toBe('')
-    expect(lensRules).not.toMatch(/#[0-9A-Fa-f]{3,8}/)
+    expect(lensRules).not.toMatch(/[^-]color:\s*#[0-9A-Fa-f]{3,8}/)
     expect(css()).toMatch(/\.lensTabs button\s*\{[^}]*color:\s*var\(--color-ink-muted\)/)
     expect(css()).toMatch(/\.lensTabs button\[aria-selected='true'\]\s*\{[^}]*border-color:\s*var\(--color-primary\)/)
     expect(css()).toMatch(/\.lensTabs button\[aria-selected='true'\]\s*\{[^}]*color:\s*var\(--color-primary-dark\)/)
     expect(css()).toMatch(/\.modeTabs small,\s*\.lensTabs small\s*\{[^}]*color:\s*var\(--color-ink-muted\)/)
+  })
+
+  // The tint was dropped after a contrast reading taken against the wrong
+  // surface. #6B6B6B on #E4F0EB measures 4.56:1, so the UAT strip stands.
+  it('lens tab 帶還原 UAT 的 #E4F0EB 底色', () => {
+    expect(css()).toMatch(/\.lensTabs\s*\{[^}]*background:\s*#E4F0EB/)
   })
 })
 
