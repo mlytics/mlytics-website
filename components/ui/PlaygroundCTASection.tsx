@@ -80,7 +80,7 @@ export function PlaygroundCTASection({
 
   return (
     <section className="section-white relative overflow-hidden py-16 lg:py-20">
-      {/* Echoes the Cortex Playground hero backdrop so the section previews its destination */}
+      {/* Echoes the AI Mode playground hero backdrop so the section previews its destination */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"

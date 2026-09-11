@@ -53,9 +53,9 @@ describe('AiModePlaygroundPage', () => {
     const hero = heading.closest('section')
 
     expect(hero).toHaveClass('ai-mode-playground-hero')
-    expect(within(hero as HTMLElement).getByText('Cortex Playground', { exact: true })).toBeInTheDocument()
+    expect(within(hero as HTMLElement).getByText('Mlytics AI Mode', { exact: true })).toBeInTheDocument()
     expect(within(hero as HTMLElement).getByText(
-      'Explore how Cortex helps readers ask, decide, and listen — while giving publishers a clear view of the value created.',
+      'Explore how Mlytics AI Mode helps users ask, decide, and listen — while giving you a clear view of the value created.',
       { exact: true },
     )).toBeInTheDocument()
     expect(within(hero as HTMLElement).queryByText(
