@@ -71,11 +71,11 @@ describe('AiModePlaygroundPage', () => {
 })
 
 describe('AiModePlayground', () => {
-  it('starts in Chat with three article questions and a disabled More to come tab', () => {
+  it('starts in Chat with three article questions', () => {
     render(<AiModePlayground />)
 
     expect(getTab(/^Chat/)).toHaveAttribute('aria-selected', 'true')
-    for (const tab of screen.getAllByRole('tab').filter((item) => !item.hasAttribute('disabled'))) {
+    for (const tab of screen.getAllByRole('tab')) {
       const controlledId = tab.getAttribute('aria-controls')
       expect(controlledId).toBeTruthy()
       expect(document.getElementById(controlledId ?? '')).toBeInTheDocument()
@@ -83,19 +83,31 @@ describe('AiModePlayground', () => {
     expect(screen.getByRole('button', { name: /at what age should a large-breed dog/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /which joint-support ingredients/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /is stiffness after walks/i })).toBeInTheDocument()
-    expect(getTab(/more to come/i)).toBeDisabled()
     expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
   })
 
-  it('keeps More to come desktop-only and makes tablet/mobile mode tabs horizontally scrollable', () => {
-    expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/)
+  it('makes tablet/mobile mode tabs horizontally scrollable without hiding any mode', () => {
+    expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/)
     expect(playgroundCss).toMatch(/\.modeTabs button\s*\{[^}]*white-space:\s*nowrap;/)
     expect(playgroundCss).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*\.modeTabs\s*\{[^}]*display:\s*flex;[^}]*flex-wrap:\s*nowrap;[^}]*overflow-x:\s*auto;/)
     expect(playgroundCss).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*\.modeTabs button\s*\{[^}]*flex:\s*0 0 clamp\(/)
-    expect(playgroundCss).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*\.modeTabs button:last-child\s*\{[^}]*display:\s*none;/)
+    expect(playgroundCss).not.toMatch(/\.modeTabs button:last-child\s*\{[^}]*display:\s*none;/)
+    expect(playgroundCss).not.toMatch(/\.modeTabs button:disabled/)
 
     render(<AiModePlayground />)
-    expect(getTab(/more to come/i)).toBeDisabled()
+    expect(screen.getAllByRole('tab')).toHaveLength(3)
+  })
+
+  it('tab 列不含不可點的佔位 tab', () => {
+    const { getAllByRole } = render(<AiModePlayground />)
+    const tabs = getAllByRole('tab')
+    expect(tabs).toHaveLength(3)
+    expect(tabs.every((t) => !(t as HTMLButtonElement).disabled)).toBe(true)
+  })
+
+  it('以說明文字取代佔位 tab', () => {
+    const { getByText } = render(<AiModePlayground />)
+    expect(getByText(/more modes coming soon/i)).toBeInTheDocument()
   })
 
   it('renders Start over as a playground-level control instead of inside SignalLedger', () => {
@@ -126,7 +138,7 @@ describe('AiModePlayground', () => {
     expect(playgroundCss).not.toMatch(/@media\s*\(max-width:\s*680px\)[\s\S]*\.sectionIntro\s*\{[^}]*grid-template-columns:/)
     expect(playgroundCss).not.toMatch(/@media\s*\(max-width:\s*680px\)[\s\S]*\.sectionIntro p\s*\{[^}]*max-width:\s*none;/)
     expect(playgroundCss).toMatch(/\.modeLabel\s*\{[^}]*display:\s*none/)
-    expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/)
+    expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/)
     expect(playgroundCss).toMatch(/\.userPanel\s*\{[^}]*padding:\s*0/)
     expect(playgroundCss).toMatch(/\.article\s*\{[^}]*padding:\s*30px\s+34px\s+38px/)
     expect(playgroundCss).toMatch(/\.articleContext\s*\{[^}]*margin:\s*-30px\s+-34px\s+24px/)
