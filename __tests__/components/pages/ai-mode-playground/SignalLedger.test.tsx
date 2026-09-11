@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { useState } from 'react'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import type { LedgerLens } from '@/components/pages/ai-mode-playground/ai-mode-playground-data'
 import { SignalLedger } from '@/components/pages/ai-mode-playground/SignalLedger'
 
 const base = {
@@ -68,5 +71,86 @@ describe('SignalLedger lens 控制項形制', () => {
     expect(css).not.toMatch(/\.modeTabs button,\s*\.lensTabs button/)
     expect(css).toMatch(/\.lensSwitch button\s*\{[^}]*min-height:\s*34px/)
     expect(css).toMatch(/\.modeTabs button\s*\{[^}]*min-height:\s*69px/)
+  })
+})
+
+describe('lens radiogroup 鍵盤操作（ARIA APG roving tabindex）', () => {
+  // A controlled harness: the real page owns lens state, so arrow keys must
+  // move focus AND flip the checked radio, not just fire a callback.
+  function Harness({ initial = 'media' as LedgerLens, onLensChange = vi.fn() }) {
+    const [lens, setLens] = useState<LedgerLens>(initial)
+    return (
+      <SignalLedger
+        {...base}
+        lens={lens}
+        onLensChange={(next) => { onLensChange(next); setLens(next) }}
+      />
+    )
+  }
+
+  const media = () => screen.getByRole('radio', { name: /media and content/i })
+  const brand = () => screen.getByRole('radio', { name: /^brand$/i })
+
+  it('只有被選取的 radio 進得了 Tab 順序', () => {
+    render(<SignalLedger lens="media" {...base} />)
+    expect(media()).toHaveAttribute('tabindex', '0')
+    expect(brand()).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('選取換邊時 tabindex 跟著換邊', () => {
+    render(<SignalLedger lens="brand" {...base} />)
+    expect(brand()).toHaveAttribute('tabindex', '0')
+    expect(media()).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('Tab 進入 radiogroup 時落在被選取的那一顆', async () => {
+    const user = userEvent.setup()
+    render(<Harness initial="brand" />)
+    await user.tab()
+    expect(brand()).toHaveFocus()
+  })
+
+  it('ArrowRight 同時移動焦點與選取', async () => {
+    const onLensChange = vi.fn()
+    const user = userEvent.setup()
+    render(<Harness onLensChange={onLensChange} />)
+    media().focus()
+    await user.keyboard('{ArrowRight}')
+    expect(onLensChange).toHaveBeenCalledWith('brand')
+    expect(brand()).toHaveFocus()
+    expect(brand()).toHaveAttribute('aria-checked', 'true')
+    expect(media()).toHaveAttribute('aria-checked', 'false')
+  })
+
+  it('ArrowDown 同向、ArrowLeft／ArrowUp 反向，且兩端都會繞回', async () => {
+    const user = userEvent.setup()
+    render(<Harness />)
+    media().focus()
+
+    await user.keyboard('{ArrowDown}')
+    expect(brand()).toHaveFocus()
+
+    await user.keyboard('{ArrowLeft}')
+    expect(media()).toHaveFocus()
+    expect(media()).toHaveAttribute('aria-checked', 'true')
+
+    // Wraps backwards past the first radio.
+    await user.keyboard('{ArrowUp}')
+    expect(brand()).toHaveFocus()
+    expect(brand()).toHaveAttribute('aria-checked', 'true')
+  })
+
+  it('Home 選第一顆、End 選最後一顆', async () => {
+    const user = userEvent.setup()
+    render(<Harness />)
+    media().focus()
+
+    await user.keyboard('{End}')
+    expect(brand()).toHaveFocus()
+    expect(brand()).toHaveAttribute('aria-checked', 'true')
+
+    await user.keyboard('{Home}')
+    expect(media()).toHaveFocus()
+    expect(media()).toHaveAttribute('aria-checked', 'true')
   })
 })
