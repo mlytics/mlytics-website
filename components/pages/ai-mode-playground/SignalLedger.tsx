@@ -15,12 +15,12 @@ export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression
 
   return (
     <aside className={styles.ledger} aria-label="Experience ledger">
-      <div className={styles.lensTabs} role="tablist" aria-label="Ledger lens">
-        <button id="lens-media" type="button" role="tab" aria-selected={lens === 'media'} aria-controls="lens-panel-media" onClick={() => onLensChange('media')}>
-          Media and Content<small>Media value</small>
+      <div className={styles.lensSwitch} role="radiogroup" aria-label="Ledger lens">
+        <button id="lens-media" type="button" role="radio" aria-checked={lens === 'media'} onClick={() => onLensChange('media')}>
+          Media and Content
         </button>
-        <button id="lens-brand" type="button" role="tab" aria-selected={lens === 'brand'} aria-controls="lens-panel-brand" onClick={() => onLensChange('brand')}>
-          Brand<small>Brand value</small>
+        <button id="lens-brand" type="button" role="radio" aria-checked={lens === 'brand'} onClick={() => onLensChange('brand')}>
+          Brand
         </button>
       </div>
       <div className={styles.surfaceLabel}><span>{lens === 'brand' ? 'Brand' : 'Media'} signal ledger</span><span>{String(events.length).padStart(2, '0')} EVENTS</span></div>
@@ -34,7 +34,7 @@ export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression
         {(['media', 'brand'] as const).map((panelLens) => {
           const panelContent = getLensContent(panelLens)
           return (
-            <div key={panelLens} id={`lens-panel-${panelLens}`} className={styles.ledgerPanel} role="tabpanel" aria-labelledby={`lens-${panelLens}`} hidden={lens !== panelLens}>
+            <div key={panelLens} id={`lens-panel-${panelLens}`} className={styles.ledgerPanel} hidden={lens !== panelLens}>
               <span className={styles.ledgerKicker}>{panelLens.toUpperCase()} LENS · {mode.toUpperCase()}</span>
               <h2>{panelContent.heading}</h2>
               <p className={styles.ledgerIntro}>{panelContent.intro}</p>

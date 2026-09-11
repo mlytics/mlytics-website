@@ -12,6 +12,10 @@ function getTab(name: RegExp) {
   return screen.getByRole('tab', { name })
 }
 
+function getLens(name: RegExp) {
+  return screen.getByRole('radio', { name })
+}
+
 let intersectionObserverCallback: IntersectionObserverCallback | null = null
 
 beforeEach(() => {
@@ -246,15 +250,15 @@ describe('AiModePlayground', () => {
     render(<AiModePlayground />)
     await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
 
-    await user.click(getTab(/media and content/i))
-    expect(getTab(/media and content/i)).toHaveAttribute('aria-controls', 'lens-panel-media')
-    expect(document.getElementById('lens-panel-media')).toHaveAttribute('aria-labelledby', 'lens-media')
+    await user.click(getLens(/media and content/i))
+    expect(getLens(/media and content/i)).toHaveAttribute('aria-checked', 'true')
+    expect(document.getElementById('lens-panel-media')).not.toHaveAttribute('hidden')
     expect(screen.getByText('Topic preference captured')).toBeInTheDocument()
     expect(screen.getByText(/user relationship grow/i)).toBeInTheDocument()
 
-    await user.click(getTab(/brand/i))
-    expect(getTab(/brand/i)).toHaveAttribute('aria-controls', 'lens-panel-brand')
-    expect(document.getElementById('lens-panel-brand')).toHaveAttribute('aria-labelledby', 'lens-brand')
+    await user.click(getLens(/^brand$/i))
+    expect(getLens(/^brand$/i)).toHaveAttribute('aria-checked', 'true')
+    expect(document.getElementById('lens-panel-brand')).not.toHaveAttribute('hidden')
     expect(screen.getByText('Active need surfaced')).toBeInTheDocument()
     expect(screen.getByText(/demand behind the interaction/i)).toBeInTheDocument()
   })
@@ -273,7 +277,7 @@ describe('AiModePlayground', () => {
     await user.click(getTab(/make a quote/i))
     await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
     await user.click(screen.getByRole('button', { name: /weight and cumulative joint load/i }))
-    const activeLedger = within(screen.getByRole('tabpanel', { name: /brand/i }))
+    const activeLedger = within(document.getElementById('lens-panel-brand') as HTMLElement)
 
     expect(activeLedger.getAllByText('CONTENT_RESONANCE')).toHaveLength(1)
     expect(activeLedger.queryByText('AMPLIFICATION_READY')).not.toBeInTheDocument()

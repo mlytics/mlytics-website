@@ -70,8 +70,7 @@
   background: transparent;
 }
 
-.modeTabs button,
-.lensTabs button {
+.modeTabs button {
   border: 0;
   border-bottom: 3px solid transparent;
   background: transparent;
@@ -109,8 +108,7 @@
   opacity: 1;
 }
 
-.modeTabs small,
-.lensTabs small {
+.modeTabs small {
   display: block;
   margin-top: 4px;
   color: #A8C5C3;
@@ -299,7 +297,7 @@
 .choice[aria-pressed='true'] { border-color: #225D59; background: #225D59; color: #FFFFFF; }
 .choice:focus-visible,
 .modeTabs button:focus-visible,
-.lensTabs button:focus-visible,
+.lensSwitch button:focus-visible,
 .quoteFeedbackChoice:focus-visible,
 .quoteGenerate:focus-visible,
 .quoteAction:focus-visible,
@@ -369,9 +367,33 @@
 .listenStatus { color: var(--color-ink-muted); font-size: .78rem; text-align: right; }
 
 .ledger { position: sticky; top: 24px; align-self: start; height: auto; max-height: calc(100vh - 48px); overflow-y: auto; border-radius: 17px; background: #EDF5F1; }
-.lensTabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 7px 7px 0; border-bottom: 0; background: #E4F0EB; }
-.lensTabs button { min-height: 69px; border: 0; border-bottom: 3px solid transparent; border-radius: 0; padding: 11px 12px 12px; background: transparent; color: #9B9B9B; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 0; line-height: 1.5; text-align: left; text-transform: none; }
-.lensTabs button[aria-selected='true'] { border-color: #225D59; background: #FAFAFA; color: #1A3D3A; }
+.lensSwitch {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  gap: 2px;
+  margin: 12px 14px 0;
+  padding: 3px;
+  border-radius: 9999px;
+  background: rgba(34, 93, 89, .08);
+}
+.lensSwitch button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 9999px;
+  padding: 6px 16px;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  font: 600 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+.lensSwitch button[aria-checked='true'] {
+  background: var(--color-surface);
+  color: var(--color-primary-dark);
+  box-shadow: 0 1px 2px rgba(34, 93, 89, .12);
+}
 .surfaceLabel { display: flex; align-items: center; justify-content: space-between; gap: .5rem; min-height: 42px; padding: 14px 18px; color: #6B6B6B; font: 11px/1.3 'SFMono-Regular', Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; }
 .ledgerBody { display: flex; flex-direction: column; padding: 0 20px 20px; }
 .ledgerShared { display: contents; }
