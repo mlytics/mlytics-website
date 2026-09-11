@@ -4,6 +4,7 @@ import styles from './CortexPlayground.module.css'
 
 type SignalLedgerProps = {
   lens: CortexLens
+  lensReady: boolean
   mode: CortexMode
   events: CortexEvent[]
   scrollDepth: number
@@ -11,11 +12,11 @@ type SignalLedgerProps = {
   onLensChange: (lens: CortexLens) => void
 }
 
-export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression, onLensChange }: SignalLedgerProps) {
+export function SignalLedger({ lens, lensReady, mode, events, scrollDepth, widgetImpression, onLensChange }: SignalLedgerProps) {
 
   return (
     <aside className={styles.ledger} aria-label="Experience ledger">
-      <div className={styles.lensTabs} role="tablist" aria-label="Ledger lens">
+      <div className={styles.lensTabs} data-lens-ready={lensReady ? 'true' : 'false'} role="tablist" aria-label="Ledger lens">
         <button id="lens-publisher" type="button" role="tab" aria-selected={lens === 'publisher'} aria-controls="lens-panel-publisher" onClick={() => onLensChange('publisher')}>
           Publisher<small>Media value</small>
         </button>
