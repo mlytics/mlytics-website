@@ -306,7 +306,7 @@
 
 .quoteLayout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .92fr); gap: 18px; align-items: start; margin-top: 16px; }
 .quoteControls { min-width: 0; }
-.quoteStepLabel { display: block; margin-bottom: 7px; color: #7D8799; font: 700 10px/15px 'SFMono-Regular', Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; }
+.quoteStepLabel { display: block; margin-bottom: 7px; color: var(--color-ink-muted); font: 700 10px/15px 'SFMono-Regular', Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; }
 .choicePrimary { display: block; font-weight: 600; }
 .choiceSecondary { display: block; margin-top: .25rem; color: var(--color-primary); font: .66rem/1.4 'SFMono-Regular', Consolas, monospace; }
 .quoteFeedbackStep { margin-top: 1rem; }
@@ -314,7 +314,7 @@
 .quoteFeedbackChoice { border: 1px solid rgba(34, 93, 89, .14); border-radius: 999px; background: var(--bg-white); padding: .5rem .7rem; color: var(--bg-dark); cursor: pointer; font-size: .72rem; }
 .quoteFeedbackChoice[aria-checked='true'] { border-color: var(--color-primary); background: var(--color-primary); color: var(--bg-white); }
 .quoteSignature { display: grid; gap: .35rem; margin-top: 1rem; color: var(--color-ink-muted); font-size: .72rem; }
-.quoteSignature em { color: var(--color-ink-subtle); font-style: normal; }
+.quoteSignature em { color: var(--color-ink-muted); font-style: normal; }
 .quoteSignature input { width: 100%; border: 1px solid rgba(34, 93, 89, .14); border-radius: .45rem; background: var(--bg-white); padding: .6rem .7rem; color: var(--bg-dark); font: inherit; font-size: .8rem; }
 .quoteSignature input:focus { border-color: var(--color-primary); outline: 2px solid rgba(34, 93, 89, .12); outline-offset: 1px; }
 .quoteGenerate { width: 100%; margin-top: .85rem; border: 1px solid var(--color-primary); border-radius: 999px; background: var(--color-primary); padding: .7rem .8rem; color: var(--bg-white); cursor: pointer; font-size: .76rem; font-weight: 700; }
@@ -401,7 +401,7 @@
 .eventRow > i { width: 7px; height: 7px; margin-top: 6px; border-radius: 50%; background: #225D59; box-shadow: 0 0 0 3px rgba(34, 93, 89, .22), 0 0 0 3px transparent; }
 .eventRow[data-tone='signal'] > i { background: #F59E0B; box-shadow: 0 0 0 3px rgba(245, 158, 11, .22), 0 0 0 3px transparent; }
 .eventRow b { display: block; color: #225D59; font: 10px/1.5 'SFMono-Regular', Consolas, monospace; letter-spacing: .08em; }
-.eventRow[data-tone='signal'] b { color: #D97706; }
+.eventRow[data-tone='signal'] b { color: var(--color-warn-deep); }
 .eventRow strong { display: block; margin-top: 2px; color: #1A1A1A; font-size: 12px; font-weight: 600; line-height: 1.5; }
 .eventRow small { display: block; margin-top: 2px; color: #6B6B6B; font-size: 12px; line-height: 1.5; }
 .empty { display: grid; gap: 5px; padding: 25px 0; color: #6B6B6B; font-size: 13px; line-height: 1.6; }

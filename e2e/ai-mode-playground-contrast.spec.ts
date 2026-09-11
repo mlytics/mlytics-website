@@ -90,3 +90,60 @@ test('選取中的 mode tab 使用 gold token 作為底線', async ({ page }) =>
   const border = await page.evaluate(`getComputedStyle(document.querySelector('${SCOPE} [role="tab"][aria-selected="true"]')).borderBottomColor`)
   expect(border).toBe('rgb(245, 158, 11)') // --color-gold
 })
+
+// The initial-render scan cannot see text that only exists after a click:
+// signal-tone ledger rows, the quote builder's step labels and signature hint.
+// Disabled controls are exempt from WCAG 1.4.3, so they stay out of the scan.
+const SCAN = `(() => {
+  ${HELPERS}
+  const scope = document.querySelector('${SCOPE}')
+  return [...scope.querySelectorAll('*')]
+    .filter((e) => {
+      if (e.children.length > 0 || !e.textContent.trim()) return false
+      if (e.closest('[aria-hidden="true"]') || e.closest(':disabled')) return false
+      const r = e.getBoundingClientRect()
+      return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'
+    })
+    .map((e) => ({ ...measure(e), selector: e.className || e.tagName }))
+})()`
+
+type Sample = { text: string; fg: number[]; bg: number[]; selector: string }
+const failures = (stage: string, samples: Sample[]) =>
+  samples.map((s) => ({ stage, ...s, ratio: round(ratio(s.fg, s.bg)) })).filter((s) => s.ratio < 4.5)
+
+test('playground 互動後狀態所有文字對比 ≥ 4.5', async ({ page }) => {
+  await page.goto('/ai-mode-playground/')
+  await expect(page.locator(SCOPE)).toHaveCount(1)
+  const scope = page.locator(SCOPE)
+  const bad: ReturnType<typeof failures> = []
+  const sweep = async (stage: string) => bad.push(...failures(stage, await page.evaluate(SCAN)))
+
+  // Chat: answering a question emits signal-tone ledger rows.
+  await page.getByRole('tab', { name: /ask/i }).click()
+  await page.locator('li button').first().click()
+  await expect(page.getByText(/^Grounded in/)).toBeVisible()
+  await expect(scope.locator("#lens-panel-brand [data-tone='signal']").first()).toBeVisible()
+  await sweep('chat')
+
+  // Quote: step labels, the signature hint, and the generated card.
+  await page.getByRole('tab', { name: /amplify/i }).click()
+  await expect(page.getByText('1 · Choose a line')).toBeVisible()
+  await page.getByRole('listitem').filter({ has: page.locator('button') }).first().locator('button').click()
+  await page.getByRole('radio', { name: 'Great' }).click()
+  await page.getByRole('button', { name: /quote card/i }).click()
+  await expect(page.getByRole('region', { name: 'Quote preview' })).toBeVisible()
+  await sweep('quote')
+
+  // Listen: playback state plus its own signal rows.
+  await page.getByRole('tab', { name: /attend/i }).click()
+  await page.getByRole('button', { name: 'Play' }).click()
+  await expect(scope.locator("#lens-panel-brand [data-tone='signal']").first()).toBeVisible()
+  await sweep('listen')
+
+  // The media lens renders a different copy set through the same rows.
+  await page.getByRole('radio', { name: 'Media and Content' }).click()
+  await expect(scope.locator("#lens-panel-media [data-tone='signal']").first()).toBeVisible()
+  await sweep('media lens')
+
+  expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0)
+})
