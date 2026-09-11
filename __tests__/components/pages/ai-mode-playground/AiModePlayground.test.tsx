@@ -114,7 +114,7 @@ describe('AiModePlayground', () => {
     expect(playgroundCss).toMatch(/\.sectionIntro\s*\{[^}]*display:\s*grid;[^}]*align-items:\s*start;[^}]*grid-template-columns:\s*1fr;[^}]*gap:\s*1rem;/)
     expect(playgroundCss).toMatch(/\.sectionIntro\s*\{[^}]*justify-items:\s*center;[^}]*text-align:\s*center;/)
     const introHeading = screen.getByRole('heading', { level: 2, name: 'A small surface for a big shift.' })
-    const introDescription = screen.getByText('Choose a mode to see how one article can meet different reader intent.', { exact: true })
+    const introDescription = screen.getByText('Choose a mode to see how one article can meet different user intent.', { exact: true })
     expect(introHeading).toHaveClass('section-heading', 'text-ink')
     expect(introDescription).toHaveClass('text-base', 'leading-relaxed', 'text-ink-muted', 'max-w-xl', 'mx-auto')
     expect(playgroundCss).not.toMatch(/\.sectionIntro h2\s*\{/)
@@ -123,7 +123,7 @@ describe('AiModePlayground', () => {
     expect(playgroundCss).not.toMatch(/@media\s*\(max-width:\s*680px\)[\s\S]*\.sectionIntro p\s*\{[^}]*max-width:\s*none;/)
     expect(playgroundCss).toMatch(/\.modeLabel\s*\{[^}]*display:\s*none/)
     expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/)
-    expect(playgroundCss).toMatch(/\.readerPanel\s*\{[^}]*padding:\s*0/)
+    expect(playgroundCss).toMatch(/\.userPanel\s*\{[^}]*padding:\s*0/)
     expect(playgroundCss).toMatch(/\.article\s*\{[^}]*padding:\s*30px\s+34px\s+38px/)
     expect(playgroundCss).toMatch(/\.articleContext\s*\{[^}]*margin:\s*-30px\s+-34px\s+24px/)
     expect(playgroundCss).toMatch(/\.ledgerBody\s*\{[^}]*padding:\s*0\s+20px\s+20px/)
@@ -141,7 +141,7 @@ describe('AiModePlayground', () => {
     expect(playgroundCss).toMatch(/\.widgetStatus:empty\s*\{[^}]*min-height:\s*0\s*;/)
   })
 
-  it('shows the selected Chat answer and lets the reader ask another question', async () => {
+  it('shows the selected Chat answer and lets the user ask another question', async () => {
     const user = userEvent.setup()
     render(<AiModePlayground />)
 
@@ -668,5 +668,27 @@ describe('AiModePlayground attribute-level naming', () => {
   it('playground 容器的 aria-label 與 Task 9 的 Playwright 選擇器一致', () => {
     const { container } = render(<AiModePlayground />)
     expect(container.querySelector('[aria-label="Mlytics AI Mode playground"]')).not.toBeNull()
+  })
+})
+
+describe('AI Mode Playground 詞彙', () => {
+  it('整頁不出現 reader / publisher / Cortex', () => {
+    const { container } = render(<AiModePlayground />)
+    expect(container.textContent).not.toMatch(/reader|publisher|cortex/i)
+  })
+
+  it('attribute 層也不殘留 reader / publisher / Cortex', () => {
+    const { container } = render(<AiModePlayground />)
+    expect(container.innerHTML).not.toMatch(/reader|publisher|cortex/i)
+  })
+
+  it('讀者欄標題改為 What the user sees', () => {
+    const { getByText } = render(<AiModePlayground />)
+    expect(getByText(/what the user sees/i)).toBeInTheDocument()
+  })
+
+  it('左欄標示為 MEDIA ARTICLE', () => {
+    const { getByText } = render(<AiModePlayground />)
+    expect(getByText('MEDIA ARTICLE')).toBeInTheDocument()
   })
 })

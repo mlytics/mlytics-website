@@ -84,7 +84,7 @@ export const CHAT_CONTENT = {
     },
   ],
   signals: [
-    { kind: 'declared_intent', title: 'Decision support', detail: 'The reader asked a specific question, not just viewed a page.' },
+    { kind: 'declared_intent', title: 'Decision support', detail: 'The user asked a specific question, not just viewed a page.' },
     { kind: 'contextual_placement', title: 'In-answer citation', detail: 'The product appears inside the grounded answer moment.' },
   ],
 } as const
@@ -98,7 +98,7 @@ export const QUOTE_CONTENT = {
     { text: 'Consider nutrition before symptoms become severe.', sourceType: 'highlight' },
   ] satisfies readonly QuoteSource[],
   signals: [
-    { kind: 'content_resonance', title: 'A claim worth sharing', detail: 'The reader selected the message they want to carry beyond the article.' },
+    { kind: 'content_resonance', title: 'A claim worth sharing', detail: 'The user selected the message they want to carry beyond the article.' },
     { kind: 'amplification_ready', title: 'Share-ready content', detail: 'A quote card turns a meaningful claim into a branded, portable format.' },
   ] as const,
 } as const
@@ -111,7 +111,7 @@ export const LISTEN_CONTENT = {
   durationSeconds: 32,
   sponsoredAttentionThresholdSeconds: 13,
   signals: [
-    { kind: 'attention_start', title: 'Listening started', detail: 'The reader chose an audio path through the story.' },
+    { kind: 'attention_start', title: 'Listening started', detail: 'The user chose an audio path through the story.' },
   ] as const,
 } as const
 

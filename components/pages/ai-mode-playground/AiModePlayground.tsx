@@ -86,7 +86,7 @@ export function AiModePlayground() {
     if (fromUrl) setLens(fromUrl)
   }, [])
 
-  // Keep the address bar honest: once the reader switches lens by hand, a
+  // Keep the address bar honest: once the user switches lens by hand, a
   // copied URL has to reopen on the lens they are looking at. `replaceState`
   // rather than `pushState` so tab switching does not stack history entries
   // and trap Back on this page. Every other query param and the hash survive
@@ -138,7 +138,7 @@ export function AiModePlayground() {
     emitEvent({
       kind: 'widget_impression',
       title: 'Widget entered viewport',
-      detail: 'Reader reached the article-end experience.',
+      detail: 'The user reached the article-end experience.',
       tone: 'raw',
       context: { mode },
     })
@@ -151,7 +151,7 @@ export function AiModePlayground() {
     setSelectedIndex(index)
     if (!widgetClickedRef.current) {
       widgetClickedRef.current = true
-      emitEvent({ kind: 'widget_click', title: CHAT_CONTENT.questions[index], detail: 'Reader interacted with the widget.', tone: 'raw', context: { mode: 'chat' } })
+      emitEvent({ kind: 'widget_click', title: CHAT_CONTENT.questions[index], detail: 'The user interacted with the widget.', tone: 'raw', context: { mode: 'chat' } })
     }
     CHAT_CONTENT.signals.forEach((signal) => emitEvent({ ...signal, tone: 'signal', context: { mode: 'chat' } }))
   }
@@ -168,7 +168,7 @@ export function AiModePlayground() {
     setSelectedIndex(index)
     if (!widgetClickedRef.current) {
       widgetClickedRef.current = true
-      emitEvent({ kind: 'widget_click', title: QUOTE_CONTENT.options[index].text, detail: 'Reader interacted with the widget.', tone: 'raw', context: { mode: 'quote' } })
+      emitEvent({ kind: 'widget_click', title: QUOTE_CONTENT.options[index].text, detail: 'The user interacted with the widget.', tone: 'raw', context: { mode: 'quote' } })
     }
     const resonance = QUOTE_CONTENT.signals.find((signal) => signal.kind === 'content_resonance')
     if (resonance) emitEvent({ ...resonance, tone: 'signal', context: { mode: 'quote' } })
@@ -193,7 +193,7 @@ export function AiModePlayground() {
     emitWidgetImpression()
     if (!widgetClickedRef.current) {
       widgetClickedRef.current = true
-      emitEvent({ kind: 'widget_click', title: 'Listening started', detail: 'Reader interacted with the widget.', tone: 'raw', context: { mode: 'listen' } })
+      emitEvent({ kind: 'widget_click', title: 'Listening started', detail: 'The user interacted with the widget.', tone: 'raw', context: { mode: 'listen' } })
       LISTEN_CONTENT.signals.forEach((signal) => emitEvent({ ...signal, tone: 'signal', context: { mode: 'listen' } }))
     }
   }
@@ -308,7 +308,7 @@ export function AiModePlayground() {
         if (progress >= threshold && scrollDepthRef.current < threshold) {
           scrollDepthRef.current = threshold
           setScrollDepth(threshold)
-          emitEvent({ kind: 'article_scroll', title: `${threshold}% scroll depth`, detail: 'Reader continued through the article.', tone: 'raw', context: { mode, threshold } })
+          emitEvent({ kind: 'article_scroll', title: `${threshold}% scroll depth`, detail: 'The user continued through the article.', tone: 'raw', context: { mode, threshold } })
         }
       }
     }
@@ -347,7 +347,7 @@ export function AiModePlayground() {
       <div className={styles.container}>
         <div className={styles.sectionIntro}>
           <div><span className={styles.eyebrow}>Try the experience</span><h2 className="section-heading mb-4 text-ink" id="playground-heading">A small surface for a big shift.</h2></div>
-          <p className="mx-auto max-w-xl text-base leading-relaxed text-ink-muted">Choose a mode to see how one article can meet different reader intent.</p>
+          <p className="mx-auto max-w-xl text-base leading-relaxed text-ink-muted">Choose a mode to see how one article can meet different user intent.</p>
         </div>
         <section ref={playgroundRef} className={styles.playground} aria-label="Mlytics AI Mode playground">
           <div className={styles.workspace}>
@@ -362,9 +362,9 @@ export function AiModePlayground() {
                 <button type="button" role="tab" aria-selected="false" aria-disabled="true" disabled>More to come<small>Coming soon</small></button>
               </div>
             </div>
-            <div className={styles.readerPanel}>
-              <div className={styles.readerColumn}>
-                <div className={styles.readerSubheader}>What the reader sees</div>
+            <div className={styles.userPanel}>
+              <div className={styles.userColumn}>
+                <div className={styles.userSubheader}>What the user sees</div>
                 <article ref={articleRef} className={styles.article} aria-labelledby="article-title">
                   <div className={styles.articleContext}><span><b>MEDIA ARTICLE</b><small>Source story</small></span><span>Mlytics AI Mode extends this story</span></div>
                   <div className={styles.articleKicker}>{ARTICLE.kicker}</div>
@@ -390,7 +390,7 @@ export function AiModePlayground() {
                     onQuoteAction={(action) => {
                       setQuoteActionStatus(action === 'download' ? 'quote card downloaded' : `${action.toUpperCase()} share recorded`)
                       if (action !== 'download' && !events.some((event) => event.kind === 'share')) {
-                        const copy = lens === 'brand' ? 'Content carried outward' : 'Reader amplification completed'
+                        const copy = lens === 'brand' ? 'Content carried outward' : 'User amplification completed'
                         emitEvent({ kind: 'share', title: copy, detail: 'The selected quote moved beyond the article through a local mock share action.', tone: 'raw', context: { mode: 'quote' } })
                       }
                     }}
