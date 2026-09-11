@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('右欄首視線是 heading 與引導，不是 metrics 列', async ({ page }) => {
+test('metrics 列回到 ledger 上方（比照 UAT）', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/ai-mode-playground/')
 
@@ -19,8 +19,8 @@ test('右欄首視線是 heading 與引導，不是 metrics 列', async ({ page 
 
   // eslint-disable-next-line no-console
   console.log('ledger tops:', JSON.stringify(tops))
-  expect(tops.heading).toBeLessThan(tops.metrics)
-  expect(tops.guide).toBeLessThan(tops.metrics)
+  expect(tops.metrics).toBeLessThan(tops.heading)
+  expect(tops.metrics).toBeLessThan(tops.guide)
 })
 
 test('純裝飾的 mono 微標籤已移除', async ({ page }) => {

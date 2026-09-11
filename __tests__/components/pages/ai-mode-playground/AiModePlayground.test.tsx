@@ -765,9 +765,11 @@ describe('右欄首視線與裝飾標籤精簡（Task 11）', () => {
     expect(guides.some((node) => node.closest('[hidden]') === null)).toBe(true)
   })
 
-  it('ledgerPanel 排在 metrics 之上，讓 heading 與引導成為首視線', () => {
-    expect(playgroundCss).toMatch(/\.ledgerPanel\s*\{[^}]*order:\s*0/)
+  // Reverted to the UAT order at An's request: the metrics row reads as the
+  // panel's masthead, so it sits above the heading rather than below it.
+  it('metrics 列排在 ledgerPanel 之上，比照 UAT', () => {
     expect(playgroundCss).toMatch(/\.metrics\s*\{[^}]*order:\s*1/)
+    expect(playgroundCss).toMatch(/\.ledgerPanel\s*\{[^}]*order:\s*2/)
   })
 
   it('已移除純裝飾的 Source story 標籤', () => {

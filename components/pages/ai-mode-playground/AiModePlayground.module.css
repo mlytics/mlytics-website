@@ -378,7 +378,7 @@
 .metric:last-child { border-right: 0; }
 .metricLabel { display: block; color: #6B6B6B; font: 10px/1.5 'SFMono-Regular', Consolas, monospace; letter-spacing: .04em; text-transform: uppercase; }
 .metricValue { display: block; margin-top: 5px; color: #1A3D3A; font-size: 19px; line-height: 1.5; font-weight: 700; }
-.ledgerPanel { order: 0; padding: 22px 0; }
+.ledgerPanel { order: 2; padding: 22px 0; }
 .ledgerKicker { color: #6B6B6B; font: 11px/1.5 'SFMono-Regular', Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; }
 .ledgerPanel h2 { margin: 10px 0 8px; color: #1A3D3A; font-size: 25px; font-weight: 400; letter-spacing: -.04em; line-height: 1.08; }
 .ledgerIntro { margin: 0 0 20px; color: #6B6B6B; font-size: 13px; line-height: 1.6; }
