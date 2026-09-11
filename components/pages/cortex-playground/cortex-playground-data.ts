@@ -1,5 +1,22 @@
 export type CortexMode = 'chat' | 'quote' | 'listen'
-export type CortexLens = 'publisher' | 'brand'
+const CORTEX_LENSES = ['publisher', 'brand'] as const
+export type CortexLens = (typeof CORTEX_LENSES)[number]
+
+export function isCortexLens(value: unknown): value is CortexLens {
+  return typeof value === 'string' && (CORTEX_LENSES as readonly string[]).includes(value)
+}
+
+/** Static export has no server-side request access, so the lens can only be
+ *  recovered from the browser URL after hydration. Pure so it can be tested
+ *  without a DOM. */
+export function readLensFromSearch(search: string): CortexLens | null {
+  try {
+    const value = new URLSearchParams(search).get('lens')
+    return isCortexLens(value) ? value : null
+  } catch {
+    return null
+  }
+}
 export type EventTone = 'raw' | 'signal'
 
 export type QuoteSource = {
