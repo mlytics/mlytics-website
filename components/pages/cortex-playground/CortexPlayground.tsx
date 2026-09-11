@@ -86,6 +86,23 @@ export function CortexPlayground() {
     if (fromUrl) setLens(fromUrl)
   }, [])
 
+  // Keep the address bar honest: once the reader switches lens by hand, a
+  // copied URL has to reopen on the lens they are looking at. `replaceState`
+  // rather than `pushState` so tab switching does not stack history entries
+  // and trap Back on this page; the rest of the query string and the hash are
+  // carried through untouched so campaign params survive a switch.
+  const handleLensChange = useCallback((nextLens: CortexLens) => {
+    setLens(nextLens)
+    const params = new URLSearchParams(window.location.search)
+    params.set('lens', nextLens)
+    const query = params.toString()
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`,
+    )
+  }, [])
+
   const emitEvent = useCallback((event: Omit<CortexEvent, 'id' | 'lensCopy'>) => {
     if (resettingRef.current || resetEpochRef.current !== resetEpoch) return
     const lensCopy = resolveLensCopy({ ...event, ...event.context })
@@ -374,7 +391,7 @@ export function CortexPlayground() {
               </div>
             </div>
           </div>
-          <SignalLedger lens={lens} mode={mode} events={events} scrollDepth={scrollDepth} widgetImpression={widgetImpression} onLensChange={setLens} />
+          <SignalLedger lens={lens} mode={mode} events={events} scrollDepth={scrollDepth} widgetImpression={widgetImpression} onLensChange={handleLensChange} />
           <button className={styles.startOver} type="button" aria-label="Start over" disabled={resetting} onClick={() => handleReset()}>
             <span className={styles.startOverIcon} aria-hidden="true">↻</span><span className={styles.startOverLabel}>START OVER</span>
           </button>

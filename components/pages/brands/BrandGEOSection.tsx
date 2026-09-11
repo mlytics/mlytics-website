@@ -321,9 +321,18 @@ export function BrandGEOSection() {
       </div>
 
       {/* ── Thin divider ──────────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-6">
+      {/* Fades in on the same terms as the CTA below it, so the rule and the
+          block it introduces arrive together rather than the hairline showing
+          up alone on the dark ground. */}
+      <motion.div
+        className="max-w-5xl mx-auto px-6"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: '-80px' }}
+        transition={{ duration: 0.5 }}
+      >
         <div style={{ height: 1, background: 'rgba(168,197,195,0.12)' }} />
-      </div>
+      </motion.div>
 
       {/* ── Playground entry point — brand lens ───────────────────── */}
       <PlaygroundCTASection

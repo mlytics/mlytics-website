@@ -1,5 +1,6 @@
 import React from 'react'
 import { cleanup, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import PublishersPage from '@/app/content-owners/page'
 
@@ -26,7 +27,18 @@ vi.mock('next/link', () => ({
   }) => <a href={href} className={className} onClick={onClick}>{children}</a>,
 }))
 
-afterEach(cleanup)
+// Only `trackCTA` is stubbed; the rest of the module stays real so other
+// sections on this page keep working.
+const trackCTA = vi.hoisted(() => vi.fn())
+vi.mock('@/lib/analytics', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/analytics')>()),
+  trackCTA,
+}))
+
+afterEach(() => {
+  cleanup()
+  trackCTA.mockClear()
+})
 
 describe('PublishersPage playground entry point', () => {
   it('renders the playground entry-point copy verbatim', () => {
@@ -46,6 +58,18 @@ describe('PublishersPage playground entry point', () => {
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
       .toHaveAttribute('href', '/cortex-playground/?lens=publisher')
+  })
+
+  // Both audience entry points carry the same `Try AI Mode` label, so
+  // `cta_position` is the only field in GA that tells them apart. Asserted
+  // against the real page rather than a fixture the test declares itself.
+  it('tracks the click with this page own position', async () => {
+    const user = userEvent.setup()
+    render(<PublishersPage />)
+
+    await user.click(screen.getByRole('link', { name: 'Try AI Mode' }))
+
+    expect(trackCTA).toHaveBeenCalledWith('Try AI Mode', 'content_owners_playground')
   })
 
   it('places the entry point after The Solution and before AI Infrastructure', () => {
