@@ -85,7 +85,7 @@
   border-radius: 0;
   background: transparent;
   padding: 11px 9px 12px;
-  color: #77908A;
+  color: var(--color-ink-muted);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
   font-size: 16px;
   font-weight: 400;
@@ -95,22 +95,22 @@
 }
 
 .modeTabs button[aria-selected='true'] {
-  border-color: #F6B83F;
+  border-color: var(--color-gold);
   background: transparent;
-  color: #173C37;
+  color: var(--color-primary-dark);
   font-weight: 700;
 }
 
 .modeTabs small {
   display: block;
   margin-top: 4px;
-  color: #A8C5C3;
+  color: var(--color-ink-muted);
   font: 700 10px/1.5 'SFMono-Regular', Consolas, monospace;
   letter-spacing: .12em;
   text-transform: uppercase;
 }
 
-.modeTabs button[aria-selected='true'] small { color: #A8C5C3; }
+.modeTabs button[aria-selected='true'] small { color: var(--color-ink-muted); }
 
 .modeNote {
   margin: 0;
@@ -252,8 +252,8 @@
 .widgetMode { display: flex; align-items: center; min-width: 0; gap: 8px; color: #1A3D3A; font-size: 13px; font-weight: 700; line-height: 19.5px; }
 .widgetModeMark { flex: 0 0 auto; color: #F6B83F; font-size: 18px; line-height: 18px; }
 .widgetGrounding,
-.widgetGrounding { max-width: 210px; color: #77908A; font: 700 10px/15px 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; letter-spacing: .1em; text-align: right; }
-.widgetFooter { justify-content: flex-end; margin: 18px 18px 16px; padding-top: 0; color: #77908A; font: 700 10px/15px 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; letter-spacing: .1em; }
+.widgetGrounding { max-width: 210px; color: var(--color-ink-muted); font: 700 10px/15px 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; letter-spacing: .1em; text-align: right; }
+.widgetFooter { justify-content: flex-end; margin: 18px 18px 16px; padding-top: 0; color: var(--color-ink-muted); font: 700 10px/15px 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; letter-spacing: .1em; }
 
 .widgetHeading {
   margin: 18px 18px 0;
@@ -309,7 +309,7 @@
 .widgetAnswer p { margin: 0; color: #1A1A1A; font-family: inherit; font-size: 14px; line-height: 20.3px; }
 .widgetAnswer .selectedPrompt { border-left: 0; padding-left: 0; color: #225D59; font-size: 14px; font-weight: 700; line-height: 20.3px; }
 .answerProduct mark { background: transparent; color: #225D59; font-weight: 700; }
-.answerGrounded { color: #77908A !important; font: 10px/15px 'SFMono-Regular', Consolas, monospace !important; }
+.answerGrounded { color: var(--color-ink-muted) !important; font: 10px/15px 'SFMono-Regular', Consolas, monospace !important; }
 .askAnother { width: fit-content; min-height: 0; margin-top: 3px; border: 0; border-radius: 0; background: transparent; padding: 0; color: #225D59; font-size: 13px; font-weight: 700; }
 .widgetStatus { min-height: 1rem; }
 .widgetStatus:empty { min-height: 0; }
@@ -416,7 +416,7 @@
 .eventRow small { display: block; margin-top: 2px; color: #6B6B6B; font-size: 12px; line-height: 1.5; }
 .empty { display: grid; gap: 5px; padding: 25px 0; color: #6B6B6B; font-size: 13px; line-height: 1.6; }
 .empty b { display: block; margin: 0 0 5px; color: #1A1A1A; font-size: inherit; font-weight: 700; }
-.projection { margin-top: 20px; border: 0; border-radius: 10px; background: #E1EEE7; padding: 13px; color: #6B6B6B; font-size: 11px; line-height: 1.5; }
+.projection { margin-top: 20px; border: 0; border-radius: 10px; background: #E1EEE7; padding: 13px; color: var(--color-primary); font-size: 11px; line-height: 1.5; }
 .projection b { display: block; margin-bottom: 5px; color: #1A3D3A; font: inherit; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .projection p { display: inline; margin: 0; color: inherit; font-size: inherit; }
 .startOver { position: absolute; right: 14px; bottom: 14px; z-index: 1000; display: inline-grid; grid-auto-flow: column; place-items: center; width: 44px; height: 44px; margin: 0; padding: 0; overflow: hidden; border: 1.5px solid transparent; border-radius: 50%; background: rgba(34, 93, 89, .34); color: #FAFAFA; cursor: pointer; font: 22px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; transition: width .18s ease, padding .18s ease, background-color .18s ease, color .18s ease, border-color .18s ease, border-radius .18s ease; }
