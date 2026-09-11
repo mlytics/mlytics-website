@@ -4,14 +4,14 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { trackCTA } from '@/lib/analytics'
-import type { CortexLens } from '@/components/pages/cortex-playground/cortex-playground-data'
+import type { LedgerLens } from '@/components/pages/ai-mode-playground/ai-mode-playground-data'
 
 export type PlaygroundCTASectionProps = {
   eyebrow: string
   heading: string
   body: string
   ctaLabel: string
-  lens: CortexLens
+  lens: LedgerLens
   trackingPosition: string
   /** How this section is placed on the page — not just a colour.
    *

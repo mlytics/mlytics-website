@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { CortexPlayground } from '@/components/pages/cortex-playground/CortexPlayground'
-import styles from './CortexPlaygroundPage.module.css'
+import { AiModePlayground } from '@/components/pages/ai-mode-playground/AiModePlayground'
+import styles from './AiModePlaygroundPage.module.css'
 
 export const metadata: Metadata = {
   title: { absolute: 'Cortex Playground · Mlytics' },
@@ -14,13 +14,13 @@ export const metadata: Metadata = {
     title: 'Cortex Playground · Mlytics',
     description: 'Explore a local Cortex Playground showing how readers can ask, decide, and listen inside one article.',
   },
-  alternates: { canonical: '/cortex-playground/' },
+  alternates: { canonical: '/ai-mode-playground/' },
 }
 
-export default function CortexPlaygroundPage() {
+export default function AiModePlaygroundPage() {
   return (
     <div className={`${styles.routeSurface} section-white`}>
-      <section className={`${styles.hero} cortex-playground-hero section-white pt-32 pb-12`}>
+      <section className={`${styles.hero} ai-mode-playground-hero section-white pt-32 pb-12`}>
         <div className={styles.heroBackdrop} aria-hidden="true">
           <div className={styles.heroGradient} />
         </div>
@@ -30,7 +30,7 @@ export default function CortexPlaygroundPage() {
           <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-ink-muted">Explore how Cortex helps readers ask, decide, and listen — while giving publishers a clear view of the value created.</p>
         </div>
       </section>
-      <CortexPlayground />
+      <AiModePlayground />
     </div>
   )
 }

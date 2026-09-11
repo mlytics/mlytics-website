@@ -1,17 +1,17 @@
-export type CortexMode = 'chat' | 'quote' | 'listen'
-const CORTEX_LENSES = ['publisher', 'brand'] as const
-export type CortexLens = (typeof CORTEX_LENSES)[number]
+export type PlaygroundMode = 'chat' | 'quote' | 'listen'
+const LEDGER_LENSES = ['publisher', 'brand'] as const
+export type LedgerLens = (typeof LEDGER_LENSES)[number]
 
-export function isCortexLens(value: unknown): value is CortexLens {
-  return typeof value === 'string' && (CORTEX_LENSES as readonly string[]).includes(value)
+export function isLedgerLens(value: unknown): value is LedgerLens {
+  return typeof value === 'string' && (LEDGER_LENSES as readonly string[]).includes(value)
 }
 
 /** Static export has no server-side request access, so the lens can only be
  *  recovered from the browser URL after hydration. Pure so it can be tested
  *  without a DOM. */
-export function readLensFromSearch(search: string): CortexLens | null {
+export function readLensFromSearch(search: string): LedgerLens | null {
   const value = new URLSearchParams(search).get('lens')
-  return isCortexLens(value) ? value : null
+  return isLedgerLens(value) ? value : null
 }
 export type EventTone = 'raw' | 'signal'
 
@@ -21,14 +21,14 @@ export type QuoteSource = {
   byline?: string
 }
 
-export type CortexEvent = {
+export type LedgerEvent = {
   id: string
   kind: string
   title: string
   detail: string
   tone: EventTone
-  context: { mode?: CortexMode; threshold?: number; signalKind?: string }
-  lensCopy: Record<CortexLens, { title: string; detail: string }>
+  context: { mode?: PlaygroundMode; threshold?: number; signalKind?: string }
+  lensCopy: Record<LedgerLens, { title: string; detail: string }>
 }
 
 export const ARTICLE = {
@@ -114,8 +114,8 @@ export const WAVEFORM_BARS = [
   28, 42, 64, 29, 52, 70, 35, 60, 27, 48,
 ] as const
 
-type LensCopy = Record<CortexLens, { title: string; detail: string }>
-type ModeLensCopy = Record<CortexMode, LensCopy>
+type LensCopy = Record<LedgerLens, { title: string; detail: string }>
+type ModeLensCopy = Record<PlaygroundMode, LensCopy>
 
 const ROLE_COPY = {
   widget_impression: {
@@ -185,7 +185,7 @@ const LENS_CONTENT = {
   },
 } as const
 
-export function getLensContent(lens: CortexLens) {
+export function getLensContent(lens: LedgerLens) {
   return LENS_CONTENT[lens]
 }
 
@@ -198,12 +198,12 @@ export function resolveLensCopy({
   detail,
 }: {
   kind: string
-  mode?: CortexMode
+  mode?: PlaygroundMode
   threshold?: number
   signalKind?: string
   title: string
   detail: string
-}): Record<CortexLens, { title: string; detail: string }> {
+}): Record<LedgerLens, { title: string; detail: string }> {
   const copyKey = signalKind ?? kind
   const copy = ROLE_COPY[copyKey as keyof typeof ROLE_COPY]
   const scoped = copyKey === 'widget_click' && mode

@@ -1,10 +1,10 @@
 import type { RefObject } from 'react'
-import type { CortexMode, QuoteSource } from './cortex-playground-data'
-import { CHAT_CONTENT, LISTEN_CONTENT, QUOTE_CONTENT, WAVEFORM_BARS } from './cortex-playground-data'
-import styles from './CortexPlayground.module.css'
+import type { PlaygroundMode, QuoteSource } from './ai-mode-playground-data'
+import { CHAT_CONTENT, LISTEN_CONTENT, QUOTE_CONTENT, WAVEFORM_BARS } from './ai-mode-playground-data'
+import styles from './AiModePlayground.module.css'
 
 type WidgetProps = {
-  mode: CortexMode
+  mode: PlaygroundMode
   selectedIndex: number | null
   quoteFeedback: string | null
   quoteSignature: string
@@ -25,7 +25,7 @@ type WidgetProps = {
 
 const poweredBy = 'POWERED BY MLYTICS AI'
 
-export function CortexPlaygroundWidget({
+export function AiModePlaygroundWidget({
   mode,
   selectedIndex,
   quoteFeedback,

@@ -1,22 +1,22 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { CortexPlaygroundWidget } from './CortexPlaygroundWidget'
+import { AiModePlaygroundWidget } from './AiModePlaygroundWidget'
 import { SignalLedger } from './SignalLedger'
 import {
   ARTICLE,
   CHAT_CONTENT,
-  CortexEvent,
-  CortexLens,
-  CortexMode,
+  LedgerEvent,
+  LedgerLens,
+  PlaygroundMode,
   LISTEN_CONTENT,
   QUOTE_CONTENT,
   readLensFromSearch,
   resolveLensCopy,
-} from './cortex-playground-data'
-import styles from './CortexPlayground.module.css'
+} from './ai-mode-playground-data'
+import styles from './AiModePlayground.module.css'
 
-const MODES: Array<{ id: CortexMode; label: string; sublabel: string }> = [
+const MODES: Array<{ id: PlaygroundMode; label: string; sublabel: string }> = [
   { id: 'chat', label: 'Chat', sublabel: 'Ask' },
   { id: 'quote', label: 'Make a quote', sublabel: 'Amplify' },
   { id: 'listen', label: 'Listen', sublabel: 'Attend' },
@@ -41,10 +41,10 @@ function getSiteHeaderBottom() {
   }, 0)
 }
 
-export function CortexPlayground() {
-  const [mode, setMode] = useState<CortexMode>('chat')
-  const [lens, setLens] = useState<CortexLens>('brand')
-  const [events, setEvents] = useState<CortexEvent[]>([])
+export function AiModePlayground() {
+  const [mode, setMode] = useState<PlaygroundMode>('chat')
+  const [lens, setLens] = useState<LedgerLens>('brand')
+  const [events, setEvents] = useState<LedgerEvent[]>([])
   const [scrollDepth, setScrollDepth] = useState(0)
   const [widgetImpression, setWidgetImpression] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -102,7 +102,7 @@ export function CortexPlayground() {
   // would skip Next's canonical-URL sync and leave it on the old lens. With
   // `null`, Next's `copyNextJsInternalHistoryState` puts `__NA` and the
   // internal tree back itself and the canonical URL follows the address bar.
-  const handleLensChange = useCallback((nextLens: CortexLens) => {
+  const handleLensChange = useCallback((nextLens: LedgerLens) => {
     setLens(nextLens)
     const params = new URLSearchParams(window.location.search)
     params.set('lens', nextLens)
@@ -113,10 +113,10 @@ export function CortexPlayground() {
     )
   }, [])
 
-  const emitEvent = useCallback((event: Omit<CortexEvent, 'id' | 'lensCopy'>) => {
+  const emitEvent = useCallback((event: Omit<LedgerEvent, 'id' | 'lensCopy'>) => {
     if (resettingRef.current || resetEpochRef.current !== resetEpoch) return
     const lensCopy = resolveLensCopy({ ...event, ...event.context })
-    const nextEvent: CortexEvent = {
+    const nextEvent: LedgerEvent = {
       ...event,
       id: `${resetEpochRef.current}-${++eventSequenceRef.current}`,
       lensCopy,
@@ -217,7 +217,7 @@ export function CortexPlayground() {
     }
   }, [])
 
-  const handleReset = useCallback((nextMode: CortexMode = 'chat') => {
+  const handleReset = useCallback((nextMode: PlaygroundMode = 'chat') => {
     if (resettingRef.current) return
     resettingRef.current = true
     trackingCleanupRef.current?.()
@@ -267,7 +267,7 @@ export function CortexPlayground() {
     }
   }, [clearAudioTimer, clearResetSchedule])
 
-  const handleModeChange = (nextMode: CortexMode) => {
+  const handleModeChange = (nextMode: PlaygroundMode) => {
     if (nextMode !== mode) handleReset(nextMode)
   }
 
@@ -372,7 +372,7 @@ export function CortexPlayground() {
                   <p className={styles.standfirst}>{ARTICLE.standfirst}</p>
                   <div className={styles.rule} />
                   {ARTICLE.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-                  <CortexPlaygroundWidget
+                  <AiModePlaygroundWidget
                     mode={mode}
                     selectedIndex={selectedIndex}
                     quoteFeedback={quoteFeedback}

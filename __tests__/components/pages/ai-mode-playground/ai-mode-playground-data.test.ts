@@ -1,20 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { isCortexLens, readLensFromSearch } from '@/components/pages/cortex-playground/cortex-playground-data'
+import { isLedgerLens, readLensFromSearch } from '@/components/pages/ai-mode-playground/ai-mode-playground-data'
 
-describe('isCortexLens', () => {
+describe('isLedgerLens', () => {
   it('accepts the two supported lenses', () => {
-    expect(isCortexLens('publisher')).toBe(true)
-    expect(isCortexLens('brand')).toBe(true)
+    expect(isLedgerLens('publisher')).toBe(true)
+    expect(isLedgerLens('brand')).toBe(true)
   })
 
   it('rejects anything else', () => {
-    expect(isCortexLens('garbage')).toBe(false)
-    expect(isCortexLens('Publisher')).toBe(false)
-    expect(isCortexLens('')).toBe(false)
-    expect(isCortexLens(null)).toBe(false)
-    expect(isCortexLens(undefined)).toBe(false)
-    expect(isCortexLens(1)).toBe(false)
-    expect(isCortexLens(['brand'])).toBe(false)
+    expect(isLedgerLens('garbage')).toBe(false)
+    expect(isLedgerLens('Publisher')).toBe(false)
+    expect(isLedgerLens('')).toBe(false)
+    expect(isLedgerLens(null)).toBe(false)
+    expect(isLedgerLens(undefined)).toBe(false)
+    expect(isLedgerLens(1)).toBe(false)
+    expect(isLedgerLens(['brand'])).toBe(false)
   })
 })
 

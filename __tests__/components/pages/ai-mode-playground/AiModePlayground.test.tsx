@@ -2,11 +2,11 @@ import { readFileSync } from 'node:fs'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
-import CortexPlaygroundPage from '@/app/cortex-playground/page'
-import { CortexPlayground } from '@/components/pages/cortex-playground/CortexPlayground'
+import AiModePlaygroundPage from '@/app/ai-mode-playground/page'
+import { AiModePlayground } from '@/components/pages/ai-mode-playground/AiModePlayground'
 
-const pageSource = readFileSync('app/cortex-playground/page.tsx', 'utf8')
-const playgroundCss = readFileSync('components/pages/cortex-playground/CortexPlayground.module.css', 'utf8')
+const pageSource = readFileSync('app/ai-mode-playground/page.tsx', 'utf8')
+const playgroundCss = readFileSync('components/pages/ai-mode-playground/AiModePlayground.module.css', 'utf8')
 
 function getTab(name: RegExp) {
   return screen.getByRole('tab', { name })
@@ -30,9 +30,9 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('CortexPlaygroundPage', () => {
+describe('AiModePlaygroundPage', () => {
   it('wraps the Hero and playground in one white route surface', () => {
-    const { container } = render(<CortexPlaygroundPage />)
+    const { container } = render(<AiModePlaygroundPage />)
 
     const routeSurface = container.firstElementChild
     expect(routeSurface).toHaveClass('section-white')
@@ -44,7 +44,7 @@ describe('CortexPlaygroundPage', () => {
   })
 
   it('keeps the complete Hero copy inside a route-scoped Hero', () => {
-    render(<CortexPlaygroundPage />)
+    render(<AiModePlaygroundPage />)
 
     const heading = screen.getByRole('heading', {
       level: 1,
@@ -52,7 +52,7 @@ describe('CortexPlaygroundPage', () => {
     })
     const hero = heading.closest('section')
 
-    expect(hero).toHaveClass('cortex-playground-hero')
+    expect(hero).toHaveClass('ai-mode-playground-hero')
     expect(within(hero as HTMLElement).getByText('Cortex Playground', { exact: true })).toBeInTheDocument()
     expect(within(hero as HTMLElement).getByText(
       'Explore how Cortex helps readers ask, decide, and listen — while giving publishers a clear view of the value created.',
@@ -66,9 +66,9 @@ describe('CortexPlaygroundPage', () => {
   })
 })
 
-describe('CortexPlayground', () => {
+describe('AiModePlayground', () => {
   it('starts in Chat with three article questions and a disabled More to come tab', () => {
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     expect(getTab(/^Chat/)).toHaveAttribute('aria-selected', 'true')
     for (const tab of screen.getAllByRole('tab').filter((item) => !item.hasAttribute('disabled'))) {
@@ -90,12 +90,12 @@ describe('CortexPlayground', () => {
     expect(playgroundCss).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*\.modeTabs button\s*\{[^}]*flex:\s*0 0 clamp\(/)
     expect(playgroundCss).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*\.modeTabs button:last-child\s*\{[^}]*display:\s*none;/)
 
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     expect(getTab(/more to come/i)).toBeDisabled()
   })
 
   it('renders Start over as a playground-level control instead of inside SignalLedger', () => {
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     const reset = screen.getByRole('button', { name: /start over/i })
     expect(reset.closest('aside')).toBeNull()
@@ -103,7 +103,7 @@ describe('CortexPlayground', () => {
   })
 
   it('keeps the route surface aligned with the hosted layout baseline', () => {
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     const playground = screen.getByRole('region', { name: 'Cortex Playground' })
     const reset = screen.getByRole('button', { name: /start over/i })
@@ -134,7 +134,7 @@ describe('CortexPlayground', () => {
   })
 
   it('keeps the hosted widget footer exact and collapses an empty chat status', () => {
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     expect(screen.getByText('POWERED BY MLYTICS AI', { exact: true })).toBeInTheDocument()
     expect(screen.queryByText('POWERED BY MLYTICS AI · NO LIVE AI/API CALL', { exact: true })).not.toBeInTheDocument()
@@ -143,7 +143,7 @@ describe('CortexPlayground', () => {
 
   it('shows the selected Chat answer and lets the reader ask another question', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
 
@@ -157,7 +157,7 @@ describe('CortexPlayground', () => {
 
   it('shows a distinct answer for the joint-support ingredients question', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await user.click(screen.getByRole('button', { name: /which joint-support ingredients/i }))
 
@@ -167,7 +167,7 @@ describe('CortexPlayground', () => {
 
   it('shows a distinct answer for the stiffness-after-walks question', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await user.click(screen.getByRole('button', { name: /is stiffness after walks/i }))
 
@@ -177,7 +177,7 @@ describe('CortexPlayground', () => {
 
   it('requires a quote and feedback before generating a two-column quote preview', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(getTab(/make a quote/i))
     await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
 
@@ -201,7 +201,7 @@ describe('CortexPlayground', () => {
 
   it('exposes icon-only LINE and Facebook quote actions with distinct triggers', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(getTab(/make a quote/i))
     await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
     await user.click(screen.getByRole('button', { name: /the senior threshold can arrive earlier/i }))
@@ -226,7 +226,7 @@ describe('CortexPlayground', () => {
 
   it('simulates Listen progress and emits the sponsored attention business signal', async () => {
     vi.useFakeTimers()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     fireEvent.click(getTab(/listen/i))
     act(() => {
       vi.runOnlyPendingTimers()
@@ -243,7 +243,7 @@ describe('CortexPlayground', () => {
 
   it('projects the same raw events differently in Publisher and Brand lenses', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
 
     await user.click(getTab(/publisher/i))
@@ -261,7 +261,7 @@ describe('CortexPlayground', () => {
 
   it('renders the hosted listen waveform density', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(getTab(/listen/i))
 
     expect(screen.getByTestId('cortex-waveform').children).toHaveLength(70)
@@ -269,7 +269,7 @@ describe('CortexPlayground', () => {
 
   it('emits quote resonance on selection and amplification only after generation', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(getTab(/make a quote/i))
     await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
     await user.click(screen.getByRole('button', { name: /weight and cumulative joint load/i }))
@@ -292,7 +292,7 @@ describe('CortexPlayground', () => {
   it('disables Start over while reset cleanup is pending', () => {
     vi.useFakeTimers()
 
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     const reset = screen.getByRole('button', { name: /start over/i })
     fireEvent.click(reset)
 
@@ -316,7 +316,7 @@ describe('CortexPlayground', () => {
     })
 
     try {
-      ({ unmount } = render(<CortexPlayground />))
+      ({ unmount } = render(<AiModePlayground />))
 
       const playground = screen.getByRole('region', { name: 'Cortex Playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
@@ -381,7 +381,7 @@ describe('CortexPlayground', () => {
     })
 
     try {
-      ({ unmount } = render(<CortexPlayground />))
+      ({ unmount } = render(<AiModePlayground />))
 
       const playground = screen.getByRole('region', { name: 'Cortex Playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
@@ -444,7 +444,7 @@ describe('CortexPlayground', () => {
     })
 
     try {
-      ({ unmount } = render(<CortexPlayground />))
+      ({ unmount } = render(<AiModePlayground />))
 
       const playground = screen.getByRole('region', { name: 'Cortex Playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
@@ -484,7 +484,7 @@ describe('CortexPlayground', () => {
     Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: undefined })
 
     try {
-      render(<CortexPlayground />)
+      render(<AiModePlayground />)
       fireEvent.click(getTab(/make a quote/i))
 
       const reset = screen.getByRole('button', { name: /start over/i })
@@ -509,7 +509,7 @@ describe('CortexPlayground', () => {
     Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: undefined })
 
     try {
-      render(<CortexPlayground />)
+      render(<AiModePlayground />)
       const playground = screen.getByRole('region', { name: 'Cortex Playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
         top: 132,
@@ -538,7 +538,7 @@ describe('CortexPlayground', () => {
 
   it('fully resets state and returns to the initial Chat surface', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
     await user.click(getTab(/make a quote/i))
     await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
@@ -569,7 +569,7 @@ describe('CortexPlayground', () => {
       toJSON: () => ({}),
     } as DOMRect)
 
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     const widget = screen.getByTestId('cortex-widget')
     const mountedObserverCallback = intersectionObserverCallback
 
@@ -606,7 +606,7 @@ describe('CortexPlayground', () => {
     Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: undefined })
 
     try {
-      render(<CortexPlayground />)
+      render(<AiModePlayground />)
       fireEvent.click(getTab(/listen/i))
       act(() => vi.runOnlyPendingTimers())
       fireEvent.click(screen.getByRole('button', { name: 'Play' }))
@@ -636,7 +636,7 @@ describe('CortexPlayground', () => {
     Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: undefined })
 
     try {
-      render(<CortexPlayground />)
+      render(<AiModePlayground />)
       fireEvent.click(getTab(/listen/i))
       act(() => vi.runOnlyPendingTimers())
       fireEvent.click(screen.getByRole('button', { name: 'Play' }))

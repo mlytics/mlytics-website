@@ -1,6 +1,6 @@
 // Two different things are covered in two different places, and neither
 // stands in for the other. The `readLensFromSearch` tests in
-// `__tests__/components/pages/cortex-playground/cortex-playground-data.test.ts`
+// `__tests__/components/pages/ai-mode-playground/ai-mode-playground-data.test.ts`
 // cover the *parser*: what a missing or unsupported `lens` resolves to (null).
 // The default-lens test below covers where the *component* actually lands with
 // no `?lens=` at all — brand — which is a separate claim, and the one the
@@ -11,10 +11,10 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { CortexPlayground } from '@/components/pages/cortex-playground/CortexPlayground'
+import { AiModePlayground } from '@/components/pages/ai-mode-playground/AiModePlayground'
 
 function setSearch(search: string) {
-  window.history.replaceState({}, '', `/cortex-playground/${search}`)
+  window.history.replaceState({}, '', `/ai-mode-playground/${search}`)
 }
 
 beforeEach(() => {
@@ -31,10 +31,10 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('CortexPlayground lens deep-link', () => {
+describe('AiModePlayground lens deep-link', () => {
   it('selects the Brand lens when no ?lens= is present', async () => {
     setSearch('')
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await waitFor(() => {
       expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'true')
@@ -44,7 +44,7 @@ describe('CortexPlayground lens deep-link', () => {
 
   it('selects the Publisher lens for ?lens=publisher', async () => {
     setSearch('?lens=publisher')
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await waitFor(() => {
       expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
@@ -53,11 +53,11 @@ describe('CortexPlayground lens deep-link', () => {
   })
 })
 
-describe('CortexPlayground lens URL sync', () => {
+describe('AiModePlayground lens URL sync', () => {
   it('rewrites ?lens= when the reader switches lens', async () => {
     const user = userEvent.setup()
     setSearch('?lens=publisher')
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await waitFor(() => {
       expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
@@ -74,7 +74,7 @@ describe('CortexPlayground lens URL sync', () => {
   it('keeps the other query params and the hash when it rewrites ?lens=', async () => {
     const user = userEvent.setup()
     setSearch('?utm_source=slack&lens=publisher#foo')
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await waitFor(() => {
       expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
@@ -92,7 +92,7 @@ describe('CortexPlayground lens URL sync', () => {
   it('replaces the history entry instead of pushing one', async () => {
     const user = userEvent.setup()
     setSearch('?lens=publisher')
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await waitFor(() => {
       expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')

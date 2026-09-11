@@ -1,14 +1,14 @@
-import type { CortexEvent, CortexLens, CortexMode } from './cortex-playground-data'
-import { getLensContent } from './cortex-playground-data'
-import styles from './CortexPlayground.module.css'
+import type { LedgerEvent, LedgerLens, PlaygroundMode } from './ai-mode-playground-data'
+import { getLensContent } from './ai-mode-playground-data'
+import styles from './AiModePlayground.module.css'
 
 type SignalLedgerProps = {
-  lens: CortexLens
-  mode: CortexMode
-  events: CortexEvent[]
+  lens: LedgerLens
+  mode: PlaygroundMode
+  events: LedgerEvent[]
   scrollDepth: number
   widgetImpression: boolean
-  onLensChange: (lens: CortexLens) => void
+  onLensChange: (lens: LedgerLens) => void
 }
 
 export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression, onLensChange }: SignalLedgerProps) {
