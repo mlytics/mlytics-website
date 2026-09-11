@@ -359,8 +359,8 @@ export function AiModePlayground() {
                     {item.label}<small>{item.sublabel}</small>
                   </button>
                 ))}
+                <button type="button" role="tab" aria-selected="false" aria-disabled="true" disabled>More to come<small>Coming soon</small></button>
               </div>
-              <p className={styles.modeNote}>More modes coming soon.</p>
             </div>
             <div className={styles.userPanel}>
               <div className={styles.userColumn}>

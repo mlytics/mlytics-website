@@ -77,11 +77,11 @@ describe('AiModePlaygroundPage', () => {
 })
 
 describe('AiModePlayground', () => {
-  it('starts in Chat with three article questions', () => {
+  it('starts in Chat with three article questions and a disabled More to come tab', () => {
     render(<AiModePlayground />)
 
     expect(getTab(/^Chat/)).toHaveAttribute('aria-selected', 'true')
-    for (const tab of screen.getAllByRole('tab')) {
+    for (const tab of screen.getAllByRole('tab').filter((item) => !item.hasAttribute('disabled'))) {
       const controlledId = tab.getAttribute('aria-controls')
       expect(controlledId).toBeTruthy()
       expect(document.getElementById(controlledId ?? '')).toBeInTheDocument()
@@ -89,31 +89,40 @@ describe('AiModePlayground', () => {
     expect(screen.getByRole('button', { name: /at what age should a large-breed dog/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /which joint-support ingredients/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /is stiffness after walks/i })).toBeInTheDocument()
+    expect(getTab(/more to come/i)).toBeDisabled()
     expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
   })
 
-  it('makes tablet/mobile mode tabs horizontally scrollable without hiding any mode', () => {
-    expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/)
+  it('keeps More to come desktop-only and makes tablet/mobile mode tabs horizontally scrollable', () => {
+    expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/)
     expect(playgroundCss).toMatch(/\.modeTabs button\s*\{[^}]*white-space:\s*nowrap;/)
     expect(playgroundCss).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*\.modeTabs\s*\{[^}]*display:\s*flex;[^}]*flex-wrap:\s*nowrap;[^}]*overflow-x:\s*auto;/)
     expect(playgroundCss).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*\.modeTabs button\s*\{[^}]*flex:\s*0 0 clamp\(/)
-    expect(playgroundCss).not.toMatch(/\.modeTabs button:last-child\s*\{[^}]*display:\s*none;/)
-    expect(playgroundCss).not.toMatch(/\.modeTabs button:disabled/)
+    expect(playgroundCss).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*\.modeTabs button:last-child\s*\{[^}]*display:\s*none;/)
 
     render(<AiModePlayground />)
-    expect(modeTabs()).toHaveLength(3)
+    expect(modeTabs()).toHaveLength(4)
+    expect(getTab(/more to come/i)).toBeDisabled()
   })
 
-  it('tab 列不含不可點的佔位 tab', () => {
+  it('佔位 tab 是第四顆，帶完整的 disabled 語意與 Coming soon 小字', () => {
     render(<AiModePlayground />)
     const tabs = modeTabs()
-    expect(tabs).toHaveLength(3)
-    expect(tabs.every((t) => !(t as HTMLButtonElement).disabled)).toBe(true)
+    const placeholder = tabs[3]
+
+    expect(placeholder).toBe(getTab(/more to come/i))
+    expect(placeholder).toHaveAttribute('aria-selected', 'false')
+    expect(placeholder).toHaveAttribute('aria-disabled', 'true')
+    expect(placeholder).toBeDisabled()
+    expect(placeholder.querySelector('small')?.textContent).toBe('Coming soon')
+    expect(tabs.slice(0, 3).every((t) => !(t as HTMLButtonElement).disabled)).toBe(true)
   })
 
-  it('以說明文字取代佔位 tab', () => {
-    const { getByText } = render(<AiModePlayground />)
-    expect(getByText(/more modes coming soon/i)).toBeInTheDocument()
+  it('佔位 tab 取代那行說明文字，且 disabled 態用 token 上色', () => {
+    render(<AiModePlayground />)
+    expect(screen.queryByText(/more modes coming soon/i)).not.toBeInTheDocument()
+    expect(playgroundCss).not.toMatch(/\.modeNote/)
+    expect(playgroundCss).toMatch(/\.modeTabs button:disabled\s*\{[^}]*color:\s*var\(--color-ink-subtle\)/)
   })
 
   it('renders Start over as a playground-level control instead of inside SignalLedger', () => {
@@ -144,7 +153,7 @@ describe('AiModePlayground', () => {
     expect(playgroundCss).not.toMatch(/@media\s*\(max-width:\s*680px\)[\s\S]*\.sectionIntro\s*\{[^}]*grid-template-columns:/)
     expect(playgroundCss).not.toMatch(/@media\s*\(max-width:\s*680px\)[\s\S]*\.sectionIntro p\s*\{[^}]*max-width:\s*none;/)
     expect(playgroundCss).toMatch(/\.modeLabel\s*\{[^}]*display:\s*none/)
-    expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/)
+    expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/)
     expect(playgroundCss).toMatch(/\.userPanel\s*\{[^}]*padding:\s*0/)
     expect(playgroundCss).toMatch(/\.article\s*\{[^}]*padding:\s*30px\s+34px\s+38px/)
     expect(playgroundCss).toMatch(/\.articleContext\s*\{[^}]*margin:\s*-30px\s+-34px\s+24px/)

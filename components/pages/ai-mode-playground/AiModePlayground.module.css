@@ -65,7 +65,7 @@
 
 .modeTabs {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
   background: transparent;
 }
@@ -102,6 +102,15 @@
   font-weight: 700;
 }
 
+/* Disabled controls are exempt from WCAG 1.4.3, but the colour is still a
+   token rather than an invented grey. */
+.modeTabs button:disabled {
+  border-bottom-style: solid;
+  background: transparent;
+  color: var(--color-ink-subtle);
+  opacity: 1;
+}
+
 .modeTabs small,
 .lensTabs small {
   display: block;
@@ -113,13 +122,6 @@
 }
 
 .modeTabs button[aria-selected='true'] small { color: var(--color-ink-muted); }
-
-.modeNote {
-  margin: 0;
-  padding: 0 9px 10px;
-  color: var(--color-ink-muted);
-  font: 400 12px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
-}
 
 .userPanel {
   display: block;
@@ -417,6 +419,7 @@
 
   .modeTabs::-webkit-scrollbar { display: none; }
   .modeTabs button { flex: 0 0 clamp(8.25rem, 32vw, 12rem); min-width: 8.25rem; }
+  .modeTabs button:last-child { display: none; }
 }
 
 @media (max-width: 680px) {
