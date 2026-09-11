@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Eyebrow } from '@/components/ui/Eyebrow'
+import { PlaygroundCTASection } from '@/components/ui/PlaygroundCTASection'
 
 const STEPS = [
   {
@@ -267,7 +268,7 @@ export function BrandGEOSection() {
       </div>
 
       {/* ── Media AEO workflow ────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-6 relative z-10 pt-16 lg:pt-20 pb-20 lg:pb-28">
+      <div className="max-w-5xl mx-auto px-6 relative z-10 pt-16 lg:pt-20 pb-16">
         <motion.div
           className="mb-12"
           initial={{ opacity: 0, y: 20 }}
@@ -318,6 +319,22 @@ export function BrandGEOSection() {
           ))}
         </div>
       </div>
+
+      {/* ── Thin divider ──────────────────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-6">
+        <div style={{ height: 1, background: 'rgba(168,197,195,0.12)' }} />
+      </div>
+
+      {/* ── Playground entry point — brand lens ───────────────────── */}
+      <PlaygroundCTASection
+        tone="dark"
+        eyebrow="Try the experience"
+        heading="What does a placement inside an AI answer look like?"
+        body="Walk through one publisher article as a reader would, and watch intent, purchase stage, and placement opportunity land on the Brand value ledger."
+        ctaLabel="Try AI Mode"
+        lens="brand"
+        trackingPosition="brands_playground"
+      />
     </section>
   )
 }
