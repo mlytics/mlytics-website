@@ -67,7 +67,7 @@ export function PlaygroundCTASection({
       {/* Matches the primary CTA in DecisiveEnginePageCTA / NotFoundContent —
           dark and light ground share the one button. */}
       <Link
-        href={`/cortex-playground/?lens=${lens}`}
+        href={`/ai-mode-playground/?lens=${lens}`}
         onClick={() => trackCTA(ctaLabel, trackingPosition)}
         className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-all hover:opacity-90"
       >

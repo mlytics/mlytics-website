@@ -53,14 +53,14 @@ describe('PlaygroundCTASection', () => {
     render(<PlaygroundCTASection {...publisherProps} />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/cortex-playground/?lens=publisher')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=publisher')
   })
 
   it('links to the playground with the brand lens', () => {
     render(<PlaygroundCTASection {...publisherProps} lens="brand" />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/cortex-playground/?lens=brand')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=brand')
   })
 
   it('renders exactly one link', () => {
@@ -153,7 +153,7 @@ describe('PlaygroundCTASection — embedded variant', () => {
     const embeddedLink = screen.getByRole('link', { name: 'Try AI Mode' })
     await userEvent.click(embeddedLink)
 
-    expect(embeddedLink).toHaveAttribute('href', '/cortex-playground/?lens=brand')
+    expect(embeddedLink).toHaveAttribute('href', '/ai-mode-playground/?lens=brand')
     expect(embeddedLink.getAttribute('href')).toBe(lightHref)
     expect(trackCTA.mock.calls).toEqual(lightCalls)
     expect(trackCTA).toHaveBeenCalledWith('Try AI Mode', 'content_owners_playground')

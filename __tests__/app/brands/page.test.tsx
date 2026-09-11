@@ -77,7 +77,7 @@ describe('BrandsPage playground entry point', () => {
     render(<BrandsPage />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/cortex-playground/?lens=brand')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=brand')
   })
 
   // Both audience entry points carry the same `Try AI Mode` label, so
