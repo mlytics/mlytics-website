@@ -145,6 +145,16 @@
   text-transform: uppercase;
 }
 
+/* The one mono micro-label worth keeping: it tells the reader the left column
+   is live, not a screenshot. The colour is the token, which holds the same
+   value the original wrote by hand. */
+.userSubheader::after {
+  color: var(--color-primary-light);
+  content: '●  LIVE PLAYGROUND';
+  font: 10px 'SFMono-Regular', Consolas, monospace;
+  letter-spacing: .1em;
+}
+
 /* No outline and no rounding: the subheader's bottom rule already draws the
    boundary above the article, and a rounded card inside the rounded workspace
    read as a box in a box. */

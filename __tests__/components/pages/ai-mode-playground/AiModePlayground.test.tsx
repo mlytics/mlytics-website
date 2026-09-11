@@ -777,8 +777,12 @@ describe('右欄首視線與裝飾標籤精簡（Task 11）', () => {
     expect(queryByText(/^source story$/i)).not.toBeInTheDocument()
   })
 
-  it('已移除 LIVE PLAYGROUND 裝飾標籤（由 CSS ::after 產生，DOM 查不到）', () => {
-    expect(playgroundCss).not.toMatch(/live playground/i)
+  // Restored at An's request. The colour is the token rather than the raw
+  // `#2D7A74` UAT wrote by hand — the token happens to hold the same value.
+  it('userSubheader 右側帶回 ● LIVE PLAYGROUND，顏色用 token', () => {
+    expect(playgroundCss).toMatch(/\.userSubheader::after\s*\{[^}]*content:\s*'●\s+LIVE PLAYGROUND'/)
+    expect(playgroundCss).toMatch(/\.userSubheader::after\s*\{[^}]*color:\s*var\(--color-primary-light\)/)
+    expect(playgroundCss).not.toMatch(/\.userSubheader::after\s*\{[^}]*color:\s*#/)
   })
 
   it('MEDIA ARTICLE 保留——它說明左欄是媒體方的原生文章', () => {

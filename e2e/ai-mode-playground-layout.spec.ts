@@ -23,7 +23,10 @@ test('metrics 列回到 ledger 上方（比照 UAT）', async ({ page }) => {
   expect(tops.metrics).toBeLessThan(tops.guide)
 })
 
-test('純裝飾的 mono 微標籤已移除', async ({ page }) => {
+// `● LIVE PLAYGROUND` is the one pseudo label An asked to keep: it marks the
+// left column as the live thing rather than a screenshot. Everything else that
+// Task 11 stripped must stay stripped.
+test('只留下 ● LIVE PLAYGROUND 這一個 mono 微標籤', async ({ page }) => {
   await page.goto('/ai-mode-playground/')
   const decorations = await page.evaluate(() => {
     const scope = document.querySelector('[aria-label="Mlytics AI Mode playground"]')!
@@ -32,8 +35,48 @@ test('純裝飾的 mono 微標籤已移除', async ({ page }) => {
       .filter((c) => c && c !== 'none' && c !== 'normal' && /[A-Z]{3,}/.test(c))
     return { pseudo, sourceStory: scope.textContent!.match(/Source story/i)?.length ?? 0 }
   })
-  expect(decorations.pseudo).toEqual([])
+  // eslint-disable-next-line no-console
+  console.log('pseudo labels:', JSON.stringify(decorations.pseudo))
+  expect(decorations.pseudo).toEqual(['"●  LIVE PLAYGROUND"'])
   expect(decorations.sourceStory).toBe(0)
+})
+
+test('● LIVE PLAYGROUND 用 token 顏色，且對比達 AA', async ({ page }) => {
+  await page.goto('/ai-mode-playground/')
+  const measured = await page.evaluate(() => {
+    const el = [...document.querySelectorAll('*')].find(
+      (e) => getComputedStyle(e, '::after').content.includes('LIVE PLAYGROUND'),
+    )!
+    const parse = (c: string) => c.match(/[\d.]+/g)!.map(Number)
+    const over = (top: number[], bottom: number[]) => {
+      const a = top.length > 3 ? top[3] : 1
+      return [0, 1, 2].map((i) => Math.round(a * top[i] + (1 - a) * bottom[i]))
+    }
+    const layers: number[][] = []
+    let n: Element | null = el
+    while (n) {
+      const c = parse(getComputedStyle(n).backgroundColor)
+      if (!(c.length > 3 && c[3] === 0)) {
+        layers.push(c)
+        if (c.length === 3 || c[3] === 1) break
+      }
+      n = n.parentElement
+    }
+    return {
+      fg: parse(getComputedStyle(el, '::after').color),
+      bg: layers.reduceRight((acc, layer) => over(layer, acc), [255, 255, 255]),
+    }
+  })
+
+  const lin = (c: number) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4 }
+  const lum = (rgb: number[]) => 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2])
+  const [x, y] = [lum(measured.fg), lum(measured.bg)].sort((m, n) => n - m)
+  const ratio = Number(((x + 0.05) / (y + 0.05)).toFixed(2))
+
+  // eslint-disable-next-line no-console
+  console.log('LIVE PLAYGROUND:', JSON.stringify({ ...measured, ratio }))
+  expect(measured.fg).toEqual([45, 122, 116]) // --color-primary-light
+  expect(ratio).toBeGreaterThanOrEqual(4.5)
 })
 
 test('lens tablist 的 roving tabindex 與方向鍵（實機按鍵）', async ({ page }) => {
