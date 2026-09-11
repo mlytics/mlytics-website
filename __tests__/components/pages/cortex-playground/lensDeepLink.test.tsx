@@ -1,11 +1,13 @@
-// Only the `?lens=publisher` case is asserted on mount. `brand` is both the
-// initial `useState` value and the fallback for a missing or unsupported
-// `lens`, so at the component level "the effect ran and chose brand" and "the
-// effect never ran" are the same rendered output — a test for either would
-// stay green with the effect deleted. The authoritative coverage for the
-// fallback lives in the `readLensFromSearch` tests in
-// `__tests__/components/pages/cortex-playground/cortex-playground-data.test.ts`,
-// which can tell those two apart.
+// Two different things are covered in two different places, and neither
+// stands in for the other. The `readLensFromSearch` tests in
+// `__tests__/components/pages/cortex-playground/cortex-playground-data.test.ts`
+// cover the *parser*: what a missing or unsupported `lens` resolves to (null).
+// The default-lens test below covers where the *component* actually lands with
+// no `?lens=` at all — brand — which is a separate claim, and the one the
+// "arrive without a deep link and you get the Brand view" promise rests on.
+// Note that at the component level "the effect ran and chose brand" and "the
+// effect never ran" render the same output, so the default-lens test pins the
+// default, not the effect; `?lens=publisher` is what exercises the effect.
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -30,6 +32,16 @@ afterEach(() => {
 })
 
 describe('CortexPlayground lens deep-link', () => {
+  it('selects the Brand lens when no ?lens= is present', async () => {
+    setSearch('')
+    render(<CortexPlayground />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'true')
+    })
+    expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'false')
+  })
+
   it('selects the Publisher lens for ?lens=publisher', async () => {
     setSearch('?lens=publisher')
     render(<CortexPlayground />)

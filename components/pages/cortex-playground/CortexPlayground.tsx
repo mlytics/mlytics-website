@@ -89,17 +89,27 @@ export function CortexPlayground() {
   // Keep the address bar honest: once the reader switches lens by hand, a
   // copied URL has to reopen on the lens they are looking at. `replaceState`
   // rather than `pushState` so tab switching does not stack history entries
-  // and trap Back on this page; the rest of the query string and the hash are
-  // carried through untouched so campaign params survive a switch.
+  // and trap Back on this page. Every other query param and the hash survive
+  // the switch, but `URLSearchParams.toString()` re-serialises the whole
+  // string, so it comes back normalised rather than byte-for-byte as it
+  // arrived (`~` as `%7E`, a space as `+`, a valueless `?debug` as `debug=`).
+  // The parsed result on the server is the same either way.
+  //
+  // The first argument is `null`, not `window.history.state`: Next patches
+  // `replaceState` and early-returns to the unpatched one whenever the state
+  // handed to it already carries `__NA` — which Next's own `HistoryUpdater`
+  // stamps onto every entry — so passing the current state straight back
+  // would skip Next's canonical-URL sync and leave it on the old lens. With
+  // `null`, Next's `copyNextJsInternalHistoryState` puts `__NA` and the
+  // internal tree back itself and the canonical URL follows the address bar.
   const handleLensChange = useCallback((nextLens: CortexLens) => {
     setLens(nextLens)
     const params = new URLSearchParams(window.location.search)
     params.set('lens', nextLens)
-    const query = params.toString()
     window.history.replaceState(
-      window.history.state,
+      null,
       '',
-      `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`,
+      `${window.location.pathname}?${params.toString()}${window.location.hash}`,
     )
   }, [])
 
