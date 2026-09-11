@@ -20,7 +20,13 @@ export default function LegacyPlaygroundRedirectPage() {
           "Unsupported Metadata" — it says to render the tag in the page), so it
           is written here and hoisted into <head> by React. No-JS fallback only:
           it loses the query string, which is why the client redirect exists. */}
-      <meta httpEquiv="refresh" content={`0; url=${DESTINATION}`} />
+      {/* The delay is deliberately 3, not 0: a meta refresh only starts its
+          timer after the document `load` event, which hydration beats, but 0
+          still leaves a narrow race — and the meta tag drops `?lens=`. Three
+          seconds lets it take over only when JS never runs (chunk 404, CSP, an
+          extension), by which point the clickable link below is on screen.
+          Do not put it back to 0. */}
+      <meta httpEquiv="refresh" content={`3; url=${DESTINATION}`} />
       <LegacyPlaygroundRedirect destination={DESTINATION} />
       <p className="text-base text-ink-muted">
         This page has moved to{' '}

@@ -51,7 +51,7 @@ export function AiModePlaygroundWidget({
   const progressPercent = (audioElapsedSeconds / LISTEN_CONTENT.durationSeconds) * 100
 
   return (
-    <div id="cortex-widget" ref={widgetRef} className={styles.widgetPanel} data-testid="cortex-widget">
+    <div id="ai-mode-widget" ref={widgetRef} className={styles.widgetPanel} data-testid="ai-mode-widget">
       <div className={styles.widgetHeader}>
         <div className={styles.widgetMode}><span className={styles.widgetModeMark} aria-hidden="true">✦</span><span>{content.label}</span></div>
         <span className={styles.widgetGrounding}>GROUNDED IN THIS ARTICLE</span>
@@ -123,7 +123,7 @@ export function AiModePlaygroundWidget({
               <div className={styles.quotePreviewPlaceholder}><span>Choose a quote and press “Generate quote card” to preview the result.</span></div>
             ) : (
               <section className={styles.quotePreview} aria-label="Quote preview" role="region">
-                <div className={styles.quoteCard} aria-label="Cortex quote card">
+                <div className={styles.quoteCard} aria-label="Quote card">
                   <div className={styles.quoteCardTop}><span>HEARTHSIDE REVIEW</span><span className={styles.quoteCardBrand}>THORNWELL</span></div>
                   <div className={styles.quoteCardQuote}>
                     <span className={styles.quoteMark} aria-hidden="true">“</span>
@@ -131,7 +131,7 @@ export function AiModePlaygroundWidget({
                     <span className={`${styles.quoteMark} ${styles.quoteMarkEnd}`} aria-hidden="true">”</span>
                   </div>
                   <div className={styles.quoteCardMeta}>
-                    <span className={styles.quoteCardSignature}>{quoteSignature || 'Cortex reader'}</span>
+                    <span className={styles.quoteCardSignature}>{quoteSignature || 'Mlytics AI Mode'}</span>
                   </div>
                 </div>
                 <div className={styles.quoteActions} aria-label="Quote actions">
@@ -156,7 +156,7 @@ export function AiModePlaygroundWidget({
             <button className={styles.listenToggle} type="button" aria-pressed={audioPlaying} aria-label={audioPlaying ? 'Pause' : 'Play'} onClick={onListen}>
               <span aria-hidden="true">{audioPlaying ? 'Ⅱ' : '▶'}</span>
             </button>
-            <div className={styles.waveform} data-testid="cortex-waveform" aria-hidden="true">
+            <div className={styles.waveform} data-testid="ai-mode-waveform" aria-hidden="true">
               {WAVEFORM_BARS.map((height, index) => <span key={index} style={{ height: `${height}%` }} />)}
             </div>
           </div>

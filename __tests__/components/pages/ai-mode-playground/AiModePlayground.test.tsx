@@ -40,7 +40,7 @@ describe('AiModePlaygroundPage', () => {
       level: 1,
       name: 'One signal. Two values.',
     }))
-    expect(routeSurface).toContainElement(screen.getByRole('region', { name: 'Cortex Playground' }))
+    expect(routeSurface).toContainElement(screen.getByRole('region', { name: 'Mlytics AI Mode playground' }))
   })
 
   it('keeps the complete Hero copy inside a route-scoped Hero', () => {
@@ -99,13 +99,13 @@ describe('AiModePlayground', () => {
 
     const reset = screen.getByRole('button', { name: /start over/i })
     expect(reset.closest('aside')).toBeNull()
-    expect(reset.closest('section[aria-label="Cortex Playground"]')).toBeInTheDocument()
+    expect(reset.closest('section[aria-label="Mlytics AI Mode playground"]')).toBeInTheDocument()
   })
 
   it('keeps the route surface aligned with the hosted layout baseline', () => {
     render(<AiModePlayground />)
 
-    const playground = screen.getByRole('region', { name: 'Cortex Playground' })
+    const playground = screen.getByRole('region', { name: 'Mlytics AI Mode playground' })
     const reset = screen.getByRole('button', { name: /start over/i })
 
     expect(playgroundCss).toMatch(/\.container\s*\{\s*width:\s*min\(1152px,\s*calc\(100%\s*-\s*48px\)\);/)
@@ -264,7 +264,7 @@ describe('AiModePlayground', () => {
     render(<AiModePlayground />)
     await user.click(getTab(/listen/i))
 
-    expect(screen.getByTestId('cortex-waveform').children).toHaveLength(70)
+    expect(screen.getByTestId('ai-mode-waveform').children).toHaveLength(70)
   })
 
   it('emits quote resonance on selection and amplification only after generation', async () => {
@@ -318,7 +318,7 @@ describe('AiModePlayground', () => {
     try {
       ({ unmount } = render(<AiModePlayground />))
 
-      const playground = screen.getByRole('region', { name: 'Cortex Playground' })
+      const playground = screen.getByRole('region', { name: 'Mlytics AI Mode playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
         top: 132,
         bottom: 632,
@@ -383,7 +383,7 @@ describe('AiModePlayground', () => {
     try {
       ({ unmount } = render(<AiModePlayground />))
 
-      const playground = screen.getByRole('region', { name: 'Cortex Playground' })
+      const playground = screen.getByRole('region', { name: 'Mlytics AI Mode playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
         top: 132,
         bottom: 632,
@@ -446,7 +446,7 @@ describe('AiModePlayground', () => {
     try {
       ({ unmount } = render(<AiModePlayground />))
 
-      const playground = screen.getByRole('region', { name: 'Cortex Playground' })
+      const playground = screen.getByRole('region', { name: 'Mlytics AI Mode playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
         top: 132,
         bottom: 632,
@@ -510,7 +510,7 @@ describe('AiModePlayground', () => {
 
     try {
       render(<AiModePlayground />)
-      const playground = screen.getByRole('region', { name: 'Cortex Playground' })
+      const playground = screen.getByRole('region', { name: 'Mlytics AI Mode playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
         top: 132,
         bottom: 632,
@@ -570,7 +570,7 @@ describe('AiModePlayground', () => {
     } as DOMRect)
 
     render(<AiModePlayground />)
-    const widget = screen.getByTestId('cortex-widget')
+    const widget = screen.getByTestId('ai-mode-widget')
     const mountedObserverCallback = intersectionObserverCallback
 
     fireEvent.wheel(window)
@@ -656,5 +656,17 @@ describe('AiModePlayground', () => {
     } finally {
       Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: originalRequestAnimationFrame })
     }
+  })
+})
+
+describe('AiModePlayground attribute-level naming', () => {
+  it('attribute 層也不殘留 Cortex（textContent 抓不到這些）', () => {
+    const { container } = render(<AiModePlayground />)
+    expect(container.innerHTML).not.toMatch(/cortex/i)
+  })
+
+  it('playground 容器的 aria-label 與 Task 9 的 Playwright 選擇器一致', () => {
+    const { container } = render(<AiModePlayground />)
+    expect(container.querySelector('[aria-label="Mlytics AI Mode playground"]')).not.toBeNull()
   })
 })

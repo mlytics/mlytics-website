@@ -349,13 +349,13 @@ export function AiModePlayground() {
           <div><span className={styles.eyebrow}>Try the experience</span><h2 className="section-heading mb-4 text-ink" id="playground-heading">A small surface for a big shift.</h2></div>
           <p className="mx-auto max-w-xl text-base leading-relaxed text-ink-muted">Choose a mode to see how one article can meet different reader intent.</p>
         </div>
-        <section ref={playgroundRef} className={styles.playground} aria-label="Cortex Playground">
+        <section ref={playgroundRef} className={styles.playground} aria-label="Mlytics AI Mode playground">
           <div className={styles.workspace}>
             <div className={styles.modeBar}>
               <span className={styles.modeLabel}>Choose an experience</span>
-              <div className={styles.modeTabs} role="tablist" aria-label="Cortex experiences">
+              <div className={styles.modeTabs} role="tablist" aria-label="AI Mode experiences">
                 {MODES.map((item) => (
-                  <button key={item.id} type="button" role="tab" aria-selected={mode === item.id} aria-controls="cortex-widget" onClick={() => handleModeChange(item.id)}>
+                  <button key={item.id} type="button" role="tab" aria-selected={mode === item.id} aria-controls="ai-mode-widget" onClick={() => handleModeChange(item.id)}>
                     {item.label}<small>{item.sublabel}</small>
                   </button>
                 ))}
@@ -366,7 +366,7 @@ export function AiModePlayground() {
               <div className={styles.readerColumn}>
                 <div className={styles.readerSubheader}>What the reader sees</div>
                 <article ref={articleRef} className={styles.article} aria-labelledby="article-title">
-                  <div className={styles.articleContext}><span><b>PUBLISHER ARTICLE</b><small>Source story</small></span><span>Cortex extends this story</span></div>
+                  <div className={styles.articleContext}><span><b>PUBLISHER ARTICLE</b><small>Source story</small></span><span>Mlytics AI Mode extends this story</span></div>
                   <div className={styles.articleKicker}>{ARTICLE.kicker}</div>
                   <h2 id="article-title">{ARTICLE.title}</h2>
                   <p className={styles.standfirst}>{ARTICLE.standfirst}</p>

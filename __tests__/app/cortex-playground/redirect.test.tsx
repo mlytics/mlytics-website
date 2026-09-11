@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import LegacyPlaygroundRedirectPage, { metadata } from '@/app/cortex-playground/page'
@@ -45,7 +47,7 @@ describe('legacy /cortex-playground/ redirect stub', () => {
     arriveAt('/cortex-playground/')
     render(<LegacyPlaygroundRedirectPage />)
     expect(document.querySelector('meta[http-equiv="refresh"]'))
-      .toHaveAttribute('content', '0; url=/ai-mode-playground/')
+      .toHaveAttribute('content', '3; url=/ai-mode-playground/')
   })
 
   // DATAI-555 put `/cortex-playground/?lens=brand` deep links into circulation.
@@ -61,5 +63,15 @@ describe('legacy /cortex-playground/ redirect stub', () => {
     const replace = arriveAt('/cortex-playground/')
     render(<LegacyPlaygroundRedirectPage />)
     expect(replace).toHaveBeenCalledWith('/ai-mode-playground/')
+  })
+
+  it('meta refresh 延遲為 3，只在 JS 沒跑起來時才接手', () => {
+    const src = readFileSync(resolve(__dirname, '../../../app/cortex-playground/page.tsx'), 'utf8')
+    expect(src).toMatch(/content=\{`3; url=\$\{DESTINATION\}`\}/)
+  })
+
+  it('DESTINATION 帶 trailing slash（next/link 在 jsdom 會去掉，故直接鎖常數）', () => {
+    const src = readFileSync(resolve(__dirname, '../../../app/cortex-playground/page.tsx'), 'utf8')
+    expect(src).toMatch(/const DESTINATION = '\/ai-mode-playground\/'/)
   })
 })
