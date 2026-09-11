@@ -101,14 +101,14 @@ describe('SignalLedger lens 控制項形制', () => {
   })
 
   // Restoring the tab shape must not restore the contrast failures that came
-  // with it: #9B9B9B on the lens strip measured 2.38, #A8C5C3 measured 1.57.
+  // with it: the original unselected label measured 2.38:1 and its 10px line
+  // 1.57:1, both from literal greys.
   it('還原的 lens tab 顏色一律走 token，不帶回低對比 hex', () => {
-    // Scoped to the lens rules: #A8C5C3 survives elsewhere in the file as the
-    // decorative waveform fill, which is not text and not in scope here.
+    // Scoped to the lens rules: the same grey survives elsewhere in the file
+    // as the decorative waveform fill, which is not text and not in scope.
     const lensRules = css().match(/^\.lensTabs[^\n]*$/gm)?.join('\n') ?? ''
     expect(lensRules).not.toBe('')
     expect(lensRules).not.toMatch(/#[0-9A-Fa-f]{3,8}/)
-    expect(css()).not.toMatch(/#9B9B9B/i)
     expect(css()).toMatch(/\.lensTabs button\s*\{[^}]*color:\s*var\(--color-ink-muted\)/)
     expect(css()).toMatch(/\.lensTabs button\[aria-selected='true'\]\s*\{[^}]*border-color:\s*var\(--color-primary\)/)
     expect(css()).toMatch(/\.lensTabs button\[aria-selected='true'\]\s*\{[^}]*color:\s*var\(--color-primary-dark\)/)

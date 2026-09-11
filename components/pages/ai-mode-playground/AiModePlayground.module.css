@@ -145,10 +145,11 @@
   text-transform: uppercase;
 }
 
+/* No outline and no rounding: the subheader's bottom rule already draws the
+   boundary above the article, and a rounded card inside the rounded workspace
+   read as a box in a box. */
 .article {
   min-width: 0;
-  border: 1px solid var(--color-line);
-  border-radius: .75rem;
   background: var(--bg-white);
   padding: 30px 34px 38px;
 }

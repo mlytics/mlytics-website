@@ -148,6 +148,17 @@ describe('AiModePlayground', () => {
     expect(playgroundCss).toMatch(/\.modeTabs button:disabled\s*\{[^}]*color:\s*var\(--color-ink-subtle\)/)
   })
 
+  // The card outline around the article repeated a boundary the subheader's
+  // bottom rule already draws, and a rounded card inside a rounded workspace
+  // read as a box in a box.
+  it('文章卡不再有圓弧邊框，分界交給 userSubheader 的底線', () => {
+    expect(playgroundCss).not.toMatch(/\.article\s*\{[^}]*border:/)
+    expect(playgroundCss).not.toMatch(/\.article\s*\{[^}]*border-radius:/)
+    expect(playgroundCss).toMatch(/\.article\s*\{[^}]*background:\s*var\(--bg-white\)/)
+    expect(playgroundCss).toMatch(/\.article\s*\{[^}]*padding:\s*30px\s+34px\s+38px/)
+    expect(playgroundCss).toMatch(/\.userSubheader\s*\{[^}]*border-bottom:\s*1px solid/)
+  })
+
   it('renders Start over as a playground-level control instead of inside SignalLedger', () => {
     render(<AiModePlayground />)
 
