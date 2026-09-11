@@ -339,7 +339,7 @@ export function BrandGEOSection() {
         variant="embedded"
         eyebrow="Try the experience"
         heading="What does a placement inside an AI answer look like?"
-        body="Walk through one publisher article as a reader would, and watch intent, purchase stage, and placement opportunity land on the Brand value ledger."
+        body="Walk through one media article as a user would, and watch intent, purchase stage, and placement opportunity land on the Brand value ledger."
         ctaLabel="Try AI Mode"
         lens="brand"
         trackingPosition="brands_playground"

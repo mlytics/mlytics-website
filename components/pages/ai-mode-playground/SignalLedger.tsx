@@ -16,14 +16,14 @@ export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression
   return (
     <aside className={styles.ledger} aria-label="Experience ledger">
       <div className={styles.lensTabs} role="tablist" aria-label="Ledger lens">
-        <button id="lens-publisher" type="button" role="tab" aria-selected={lens === 'publisher'} aria-controls="lens-panel-publisher" onClick={() => onLensChange('publisher')}>
-          Publisher<small>Media value</small>
+        <button id="lens-media" type="button" role="tab" aria-selected={lens === 'media'} aria-controls="lens-panel-media" onClick={() => onLensChange('media')}>
+          Media and Content<small>Media value</small>
         </button>
         <button id="lens-brand" type="button" role="tab" aria-selected={lens === 'brand'} aria-controls="lens-panel-brand" onClick={() => onLensChange('brand')}>
           Brand<small>Brand value</small>
         </button>
       </div>
-      <div className={styles.surfaceLabel}><span>{lens === 'brand' ? 'Brand' : 'Publisher'} signal ledger</span><span>{String(events.length).padStart(2, '0')} EVENTS</span></div>
+      <div className={styles.surfaceLabel}><span>{lens === 'brand' ? 'Brand' : 'Media'} signal ledger</span><span>{String(events.length).padStart(2, '0')} EVENTS</span></div>
       <div className={styles.ledgerBody}>
         <div className={styles.ledgerShared}>
           <div className={styles.metrics} aria-label="Preview metrics">
@@ -31,7 +31,7 @@ export function SignalLedger({ lens, mode, events, scrollDepth, widgetImpression
             <div className={styles.metric}><span className={styles.metricLabel}>Widget impression</span><span className={styles.metricValue} aria-live="polite">{widgetImpression ? 'Captured' : 'Waiting'}</span></div>
           </div>
         </div>
-        {(['publisher', 'brand'] as const).map((panelLens) => {
+        {(['media', 'brand'] as const).map((panelLens) => {
           const panelContent = getLensContent(panelLens)
           return (
             <div key={panelLens} id={`lens-panel-${panelLens}`} className={styles.ledgerPanel} role="tabpanel" aria-labelledby={`lens-${panelLens}`} hidden={lens !== panelLens}>

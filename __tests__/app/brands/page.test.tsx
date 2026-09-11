@@ -69,7 +69,7 @@ describe('BrandsPage playground entry point', () => {
       name: 'What does a placement inside an AI answer look like?',
     })).toBeInTheDocument()
     expect(screen.getByText(
-      'Walk through one publisher article as a reader would, and watch intent, purchase stage, and placement opportunity land on the Brand value ledger.',
+      'Walk through one media article as a user would, and watch intent, purchase stage, and placement opportunity land on the Brand value ledger.',
     )).toBeInTheDocument()
   })
 

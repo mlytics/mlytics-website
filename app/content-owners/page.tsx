@@ -51,13 +51,13 @@ export default function PublishersPage() {
       {/* Solution — three pitches vs LLM search */}
       <SolutionPitches />
 
-      {/* Playground entry point — publisher lens */}
+      {/* Playground entry point — media lens */}
       <PlaygroundCTASection
         eyebrow="Try the experience"
         heading="What does this look like inside your article?"
-        body="Walk through one article with the Cortex widget, and watch reader signals land on the Media value ledger as they happen."
+        body="Walk through one article with the AI Mode widget, and watch user signals land on the Media value ledger as they happen."
         ctaLabel="Try AI Mode"
-        lens="publisher"
+        lens="media"
         trackingPosition="content_owners_playground"
       />
 

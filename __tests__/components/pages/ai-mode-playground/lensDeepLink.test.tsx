@@ -7,7 +7,7 @@
 // "arrive without a deep link and you get the Brand view" promise rests on.
 // Note that at the component level "the effect ran and chose brand" and "the
 // effect never ran" render the same output, so the default-lens test pins the
-// default, not the effect; `?lens=publisher` is what exercises the effect.
+// default, not the effect; `?lens=media` is what exercises the effect.
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -39,28 +39,28 @@ describe('AiModePlayground lens deep-link', () => {
     await waitFor(() => {
       expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'true')
     })
-    expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'false')
+    expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'false')
   })
 
-  it('selects the Publisher lens for ?lens=publisher', async () => {
-    setSearch('?lens=publisher')
+  it('selects the Media lens for ?lens=media', async () => {
+    setSearch('?lens=media')
     render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
     expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'false')
   })
 })
 
 describe('AiModePlayground lens URL sync', () => {
-  it('rewrites ?lens= when the reader switches lens', async () => {
+  it('rewrites ?lens= when the user switches lens', async () => {
     const user = userEvent.setup()
-    setSearch('?lens=publisher')
+    setSearch('?lens=media')
     render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
 
     await user.click(screen.getByRole('tab', { name: /^brand/i }))
@@ -73,11 +73,11 @@ describe('AiModePlayground lens URL sync', () => {
 
   it('keeps the other query params and the hash when it rewrites ?lens=', async () => {
     const user = userEvent.setup()
-    setSearch('?utm_source=slack&lens=publisher#foo')
+    setSearch('?utm_source=slack&lens=media#foo')
     render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
 
     await user.click(screen.getByRole('tab', { name: /^brand/i }))
@@ -91,19 +91,19 @@ describe('AiModePlayground lens URL sync', () => {
 
   it('replaces the history entry instead of pushing one', async () => {
     const user = userEvent.setup()
-    setSearch('?lens=publisher')
+    setSearch('?lens=media')
     render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
     const lengthBefore = window.history.length
 
     await user.click(screen.getByRole('tab', { name: /^brand/i }))
-    await user.click(screen.getByRole('tab', { name: /publisher/i }))
+    await user.click(screen.getByRole('tab', { name: /media and content/i }))
 
     await waitFor(() => {
-      expect(new URLSearchParams(window.location.search).get('lens')).toBe('publisher')
+      expect(new URLSearchParams(window.location.search).get('lens')).toBe('media')
     })
     expect(window.history.length).toBe(lengthBefore)
   })

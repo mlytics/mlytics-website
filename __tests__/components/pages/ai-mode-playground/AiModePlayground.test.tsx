@@ -241,16 +241,16 @@ describe('AiModePlayground', () => {
     expect(screen.getByText(/sponsored attention qualified/i)).toBeInTheDocument()
   })
 
-  it('projects the same raw events differently in Publisher and Brand lenses', async () => {
+  it('projects the same raw events differently in Media and Brand lenses', async () => {
     const user = userEvent.setup()
     render(<AiModePlayground />)
     await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
 
-    await user.click(getTab(/publisher/i))
-    expect(getTab(/publisher/i)).toHaveAttribute('aria-controls', 'lens-panel-publisher')
-    expect(document.getElementById('lens-panel-publisher')).toHaveAttribute('aria-labelledby', 'lens-publisher')
+    await user.click(getTab(/media and content/i))
+    expect(getTab(/media and content/i)).toHaveAttribute('aria-controls', 'lens-panel-media')
+    expect(document.getElementById('lens-panel-media')).toHaveAttribute('aria-labelledby', 'lens-media')
     expect(screen.getByText('Topic preference captured')).toBeInTheDocument()
-    expect(screen.getByText(/reader relationship grow/i)).toBeInTheDocument()
+    expect(screen.getByText(/user relationship grow/i)).toBeInTheDocument()
 
     await user.click(getTab(/brand/i))
     expect(getTab(/brand/i)).toHaveAttribute('aria-controls', 'lens-panel-brand')
