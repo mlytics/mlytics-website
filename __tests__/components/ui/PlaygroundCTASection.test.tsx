@@ -32,7 +32,7 @@ afterEach(() => {
 const mediaProps = {
   eyebrow: 'Try the experience',
   heading: 'What does this look like inside your article?',
-  body: 'Walk through one article with the Cortex widget, and watch reader signals land on the Media value ledger as they happen.',
+  body: 'Walk through one article with the AI Mode widget, and watch user signals land on the Media value ledger as they happen.',
   ctaLabel: 'Try AI Mode',
   lens: 'content-owners' as const,
   trackingPosition: 'content_owners_playground',
