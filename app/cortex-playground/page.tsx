@@ -4,9 +4,12 @@ import { LegacyPlaygroundRedirect } from './LegacyPlaygroundRedirect'
 
 const DESTINATION = '/ai-mode-playground/'
 
+/** No `robots: { index: false }` on purpose. `noindex` and `canonical` pull in
+ *  opposite directions — a noindexed page's canonical tends to be dropped — and
+ *  the honest signal for a moved page is the canonical. There is no
+ *  duplicate-content risk: this stub is one sentence. */
 export const metadata: Metadata = {
   title: { absolute: 'Moved · Mlytics' },
-  robots: { index: false, follow: true },
   alternates: { canonical: DESTINATION },
 }
 
@@ -16,17 +19,13 @@ export const metadata: Metadata = {
 export default function LegacyPlaygroundRedirectPage() {
   return (
     <div className="mx-auto max-w-xl px-6 py-32 text-center">
-      {/* The Metadata API cannot emit `http-equiv` (Next docs, generate-metadata
-          "Unsupported Metadata" — it says to render the tag in the page), so it
-          is written here and hoisted into <head> by React. No-JS fallback only:
-          it loses the query string, which is why the client redirect exists. */}
-      {/* The delay is deliberately 3, not 0: a meta refresh only starts its
-          timer after the document `load` event, which hydration beats, but 0
-          still leaves a narrow race — and the meta tag drops `?lens=`. Three
-          seconds lets it take over only when JS never runs (chunk 404, CSP, an
-          extension), by which point the clickable link below is on screen.
-          Do not put it back to 0. */}
-      <meta httpEquiv="refresh" content={`3; url=${DESTINATION}`} />
+      {/* Do NOT add a `<meta http-equiv="refresh">` here, at any delay. A
+          non-zero delay is WCAG F40 — a documented failure of SC 2.2.1 Timing
+          Adjustable — and a zero delay races hydration. It bought nothing
+          either way: the tag drops `?lens=`, so the no-JS visitor it was meant
+          to serve landed on the wrong lens anyway. When JS does not run, WCAG's
+          own advice is to offer a link instead of a timed jump, which is what
+          the paragraph below is. */}
       <LegacyPlaygroundRedirect destination={DESTINATION} />
       <p className="text-base text-ink-muted">
         This page has moved to{' '}

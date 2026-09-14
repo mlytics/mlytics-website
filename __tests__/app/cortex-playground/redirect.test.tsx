@@ -29,8 +29,11 @@ describe('legacy /cortex-playground/ redirect stub', () => {
     expect(metadata.alternates?.canonical).toBe('/ai-mode-playground/')
   })
 
-  it('標示 noindex，避免與新頁競食', () => {
-    expect(metadata.robots).toMatchObject({ index: false, follow: true })
+  // `noindex` and `canonical` are contradictory signals — a noindexed page's
+  // canonical tends to be ignored, so the "the content lives over there" hint
+  // is the one worth keeping. This one-line stub has no duplicate-content risk.
+  it('不送 noindex，只留 canonical 當作搬家訊號', () => {
+    expect(metadata.robots).toBeUndefined()
   })
 
   // The trailing slash is asserted loosely on purpose: `trailingSlash: true`
@@ -43,11 +46,14 @@ describe('legacy /cortex-playground/ redirect stub', () => {
       .toMatch(/^\/ai-mode-playground\/?$/)
   })
 
-  it('留一個 meta refresh 當作無 JS 時的 fallback', () => {
+  // A meta refresh with a non-zero delay is WCAG F40 (a failure of SC 2.2.1
+  // Timing Adjustable), and it dropped `?lens=` anyway — so the no-JS path
+  // paid an accessibility failure for nothing. The clickable link below is
+  // exactly what WCAG recommends instead. Do not reintroduce the tag.
+  it('不使用 meta refresh（WCAG F40）', () => {
     arriveAt('/cortex-playground/')
     render(<LegacyPlaygroundRedirectPage />)
-    expect(document.querySelector('meta[http-equiv="refresh"]'))
-      .toHaveAttribute('content', '3; url=/ai-mode-playground/')
+    expect(document.querySelector('meta[http-equiv="refresh"]')).toBeNull()
   })
 
   // DATAI-555 put `/cortex-playground/?lens=brand` deep links into circulation.
@@ -65,9 +71,11 @@ describe('legacy /cortex-playground/ redirect stub', () => {
     expect(replace).toHaveBeenCalledWith('/ai-mode-playground/')
   })
 
-  it('meta refresh 延遲為 3，只在 JS 沒跑起來時才接手', () => {
+  // Matches the JSX attribute, not the word: the page carries a comment saying
+  // why the tag must not come back, and that comment has to stay greppable.
+  it('原始碼不含 httpEquiv 屬性，擋住日後被當成優化補回來', () => {
     const src = readFileSync(resolve(__dirname, '../../../app/cortex-playground/page.tsx'), 'utf8')
-    expect(src).toMatch(/content=\{`3; url=\$\{DESTINATION\}`\}/)
+    expect(src).not.toMatch(/httpEquiv\s*=/)
   })
 
   it('DESTINATION 帶 trailing slash（next/link 在 jsdom 會去掉，故直接鎖常數）', () => {
