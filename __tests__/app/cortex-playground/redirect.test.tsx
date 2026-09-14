@@ -38,7 +38,9 @@ describe('legacy /cortex-playground/ redirect stub', () => {
 
   // The trailing slash is asserted loosely on purpose: `trailingSlash: true`
   // lives in next.config.ts, which vitest does not load, so next/link drops it
-  // here. The built HTML is checked separately.
+  // here. `e2e/legacy-playground-redirect.spec.ts` reads the exported
+  // out/cortex-playground/index.html and pins the real href there — as well as
+  // the browser jump and the no-JS path, neither of which jsdom can see.
   it('提供可點擊的新路徑連結', () => {
     arriveAt('/cortex-playground/')
     render(<LegacyPlaygroundRedirectPage />)
