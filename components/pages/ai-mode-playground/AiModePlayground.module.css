@@ -359,7 +359,7 @@
 .quoteActionSvg { display: block; width: 1.1rem; height: 1.1rem; }
 .quoteActionStatus { min-height: 1.1rem; margin-top: .4rem; color: var(--color-ink-muted); font-size: .68rem; line-height: 1.4; }
 
-.listenBody { display: grid; gap: 0; padding-top: 18px; }
+.listenBody { display: grid; gap: 10px; padding-top: 18px; }
 .listenVisual { display: flex; align-items: center; gap: 13px; min-width: 0; }
 .listenToggle { flex: 0 0 auto; display: inline-grid; width: 43px; height: 43px; place-items: center; border: 0; border-radius: 50%; background: #225D59; color: #FFFFFF; cursor: pointer; font-size: 16px; line-height: 1; }
 .listenToggle:hover { background: #1A3D3A; }

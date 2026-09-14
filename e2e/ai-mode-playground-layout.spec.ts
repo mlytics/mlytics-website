@@ -224,3 +224,48 @@ test('mode 方向鍵不會觸發 reset——已產生的事件留著', async ({ 
   expect(after).toBe(before)
   await expect(page.getByText(/^Grounded in/)).toBeVisible()
 })
+
+test('Listen 模式播放器三列間距 ≥ 8px（波形↔進度條、進度條↔時間列）', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.goto('/ai-mode-playground/')
+
+  // 切到 Listen 模式
+  const modeList = page.getByRole('tablist', { name: 'AI Mode experiences' })
+  const listenTab = modeList.getByRole('tab', { name: /^Listen/ })
+  await listenTab.click()
+
+  // 等待 Listen 模式的 UI 顯示
+  await page.getByRole('progressbar', { name: 'Audio progress' }).waitFor({ state: 'visible' })
+
+  const gaps = await page.evaluate(() => {
+    // 找到 listenBody 及其三個子元素
+    const listenBody = document.querySelector('[class*="listenBody"]') as HTMLElement
+    if (!listenBody) throw new Error('listenBody not found')
+
+    const listenVisual = listenBody.querySelector('[class*="listenVisual"]') as HTMLElement
+    const listenProgress = listenBody.querySelector('[class*="listenProgress"]') as HTMLElement
+    const listenMeta = listenBody.querySelector('[class*="listenMeta"]') as HTMLElement
+
+    if (!listenVisual || !listenProgress || !listenMeta) {
+      throw new Error(`Missing elements: visual=${!!listenVisual}, progress=${!!listenProgress}, meta=${!!listenMeta}`)
+    }
+
+    const visualRect = listenVisual.getBoundingClientRect()
+    const progressRect = listenProgress.getBoundingClientRect()
+    const metaRect = listenMeta.getBoundingClientRect()
+
+    return {
+      visualBottom: visualRect.bottom,
+      progressTop: progressRect.top,
+      progressBottom: progressRect.bottom,
+      metaTop: metaRect.top,
+      gap1: progressRect.top - visualRect.bottom,
+      gap2: metaRect.top - progressRect.bottom,
+    }
+  })
+
+  // eslint-disable-next-line no-console
+  console.log('Listen gaps:', JSON.stringify(gaps))
+  expect(gaps.gap1).toBeGreaterThanOrEqual(8)
+  expect(gaps.gap2).toBeGreaterThanOrEqual(8)
+})
