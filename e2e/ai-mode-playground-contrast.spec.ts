@@ -7,6 +7,18 @@ const round = (n: number) => Number(n.toFixed(2))
 
 const SCOPE = '[aria-label="Mlytics AI Mode playground"]'
 
+// The sweeps used to start at SCOPE, so the dark Hero and the section intro
+// above the playground were never measured at all. They are in scope now.
+// Nav and Footer deliberately are not: they are site-wide furniture that this
+// ticket does not touch, and pulling them in would make this spec fail for
+// reasons that belong to another change.
+const SCAN_ROOTS = ['.ai-mode-playground-hero', 'section[aria-labelledby="playground-heading"]']
+const ROOTS = JSON.stringify(SCAN_ROOTS)
+
+type Sample = { text: string; fg: number[]; bg: number[]; selector: string }
+const failures = (stage: string, samples: Sample[]) =>
+  samples.map((s) => ({ stage, ...s, ratio: round(ratio(s.fg, s.bg)) })).filter((s) => s.ratio < 4.5)
+
 // Resolves an element's effective background by compositing translucent ancestor
 // layers, and skips aria-hidden subtrees (decoration, outside WCAG 1.4.3).
 const HELPERS = `
@@ -29,27 +41,59 @@ const HELPERS = `
     return layers.reduceRight((acc, layer) => over(layer, acc), [255, 255, 255])
   }
   const measure = (el) => ({ text: el.textContent.trim().slice(0, 40), fg: parse(getComputedStyle(el).color), bg: bgOf(el) })
+
+  // What actually gets painted in this element's own color: its direct text
+  // nodes. Filtering on \`children.length === 0\` instead — which is what this
+  // spec used to do — silently skipped every element that mixes text with an
+  // element child, and that is the exact shape of a mode tab
+  // (\`Chat<small>Ask</small>\`). Six of them went unmeasured.
+  const ownText = (el) => [...el.childNodes]
+    .filter((n) => n.nodeType === 3)
+    .map((n) => n.textContent)
+    .join('')
+    .trim()
+
+  // Disabled controls are exempt from WCAG 1.4.3, so they are excluded on
+  // purpose rather than by accident: with the filter above fixed, the disabled
+  // \`More to come\` tab measures 2.67:1 and is allowed to. The per-item test
+  // below drops disabled tabs the same way.
+  const exempt = (el) =>
+    el.closest('[aria-hidden="true"]') || el.closest(':disabled') || el.closest('[aria-disabled="true"]')
+
+  const painted = (el) => {
+    const r = el.getBoundingClientRect()
+    return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'
+  }
+
+  const scan = (selectors) => selectors
+    .flatMap((sel) => [...document.querySelectorAll(sel)])
+    .flatMap((root) => [root, ...root.querySelectorAll('*')])
+    .filter((el) => ownText(el) && !exempt(el) && painted(el))
+    .map((el) => ({ ...measure(el), text: ownText(el).slice(0, 40), selector: el.className || el.tagName }))
 `
 
 test('playground 初始畫面所有文字對比 ≥ 4.5', async ({ page }) => {
   await page.goto('/ai-mode-playground/')
   await expect(page.locator(SCOPE)).toHaveCount(1)
 
-  const samples: { text: string; fg: number[]; bg: number[] }[] = await page.evaluate(`(() => {
+  const samples: Sample[] = await page.evaluate(`(() => {
     ${HELPERS}
-    const scope = document.querySelector('${SCOPE}')
-    return [...scope.querySelectorAll('*')]
-      .filter((e) => {
-        if (e.children.length > 0 || !e.textContent.trim()) return false
-        if (e.closest('[aria-hidden="true"]')) return false
-        const r = e.getBoundingClientRect()
-        return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'
-      })
-      .map(measure)
+    return scan(${ROOTS})
   })()`)
 
   expect(samples.length).toBeGreaterThan(10)
-  const bad = samples.map((s) => ({ ...s, ratio: round(ratio(s.fg, s.bg)) })).filter((s) => s.ratio < 4.5)
+
+  // Pin the widened scope: if a refactor moves the Hero out from under
+  // SCAN_ROOTS, this fails loudly instead of quietly measuring less.
+  expect(samples.map((s) => s.text)).toEqual(
+    expect.arrayContaining(['Mlytics AI Mode', 'One signal. Two values.']),
+  )
+  // Same for the section intro, which sits between the Hero and the playground.
+  expect(samples.some((s) => s.text.startsWith('A small surface'))).toBe(true)
+  // And for the tab labels the old leaf-only filter skipped entirely.
+  expect(samples.some((s) => s.text === 'Chat')).toBe(true)
+
+  const bad = failures('initial', samples)
   expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0)
 })
 
@@ -99,23 +143,10 @@ test('選取中的 mode tab 使用 gold token 作為底線', async ({ page }) =>
 
 // The initial-render scan cannot see text that only exists after a click:
 // signal-tone ledger rows, the quote builder's step labels and signature hint.
-// Disabled controls are exempt from WCAG 1.4.3, so they stay out of the scan.
 const SCAN = `(() => {
   ${HELPERS}
-  const scope = document.querySelector('${SCOPE}')
-  return [...scope.querySelectorAll('*')]
-    .filter((e) => {
-      if (e.children.length > 0 || !e.textContent.trim()) return false
-      if (e.closest('[aria-hidden="true"]') || e.closest(':disabled')) return false
-      const r = e.getBoundingClientRect()
-      return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'
-    })
-    .map((e) => ({ ...measure(e), selector: e.className || e.tagName }))
+  return scan(${ROOTS})
 })()`
-
-type Sample = { text: string; fg: number[]; bg: number[]; selector: string }
-const failures = (stage: string, samples: Sample[]) =>
-  samples.map((s) => ({ stage, ...s, ratio: round(ratio(s.fg, s.bg)) })).filter((s) => s.ratio < 4.5)
 
 test('playground 互動後狀態所有文字對比 ≥ 4.5', async ({ page }) => {
   await page.goto('/ai-mode-playground/')
