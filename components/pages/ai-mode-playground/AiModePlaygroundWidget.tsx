@@ -1,6 +1,6 @@
 import type { RefObject } from 'react'
 import type { PlaygroundMode, QuoteSource } from './ai-mode-playground-data'
-import { CHAT_CONTENT, LISTEN_CONTENT, QUOTE_CONTENT, WAVEFORM_BARS } from './ai-mode-playground-data'
+import { CHAT_CONTENT, LISTEN_CONTENT, modeTabId, QUOTE_CONTENT, WAVEFORM_BARS } from './ai-mode-playground-data'
 import styles from './AiModePlayground.module.css'
 
 type WidgetProps = {
@@ -51,7 +51,17 @@ export function AiModePlaygroundWidget({
   const progressPercent = (audioElapsedSeconds / LISTEN_CONTENT.durationSeconds) * 100
 
   return (
-    <div id="ai-mode-widget" ref={widgetRef} className={styles.widgetPanel} data-testid="ai-mode-widget">
+    // The single panel the mode tablist controls. Its content is swapped for
+    // the selected mode rather than one panel existing per mode, so the label
+    // has to follow the selection instead of being fixed at one tab.
+    <div
+      id="ai-mode-widget"
+      ref={widgetRef}
+      className={styles.widgetPanel}
+      role="tabpanel"
+      aria-labelledby={modeTabId(mode)}
+      data-testid="ai-mode-widget"
+    >
       <div className={styles.widgetHeader}>
         <div className={styles.widgetMode}><span className={styles.widgetModeMark} aria-hidden="true">✦</span><span>{content.label}</span></div>
         <span className={styles.widgetGrounding}>GROUNDED IN THIS ARTICLE</span>

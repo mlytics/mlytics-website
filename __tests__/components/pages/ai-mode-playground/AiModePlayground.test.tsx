@@ -124,6 +124,52 @@ describe('AiModePlayground', () => {
     expect(visibleEventCount()).toBe('00 EVENTS')
   })
 
+  // The mode tablist took on the APG tabs pattern in full — roving tabindex,
+  // arrow keys, manual activation — so the panel side has to hold up its end:
+  // a tab points at a real tabpanel, and that panel points back at whichever
+  // tab is selected. There is only one panel and its content swaps with the
+  // mode, so the back-reference has to move with the selection. The older
+  // assertion above only checks that `aria-controls` resolves to SOME element,
+  // which a missing `role="tabpanel"` and a missing `aria-labelledby` both
+  // slip straight through.
+  it('mode tab 與 widget panel 雙向關聯，aria-labelledby 跟著選中的 tab 走', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+
+    const enabled = modeTabs().filter((tab) => !(tab as HTMLButtonElement).disabled)
+    expect(enabled.map((tab) => tab.id)).toEqual(['mode-tab-chat', 'mode-tab-quote', 'mode-tab-listen'])
+
+    for (const tab of enabled) {
+      const panel = document.getElementById(tab.getAttribute('aria-controls') ?? '')
+      expect(panel, `${tab.id} 的 aria-controls 指不到元素`).toBeInTheDocument()
+      expect(panel).toHaveAttribute('role', 'tabpanel')
+    }
+
+    const selected = () => modeTabs().find((tab) => tab.getAttribute('aria-selected') === 'true') as HTMLElement
+    const panel = () => document.getElementById(selected().getAttribute('aria-controls') ?? '') as HTMLElement
+
+    expect(selected().id).toBe('mode-tab-chat')
+    expect(panel()).toHaveAttribute('aria-labelledby', 'mode-tab-chat')
+
+    await user.click(getTab(/make a quote/i))
+    await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
+    expect(selected().id).toBe('mode-tab-quote')
+    expect(panel()).toHaveAttribute('aria-labelledby', 'mode-tab-quote')
+
+    await user.click(getTab(/^Listen/))
+    await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
+    expect(selected().id).toBe('mode-tab-listen')
+    expect(panel()).toHaveAttribute('aria-labelledby', 'mode-tab-listen')
+  })
+
+  // The disabled placeholder controls nothing, so claiming the live panel
+  // would give that panel a second owner that can never select it.
+  it('disabled 的 More to come 不宣稱控制任何 panel', () => {
+    render(<AiModePlayground />)
+
+    expect(getTab(/more to come/i)).not.toHaveAttribute('aria-controls')
+  })
+
   it('keeps More to come desktop-only and makes tablet/mobile mode tabs horizontally scrollable', () => {
     expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/)
     expect(playgroundCss).toMatch(/\.modeTabs button\s*\{[^}]*white-space:\s*nowrap;/)

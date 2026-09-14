@@ -10,6 +10,7 @@ import {
   LedgerLens,
   PlaygroundMode,
   LISTEN_CONTENT,
+  modeTabId,
   QUOTE_CONTENT,
   readLensFromSearch,
   resolveLensCopy,
@@ -399,6 +400,7 @@ export function AiModePlayground() {
                   <button
                     key={item.id}
                     ref={(node) => { modeTabRefs.current[index] = node }}
+                    id={modeTabId(item.id)}
                     type="button"
                     role="tab"
                     aria-selected={mode === item.id}

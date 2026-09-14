@@ -1,4 +1,9 @@
 export type PlaygroundMode = 'chat' | 'quote' | 'listen'
+
+/** The mode tablist and the widget panel have to name the same id from two
+ *  files — the tab carries it, the panel points back at it — so it is derived
+ *  in one place rather than spelled out twice. */
+export const modeTabId = (mode: PlaygroundMode) => `mode-tab-${mode}`
 /** The lens values match the site paths they speak for — `/content-owners/`
  *  and `/brands/` — so a URL, a DOM id and a copy key all read the same. */
 const LEDGER_LENSES = ['content-owners', 'brands'] as const
