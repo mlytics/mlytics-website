@@ -307,7 +307,17 @@
 .quoteGenerate:focus-visible,
 .quoteAction:focus-visible,
 .listenToggle:focus-visible,
-.startOver:focus-visible { outline: 3px solid var(--color-gold); outline-offset: 3px; }
+.startOver:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; }
+
+/* Start over floats over the seam between the light ledger and the dark
+   playground frame, so no single ring colour clears 3:1 on both sides of it:
+   measured, the primary ring reaches 7.2:1 over the ledger but 1.57:1 over
+   --bg-dark, and gold is the exact mirror (5.52:1 dark, 1.94:1 light). The
+   white band fills the outline-offset gap, so the indicator is two bands that
+   separate from each other (7.56:1) and one of them always separates from
+   whatever is behind — the same reason a browser's own default focus ring is
+   drawn in two tones. */
+.startOver:focus-visible { box-shadow: 0 0 0 3px var(--bg-white); }
 
 .widgetPrompts { margin-top: 14px; }
 .widgetAnswer { display: grid; gap: 12px; margin-top: 16px; color: #1A1A1A; font-size: 14px; line-height: 20.3px; }

@@ -186,3 +186,143 @@ test('playground 互動後狀態所有文字對比 ≥ 4.5', async ({ page }) =>
 
   expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0)
 })
+
+// WCAG 2.2 SC 1.4.11 Non-text Contrast: a focus indicator has to reach 3:1
+// against the colours it sits next to. `outline-offset` puts this page's ring
+// OUTSIDE the control, floating over whatever surface happens to be behind it
+// — so the governing measurement is the ring colour against the composited
+// background under the ring, found by hit-testing points the ring really
+// paints, not against the control's own fill.
+//
+// Only the four side midpoints are sampled. The bounding box corners are not
+// on the ring at all once the control is rounded (`.startOver` is a pill at
+// focus), so sampling them would report a background the ring never touches.
+//
+// An indicator may be made of more than one band: an outline plus a
+// box-shadow ring reads as one indicator, and it is enough for ONE band to
+// clear 3:1 against a given neighbour as long as the bands also separate from
+// each other — which is how a browser's own default focus ring stays visible
+// on a background it cannot know in advance.
+const RING = `
+  const bandColors = (cs) => {
+    const bands = [parse(cs.outlineColor)]
+    const shadow = (cs.boxShadow || 'none').match(/rgba?\([^)]*\)/)
+    if (shadow) bands.push(parse(shadow[0]))
+    return bands
+  }
+  const ringBackgrounds = (el) => {
+    const cs = getComputedStyle(el)
+    const width = parseFloat(cs.outlineWidth) || 0
+    const mid = (parseFloat(cs.outlineOffset) || 0) + width / 2
+    const r = el.getBoundingClientRect()
+    const cx = r.left + r.width / 2
+    const cy = r.top + r.height / 2
+    const points = [[cx, r.top - mid], [cx, r.bottom + mid], [r.left - mid, cy], [r.right + mid, cy]]
+    const seen = []
+    for (const [x, y] of points) {
+      if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue
+      let hit = document.elementFromPoint(x, y)
+      if (!hit) continue
+      // The ring is painted outside the control's border box, so a hit on the
+      // control itself would mean the point landed back inside it; step out.
+      while (hit && (hit === el || el.contains(hit))) hit = hit.parentElement
+      if (!hit) continue
+      seen.push({ at: [Math.round(x), Math.round(y)], bg: bgOf(hit), tag: String(hit.className || hit.tagName).slice(0, 40) })
+    }
+    return { bands: bandColors(cs), width, samples: seen, focusVisible: el.matches(':focus-visible'), rect: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)], viewport: [innerWidth, innerHeight] }
+  }
+`
+
+type Ring = {
+  bands: number[][]
+  width: number
+  focusVisible: boolean
+  samples: { at: number[]; bg: number[]; tag: string }[]
+}
+
+// `finder` is a DOM expression rather than a Playwright locator: the ring has
+// to be measured inside the page, where `:has-text()` and friends do not exist.
+async function measureRing(page: import('@playwright/test').Page, finder: string): Promise<Ring> {
+  // Chromium only matches :focus-visible on a programmatically focused button
+  // when the last interaction was a keypress, so prime keyboard modality first.
+  // Tab moves focus away; the focus() below takes it straight back.
+  await page.keyboard.press('Tab')
+  await page.evaluate(`(() => { ${finder}.focus() })()`)
+  // .startOver animates its width over .18s on focus, and switching mode runs
+  // handleReset, which scrolls the page back to the top of the playground on
+  // the next frame. Both have to land before the ring is located.
+  await page.waitForTimeout(400)
+  await page.evaluate(`(() => { ${finder}.scrollIntoView({ block: 'center' }) })()`)
+  return page.evaluate(`(() => {
+    ${HELPERS}
+    ${RING}
+    return ringBackgrounds(${finder})
+  })()`)
+}
+
+const MODE_TAB = '[role="tablist"][aria-label="AI Mode experiences"] [role="tab"]:not([disabled])'
+const LENS_TAB = '[role="tablist"][aria-label="Ledger lens"] [role="tab"]'
+const byText = (text: string) =>
+  `[...document.querySelectorAll('button')].find((b) => b.textContent.includes(${JSON.stringify(text)}))`
+const first = (selector: string) => `document.querySelector(${JSON.stringify(selector)})`
+const rgb = (c: number[]) => `rgb(${c.slice(0, 3).join(', ')})`
+
+test('每一類控制項的 focus ring 對相鄰底色 ≥ 3:1（WCAG 1.4.11）', async ({ page }) => {
+  await page.goto('/ai-mode-playground/')
+  // The site scrolls smoothly, so scrollIntoView lands asynchronously and the
+  // ring would be hit-tested at coordinates the page has already left behind.
+  await page.addStyleTag({ content: '*, html { scroll-behavior: auto !important }' })
+  const results: Record<string, { ratio: number; bands: string[]; worstBg: string; at: number[] }> = {}
+
+  const check = async (name: string, finder: string) => {
+    const ring = await measureRing(page, finder)
+    expect(ring.focusVisible, `${name} 沒有進入 :focus-visible，量到的不是 focus ring`).toBe(true)
+    expect(ring.width, `${name} 沒有 outline`).toBeGreaterThan(0)
+    expect(ring.samples.length, `${name} 的 ring 四邊沒有全部取到相鄰底色`).toBe(4)
+    // A multi-band indicator only holds together if the bands separate from
+    // each other too; otherwise it is one blurred band, not two.
+    if (ring.bands.length > 1) {
+      const between = round(ratio(ring.bands[0], ring.bands[1]))
+      expect(between, `${name} 兩層 ring 之間只有 ${between}:1`).toBeGreaterThanOrEqual(3)
+    }
+    const worst = ring.samples
+      .map((s) => ({ ...s, r: Math.max(...ring.bands.map((band) => ratio(band, s.bg))) }))
+      .sort((a, b) => a.r - b.r)[0]
+    results[name] = {
+      ratio: round(worst.r),
+      bands: ring.bands.map(rgb),
+      worstBg: rgb(worst.bg),
+      at: worst.at,
+    }
+  }
+
+  await check('modeTabs button', first(MODE_TAB))
+  await check('lensTabs button', first(LENS_TAB))
+  await check('choice (chat question)', first('ul[aria-label="Article questions"] li button'))
+  await check('startOver', first('button[aria-label="Start over"]'))
+
+  // Quote mode unlocks four more of the eight control classes the rule covers.
+  await page.locator(MODE_TAB, { hasText: 'Amplify' }).click()
+  await expect(page.getByText('1 · Choose a line')).toBeVisible()
+  await check('choice (quote option)', first('ul[aria-label="Quote options"] li button'))
+  await check('quoteFeedbackChoice', first('[role="radiogroup"][aria-label="Quote feedback"] [role="radio"]'))
+
+  // `Generate quote card` stays disabled — and so unfocusable — until a line
+  // and a reaction are chosen, so it can only be measured after both.
+  await page.locator('ul[aria-label="Quote options"] li button').first().click()
+  await page.getByRole('radio', { name: 'Great' }).click()
+  await check('quoteGenerate', byText('Generate quote card'))
+
+  await page.getByRole('button', { name: /quote card/i }).click()
+  await expect(page.getByRole('region', { name: 'Quote preview' })).toBeVisible()
+  await check('quoteAction', first('button[aria-label="Share on LINE"]'))
+
+  await page.locator(MODE_TAB, { hasText: 'Attend' }).click()
+  await check('listenToggle', first('button[aria-label="Play"]'))
+
+  // eslint-disable-next-line no-console
+  console.log('focus ring 1.4.11:', JSON.stringify(results, null, 2))
+  for (const [name, r] of Object.entries(results)) {
+    expect(r.ratio, `${name} = ${r.ratio} (${r.bands.join(' + ')} on ${r.worstBg})`).toBeGreaterThanOrEqual(3)
+  }
+})
