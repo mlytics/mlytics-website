@@ -1,10 +1,10 @@
 import type { RefObject } from 'react'
-import type { CortexMode, QuoteSource } from './cortex-playground-data'
-import { CHAT_CONTENT, LISTEN_CONTENT, QUOTE_CONTENT, WAVEFORM_BARS } from './cortex-playground-data'
-import styles from './CortexPlayground.module.css'
+import type { PlaygroundMode, QuoteSource } from './ai-mode-playground-data'
+import { CHAT_CONTENT, LISTEN_CONTENT, modeTabId, QUOTE_CONTENT, WAVEFORM_BARS } from './ai-mode-playground-data'
+import styles from './AiModePlayground.module.css'
 
 type WidgetProps = {
-  mode: CortexMode
+  mode: PlaygroundMode
   selectedIndex: number | null
   quoteFeedback: string | null
   quoteSignature: string
@@ -25,7 +25,7 @@ type WidgetProps = {
 
 const poweredBy = 'POWERED BY MLYTICS AI'
 
-export function CortexPlaygroundWidget({
+export function AiModePlaygroundWidget({
   mode,
   selectedIndex,
   quoteFeedback,
@@ -51,7 +51,17 @@ export function CortexPlaygroundWidget({
   const progressPercent = (audioElapsedSeconds / LISTEN_CONTENT.durationSeconds) * 100
 
   return (
-    <div id="cortex-widget" ref={widgetRef} className={styles.widgetPanel} data-testid="cortex-widget">
+    // The single panel the mode tablist controls. Its content is swapped for
+    // the selected mode rather than one panel existing per mode, so the label
+    // has to follow the selection instead of being fixed at one tab.
+    <div
+      id="ai-mode-widget"
+      ref={widgetRef}
+      className={styles.widgetPanel}
+      role="tabpanel"
+      aria-labelledby={modeTabId(mode)}
+      data-testid="ai-mode-widget"
+    >
       <div className={styles.widgetHeader}>
         <div className={styles.widgetMode}><span className={styles.widgetModeMark} aria-hidden="true">✦</span><span>{content.label}</span></div>
         <span className={styles.widgetGrounding}>GROUNDED IN THIS ARTICLE</span>
@@ -123,7 +133,7 @@ export function CortexPlaygroundWidget({
               <div className={styles.quotePreviewPlaceholder}><span>Choose a quote and press “Generate quote card” to preview the result.</span></div>
             ) : (
               <section className={styles.quotePreview} aria-label="Quote preview" role="region">
-                <div className={styles.quoteCard} aria-label="Cortex quote card">
+                <div className={styles.quoteCard} aria-label="Quote card">
                   <div className={styles.quoteCardTop}><span>HEARTHSIDE REVIEW</span><span className={styles.quoteCardBrand}>THORNWELL</span></div>
                   <div className={styles.quoteCardQuote}>
                     <span className={styles.quoteMark} aria-hidden="true">“</span>
@@ -131,7 +141,7 @@ export function CortexPlaygroundWidget({
                     <span className={`${styles.quoteMark} ${styles.quoteMarkEnd}`} aria-hidden="true">”</span>
                   </div>
                   <div className={styles.quoteCardMeta}>
-                    <span className={styles.quoteCardSignature}>{quoteSignature || 'Cortex reader'}</span>
+                    <span className={styles.quoteCardSignature}>{quoteSignature || 'Mlytics AI Mode'}</span>
                   </div>
                 </div>
                 <div className={styles.quoteActions} aria-label="Quote actions">
@@ -156,7 +166,7 @@ export function CortexPlaygroundWidget({
             <button className={styles.listenToggle} type="button" aria-pressed={audioPlaying} aria-label={audioPlaying ? 'Pause' : 'Play'} onClick={onListen}>
               <span aria-hidden="true">{audioPlaying ? 'Ⅱ' : '▶'}</span>
             </button>
-            <div className={styles.waveform} data-testid="cortex-waveform" aria-hidden="true">
+            <div className={styles.waveform} data-testid="ai-mode-waveform" aria-hidden="true">
               {WAVEFORM_BARS.map((height, index) => <span key={index} style={{ height: `${height}%` }} />)}
             </div>
           </div>

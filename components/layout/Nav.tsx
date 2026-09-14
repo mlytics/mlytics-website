@@ -13,7 +13,7 @@ const NAV_LINKS = [
   { label: 'Brands', href: '/brands' },
   { label: 'Developers', href: '/developers' },
   { label: 'Partnership', href: '/partnership' },
-  { label: 'Cortex Playground', href: '/cortex-playground' },
+  { label: 'AI Mode', href: '/ai-mode-playground' },
 ]
 
 export function Nav() {

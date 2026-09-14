@@ -29,52 +29,52 @@ afterEach(() => {
   trackCTA.mockClear()
 })
 
-const publisherProps = {
+const mediaProps = {
   eyebrow: 'Try the experience',
   heading: 'What does this look like inside your article?',
-  body: 'Walk through one article with the Cortex widget, and watch reader signals land on the Media value ledger as they happen.',
+  body: 'Walk through one article with the AI Mode widget, and watch user signals land on the Media value ledger as they happen.',
   ctaLabel: 'Try AI Mode',
-  lens: 'publisher' as const,
+  lens: 'content-owners' as const,
   trackingPosition: 'content_owners_playground',
 }
 
 describe('PlaygroundCTASection', () => {
   it('renders the eyebrow, heading and body it is given', () => {
-    render(<PlaygroundCTASection {...publisherProps} />)
+    render(<PlaygroundCTASection {...mediaProps} />)
 
     expect(screen.getByText('Try the experience')).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
       'What does this look like inside your article?',
     )
-    expect(screen.getByText(publisherProps.body)).toBeInTheDocument()
+    expect(screen.getByText(mediaProps.body)).toBeInTheDocument()
   })
 
-  it('links to the playground with the publisher lens', () => {
-    render(<PlaygroundCTASection {...publisherProps} />)
+  it('links to the playground with the content-owners lens', () => {
+    render(<PlaygroundCTASection {...mediaProps} />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/cortex-playground/?lens=publisher')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=content-owners')
   })
 
-  it('links to the playground with the brand lens', () => {
-    render(<PlaygroundCTASection {...publisherProps} lens="brand" />)
+  it('links to the playground with the brands lens', () => {
+    render(<PlaygroundCTASection {...mediaProps} lens="brands" />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/cortex-playground/?lens=brand')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=brands')
   })
 
   it('renders exactly one link', () => {
-    render(<PlaygroundCTASection {...publisherProps} />)
+    render(<PlaygroundCTASection {...mediaProps} />)
     expect(screen.getAllByRole('link')).toHaveLength(1)
   })
 
   it('sits on a light section surface', () => {
-    const { container } = render(<PlaygroundCTASection {...publisherProps} />)
+    const { container } = render(<PlaygroundCTASection {...mediaProps} />)
     expect(container.firstElementChild).toHaveClass('section-white')
   })
 
   it('tracks the click with the label and position it is given', async () => {
-    render(<PlaygroundCTASection {...publisherProps} />)
+    render(<PlaygroundCTASection {...mediaProps} />)
 
     await userEvent.click(screen.getByRole('link', { name: 'Try AI Mode' }))
 
@@ -82,7 +82,7 @@ describe('PlaygroundCTASection', () => {
   })
 
   it('defaults to the standalone variant when none is given', () => {
-    const { container } = render(<PlaygroundCTASection {...publisherProps} />)
+    const { container } = render(<PlaygroundCTASection {...mediaProps} />)
 
     const root = container.firstElementChild
     expect(root?.tagName).toBe('SECTION')
@@ -91,7 +91,7 @@ describe('PlaygroundCTASection', () => {
 })
 
 describe('PlaygroundCTASection — embedded variant', () => {
-  const embeddedProps = { ...publisherProps, variant: 'embedded' as const }
+  const embeddedProps = { ...mediaProps, variant: 'embedded' as const }
 
   it('renders no section wrapper of its own, so the host section shows through', () => {
     const { container } = render(<PlaygroundCTASection {...embeddedProps} />)
@@ -112,7 +112,7 @@ describe('PlaygroundCTASection — embedded variant', () => {
   })
 
   it.each([
-    ['standalone', publisherProps],
+    ['standalone', mediaProps],
     ['embedded', embeddedProps],
   ])('gives the %s variant the site-wide primary pill button', (_variant, props) => {
     render(<PlaygroundCTASection {...props} />)
@@ -127,7 +127,7 @@ describe('PlaygroundCTASection — embedded variant', () => {
   })
 
   it('styles the button identically in both variants', () => {
-    render(<PlaygroundCTASection {...publisherProps} />)
+    render(<PlaygroundCTASection {...mediaProps} />)
     const standaloneClass = screen
       .getByRole('link', { name: 'Try AI Mode' })
       .getAttribute('class')
@@ -142,18 +142,18 @@ describe('PlaygroundCTASection — embedded variant', () => {
   })
 
   it('links and tracks exactly as the standalone variant does', async () => {
-    const { container: light } = render(<PlaygroundCTASection {...publisherProps} lens="brand" />)
+    const { container: light } = render(<PlaygroundCTASection {...mediaProps} lens="brands" />)
     const lightHref = light.querySelector('a')?.getAttribute('href')
     await userEvent.click(screen.getByRole('link', { name: 'Try AI Mode' }))
     const lightCalls = trackCTA.mock.calls.slice()
     cleanup()
     trackCTA.mockClear()
 
-    render(<PlaygroundCTASection {...embeddedProps} lens="brand" />)
+    render(<PlaygroundCTASection {...embeddedProps} lens="brands" />)
     const embeddedLink = screen.getByRole('link', { name: 'Try AI Mode' })
     await userEvent.click(embeddedLink)
 
-    expect(embeddedLink).toHaveAttribute('href', '/cortex-playground/?lens=brand')
+    expect(embeddedLink).toHaveAttribute('href', '/ai-mode-playground/?lens=brands')
     expect(embeddedLink.getAttribute('href')).toBe(lightHref)
     expect(trackCTA.mock.calls).toEqual(lightCalls)
     expect(trackCTA).toHaveBeenCalledWith('Try AI Mode', 'content_owners_playground')
@@ -166,16 +166,16 @@ describe('PlaygroundCTASection — embedded variant', () => {
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
       'What does this look like inside your article?',
     )
-    expect(screen.getByText(publisherProps.body)).toBeInTheDocument()
+    expect(screen.getByText(mediaProps.body)).toBeInTheDocument()
     expect(screen.getAllByRole('link')).toHaveLength(1)
   })
 })
 
 describe('PlaygroundCTASection — text colour per variant', () => {
-  const embeddedProps = { ...publisherProps, variant: 'embedded' as const }
+  const embeddedProps = { ...mediaProps, variant: 'embedded' as const }
 
   it('gives the standalone heading dark ink, never white', () => {
-    render(<PlaygroundCTASection {...publisherProps} />)
+    render(<PlaygroundCTASection {...mediaProps} />)
 
     const heading = screen.getByRole('heading', { level: 2 })
     expect(heading).toHaveClass('text-ink')
@@ -191,9 +191,9 @@ describe('PlaygroundCTASection — text colour per variant', () => {
   })
 
   it('gives the standalone body muted ink, never on-dark text', () => {
-    render(<PlaygroundCTASection {...publisherProps} />)
+    render(<PlaygroundCTASection {...mediaProps} />)
 
-    const body = screen.getByText(publisherProps.body)
+    const body = screen.getByText(mediaProps.body)
     expect(body).toHaveClass('text-ink-muted')
     expect(body).not.toHaveClass('text-on-dark')
   })
@@ -201,7 +201,7 @@ describe('PlaygroundCTASection — text colour per variant', () => {
   it('gives the embedded body on-dark text, never muted ink', () => {
     render(<PlaygroundCTASection {...embeddedProps} />)
 
-    const body = screen.getByText(publisherProps.body)
+    const body = screen.getByText(mediaProps.body)
     expect(body).toHaveClass('text-on-dark')
     expect(body).not.toHaveClass('text-ink-muted')
   })

@@ -49,15 +49,15 @@ describe('PublishersPage playground entry point', () => {
       name: 'What does this look like inside your article?',
     })).toBeInTheDocument()
     expect(screen.getByText(
-      'Walk through one article with the Cortex widget, and watch reader signals land on the Media value ledger as they happen.',
+      'Walk through one article with the AI Mode widget, and watch user signals land on the Media value ledger as they happen.',
     )).toBeInTheDocument()
   })
 
-  it('links to the playground with the publisher lens', () => {
+  it('links to the playground with the content-owners lens', () => {
     render(<PublishersPage />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/cortex-playground/?lens=publisher')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=content-owners')
   })
 
   // Both audience entry points carry the same `Try AI Mode` label, so

@@ -2,14 +2,33 @@ import { readFileSync } from 'node:fs'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
-import CortexPlaygroundPage from '@/app/cortex-playground/page'
-import { CortexPlayground } from '@/components/pages/cortex-playground/CortexPlayground'
+import AiModePlaygroundPage from '@/app/ai-mode-playground/page'
+import { AiModePlayground } from '@/components/pages/ai-mode-playground/AiModePlayground'
 
-const pageSource = readFileSync('app/cortex-playground/page.tsx', 'utf8')
-const playgroundCss = readFileSync('components/pages/cortex-playground/CortexPlayground.module.css', 'utf8')
+const pageSource = readFileSync('app/ai-mode-playground/page.tsx', 'utf8')
+const playgroundCss = readFileSync('components/pages/ai-mode-playground/AiModePlayground.module.css', 'utf8')
+const pageCss = readFileSync('app/ai-mode-playground/AiModePlaygroundPage.module.css', 'utf8')
 
 function getTab(name: RegExp) {
   return screen.getByRole('tab', { name })
+}
+
+function getLens(name: RegExp) {
+  return screen.getByRole('tab', { name })
+}
+
+// Both tablists on the page are made of `role="tab"`, so any count of the mode
+// tabs has to be scoped to the mode tablist rather than the whole document.
+function modeTabs() {
+  return within(screen.getByRole('tablist', { name: /ai mode experiences/i })).getAllByRole('tab')
+}
+
+// The event count now rides each lens panel's kicker, so it renders once per
+// lens with the inactive panel `hidden`. Assertions want the visible one.
+function visibleEventCount() {
+  const shown = screen.getAllByText(/^\d\d EVENTS$/).filter((node) => node.closest('[hidden]') === null)
+  expect(shown).toHaveLength(1)
+  return shown[0].textContent
 }
 
 let intersectionObserverCallback: IntersectionObserverCallback | null = null
@@ -30,9 +49,9 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('CortexPlaygroundPage', () => {
+describe('AiModePlaygroundPage', () => {
   it('wraps the Hero and playground in one white route surface', () => {
-    const { container } = render(<CortexPlaygroundPage />)
+    const { container } = render(<AiModePlaygroundPage />)
 
     const routeSurface = container.firstElementChild
     expect(routeSurface).toHaveClass('section-white')
@@ -40,11 +59,11 @@ describe('CortexPlaygroundPage', () => {
       level: 1,
       name: 'One signal. Two values.',
     }))
-    expect(routeSurface).toContainElement(screen.getByRole('region', { name: 'Cortex Playground' }))
+    expect(routeSurface).toContainElement(screen.getByRole('region', { name: 'Mlytics AI Mode playground' }))
   })
 
   it('keeps the complete Hero copy inside a route-scoped Hero', () => {
-    render(<CortexPlaygroundPage />)
+    render(<AiModePlaygroundPage />)
 
     const heading = screen.getByRole('heading', {
       level: 1,
@@ -52,10 +71,10 @@ describe('CortexPlaygroundPage', () => {
     })
     const hero = heading.closest('section')
 
-    expect(hero).toHaveClass('cortex-playground-hero')
-    expect(within(hero as HTMLElement).getByText('Cortex Playground', { exact: true })).toBeInTheDocument()
+    expect(hero).toHaveClass('ai-mode-playground-hero')
+    expect(within(hero as HTMLElement).getByText('Mlytics AI Mode', { exact: true })).toBeInTheDocument()
     expect(within(hero as HTMLElement).getByText(
-      'Explore how Cortex helps readers ask, decide, and listen — while giving publishers a clear view of the value created.',
+      'Explore how Mlytics AI Mode helps users ask, decide, and listen — while giving you a clear view of the value created.',
       { exact: true },
     )).toBeInTheDocument()
     expect(within(hero as HTMLElement).queryByText(
@@ -64,11 +83,33 @@ describe('CortexPlaygroundPage', () => {
     )).not.toBeInTheDocument()
     expect(pageSource).not.toMatch(/WorldMapDots/)
   })
+
+  // The Hero and the "Try the experience" section read as near-duplicates of
+  // each other: same white ground, same centred eyebrow-plus-heading stack, a
+  // short scroll apart. Going dark, the way /content-owners/ does, is what
+  // separates them.
+  it('Hero 走深色底，與 /content-owners/ 同一組 token', () => {
+    render(<AiModePlaygroundPage />)
+    const hero = screen.getByRole('heading', { level: 1, name: 'One signal. Two values.' }).closest('section')
+
+    expect(hero).toHaveClass('section-dark')
+    expect(hero).not.toHaveClass('section-white')
+    expect(screen.getByRole('heading', { level: 1, name: 'One signal. Two values.' })).toHaveClass('text-white', 'text-4xl', 'md:text-5xl')
+    expect(within(hero as HTMLElement).getByText('Mlytics AI Mode', { exact: true })).toHaveStyle({ color: 'var(--color-on-dark)' })
+  })
+
+  it('為淺色 Hero 設計的漸層背景已移除', () => {
+    render(<AiModePlaygroundPage />)
+
+    expect(pageSource).not.toMatch(/heroBackdrop|heroGradient/)
+    expect(pageCss).not.toMatch(/\.heroBackdrop|\.heroGradient/)
+    expect(pageCss).not.toMatch(/\.hero\s*\{[^}]*background:\s*var\(--bg-white\)/)
+  })
 })
 
-describe('CortexPlayground', () => {
+describe('AiModePlayground', () => {
   it('starts in Chat with three article questions and a disabled More to come tab', () => {
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     expect(getTab(/^Chat/)).toHaveAttribute('aria-selected', 'true')
     for (const tab of screen.getAllByRole('tab').filter((item) => !item.hasAttribute('disabled'))) {
@@ -80,7 +121,53 @@ describe('CortexPlayground', () => {
     expect(screen.getByRole('button', { name: /which joint-support ingredients/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /is stiffness after walks/i })).toBeInTheDocument()
     expect(getTab(/more to come/i)).toBeDisabled()
-    expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+    expect(visibleEventCount()).toBe('00 EVENTS')
+  })
+
+  // The mode tablist took on the APG tabs pattern in full — roving tabindex,
+  // arrow keys, manual activation — so the panel side has to hold up its end:
+  // a tab points at a real tabpanel, and that panel points back at whichever
+  // tab is selected. There is only one panel and its content swaps with the
+  // mode, so the back-reference has to move with the selection. The older
+  // assertion above only checks that `aria-controls` resolves to SOME element,
+  // which a missing `role="tabpanel"` and a missing `aria-labelledby` both
+  // slip straight through.
+  it('mode tab 與 widget panel 雙向關聯，aria-labelledby 跟著選中的 tab 走', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+
+    const enabled = modeTabs().filter((tab) => !(tab as HTMLButtonElement).disabled)
+    expect(enabled.map((tab) => tab.id)).toEqual(['mode-tab-chat', 'mode-tab-quote', 'mode-tab-listen'])
+
+    for (const tab of enabled) {
+      const panel = document.getElementById(tab.getAttribute('aria-controls') ?? '')
+      expect(panel, `${tab.id} 的 aria-controls 指不到元素`).toBeInTheDocument()
+      expect(panel).toHaveAttribute('role', 'tabpanel')
+    }
+
+    const selected = () => modeTabs().find((tab) => tab.getAttribute('aria-selected') === 'true') as HTMLElement
+    const panel = () => document.getElementById(selected().getAttribute('aria-controls') ?? '') as HTMLElement
+
+    expect(selected().id).toBe('mode-tab-chat')
+    expect(panel()).toHaveAttribute('aria-labelledby', 'mode-tab-chat')
+
+    await user.click(getTab(/make a quote/i))
+    await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
+    expect(selected().id).toBe('mode-tab-quote')
+    expect(panel()).toHaveAttribute('aria-labelledby', 'mode-tab-quote')
+
+    await user.click(getTab(/^Listen/))
+    await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
+    expect(selected().id).toBe('mode-tab-listen')
+    expect(panel()).toHaveAttribute('aria-labelledby', 'mode-tab-listen')
+  })
+
+  // The disabled placeholder controls nothing, so claiming the live panel
+  // would give that panel a second owner that can never select it.
+  it('disabled 的 More to come 不宣稱控制任何 panel', () => {
+    render(<AiModePlayground />)
+
+    expect(getTab(/more to come/i)).not.toHaveAttribute('aria-controls')
   })
 
   it('keeps More to come desktop-only and makes tablet/mobile mode tabs horizontally scrollable', () => {
@@ -90,22 +177,54 @@ describe('CortexPlayground', () => {
     expect(playgroundCss).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*\.modeTabs button\s*\{[^}]*flex:\s*0 0 clamp\(/)
     expect(playgroundCss).toMatch(/@media\s*\(max-width:\s*1024px\)[\s\S]*\.modeTabs button:last-child\s*\{[^}]*display:\s*none;/)
 
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
+    expect(modeTabs()).toHaveLength(4)
     expect(getTab(/more to come/i)).toBeDisabled()
   })
 
+  it('佔位 tab 是第四顆，帶完整的 disabled 語意與 Coming soon 小字', () => {
+    render(<AiModePlayground />)
+    const tabs = modeTabs()
+    const placeholder = tabs[3]
+
+    expect(placeholder).toBe(getTab(/more to come/i))
+    expect(placeholder).toHaveAttribute('aria-selected', 'false')
+    expect(placeholder).toHaveAttribute('aria-disabled', 'true')
+    expect(placeholder).toBeDisabled()
+    expect(placeholder.querySelector('small')?.textContent).toBe('Coming soon')
+    expect(tabs.slice(0, 3).every((t) => !(t as HTMLButtonElement).disabled)).toBe(true)
+  })
+
+  it('佔位 tab 取代那行說明文字，且 disabled 態用 token 上色', () => {
+    render(<AiModePlayground />)
+    expect(screen.queryByText(/more modes coming soon/i)).not.toBeInTheDocument()
+    expect(playgroundCss).not.toMatch(/\.modeNote/)
+    expect(playgroundCss).toMatch(/\.modeTabs button:disabled\s*\{[^}]*color:\s*var\(--color-ink-subtle\)/)
+  })
+
+  // The card outline around the article repeated a boundary the subheader's
+  // bottom rule already draws, and a rounded card inside a rounded workspace
+  // read as a box in a box.
+  it('文章卡不再有圓弧邊框，分界交給 userSubheader 的底線', () => {
+    expect(playgroundCss).not.toMatch(/\.article\s*\{[^}]*border:/)
+    expect(playgroundCss).not.toMatch(/\.article\s*\{[^}]*border-radius:/)
+    expect(playgroundCss).toMatch(/\.article\s*\{[^}]*background:\s*var\(--bg-white\)/)
+    expect(playgroundCss).toMatch(/\.article\s*\{[^}]*padding:\s*30px\s+34px\s+38px/)
+    expect(playgroundCss).toMatch(/\.userSubheader\s*\{[^}]*border-bottom:\s*1px solid/)
+  })
+
   it('renders Start over as a playground-level control instead of inside SignalLedger', () => {
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     const reset = screen.getByRole('button', { name: /start over/i })
     expect(reset.closest('aside')).toBeNull()
-    expect(reset.closest('section[aria-label="Cortex Playground"]')).toBeInTheDocument()
+    expect(reset.closest('section[aria-label="Mlytics AI Mode playground"]')).toBeInTheDocument()
   })
 
   it('keeps the route surface aligned with the hosted layout baseline', () => {
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
-    const playground = screen.getByRole('region', { name: 'Cortex Playground' })
+    const playground = screen.getByRole('region', { name: 'Mlytics AI Mode playground' })
     const reset = screen.getByRole('button', { name: /start over/i })
 
     expect(playgroundCss).toMatch(/\.container\s*\{\s*width:\s*min\(1152px,\s*calc\(100%\s*-\s*48px\)\);/)
@@ -114,7 +233,7 @@ describe('CortexPlayground', () => {
     expect(playgroundCss).toMatch(/\.sectionIntro\s*\{[^}]*display:\s*grid;[^}]*align-items:\s*start;[^}]*grid-template-columns:\s*1fr;[^}]*gap:\s*1rem;/)
     expect(playgroundCss).toMatch(/\.sectionIntro\s*\{[^}]*justify-items:\s*center;[^}]*text-align:\s*center;/)
     const introHeading = screen.getByRole('heading', { level: 2, name: 'A small surface for a big shift.' })
-    const introDescription = screen.getByText('Choose a mode to see how one article can meet different reader intent.', { exact: true })
+    const introDescription = screen.getByText('Choose a mode to see how one article can meet different user intent.', { exact: true })
     expect(introHeading).toHaveClass('section-heading', 'text-ink')
     expect(introDescription).toHaveClass('text-base', 'leading-relaxed', 'text-ink-muted', 'max-w-xl', 'mx-auto')
     expect(playgroundCss).not.toMatch(/\.sectionIntro h2\s*\{/)
@@ -123,7 +242,7 @@ describe('CortexPlayground', () => {
     expect(playgroundCss).not.toMatch(/@media\s*\(max-width:\s*680px\)[\s\S]*\.sectionIntro p\s*\{[^}]*max-width:\s*none;/)
     expect(playgroundCss).toMatch(/\.modeLabel\s*\{[^}]*display:\s*none/)
     expect(playgroundCss).toMatch(/\.modeTabs\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/)
-    expect(playgroundCss).toMatch(/\.readerPanel\s*\{[^}]*padding:\s*0/)
+    expect(playgroundCss).toMatch(/\.userPanel\s*\{[^}]*padding:\s*0/)
     expect(playgroundCss).toMatch(/\.article\s*\{[^}]*padding:\s*30px\s+34px\s+38px/)
     expect(playgroundCss).toMatch(/\.articleContext\s*\{[^}]*margin:\s*-30px\s+-34px\s+24px/)
     expect(playgroundCss).toMatch(/\.ledgerBody\s*\{[^}]*padding:\s*0\s+20px\s+20px/)
@@ -134,16 +253,16 @@ describe('CortexPlayground', () => {
   })
 
   it('keeps the hosted widget footer exact and collapses an empty chat status', () => {
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     expect(screen.getByText('POWERED BY MLYTICS AI', { exact: true })).toBeInTheDocument()
     expect(screen.queryByText('POWERED BY MLYTICS AI · NO LIVE AI/API CALL', { exact: true })).not.toBeInTheDocument()
     expect(playgroundCss).toMatch(/\.widgetStatus:empty\s*\{[^}]*min-height:\s*0\s*;/)
   })
 
-  it('shows the selected Chat answer and lets the reader ask another question', async () => {
+  it('shows the selected Chat answer and lets the user ask another question', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
 
@@ -157,7 +276,7 @@ describe('CortexPlayground', () => {
 
   it('shows a distinct answer for the joint-support ingredients question', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await user.click(screen.getByRole('button', { name: /which joint-support ingredients/i }))
 
@@ -167,7 +286,7 @@ describe('CortexPlayground', () => {
 
   it('shows a distinct answer for the stiffness-after-walks question', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await user.click(screen.getByRole('button', { name: /is stiffness after walks/i }))
 
@@ -177,7 +296,7 @@ describe('CortexPlayground', () => {
 
   it('requires a quote and feedback before generating a two-column quote preview', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(getTab(/make a quote/i))
     await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
 
@@ -201,7 +320,7 @@ describe('CortexPlayground', () => {
 
   it('exposes icon-only LINE and Facebook quote actions with distinct triggers', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(getTab(/make a quote/i))
     await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
     await user.click(screen.getByRole('button', { name: /the senior threshold can arrive earlier/i }))
@@ -226,7 +345,7 @@ describe('CortexPlayground', () => {
 
   it('simulates Listen progress and emits the sponsored attention business signal', async () => {
     vi.useFakeTimers()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     fireEvent.click(getTab(/listen/i))
     act(() => {
       vi.runOnlyPendingTimers()
@@ -241,39 +360,39 @@ describe('CortexPlayground', () => {
     expect(screen.getByText(/sponsored attention qualified/i)).toBeInTheDocument()
   })
 
-  it('projects the same raw events differently in Publisher and Brand lenses', async () => {
+  it('projects the same raw events differently in Media and Brand lenses', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
 
-    await user.click(getTab(/publisher/i))
-    expect(getTab(/publisher/i)).toHaveAttribute('aria-controls', 'lens-panel-publisher')
-    expect(document.getElementById('lens-panel-publisher')).toHaveAttribute('aria-labelledby', 'lens-publisher')
+    await user.click(getLens(/media and content/i))
+    expect(getLens(/media and content/i)).toHaveAttribute('aria-selected', 'true')
+    expect(document.getElementById('lens-panel-content-owners')).not.toHaveAttribute('hidden')
     expect(screen.getByText('Topic preference captured')).toBeInTheDocument()
-    expect(screen.getByText(/reader relationship grow/i)).toBeInTheDocument()
+    expect(screen.getByText(/user relationship grow/i)).toBeInTheDocument()
 
-    await user.click(getTab(/brand/i))
-    expect(getTab(/brand/i)).toHaveAttribute('aria-controls', 'lens-panel-brand')
-    expect(document.getElementById('lens-panel-brand')).toHaveAttribute('aria-labelledby', 'lens-brand')
+    await user.click(getLens(/^brand/i))
+    expect(getLens(/^brand/i)).toHaveAttribute('aria-selected', 'true')
+    expect(document.getElementById('lens-panel-brands')).not.toHaveAttribute('hidden')
     expect(screen.getByText('Active need surfaced')).toBeInTheDocument()
     expect(screen.getByText(/demand behind the interaction/i)).toBeInTheDocument()
   })
 
   it('renders the hosted listen waveform density', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(getTab(/listen/i))
 
-    expect(screen.getByTestId('cortex-waveform').children).toHaveLength(70)
+    expect(screen.getByTestId('ai-mode-waveform').children).toHaveLength(70)
   })
 
   it('emits quote resonance on selection and amplification only after generation', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(getTab(/make a quote/i))
     await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
     await user.click(screen.getByRole('button', { name: /weight and cumulative joint load/i }))
-    const activeLedger = within(screen.getByRole('tabpanel', { name: /brand/i }))
+    const activeLedger = within(document.getElementById('lens-panel-brands') as HTMLElement)
 
     expect(activeLedger.getAllByText('CONTENT_RESONANCE')).toHaveLength(1)
     expect(activeLedger.queryByText('AMPLIFICATION_READY')).not.toBeInTheDocument()
@@ -292,7 +411,7 @@ describe('CortexPlayground', () => {
   it('disables Start over while reset cleanup is pending', () => {
     vi.useFakeTimers()
 
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     const reset = screen.getByRole('button', { name: /start over/i })
     fireEvent.click(reset)
 
@@ -316,9 +435,9 @@ describe('CortexPlayground', () => {
     })
 
     try {
-      ({ unmount } = render(<CortexPlayground />))
+      ({ unmount } = render(<AiModePlayground />))
 
-      const playground = screen.getByRole('region', { name: 'Cortex Playground' })
+      const playground = screen.getByRole('region', { name: 'Mlytics AI Mode playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
         top: 132,
         bottom: 632,
@@ -381,9 +500,9 @@ describe('CortexPlayground', () => {
     })
 
     try {
-      ({ unmount } = render(<CortexPlayground />))
+      ({ unmount } = render(<AiModePlayground />))
 
-      const playground = screen.getByRole('region', { name: 'Cortex Playground' })
+      const playground = screen.getByRole('region', { name: 'Mlytics AI Mode playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
         top: 132,
         bottom: 632,
@@ -444,9 +563,9 @@ describe('CortexPlayground', () => {
     })
 
     try {
-      ({ unmount } = render(<CortexPlayground />))
+      ({ unmount } = render(<AiModePlayground />))
 
-      const playground = screen.getByRole('region', { name: 'Cortex Playground' })
+      const playground = screen.getByRole('region', { name: 'Mlytics AI Mode playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
         top: 132,
         bottom: 632,
@@ -484,7 +603,7 @@ describe('CortexPlayground', () => {
     Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: undefined })
 
     try {
-      render(<CortexPlayground />)
+      render(<AiModePlayground />)
       fireEvent.click(getTab(/make a quote/i))
 
       const reset = screen.getByRole('button', { name: /start over/i })
@@ -509,8 +628,8 @@ describe('CortexPlayground', () => {
     Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: undefined })
 
     try {
-      render(<CortexPlayground />)
-      const playground = screen.getByRole('region', { name: 'Cortex Playground' })
+      render(<AiModePlayground />)
+      const playground = screen.getByRole('region', { name: 'Mlytics AI Mode playground' })
       vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({
         top: 132,
         bottom: 632,
@@ -538,7 +657,7 @@ describe('CortexPlayground', () => {
 
   it('fully resets state and returns to the initial Chat surface', async () => {
     const user = userEvent.setup()
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
     await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
     await user.click(getTab(/make a quote/i))
     await waitFor(() => expect(screen.getByRole('button', { name: /start over/i })).toBeEnabled())
@@ -549,7 +668,7 @@ describe('CortexPlayground', () => {
     await user.click(screen.getByRole('button', { name: /start over/i }))
 
     expect(getTab(/^Chat/)).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+    expect(visibleEventCount()).toBe('00 EVENTS')
     expect(screen.getByRole('button', { name: /at what age should a large-breed dog/i })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /generate quote card/i })).not.toBeInTheDocument()
     expect(screen.queryByDisplayValue('An Chou')).not.toBeInTheDocument()
@@ -569,8 +688,8 @@ describe('CortexPlayground', () => {
       toJSON: () => ({}),
     } as DOMRect)
 
-    render(<CortexPlayground />)
-    const widget = screen.getByTestId('cortex-widget')
+    render(<AiModePlayground />)
+    const widget = screen.getByTestId('ai-mode-widget')
     const mountedObserverCallback = intersectionObserverCallback
 
     fireEvent.wheel(window)
@@ -585,7 +704,7 @@ describe('CortexPlayground', () => {
     fireEvent.click(reset)
 
     expect(reset).toBeDisabled()
-    expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+    expect(visibleEventCount()).toBe('00 EVENTS')
     expect(screen.getByText('0%')).toBeInTheDocument()
     expect(screen.getByText('Waiting')).toBeInTheDocument()
 
@@ -595,7 +714,7 @@ describe('CortexPlayground', () => {
       vi.runOnlyPendingTimers()
     })
 
-    expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+    expect(visibleEventCount()).toBe('00 EVENTS')
     expect(screen.getByText('0%')).toBeInTheDocument()
     expect(screen.getByText('Waiting')).toBeInTheDocument()
   })
@@ -606,7 +725,7 @@ describe('CortexPlayground', () => {
     Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: undefined })
 
     try {
-      render(<CortexPlayground />)
+      render(<AiModePlayground />)
       fireEvent.click(getTab(/listen/i))
       act(() => vi.runOnlyPendingTimers())
       fireEvent.click(screen.getByRole('button', { name: 'Play' }))
@@ -623,7 +742,7 @@ describe('CortexPlayground', () => {
         vi.runAllTimers()
       })
 
-      expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+      expect(visibleEventCount()).toBe('00 EVENTS')
       expect(screen.queryByText(/sponsored attention qualified/i)).not.toBeInTheDocument()
     } finally {
       Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: originalRequestAnimationFrame })
@@ -636,7 +755,7 @@ describe('CortexPlayground', () => {
     Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: undefined })
 
     try {
-      render(<CortexPlayground />)
+      render(<AiModePlayground />)
       fireEvent.click(getTab(/listen/i))
       act(() => vi.runOnlyPendingTimers())
       fireEvent.click(screen.getByRole('button', { name: 'Play' }))
@@ -646,7 +765,7 @@ describe('CortexPlayground', () => {
 
       expect(reset).toBeDisabled()
       expect(getTab(/^Chat/)).toHaveAttribute('aria-selected', 'true')
-      expect(screen.getByText('00 EVENTS')).toBeInTheDocument()
+      expect(visibleEventCount()).toBe('00 EVENTS')
       expect(screen.getByText('0%')).toBeInTheDocument()
       expect(screen.getByText('Waiting')).toBeInTheDocument()
 
@@ -656,5 +775,191 @@ describe('CortexPlayground', () => {
     } finally {
       Object.defineProperty(window, 'requestAnimationFrame', { configurable: true, writable: true, value: originalRequestAnimationFrame })
     }
+  })
+})
+
+describe('AiModePlayground attribute-level naming', () => {
+  it('attribute 層也不殘留 Cortex（textContent 抓不到這些）', () => {
+    const { container } = render(<AiModePlayground />)
+    expect(container.innerHTML).not.toMatch(/cortex/i)
+  })
+
+  it('playground 容器的 aria-label 與 Task 9 的 Playwright 選擇器一致', () => {
+    const { container } = render(<AiModePlayground />)
+    expect(container.querySelector('[aria-label="Mlytics AI Mode playground"]')).not.toBeNull()
+  })
+})
+
+describe('AI Mode Playground 詞彙', () => {
+  it('整頁不出現 reader / publisher / Cortex', () => {
+    const { container } = render(<AiModePlayground />)
+    expect(container.textContent).not.toMatch(/reader|publisher|cortex/i)
+  })
+
+  it('attribute 層也不殘留 reader / publisher / Cortex', () => {
+    const { container } = render(<AiModePlayground />)
+    expect(container.innerHTML).not.toMatch(/reader|publisher|cortex/i)
+  })
+
+  it('讀者欄標題改為 What the user sees', () => {
+    const { getByText } = render(<AiModePlayground />)
+    expect(getByText(/what the user sees/i)).toBeInTheDocument()
+  })
+
+  it('左欄標示為 MEDIA ARTICLE', () => {
+    const { getByText } = render(<AiModePlayground />)
+    expect(getByText('MEDIA ARTICLE')).toBeInTheDocument()
+  })
+})
+
+describe('右欄首視線與裝飾標籤精簡（Task 11）', () => {
+  it('右欄在未互動時就顯示引導，而不是只有空的 metrics 列', () => {
+    const { getAllByText } = render(<AiModePlayground />)
+    const guides = getAllByText(/nothing captured yet/i)
+    expect(guides.some((node) => node.closest('[hidden]') === null)).toBe(true)
+  })
+
+  // Reverted to the UAT order at An's request: the metrics row reads as the
+  // panel's masthead, so it sits above the heading rather than below it.
+  it('metrics 列排在 ledgerPanel 之上，比照 UAT', () => {
+    expect(playgroundCss).toMatch(/\.metrics\s*\{[^}]*order:\s*1/)
+    expect(playgroundCss).toMatch(/\.ledgerPanel\s*\{[^}]*order:\s*2/)
+  })
+
+  it('已移除純裝飾的 Source story 標籤', () => {
+    const { queryByText } = render(<AiModePlayground />)
+    expect(queryByText(/^source story$/i)).not.toBeInTheDocument()
+  })
+
+  // Restored at An's request. The colour is the token rather than the raw
+  // `#2D7A74` UAT wrote by hand — the token happens to hold the same value.
+  it('userSubheader 右側帶回 ● LIVE PLAYGROUND，顏色用 token', () => {
+    expect(playgroundCss).toMatch(/\.userSubheader::after\s*\{[^}]*content:\s*'●\s+LIVE PLAYGROUND'/)
+    expect(playgroundCss).toMatch(/\.userSubheader::after\s*\{[^}]*color:\s*var\(--color-primary-light\)/)
+    expect(playgroundCss).not.toMatch(/\.userSubheader::after\s*\{[^}]*color:\s*#/)
+  })
+
+  it('MEDIA ARTICLE 保留——它說明左欄是媒體方的原生文章', () => {
+    const { getByText } = render(<AiModePlayground />)
+    expect(getByText('MEDIA ARTICLE')).toBeInTheDocument()
+  })
+})
+
+// The lens tablist on the right uses automatic activation, which is free
+// there. Here it is not: handleModeChange runs handleReset, so arrowing from
+// Chat to Listen would wipe the playground twice on the way. ARIA APG allows
+// manual activation exactly for this case.
+describe('mode tablist 鍵盤操作（ARIA APG manual activation）', () => {
+  const chat = () => getTab(/^Chat/)
+  const quote = () => getTab(/make a quote/i)
+  const listen = () => getTab(/^Listen/)
+  const more = () => getTab(/more to come/i)
+
+  const selected = () => modeTabs().map((tab) => tab.getAttribute('aria-selected'))
+
+  it('roving tabindex：只有被選取的 tab 進得了 Tab 順序', () => {
+    render(<AiModePlayground />)
+    expect(chat()).toHaveAttribute('tabindex', '0')
+    expect(quote()).toHaveAttribute('tabindex', '-1')
+    expect(listen()).toHaveAttribute('tabindex', '-1')
+    expect(more()).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('方向鍵只移動焦點，aria-selected 不變', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+    chat().focus()
+    const before = selected()
+
+    await user.keyboard('{ArrowRight}')
+    expect(quote()).toHaveFocus()
+    expect(selected()).toEqual(before)
+
+    await user.keyboard('{ArrowRight}')
+    expect(listen()).toHaveFocus()
+    expect(selected()).toEqual(before)
+
+    await user.keyboard('{ArrowLeft}')
+    expect(quote()).toHaveFocus()
+    expect(selected()).toEqual(before)
+
+    // ArrowDown/ArrowUp mirror right/left.
+    await user.keyboard('{ArrowDown}')
+    expect(listen()).toHaveFocus()
+    await user.keyboard('{ArrowUp}')
+    expect(quote()).toHaveFocus()
+    expect(selected()).toEqual(before)
+  })
+
+  it('方向鍵跳過 disabled 的 More to come，並在可用的 tab 之間繞回', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+    listen().focus()
+
+    // Listen is the last enabled tab; forward wraps past More to come.
+    await user.keyboard('{ArrowRight}')
+    expect(more()).not.toHaveFocus()
+    expect(chat()).toHaveFocus()
+
+    await user.keyboard('{ArrowLeft}')
+    expect(more()).not.toHaveFocus()
+    expect(listen()).toHaveFocus()
+  })
+
+  it('Home／End 移到第一個／最後一個可用 tab，且不改變選取', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+    quote().focus()
+    const before = selected()
+
+    await user.keyboard('{End}')
+    expect(listen()).toHaveFocus()
+    expect(selected()).toEqual(before)
+
+    await user.keyboard('{Home}')
+    expect(chat()).toHaveFocus()
+    expect(selected()).toEqual(before)
+  })
+
+  it('Enter 啟用目前有焦點的 tab', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+    chat().focus()
+    await user.keyboard('{ArrowRight}')
+    expect(quote()).toHaveAttribute('aria-selected', 'false')
+
+    await user.keyboard('{Enter}')
+    await waitFor(() => expect(quote()).toHaveAttribute('aria-selected', 'true'))
+    expect(chat()).toHaveAttribute('aria-selected', 'false')
+  })
+
+  it('Space 啟用目前有焦點的 tab', async () => {
+    const user = userEvent.setup()
+    render(<AiModePlayground />)
+    chat().focus()
+    await user.keyboard('{End}')
+    expect(listen()).toHaveAttribute('aria-selected', 'false')
+
+    await user.keyboard('[Space]')
+    await waitFor(() => expect(listen()).toHaveAttribute('aria-selected', 'true'))
+  })
+
+  // The whole reason for manual activation: arrowing past a mode must not
+  // reset the events the user already collected.
+  it('方向鍵不會觸發 reset——已產生的事件不被清空', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<AiModePlayground />)
+    const rows = () => container.querySelectorAll('#lens-panel-brands [data-tone]').length
+
+    await user.click(screen.getByRole('button', { name: /at what age should a large-breed dog/i }))
+    await waitFor(() => expect(rows()).toBeGreaterThan(0))
+    const before = rows()
+
+    chat().focus()
+    await user.keyboard('{ArrowRight}{ArrowRight}{ArrowLeft}{Home}{End}')
+
+    expect(rows()).toBe(before)
+    expect(screen.getByText(/^Grounded in/)).toBeInTheDocument()
+    expect(chat()).toHaveAttribute('aria-selected', 'true')
   })
 })

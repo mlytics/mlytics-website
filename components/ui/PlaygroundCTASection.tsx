@@ -4,14 +4,14 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { trackCTA } from '@/lib/analytics'
-import type { CortexLens } from '@/components/pages/cortex-playground/cortex-playground-data'
+import type { LedgerLens } from '@/components/pages/ai-mode-playground/ai-mode-playground-data'
 
 export type PlaygroundCTASectionProps = {
   eyebrow: string
   heading: string
   body: string
   ctaLabel: string
-  lens: CortexLens
+  lens: LedgerLens
   trackingPosition: string
   /** How this section is placed on the page — not just a colour.
    *
@@ -67,7 +67,7 @@ export function PlaygroundCTASection({
       {/* Matches the primary CTA in DecisiveEnginePageCTA / NotFoundContent —
           dark and light ground share the one button. */}
       <Link
-        href={`/cortex-playground/?lens=${lens}`}
+        href={`/ai-mode-playground/?lens=${lens}`}
         onClick={() => trackCTA(ctaLabel, trackingPosition)}
         className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-all hover:opacity-90"
       >
@@ -80,7 +80,7 @@ export function PlaygroundCTASection({
 
   return (
     <section className="section-white relative overflow-hidden py-16 lg:py-20">
-      {/* Echoes the Cortex Playground hero backdrop so the section previews its destination */}
+      {/* Echoes the AI Mode playground hero backdrop so the section previews its destination */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"

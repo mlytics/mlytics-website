@@ -1,0 +1,12 @@
+.routeSurface {
+  --bg-light: var(--bg-white);
+  overflow-x: clip;
+}
+
+/* The Hero's ground comes from .section-dark; this only keeps it a positioned,
+   self-clipping block. The radial wash that used to sit behind it was built
+   for a white Hero and has no counterpart on the dark one. */
+.hero {
+  position: relative;
+  overflow: hidden;
+}

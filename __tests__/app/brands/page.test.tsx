@@ -69,15 +69,15 @@ describe('BrandsPage playground entry point', () => {
       name: 'What does a placement inside an AI answer look like?',
     })).toBeInTheDocument()
     expect(screen.getByText(
-      'Walk through one publisher article as a reader would, and watch intent, purchase stage, and placement opportunity land on the Brand value ledger.',
+      'Walk through one media article as a user would, and watch intent, purchase stage, and placement opportunity land on the Brand value ledger.',
     )).toBeInTheDocument()
   })
 
-  it('links to the playground with the brand lens', () => {
+  it('links to the playground with the brands lens', () => {
     render(<BrandsPage />)
 
     expect(screen.getByRole('link', { name: 'Try AI Mode' }))
-      .toHaveAttribute('href', '/cortex-playground/?lens=brand')
+      .toHaveAttribute('href', '/ai-mode-playground/?lens=brands')
   })
 
   // Both audience entry points carry the same `Try AI Mode` label, so

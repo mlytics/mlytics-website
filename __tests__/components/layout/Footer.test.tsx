@@ -32,23 +32,23 @@ describe('Footer', () => {
     usePathnameMock.mockReturnValue('/')
   })
 
-  it('renders the Cortex Playground link between Partnership and Contact', () => {
+  it('renders the AI Mode link between Partnership and Contact', () => {
     render(<Footer />)
 
     const solutions = screen.getByText('Solutions').closest('div') as HTMLElement
     const links = Array.from(solutions.querySelectorAll('a'))
-    const playgroundLink = screen.getByRole('link', { name: 'Cortex Playground' }) as HTMLAnchorElement
+    const playgroundLink = screen.getByRole('link', { name: 'AI Mode' }) as HTMLAnchorElement
 
-    expect(playgroundLink).toHaveAttribute('href', '/cortex-playground')
+    expect(playgroundLink).toHaveAttribute('href', '/ai-mode-playground')
     expect(links.indexOf(playgroundLink)).toBe(links.findIndex((link) => link.textContent === 'Partnership') + 1)
     expect(links.indexOf(playgroundLink)).toBe(links.findIndex((link) => link.textContent === 'Contact') - 1)
   })
 
-  it('uses the active styling when the Cortex Playground pathname is current', () => {
-    usePathnameMock.mockReturnValue('/cortex-playground/')
+  it('uses the active styling when the AI Mode pathname is current', () => {
+    usePathnameMock.mockReturnValue('/ai-mode-playground/')
     render(<Footer />)
 
-    expect(screen.getByRole('link', { name: 'Cortex Playground' })).toHaveStyle({
+    expect(screen.getByRole('link', { name: 'AI Mode' })).toHaveStyle({
       color: '#fff',
       fontWeight: 600,
     })

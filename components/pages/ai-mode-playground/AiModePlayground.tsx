@@ -1,22 +1,23 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { CortexPlaygroundWidget } from './CortexPlaygroundWidget'
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
+import { AiModePlaygroundWidget } from './AiModePlaygroundWidget'
 import { SignalLedger } from './SignalLedger'
 import {
   ARTICLE,
   CHAT_CONTENT,
-  CortexEvent,
-  CortexLens,
-  CortexMode,
+  LedgerEvent,
+  LedgerLens,
+  PlaygroundMode,
   LISTEN_CONTENT,
+  modeTabId,
   QUOTE_CONTENT,
   readLensFromSearch,
   resolveLensCopy,
-} from './cortex-playground-data'
-import styles from './CortexPlayground.module.css'
+} from './ai-mode-playground-data'
+import styles from './AiModePlayground.module.css'
 
-const MODES: Array<{ id: CortexMode; label: string; sublabel: string }> = [
+const MODES: Array<{ id: PlaygroundMode; label: string; sublabel: string }> = [
   { id: 'chat', label: 'Chat', sublabel: 'Ask' },
   { id: 'quote', label: 'Make a quote', sublabel: 'Amplify' },
   { id: 'listen', label: 'Listen', sublabel: 'Attend' },
@@ -41,10 +42,10 @@ function getSiteHeaderBottom() {
   }, 0)
 }
 
-export function CortexPlayground() {
-  const [mode, setMode] = useState<CortexMode>('chat')
-  const [lens, setLens] = useState<CortexLens>('brand')
-  const [events, setEvents] = useState<CortexEvent[]>([])
+export function AiModePlayground() {
+  const [mode, setMode] = useState<PlaygroundMode>('chat')
+  const [lens, setLens] = useState<LedgerLens>('brands')
+  const [events, setEvents] = useState<LedgerEvent[]>([])
   const [scrollDepth, setScrollDepth] = useState(0)
   const [widgetImpression, setWidgetImpression] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -60,6 +61,7 @@ export function CortexPlayground() {
   const articleRef = useRef<HTMLElement>(null)
   const playgroundRef = useRef<HTMLElement>(null)
   const widgetRef = useRef<HTMLDivElement>(null)
+  const modeTabRefs = useRef<(HTMLButtonElement | null)[]>([])
   const resetEpochRef = useRef(0)
   const resettingRef = useRef(false)
   const eventSequenceRef = useRef(0)
@@ -86,7 +88,7 @@ export function CortexPlayground() {
     if (fromUrl) setLens(fromUrl)
   }, [])
 
-  // Keep the address bar honest: once the reader switches lens by hand, a
+  // Keep the address bar honest: once the user switches lens by hand, a
   // copied URL has to reopen on the lens they are looking at. `replaceState`
   // rather than `pushState` so tab switching does not stack history entries
   // and trap Back on this page. Every other query param and the hash survive
@@ -102,7 +104,7 @@ export function CortexPlayground() {
   // would skip Next's canonical-URL sync and leave it on the old lens. With
   // `null`, Next's `copyNextJsInternalHistoryState` puts `__NA` and the
   // internal tree back itself and the canonical URL follows the address bar.
-  const handleLensChange = useCallback((nextLens: CortexLens) => {
+  const handleLensChange = useCallback((nextLens: LedgerLens) => {
     setLens(nextLens)
     const params = new URLSearchParams(window.location.search)
     params.set('lens', nextLens)
@@ -113,10 +115,10 @@ export function CortexPlayground() {
     )
   }, [])
 
-  const emitEvent = useCallback((event: Omit<CortexEvent, 'id' | 'lensCopy'>) => {
+  const emitEvent = useCallback((event: Omit<LedgerEvent, 'id' | 'lensCopy'>) => {
     if (resettingRef.current || resetEpochRef.current !== resetEpoch) return
     const lensCopy = resolveLensCopy({ ...event, ...event.context })
-    const nextEvent: CortexEvent = {
+    const nextEvent: LedgerEvent = {
       ...event,
       id: `${resetEpochRef.current}-${++eventSequenceRef.current}`,
       lensCopy,
@@ -138,7 +140,7 @@ export function CortexPlayground() {
     emitEvent({
       kind: 'widget_impression',
       title: 'Widget entered viewport',
-      detail: 'Reader reached the article-end experience.',
+      detail: 'The user reached the article-end experience.',
       tone: 'raw',
       context: { mode },
     })
@@ -151,7 +153,7 @@ export function CortexPlayground() {
     setSelectedIndex(index)
     if (!widgetClickedRef.current) {
       widgetClickedRef.current = true
-      emitEvent({ kind: 'widget_click', title: CHAT_CONTENT.questions[index], detail: 'Reader interacted with the widget.', tone: 'raw', context: { mode: 'chat' } })
+      emitEvent({ kind: 'widget_click', title: CHAT_CONTENT.questions[index], detail: 'The user interacted with the widget.', tone: 'raw', context: { mode: 'chat' } })
     }
     CHAT_CONTENT.signals.forEach((signal) => emitEvent({ ...signal, tone: 'signal', context: { mode: 'chat' } }))
   }
@@ -168,7 +170,7 @@ export function CortexPlayground() {
     setSelectedIndex(index)
     if (!widgetClickedRef.current) {
       widgetClickedRef.current = true
-      emitEvent({ kind: 'widget_click', title: QUOTE_CONTENT.options[index].text, detail: 'Reader interacted with the widget.', tone: 'raw', context: { mode: 'quote' } })
+      emitEvent({ kind: 'widget_click', title: QUOTE_CONTENT.options[index].text, detail: 'The user interacted with the widget.', tone: 'raw', context: { mode: 'quote' } })
     }
     const resonance = QUOTE_CONTENT.signals.find((signal) => signal.kind === 'content_resonance')
     if (resonance) emitEvent({ ...resonance, tone: 'signal', context: { mode: 'quote' } })
@@ -193,7 +195,7 @@ export function CortexPlayground() {
     emitWidgetImpression()
     if (!widgetClickedRef.current) {
       widgetClickedRef.current = true
-      emitEvent({ kind: 'widget_click', title: 'Listening started', detail: 'Reader interacted with the widget.', tone: 'raw', context: { mode: 'listen' } })
+      emitEvent({ kind: 'widget_click', title: 'Listening started', detail: 'The user interacted with the widget.', tone: 'raw', context: { mode: 'listen' } })
       LISTEN_CONTENT.signals.forEach((signal) => emitEvent({ ...signal, tone: 'signal', context: { mode: 'listen' } }))
     }
   }
@@ -217,7 +219,7 @@ export function CortexPlayground() {
     }
   }, [])
 
-  const handleReset = useCallback((nextMode: CortexMode = 'chat') => {
+  const handleReset = useCallback((nextMode: PlaygroundMode = 'chat') => {
     if (resettingRef.current) return
     resettingRef.current = true
     trackingCleanupRef.current?.()
@@ -267,8 +269,48 @@ export function CortexPlayground() {
     }
   }, [clearAudioTimer, clearResetSchedule])
 
-  const handleModeChange = (nextMode: CortexMode) => {
+  const handleModeChange = (nextMode: PlaygroundMode) => {
     if (nextMode !== mode) handleReset(nextMode)
+  }
+
+  // ARIA APG tabs with MANUAL activation, unlike the lens tablist on the
+  // right. Selecting a mode runs handleReset, so automatic activation would
+  // wipe the playground at every tab the user arrows past on the way to the
+  // one they want. Arrows and Home/End move focus only; Enter/Space commits.
+  //
+  // Only MODES get refs, so the disabled `More to come` tab is skipped by
+  // construction — it can never take focus or be activated.
+  function handleModeKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    const focused = modeTabRefs.current.indexOf(document.activeElement as HTMLButtonElement)
+    const current = focused === -1 ? MODES.findIndex((item) => item.id === mode) : focused
+    let next: number
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        next = (current + 1) % MODES.length
+        break
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        next = (current - 1 + MODES.length) % MODES.length
+        break
+      case 'Home':
+        next = 0
+        break
+      case 'End':
+        next = MODES.length - 1
+        break
+      case 'Enter':
+      case ' ':
+        // preventDefault suppresses the button's own click activation, so the
+        // mode changes exactly once rather than once here and once natively.
+        event.preventDefault()
+        if (current !== -1) handleModeChange(MODES[current].id)
+        return
+      default:
+        return
+    }
+    event.preventDefault()
+    modeTabRefs.current[next]?.focus()
   }
 
   useEffect(() => {
@@ -308,7 +350,7 @@ export function CortexPlayground() {
         if (progress >= threshold && scrollDepthRef.current < threshold) {
           scrollDepthRef.current = threshold
           setScrollDepth(threshold)
-          emitEvent({ kind: 'article_scroll', title: `${threshold}% scroll depth`, detail: 'Reader continued through the article.', tone: 'raw', context: { mode, threshold } })
+          emitEvent({ kind: 'article_scroll', title: `${threshold}% scroll depth`, detail: 'The user continued through the article.', tone: 'raw', context: { mode, threshold } })
         }
       }
     }
@@ -347,32 +389,42 @@ export function CortexPlayground() {
       <div className={styles.container}>
         <div className={styles.sectionIntro}>
           <div><span className={styles.eyebrow}>Try the experience</span><h2 className="section-heading mb-4 text-ink" id="playground-heading">A small surface for a big shift.</h2></div>
-          <p className="mx-auto max-w-xl text-base leading-relaxed text-ink-muted">Choose a mode to see how one article can meet different reader intent.</p>
+          <p className="mx-auto max-w-xl text-base leading-relaxed text-ink-muted">Choose a mode to see how one article can meet different user intent.</p>
         </div>
-        <section ref={playgroundRef} className={styles.playground} aria-label="Cortex Playground">
+        <section ref={playgroundRef} className={styles.playground} aria-label="Mlytics AI Mode playground">
           <div className={styles.workspace}>
             <div className={styles.modeBar}>
               <span className={styles.modeLabel}>Choose an experience</span>
-              <div className={styles.modeTabs} role="tablist" aria-label="Cortex experiences">
-                {MODES.map((item) => (
-                  <button key={item.id} type="button" role="tab" aria-selected={mode === item.id} aria-controls="cortex-widget" onClick={() => handleModeChange(item.id)}>
+              <div className={styles.modeTabs} role="tablist" aria-label="AI Mode experiences" onKeyDown={handleModeKeyDown}>
+                {MODES.map((item, index) => (
+                  <button
+                    key={item.id}
+                    ref={(node) => { modeTabRefs.current[index] = node }}
+                    id={modeTabId(item.id)}
+                    type="button"
+                    role="tab"
+                    aria-selected={mode === item.id}
+                    aria-controls="ai-mode-widget"
+                    tabIndex={mode === item.id ? 0 : -1}
+                    onClick={() => handleModeChange(item.id)}
+                  >
                     {item.label}<small>{item.sublabel}</small>
                   </button>
                 ))}
-                <button type="button" role="tab" aria-selected="false" aria-disabled="true" disabled>More to come<small>Coming soon</small></button>
+                <button type="button" role="tab" aria-selected="false" aria-disabled="true" tabIndex={-1} disabled>More to come<small>Coming soon</small></button>
               </div>
             </div>
-            <div className={styles.readerPanel}>
-              <div className={styles.readerColumn}>
-                <div className={styles.readerSubheader}>What the reader sees</div>
+            <div className={styles.userPanel}>
+              <div className={styles.userColumn}>
+                <div className={styles.userSubheader}>What the user sees</div>
                 <article ref={articleRef} className={styles.article} aria-labelledby="article-title">
-                  <div className={styles.articleContext}><span><b>PUBLISHER ARTICLE</b><small>Source story</small></span><span>Cortex extends this story</span></div>
+                  <div className={styles.articleContext}><span><b>MEDIA ARTICLE</b></span><span>Mlytics AI Mode extends this story</span></div>
                   <div className={styles.articleKicker}>{ARTICLE.kicker}</div>
                   <h2 id="article-title">{ARTICLE.title}</h2>
                   <p className={styles.standfirst}>{ARTICLE.standfirst}</p>
                   <div className={styles.rule} />
                   {ARTICLE.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-                  <CortexPlaygroundWidget
+                  <AiModePlaygroundWidget
                     mode={mode}
                     selectedIndex={selectedIndex}
                     quoteFeedback={quoteFeedback}
@@ -390,7 +442,7 @@ export function CortexPlayground() {
                     onQuoteAction={(action) => {
                       setQuoteActionStatus(action === 'download' ? 'quote card downloaded' : `${action.toUpperCase()} share recorded`)
                       if (action !== 'download' && !events.some((event) => event.kind === 'share')) {
-                        const copy = lens === 'brand' ? 'Content carried outward' : 'Reader amplification completed'
+                        const copy = lens === 'brands' ? 'Content carried outward' : 'User amplification completed'
                         emitEvent({ kind: 'share', title: copy, detail: 'The selected quote moved beyond the article through a local mock share action.', tone: 'raw', context: { mode: 'quote' } })
                       }
                     }}

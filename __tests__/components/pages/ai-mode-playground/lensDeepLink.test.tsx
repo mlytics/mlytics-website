@@ -1,20 +1,20 @@
 // Two different things are covered in two different places, and neither
 // stands in for the other. The `readLensFromSearch` tests in
-// `__tests__/components/pages/cortex-playground/cortex-playground-data.test.ts`
+// `__tests__/components/pages/ai-mode-playground/ai-mode-playground-data.test.ts`
 // cover the *parser*: what a missing or unsupported `lens` resolves to (null).
 // The default-lens test below covers where the *component* actually lands with
 // no `?lens=` at all — brand — which is a separate claim, and the one the
 // "arrive without a deep link and you get the Brand view" promise rests on.
 // Note that at the component level "the effect ran and chose brand" and "the
 // effect never ran" render the same output, so the default-lens test pins the
-// default, not the effect; `?lens=publisher` is what exercises the effect.
+// default, not the effect; `?lens=content-owners` is what exercises the effect.
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { CortexPlayground } from '@/components/pages/cortex-playground/CortexPlayground'
+import { AiModePlayground } from '@/components/pages/ai-mode-playground/AiModePlayground'
 
 function setSearch(search: string) {
-  window.history.replaceState({}, '', `/cortex-playground/${search}`)
+  window.history.replaceState({}, '', `/ai-mode-playground/${search}`)
 }
 
 beforeEach(() => {
@@ -31,59 +31,74 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('CortexPlayground lens deep-link', () => {
+describe('AiModePlayground lens deep-link', () => {
   it('selects the Brand lens when no ?lens= is present', async () => {
     setSearch('')
-    render(<CortexPlayground />)
+    render(<AiModePlayground />)
 
     await waitFor(() => {
       expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'true')
     })
-    expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'false')
+    expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'false')
   })
 
-  it('selects the Publisher lens for ?lens=publisher', async () => {
-    setSearch('?lens=publisher')
-    render(<CortexPlayground />)
+  it('selects the Media lens for ?lens=content-owners', async () => {
+    setSearch('?lens=content-owners')
+    render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
     expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'false')
   })
-})
 
-describe('CortexPlayground lens URL sync', () => {
-  it('rewrites ?lens= when the reader switches lens', async () => {
-    const user = userEvent.setup()
-    setSearch('?lens=publisher')
-    render(<CortexPlayground />)
+  // The parser test covers the alias table in isolation; this covers the wiring
+  // — a link someone shared before the rename still opens on the right lens.
+  it.each([
+    ['?lens=publisher', /media and content/i],
+    ['?lens=media', /media and content/i],
+    ['?lens=brand', /^brand/i],
+  ])('resolves the legacy value in %s through the component', async (search, selected) => {
+    setSearch(search)
+    render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: selected })).toHaveAttribute('aria-selected', 'true')
+    })
+  })
+})
+
+describe('AiModePlayground lens URL sync', () => {
+  it('rewrites ?lens= when the user switches lens', async () => {
+    const user = userEvent.setup()
+    setSearch('?lens=content-owners')
+    render(<AiModePlayground />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
 
     await user.click(screen.getByRole('tab', { name: /^brand/i }))
 
     await waitFor(() => {
-      expect(new URLSearchParams(window.location.search).get('lens')).toBe('brand')
+      expect(new URLSearchParams(window.location.search).get('lens')).toBe('brands')
     })
     expect(screen.getByRole('tab', { name: /^brand/i })).toHaveAttribute('aria-selected', 'true')
   })
 
   it('keeps the other query params and the hash when it rewrites ?lens=', async () => {
     const user = userEvent.setup()
-    setSearch('?utm_source=slack&lens=publisher#foo')
-    render(<CortexPlayground />)
+    setSearch('?utm_source=slack&lens=content-owners#foo')
+    render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
 
     await user.click(screen.getByRole('tab', { name: /^brand/i }))
 
     await waitFor(() => {
-      expect(new URLSearchParams(window.location.search).get('lens')).toBe('brand')
+      expect(new URLSearchParams(window.location.search).get('lens')).toBe('brands')
     })
     expect(new URLSearchParams(window.location.search).get('utm_source')).toBe('slack')
     expect(window.location.hash).toBe('#foo')
@@ -91,19 +106,19 @@ describe('CortexPlayground lens URL sync', () => {
 
   it('replaces the history entry instead of pushing one', async () => {
     const user = userEvent.setup()
-    setSearch('?lens=publisher')
-    render(<CortexPlayground />)
+    setSearch('?lens=content-owners')
+    render(<AiModePlayground />)
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: /publisher/i })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('tab', { name: /media and content/i })).toHaveAttribute('aria-selected', 'true')
     })
     const lengthBefore = window.history.length
 
     await user.click(screen.getByRole('tab', { name: /^brand/i }))
-    await user.click(screen.getByRole('tab', { name: /publisher/i }))
+    await user.click(screen.getByRole('tab', { name: /media and content/i }))
 
     await waitFor(() => {
-      expect(new URLSearchParams(window.location.search).get('lens')).toBe('publisher')
+      expect(new URLSearchParams(window.location.search).get('lens')).toBe('content-owners')
     })
     expect(window.history.length).toBe(lengthBefore)
   })

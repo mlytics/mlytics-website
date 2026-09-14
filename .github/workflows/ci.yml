@@ -25,5 +25,12 @@ jobs:
       - name: Vitest unit tests
         run: npm test -- --run
 
+      # The static export is what ships, and it is also what
+      # e2e/legacy-playground-redirect.spec.ts reads to confirm the old route's
+      # canonical and the absence of a meta refresh in the shipped HTML. `next
+      # dev` never writes out/, so the build has to come first.
+      - name: Build static export
+        run: npm run build
+
       - name: Playwright E2E tests
         run: npm run test:e2e
