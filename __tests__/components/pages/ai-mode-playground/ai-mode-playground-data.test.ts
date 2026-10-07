@@ -1,29 +1,33 @@
 import { describe, expect, it } from 'vitest'
-import { isLedgerLens, readLensFromSearch } from '@/components/pages/ai-mode-playground/ai-mode-playground-data'
+import { DEFAULT_LENS, isPlaygroundLens, readLensFromSearch } from '@/components/pages/ai-mode-playground/ai-mode-playground-data'
 
-describe('isLedgerLens', () => {
+describe('isPlaygroundLens', () => {
   it('accepts the two supported lenses', () => {
-    expect(isLedgerLens('content-owners')).toBe(true)
-    expect(isLedgerLens('brands')).toBe(true)
+    expect(isPlaygroundLens('content-owners')).toBe(true)
+    expect(isPlaygroundLens('brands')).toBe(true)
   })
 
   // The three retired values still resolve through `readLensFromSearch`, but
   // they are not lens values any more: nothing inside the app may hold one.
   it('rejects the retired lens values', () => {
-    expect(isLedgerLens('media')).toBe(false)
-    expect(isLedgerLens('publisher')).toBe(false)
-    expect(isLedgerLens('brand')).toBe(false)
+    expect(isPlaygroundLens('media')).toBe(false)
+    expect(isPlaygroundLens('publisher')).toBe(false)
+    expect(isPlaygroundLens('brand')).toBe(false)
   })
 
   it('rejects anything else', () => {
-    expect(isLedgerLens('garbage')).toBe(false)
-    expect(isLedgerLens('Content-Owners')).toBe(false)
-    expect(isLedgerLens('')).toBe(false)
-    expect(isLedgerLens(null)).toBe(false)
-    expect(isLedgerLens(undefined)).toBe(false)
-    expect(isLedgerLens(1)).toBe(false)
-    expect(isLedgerLens(['brands'])).toBe(false)
+    expect(isPlaygroundLens('garbage')).toBe(false)
+    expect(isPlaygroundLens('Content-Owners')).toBe(false)
+    expect(isPlaygroundLens('')).toBe(false)
+    expect(isPlaygroundLens(null)).toBe(false)
+    expect(isPlaygroundLens(undefined)).toBe(false)
+    expect(isPlaygroundLens(1)).toBe(false)
+    expect(isPlaygroundLens(['brands'])).toBe(false)
   })
+})
+
+it('defaults to the content-owners lens', () => {
+  expect(DEFAULT_LENS).toBe('content-owners')
 })
 
 describe('readLensFromSearch', () => {

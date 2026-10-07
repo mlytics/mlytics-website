@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { expect, test } from '@playwright/test'
+import { LENS_LABELS, UI } from '../components/pages/ai-mode-playground/ai-mode-playground-copy'
 
 // The old route is the only thing catching the `/cortex-playground/` links
 // DATAI-555 already put into circulation, and every assertion it had lived in
@@ -11,7 +12,7 @@ import { expect, test } from '@playwright/test'
 const LEGACY = '/cortex-playground/'
 const DESTINATION = '/ai-mode-playground/'
 const selectedLens = (page: import('@playwright/test').Page) =>
-  page.getByRole('tablist', { name: 'Ledger lens' }).getByRole('tab', { selected: true })
+  page.getByRole('tablist', { name: UI.canvas.customerTablistLabel }).getByRole('tab', { selected: true })
 
 test.describe('JS 開：真實瀏覽器跳轉', () => {
   test('沒有參數時落在新路徑', async ({ page }) => {
@@ -27,7 +28,7 @@ test.describe('JS 開：真實瀏覽器跳轉', () => {
     await page.goto(`${LEGACY}?lens=publisher`)
     await page.waitForURL(`**${DESTINATION}?lens=publisher`)
     expect(new URL(page.url()).search).toBe('?lens=publisher')
-    await expect(selectedLens(page)).toHaveText(/Media and Content/)
+    await expect(selectedLens(page)).toHaveText(LENS_LABELS['content-owners'])
   })
 
   test('?lens=brand#ledger 連 hash 一起保留並選中 Brand', async ({ page }) => {
@@ -36,7 +37,7 @@ test.describe('JS 開：真實瀏覽器跳轉', () => {
     const url = new URL(page.url())
     expect(url.search).toBe('?lens=brand')
     expect(url.hash).toBe('#ledger')
-    await expect(selectedLens(page)).toHaveText(/^Brand/)
+    await expect(selectedLens(page)).toHaveText(LENS_LABELS.brands)
   })
 
   test('其他 query 參數一併帶過去', async ({ page }) => {
@@ -45,7 +46,7 @@ test.describe('JS 開：真實瀏覽器跳轉', () => {
     const params = new URL(page.url()).searchParams
     expect(params.get('utm_source')).toBe('slack')
     expect(params.get('lens')).toBe('media')
-    await expect(selectedLens(page)).toHaveText(/Media and Content/)
+    await expect(selectedLens(page)).toHaveText(LENS_LABELS['content-owners'])
   })
 })
 
