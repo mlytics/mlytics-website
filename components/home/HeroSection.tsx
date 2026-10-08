@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { WorldMapDots } from './WorldMapDots'
 import { LogoMarquee } from './LogoMarquee'
 import { InlineEmailCTA } from '@/components/ui/InlineEmailCTA'
+import { trackCTA } from '@/lib/analytics'
 
 const ROTATING_WORDS = [
   'that puts your brand inside AI answers',
@@ -75,8 +77,29 @@ export function HeroSection() {
               </span>
             </h1>
 
-            {/* Early access CTA */}
-            <InlineEmailCTA ctaLabel="hero" pageName="Homepage Hero" />
+            {/* Early access CTA + secondary Try AI Mode entry.
+                Mobile: stacked, the button exactly as wide as the input block.
+                ≥ 640px: one row — the 28rem input block (InlineEmailCTA's own
+                max-w-md), 12px gap, then the button. The row needs ~581px
+                (448 + 12 + ~121), i.e. a ~629px viewport with px-6; 640 leaves
+                a little slack. Not `sm:` — this project redefines sm as 30rem
+                (480px, globals.css), where the row would overflow.
+                Top-aligned rather than centred: InlineEmailCTA grows an error
+                line under its pill, and centring would push the button down
+                when that appears. Height 50px = the pill's own height, so the
+                two line up exactly. */}
+            <div className="flex flex-col gap-3 w-full max-w-md min-[640px]:flex-row min-[640px]:items-start min-[640px]:w-auto min-[640px]:max-w-none">
+              <div className="w-full min-[640px]:w-[28rem] min-[640px]:shrink-0">
+                <InlineEmailCTA ctaLabel="hero" pageName="Homepage Hero" />
+              </div>
+              <Link
+                href="/ai-mode-playground"
+                onClick={() => trackCTA('Try AI Mode', 'home_hero')}
+                className="w-full min-[640px]:w-auto min-[640px]:shrink-0 h-[50px] inline-flex items-center justify-center px-[calc(1.25rem-1px)] rounded-full text-sm font-semibold whitespace-nowrap border border-primary bg-white text-primary transition-all hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                Try AI Mode
+              </Link>
+            </div>
 
           </div>
         </div>

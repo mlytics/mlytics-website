@@ -2,6 +2,9 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HeroSection } from '@/components/home/HeroSection'
+import { trackCTA } from '@/lib/analytics'
+
+vi.mock('@/lib/analytics', () => ({ trackCTA: vi.fn() }))
 
 // Mock framer-motion — AnimatePresence + motion.span used for rotating words
 vi.mock('framer-motion', () => ({
@@ -103,6 +106,30 @@ describe('HeroSection', () => {
       expect(screen.getByText(/email is required/i)).toBeInTheDocument()
       await userEvent.type(screen.getByPlaceholderText(/enter your email/i), 'a')
       expect(screen.queryByText(/email is required/i)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Try AI Mode entry', () => {
+    it('renders a Try AI Mode link to /ai-mode-playground next to the email form, outside it', () => {
+      render(<HeroSection />)
+      const link = screen.getByRole('link', { name: 'Try AI Mode' })
+      expect(link).toHaveAttribute('href', '/ai-mode-playground')
+      const form = screen.getByPlaceholderText(/enter your email/i).closest('form')!
+      // Not inside InlineEmailCTA's form row with Get Early Access.
+      expect(form).not.toContainElement(link)
+      // form → its width wrapper → the link: siblings in one flex container.
+      const formSlot = form.parentElement!
+      expect(formSlot.nextElementSibling).toBe(link)
+      const row = formSlot.parentElement!
+      expect(row).toHaveClass('flex', 'flex-col', 'gap-3', 'w-full', 'max-w-md', 'min-[640px]:flex-row')
+      expect(formSlot).toHaveClass('w-full', 'min-[640px]:w-[28rem]')
+      expect(link).toHaveClass('w-full', 'min-[640px]:w-auto', 'h-[50px]', 'border-primary', 'text-primary', 'bg-white', 'rounded-full')
+    })
+
+    it('tracks clicks as home_hero', async () => {
+      render(<HeroSection />)
+      await userEvent.click(screen.getByRole('link', { name: 'Try AI Mode' }))
+      expect(trackCTA).toHaveBeenCalledWith('Try AI Mode', 'home_hero')
     })
   })
 })

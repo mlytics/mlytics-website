@@ -13,8 +13,24 @@ const NAV_LINKS = [
   { label: 'Brands', href: '/brands' },
   { label: 'Developers', href: '/developers' },
   { label: 'Partnership', href: '/partnership' },
-  { label: 'AI Mode', href: '/ai-mode-playground' },
 ]
+
+const AI_MODE_HREF = '/ai-mode-playground'
+
+const FOCUS_RING = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+
+// Primary: the solid pill Book a Demo used to wear.
+const PRIMARY_BTN = 'px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 bg-primary'
+
+// Secondary: the site's `.pill-btn` look (globals.css — white fill, primary
+// border, primary text, fills primary on hover) written as utilities.
+// `.pill-btn` itself is unlayered CSS, so it would beat Tailwind's padding
+// utilities and could not be sized to match the primary. The border is 1px,
+// not .pill-btn's 1.5px: Chrome snaps 1.5px to 1px on 1x screens, so a 1.5px
+// border cannot be offset in the padding consistently. The padding subtracts
+// the 1px so both buttons render at the same height.
+const SECONDARY_BTN =
+  'px-[calc(1rem-1px)] py-[calc(0.5rem-1px)] rounded-full text-sm font-semibold border border-primary bg-white text-primary transition-all hover:bg-primary hover:text-white'
 
 export function Nav() {
   const pathname = usePathname()
@@ -24,6 +40,7 @@ export function Nav() {
   const lastScrollY = useRef(0)
 
   const normalizedPathname = pathname.replace(/\/$/, '') || '/'
+  const isAiModePage = normalizedPathname === AI_MODE_HREF
 
   useEffect(() => {
     const handler = () => {
@@ -95,9 +112,17 @@ export function Nav() {
         {/* CTA */}
         <div className="hidden lg:flex items-center gap-3">
           <Link
+            href={AI_MODE_HREF}
+            onClick={() => trackCTA('Try AI Mode', 'nav')}
+            aria-current={isAiModePage ? 'page' : undefined}
+            className={`${PRIMARY_BTN} ${FOCUS_RING}`}
+          >
+            Try AI Mode
+          </Link>
+          <Link
             href="/book-a-demo"
             onClick={() => trackCTA('Book a Demo', 'nav')}
-            className="px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 bg-primary"
+            className={`${SECONDARY_BTN} ${FOCUS_RING}`}
           >
             Book a Demo
           </Link>
@@ -137,9 +162,17 @@ export function Nav() {
                 </Link>
               ))}
               <Link
+                href={AI_MODE_HREF}
+                onClick={() => { trackCTA('Try AI Mode', 'nav_mobile'); setMobileOpen(false) }}
+                aria-current={isAiModePage ? 'page' : undefined}
+                className={`block w-full mt-2 py-2.5 rounded-full text-sm font-semibold text-white text-center bg-primary ${FOCUS_RING}`}
+              >
+                Try AI Mode
+              </Link>
+              <Link
                 href="/book-a-demo"
                 onClick={() => { trackCTA('Book a Demo', 'nav_mobile'); setMobileOpen(false) }}
-                className="block w-full mt-2 py-2.5 rounded-full text-sm font-semibold text-white text-center bg-primary"
+                className={`block w-full mt-2 py-[calc(0.625rem-1px)] rounded-full text-sm font-semibold text-center border border-primary bg-white text-primary transition-all hover:bg-primary hover:text-white ${FOCUS_RING}`}
               >
                 Book a Demo
               </Link>
