@@ -1,0 +1,537 @@
+.panel {
+  /* Inset by the canvas padding so the module's edges line up with the
+     canvas content below it (prototype .experience-module). */
+  --panel-pad: clamp(20px, 3vw, 32px);
+  justify-self: center;
+  width: calc(100% - 2 * var(--canvas-pad));
+  min-width: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 18px;
+  background: var(--bg-light);
+  box-shadow: 0 12px 28px rgba(34, 93, 89, .05);
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--color-line);
+  background: var(--bg-white);
+  border-radius: 18px 18px 0 0;
+}
+
+.tab {
+  min-height: 58px;
+  padding: 12px 8px;
+  border: 0;
+  border-right: 1px solid var(--color-line);
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-small);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.tab:last-child {
+  border-right: 0;
+}
+
+.tab:hover,
+.tab:focus-visible {
+  background: rgba(34, 93, 89, .06);
+  color: var(--color-primary);
+}
+
+.tab:focus-visible,
+.reset:focus-visible,
+.choice:focus-visible,
+.feedbackOption:focus-visible,
+.signatureInput:focus-visible,
+.shareButton:focus-visible,
+.listenToggle:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.tab[aria-selected='true'] {
+  border-bottom-color: var(--color-gold);
+  color: var(--bg-dark);
+}
+
+.instruction {
+  margin: 0;
+  padding: 18px var(--panel-pad) 0;
+  color: var(--color-ink-muted);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.panelBody {
+  padding: 12px var(--panel-pad) var(--panel-pad);
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0 0 17px 17px;
+  background: var(--bg-white);
+}
+
+.card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: var(--bg-white);
+  box-shadow: 0 4px 14px rgba(34, 93, 89, .04);
+}
+
+.cardHeader {
+  display: flex;
+  /* Reset is pinned top-right (owner decision): its top edge sits on the
+     title's top edge, and a title that wraps grows downward without moving
+     it. No margin offset, so nothing here depends on the title's size. */
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Listen keeps its Reset button (owner decision) but matches the prototype's
+   9px title-to-player spacing. */
+.cardHeaderListen {
+  margin-bottom: 9px;
+}
+
+.cardTitle {
+  min-width: 0;
+  margin: 0;
+  color: var(--bg-dark);
+  font-size: var(--font-size-h3);
+  font-weight: 700;
+  line-height: 1.375;
+}
+
+.reset {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid var(--color-line);
+  border-radius: 9999px;
+  background: var(--bg-white);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+}
+
+.reset:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.choiceList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.choiceItem {
+  min-width: 0;
+}
+
+.choice {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  background: var(--bg-white);
+  color: var(--color-ink);
+  font-size: var(--font-size-small);
+  line-height: 1.45;
+  text-align: left;
+}
+
+.choice:hover,
+.choice[aria-pressed='true'] {
+  border-color: var(--color-primary);
+  background: rgba(34, 93, 89, .08);
+  color: var(--color-primary);
+}
+
+.quoteLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(260px, .92fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.quoteControls {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.step {
+  display: grid;
+  gap: 8px;
+}
+
+.stepLabel,
+.sponsorLabel {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: 1.5;
+}
+
+.feedback {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.feedbackOption {
+  min-height: 42px;
+  padding: 8px;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  background: var(--bg-white);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+}
+
+.feedbackOption:hover,
+.feedbackOption[aria-checked='true'] {
+  border-color: var(--color-primary);
+  background: rgba(34, 93, 89, .08);
+  color: var(--color-primary);
+}
+
+.signature {
+  display: grid;
+  gap: 7px;
+}
+
+.signatureInput {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  background: var(--bg-white);
+  color: var(--color-ink);
+  font-size: .76rem;
+  font-weight: 700;
+}
+
+.preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: rgba(34, 93, 89, .04);
+}
+
+.previewEmpty {
+  display: grid;
+  place-items: center;
+  min-height: 164px;
+  margin: 0;
+  padding: 22px;
+  border: 1px dashed rgba(34, 93, 89, .3);
+  border-radius: 12px;
+  background: rgba(34, 93, 89, .04);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-small);
+  line-height: 1.55;
+  text-align: center;
+}
+
+.quoteCard {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  min-height: 248px;
+  overflow: hidden;
+  padding: 28px 24px 22px;
+  border: 1px solid rgba(168, 197, 195, .28);
+  border-radius: 18px;
+  /* The trailing var(--bg-dark) gives the card a solid computed
+     background-color (the gradient's darkest stop) under the white text, so
+     anything that reads background-color instead of painting the image
+     (an a11y checker, a user stylesheet that drops background-image) sees a
+     dark ground rather than transparent. This repo's contrast spec no longer
+     relies on it: the generic scan skips the quote card (onGradient), and the
+     card's text is measured from real pixels by the quote-card pixel test. */
+  background: linear-gradient(145deg, var(--bg-dark) 0%, var(--color-primary) 62%, var(--color-primary-light) 100%), var(--bg-dark);
+  color: var(--color-on-dark);
+  box-shadow: 0 18px 36px rgba(26, 61, 58, .22);
+}
+
+/* Decoration: a ring with two halo bands at the top right, and a large
+   opening quote mark at the bottom right. Both sit under the card content. */
+.quoteCard::before {
+  position: absolute;
+  z-index: 0;
+  top: -92px;
+  right: -54px;
+  width: 220px;
+  height: 220px;
+  border: 1px solid rgba(168, 197, 195, .24);
+  border-radius: 50%;
+  box-shadow: 0 0 0 22px rgba(168, 197, 195, .05), 0 0 0 46px rgba(168, 197, 195, .035);
+  content: '';
+}
+
+.quoteCard::after {
+  position: absolute;
+  z-index: 0;
+  right: 24px;
+  bottom: -48px;
+  color: rgba(168, 197, 195, .16);
+  font: 700 15rem/.75 Georgia, serif;
+  /* Empty alt text: screen readers skip the decoration. */
+  content: '“' / '';
+}
+
+.quoteText {
+  position: relative;
+  z-index: 1;
+  margin: 32px 0 24px;
+  color: var(--bg-white);
+  font-size: clamp(1.2rem, 2.4vw, 1.55rem);
+  font-weight: 750;
+  line-height: 1.42;
+  letter-spacing: -.02em;
+}
+
+.signatureText {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  /* Solid white: at .78 it fell to 3.6-4.1:1 over the light end of the
+     gradient and the quote-mark decoration. */
+  color: var(--bg-white);
+  font-size: .78rem;
+  line-height: 1.5;
+  letter-spacing: .02em;
+  /* A typed signature can be one unbroken run (an email, a URL). Without a
+     break opportunity it overflows and the card's overflow: hidden clips it. */
+  overflow-wrap: anywhere;
+}
+
+.sponsor {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  /* When the label and the full-size logo cannot share a line, the logo
+     wraps under the label instead of being squeezed or clipped by the
+     card's overflow: hidden. */
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-top: 24px;
+  padding: 8px 10px 8px 12px;
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .94);
+  color: var(--bg-dark);
+}
+
+.sponsorLabel {
+  color: var(--bg-dark);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sponsorLogo {
+  display: block;
+  flex: 0 1 auto;
+  width: min(115px, 100%);
+  min-width: 0;
+  height: auto;
+}
+
+.shareActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.shareButton {
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid var(--color-primary);
+  border-radius: 9999px;
+  background: var(--bg-white);
+  color: var(--color-primary);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+}
+
+.shareButton:hover {
+  background: rgba(34, 93, 89, .08);
+}
+
+.listenVisual {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.listenToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-primary);
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--bg-white);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+}
+
+.listenToggle:hover {
+  border-color: var(--color-primary-dark);
+  background: var(--color-primary-dark);
+}
+
+.listenIcon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.buttonLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  margin: -1px;
+  border: 0;
+  white-space: nowrap;
+}
+
+.listenTrack {
+  min-width: 0;
+}
+
+.listenProgress {
+  height: 10px;
+  border-radius: 9999px;
+  background: rgba(34, 93, 89, .12);
+  overflow: hidden;
+}
+
+.listenFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-gold);
+  transition: width 240ms linear;
+}
+
+.listenMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 9px;
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-caption);
+}
+
+.listenTime,
+.listenStatus {
+  min-width: 0;
+}
+
+.listenStatus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  margin: -1px;
+  border: 0;
+  white-space: nowrap;
+  color: var(--color-primary);
+  font-weight: 700;
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  .quoteLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .panel {
+    border-radius: 14px;
+  }
+
+  .tabs {
+    border-radius: 14px 14px 0 0;
+  }
+
+  .tab {
+    padding-inline: 3px;
+  }
+
+  .panelBody {
+    padding-inline: 16px;
+    border-radius: 0 0 13px 13px;
+  }
+
+  .instruction {
+    padding-inline: 16px;
+  }
+
+  /* 18px on phones, matching the site's mobile card-title precedent
+     (publishers KnowledgeBaseSection: text-lg). The unitless 1.375
+     line-height carries over, so the ratio matches desktop. */
+  .cardTitle {
+    font-size: 1.125rem;
+  }
+
+  .feedback {
+    grid-template-columns: 1fr;
+  }
+
+  /* At 320 the quote card is only ~146px wide, too narrow for the one-line
+     SPONSORED BY label inside the pill. Give the card back some width from
+     the preview frame and its own side padding. */
+  .preview {
+    padding: 8px;
+  }
+
+  .quoteCard {
+    padding-inline: 12px;
+  }
+
+  .sponsor {
+    padding-inline: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listenFill {
+    transition: none;
+  }
+}

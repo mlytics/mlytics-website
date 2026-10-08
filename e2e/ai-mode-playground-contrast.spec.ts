@@ -1,18 +1,25 @@
 import { expect, test } from '@playwright/test'
+import {
+  EXPERIENCE_LABELS,
+  HERO,
+  LENS_LABELS,
+  QUOTE_OPTIONS,
+  UI,
+} from '../components/pages/ai-mode-playground/ai-mode-playground-copy'
 
 const lin = (c: number) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4 }
 const lum = (rgb: number[]) => 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2])
 const ratio = (a: number[], b: number[]) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05) }
 const round = (n: number) => Number(n.toFixed(2))
 
-const SCOPE = '[aria-label="Mlytics AI Mode playground"]'
+const SCOPE = '[data-playground-root]'
 
 // The sweeps used to start at SCOPE, so the dark Hero and the section intro
 // above the playground were never measured at all. They are in scope now.
 // Nav and Footer deliberately are not: they are site-wide furniture that this
 // ticket does not touch, and pulling them in would make this spec fail for
 // reasons that belong to another change.
-const SCAN_ROOTS = ['.ai-mode-playground-hero', 'section[aria-labelledby="playground-heading"]']
+const SCAN_ROOTS = ['.ai-mode-playground-hero', '[data-playground-root]']
 const ROOTS = JSON.stringify(SCAN_ROOTS)
 
 type Sample = { text: string; fg: number[]; bg: number[]; selector: string }
@@ -60,6 +67,12 @@ const HELPERS = `
   const exempt = (el) =>
     el.closest('[aria-hidden="true"]') || el.closest(':disabled') || el.closest('[aria-disabled="true"]')
 
+  // The quote card paints a gradient plus decorations under its text, and
+  // bgOf() can only see the solid colour beneath the gradient, so it reports a
+  // background the text never sits on. Its text is measured from real pixels
+  // by the dedicated quote-card test below instead.
+  const onGradient = (el) => el.closest('[class*="quoteCard"]')
+
   const painted = (el) => {
     const r = el.getBoundingClientRect()
     return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'
@@ -68,7 +81,7 @@ const HELPERS = `
   const scan = (selectors) => selectors
     .flatMap((sel) => [...document.querySelectorAll(sel)])
     .flatMap((root) => [root, ...root.querySelectorAll('*')])
-    .filter((el) => ownText(el) && !exempt(el) && painted(el))
+    .filter((el) => ownText(el) && !exempt(el) && !onGradient(el) && painted(el))
     .map((el) => ({ ...measure(el), text: ownText(el).slice(0, 40), selector: el.className || el.tagName }))
 `
 
@@ -86,10 +99,10 @@ test('playground 初始畫面所有文字對比 ≥ 4.5', async ({ page }) => {
   // Pin the widened scope: if a refactor moves the Hero out from under
   // SCAN_ROOTS, this fails loudly instead of quietly measuring less.
   expect(samples.map((s) => s.text)).toEqual(
-    expect.arrayContaining(['Mlytics AI Mode', 'One signal. Two values.']),
+    expect.arrayContaining([HERO.eyebrow, HERO.title.slice(0, 40), EXPERIENCE_LABELS.chat]),
   )
   // Same for the section intro, which sits between the Hero and the playground.
-  expect(samples.some((s) => s.text.startsWith('A small surface'))).toBe(true)
+  expect(samples.some((s) => s.text === HERO.copy.slice(0, 40))).toBe(true)
   // And for the tab labels the old leaf-only filter skipped entirely.
   expect(samples.some((s) => s.text === 'Chat')).toBe(true)
 
@@ -100,32 +113,18 @@ test('playground 初始畫面所有文字對比 ≥ 4.5', async ({ page }) => {
 test('Task 9 逐項：每個 tab 狀態與內文的實測對比', async ({ page }) => {
   await page.goto('/ai-mode-playground/')
 
-  // Reach the grounded answer line, which only renders after a prompt is chosen.
-  await page.getByRole('tablist', { name: 'AI Mode experiences' }).getByRole('tab', { name: /ask/i }).click()
-  await page.locator('li button').first().click()
-  await expect(page.getByText(/^Grounded in/)).toBeVisible()
-
   const measured: Record<string, { fg: number[]; bg: number[] }> = await page.evaluate(`(() => {
     ${HELPERS}
     const scope = document.querySelector('${SCOPE}')
-    const inList = (label) => [...scope.querySelectorAll('[role="tablist"][aria-label="' + label + '"] [role="tab"]')]
-    const modes = inList('AI Mode experiences').filter((t) => !t.disabled)
-    const lenses = inList('Ledger lens')
-    const modeOff = modes.find((t) => t.getAttribute('aria-selected') === 'false')
-    const modeOn = modes.find((t) => t.getAttribute('aria-selected') === 'true')
-    const lensOff = lenses.find((t) => t.getAttribute('aria-selected') === 'false')
-    const lensOn = lenses.find((t) => t.getAttribute('aria-selected') === 'true')
-    const grounded = [...scope.querySelectorAll('p')].find((p) => p.textContent.trim().startsWith('Grounded in'))
+    const find = (selector) => scope.querySelector(selector)
     return {
-      'modeTab unselected': measure(modeOff),
-      'modeTab small': measure(modeOff.querySelector('small')),
-      'modeTab selected': measure(modeOn),
-      'modeTab selected small': measure(modeOn.querySelector('small')),
-      'answerGrounded': measure(grounded),
-      'lensTab unselected': measure(lensOff),
-      'lensTab unselected small': measure(lensOff.querySelector('small')),
-      'lensTab selected': measure(lensOn),
-      'lensTab selected small': measure(lensOn.querySelector('small')),
+      'experience tab unselected': measure(find('#experience-tab-quote')),
+      'experience tab selected': measure(find('#experience-tab-chat')),
+      'customer tab unselected': measure(find('#customer-tab-brands')),
+      'customer tab selected': measure(find('#customer-tab-content-owners')),
+      cellKicker: measure(find('[class*="cellKicker"]')),
+      cellLabel: measure(find('[class*="cellLabel"]')),
+      stageKicker: measure(find('[class*="stageKicker"]')),
     }
   })()`)
 
@@ -135,9 +134,9 @@ test('Task 9 逐項：每個 tab 狀態與內文的實測對比', async ({ page 
   for (const [name, r] of Object.entries(results)) expect(r, `${name} = ${r}`).toBeGreaterThanOrEqual(4.5)
 })
 
-test('選取中的 mode tab 使用 gold token 作為底線', async ({ page }) => {
+test('選取中的 experience tab 使用 gold token 作為底線', async ({ page }) => {
   await page.goto('/ai-mode-playground/')
-  const border = await page.evaluate(`getComputedStyle(document.querySelector('${SCOPE} [role="tablist"][aria-label="AI Mode experiences"] [role="tab"][aria-selected="true"]')).borderBottomColor`)
+  const border = await page.evaluate(`getComputedStyle(document.querySelector('${SCOPE} [role="tablist"][aria-label="${UI.experienceTablistLabel}"] [role="tab"][aria-selected="true"]')).borderBottomColor`)
   expect(border).toBe('rgb(245, 158, 11)') // --color-gold
 })
 
@@ -151,38 +150,33 @@ const SCAN = `(() => {
 test('playground 互動後狀態所有文字對比 ≥ 4.5', async ({ page }) => {
   await page.goto('/ai-mode-playground/')
   await expect(page.locator(SCOPE)).toHaveCount(1)
-  const scope = page.locator(SCOPE)
   const bad: ReturnType<typeof failures> = []
   const sweep = async (stage: string) => bad.push(...failures(stage, await page.evaluate(SCAN)))
 
-  // Chat: answering a question emits signal-tone ledger rows.
-  const modeTab = (name: RegExp) => page.getByRole('tablist', { name: 'AI Mode experiences' }).getByRole('tab', { name })
-
-  await modeTab(/ask/i).click()
-  await page.locator('li button').first().click()
-  await expect(page.getByText(/^Grounded in/)).toBeVisible()
-  await expect(scope.locator("#lens-panel-brands [data-tone='signal']").first()).toBeVisible()
+  // Chat: answering a question emits the raw signal and changes the path copy.
+  await page.getByRole('button', { name: /iPhone 18 Pro full specs/ }).click()
+  await expect(page.locator('#stage-02-copy')).toContainText('iPhone 18 Pro full specs')
   await sweep('chat')
 
   // Quote: step labels, the signature hint, and the generated card.
-  await modeTab(/amplify/i).click()
-  await expect(page.getByText('1 · Choose a line')).toBeVisible()
-  await page.getByRole('listitem').filter({ has: page.locator('button') }).first().locator('button').click()
-  await page.getByRole('radio', { name: 'Great' }).click()
-  await page.getByRole('button', { name: /quote card/i }).click()
-  await expect(page.getByRole('region', { name: 'Quote preview' })).toBeVisible()
+  await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+  await page.getByRole('button', { name: /Before you choose/ }).click()
+  await page.getByRole('radio', { name: 'Resonates', exact: true }).click()
+  await expect(page.getByRole('region', { name: UI.quote.previewLabel })).toBeVisible()
+  await expect(page.getByRole('blockquote')).toBeVisible()
+  await expect(page.getByText(UI.quote.anonymous)).toBeVisible()
+  await expect(page.getByRole('region', { name: UI.quote.previewLabel }).getByRole('img', { name: 'Mlytics' })).toBeVisible()
   await sweep('quote')
 
   // Listen: playback state plus its own signal rows.
-  await modeTab(/attend/i).click()
-  await page.getByRole('button', { name: 'Play' }).click()
-  await expect(scope.locator("#lens-panel-brands [data-tone='signal']").first()).toBeVisible()
+  await page.getByRole('tab', { name: EXPERIENCE_LABELS.listen, exact: true }).click()
+  await page.getByRole('button', { name: UI.listen.play, exact: true }).click()
+  await expect(page.getByRole('progressbar')).toBeVisible()
   await sweep('listen')
 
-  // The media lens renders a different copy set through the same rows.
-  await page.getByRole('tablist', { name: 'Ledger lens' }).getByRole('tab', { name: /Media and Content/ }).click()
-  await expect(scope.locator("#lens-panel-content-owners [data-tone='signal']").first()).toBeVisible()
-  await sweep('media lens')
+  // The Brands lens renders a different copy set through the same stages.
+  await page.getByRole('tab', { name: LENS_LABELS.brands, exact: true }).click()
+  await sweep('brands lens')
 
   expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0)
 })
@@ -195,8 +189,8 @@ test('playground 互動後狀態所有文字對比 ≥ 4.5', async ({ page }) =>
 // paints, not against the control's own fill.
 //
 // Only the four side midpoints are sampled. The bounding box corners are not
-// on the ring at all once the control is rounded (`.startOver` is a pill at
-// focus), so sampling them would report a background the ring never touches.
+// on the ring at all once the control is rounded (the Reset button is a pill),
+// so sampling them would report a background the ring never touches.
 //
 // An indicator may be made of more than one band: an outline plus a
 // box-shadow ring reads as one indicator, and it is enough for ONE band to
@@ -242,15 +236,21 @@ type Ring = {
 
 // `finder` is a DOM expression rather than a Playwright locator: the ring has
 // to be measured inside the page, where `:has-text()` and friends do not exist.
-async function measureRing(page: import('@playwright/test').Page, finder: string): Promise<Ring> {
-  // Chromium only matches :focus-visible on a programmatically focused button
-  // when the last interaction was a keypress, so prime keyboard modality first.
-  // Tab moves focus away; the focus() below takes it straight back.
-  await page.keyboard.press('Tab')
-  await page.evaluate(`(() => { ${finder}.focus() })()`)
-  // .startOver animates its width over .18s on focus, and switching mode runs
-  // handleReset, which scrolls the page back to the top of the playground on
-  // the next frame. Both have to land before the ring is located.
+async function measureRing(
+  page: import('@playwright/test').Page,
+  finder: string,
+  { refocus = true }: { refocus?: boolean } = {},
+): Promise<Ring> {
+  if (refocus) {
+    // Chromium only matches :focus-visible on a programmatically focused button
+    // when the last interaction was a keypress, so prime keyboard modality first.
+    // Tab moves focus away; the focus() below takes it straight back.
+    await page.keyboard.press('Tab')
+    await page.evaluate(`(() => { ${finder}.focus() })()`)
+  }
+  // Let any scroll the page itself started (a completion scrolls the stage 02
+  // signal into view with an explicit smooth behaviour) and any hover/focus
+  // transition land before the ring is located, then centre the control.
   await page.waitForTimeout(400)
   await page.evaluate(`(() => { ${finder}.scrollIntoView({ block: 'center' }) })()`)
   return page.evaluate(`(() => {
@@ -260,8 +260,8 @@ async function measureRing(page: import('@playwright/test').Page, finder: string
   })()`)
 }
 
-const MODE_TAB = '[role="tablist"][aria-label="AI Mode experiences"] [role="tab"]:not([disabled])'
-const LENS_TAB = '[role="tablist"][aria-label="Ledger lens"] [role="tab"]'
+const EXPERIENCE_TAB = `[role="tablist"][aria-label="${UI.experienceTablistLabel}"] [role="tab"]`
+const CUSTOMER_TAB = `[role="tablist"][aria-label="${UI.canvas.customerTablistLabel}"] [role="tab"]`
 const byText = (text: string) =>
   `[...document.querySelectorAll('button')].find((b) => b.textContent.includes(${JSON.stringify(text)}))`
 const first = (selector: string) => `document.querySelector(${JSON.stringify(selector)})`
@@ -274,8 +274,8 @@ test('每一類控制項的 focus ring 對相鄰底色 ≥ 3:1（WCAG 1.4.11）'
   await page.addStyleTag({ content: '*, html { scroll-behavior: auto !important }' })
   const results: Record<string, { ratio: number; bands: string[]; worstBg: string; at: number[] }> = {}
 
-  const check = async (name: string, finder: string) => {
-    const ring = await measureRing(page, finder)
+  const check = async (name: string, finder: string, options?: { refocus?: boolean }) => {
+    const ring = await measureRing(page, finder, options)
     expect(ring.focusVisible, `${name} 沒有進入 :focus-visible，量到的不是 focus ring`).toBe(true)
     expect(ring.width, `${name} 沒有 outline`).toBeGreaterThan(0)
     expect(ring.samples.length, `${name} 的 ring 四邊沒有全部取到相鄰底色`).toBe(4)
@@ -296,29 +296,35 @@ test('每一類控制項的 focus ring 對相鄰底色 ≥ 3:1（WCAG 1.4.11）'
     }
   }
 
-  await check('modeTabs button', first(MODE_TAB))
-  await check('lensTabs button', first(LENS_TAB))
-  await check('choice (chat question)', first('ul[aria-label="Article questions"] li button'))
-  await check('startOver', first('button[aria-label="Start over"]'))
+  await check('experience tab', first(EXPERIENCE_TAB))
+  await check('customer tab', first(CUSTOMER_TAB))
+  await check('choice (chat question)', first('button[class*="choice"]'))
+  await check('reset', first('button[class*="reset"]'))
 
-  // Quote mode unlocks four more of the eight control classes the rule covers.
-  await page.locator(MODE_TAB, { hasText: 'Amplify' }).click()
-  await expect(page.getByText('1 · Choose a line')).toBeVisible()
-  await check('choice (quote option)', first('ul[aria-label="Quote options"] li button'))
-  await check('quoteFeedbackChoice', first('[role="radiogroup"][aria-label="Quote feedback"] [role="radio"]'))
+  // A keyboard Chat answer moves focus to the stage 02 raw-signal copy. Its
+  // ring is measured where the app put it, without re-focusing: the copy sits
+  // in a boxed surface now, so the ring has to clear that box, not the page.
+  await page.locator('button[class*="choice"]').first().focus()
+  await page.keyboard.press('Enter')
+  await expect(page.locator('#stage-02-copy')).toBeFocused()
+  await check('stage 02 signal (after keyboard Chat answer)', first('#stage-02-copy'), { refocus: false })
 
-  // `Generate quote card` stays disabled — and so unfocusable — until a line
-  // and a reaction are chosen, so it can only be measured after both.
-  await page.locator('ul[aria-label="Quote options"] li button').first().click()
-  await page.getByRole('radio', { name: 'Great' }).click()
-  await check('quoteGenerate', byText('Generate quote card'))
+  // Entering Quote renders its step controls and the signature input at once;
+  // the share buttons only appear once a line is selected.
+  await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+  await expect(page.getByText(UI.quote.step1)).toBeVisible()
+  await check('choice (quote option)', first('button[class*="choice"]'))
+  await check('quoteFeedbackChoice', first('[role="radiogroup"][aria-label="' + UI.quote.feedbackLabel + '"] [role="radio"]'))
+  await check('quote signature input', first('input[class*="signatureInput"]'))
 
-  await page.getByRole('button', { name: /quote card/i }).click()
-  await expect(page.getByRole('region', { name: 'Quote preview' })).toBeVisible()
-  await check('quoteAction', first('button[aria-label="Share on LINE"]'))
+  await page.locator('button[class*="choice"]').first().click()
+  await page.getByRole('radio', { name: 'Helpful', exact: true }).click()
+  await check('quoteAction', first('button[class*="shareButton"]'))
 
-  await page.locator(MODE_TAB, { hasText: 'Attend' }).click()
-  await check('listenToggle', first('button[aria-label="Play"]'))
+  await page.getByRole('tab', { name: EXPERIENCE_LABELS.listen, exact: true }).click()
+  await check('listenToggle', first('button[class*="listenToggle"]'))
+  await check('ctaPrimary', first('a[class*="ctaPrimary"]'))
+  await check('ctaSecondary', first('a[class*="ctaSecondary"]'))
 
   // eslint-disable-next-line no-console
   console.log('focus ring 1.4.11:', JSON.stringify(results, null, 2))
@@ -326,3 +332,127 @@ test('每一類控制項的 focus ring 對相鄰底色 ≥ 3:1（WCAG 1.4.11）'
     expect(r.ratio, `${name} = ${r.ratio} (${r.bands.join(' + ')} on ${r.worstBg})`).toBeGreaterThanOrEqual(3)
   }
 })
+
+// The quote card's text sits on a 145deg gradient with a halo ring and a large
+// quote-mark decoration behind it, so no computed background-color describes
+// what is under any given glyph. This test photographs the card with its text
+// made transparent and takes the worst real pixel under every line box of
+// every text run, compositing the text colour (alpha included) over each one.
+// Every run is held to 4.5:1, the same bar as the rest of this spec, even the
+// quote itself, which is large enough that WCAG would accept 3:1.
+//
+// Where the text lands on the gradient depends on how long the quote is, how
+// many lines the signature wraps to, and the card width, so every quote line
+// is measured, with both the default signature and a long typed one that
+// pushes the signature further down into the light end of the gradient and
+// over the quote-mark decoration. 1024 is in the sweep because that is where
+// a typed signature at .78 alpha measured worst (3.66-3.84:1).
+type QuoteRun = { probe: string; text: string; fg: number[]; rects: number[][] }
+type QuoteResult = { quote: number; probe: string; text: string; worst: number; worstBg: number[] }
+
+const TYPED_SIGNATURE = 'Jordan Lee-Montgomery from Acme Publishing Group International'
+const SIGNATURES = [
+  { name: 'default', typed: null, shown: UI.quote.anonymous },
+  { name: 'typed', typed: TYPED_SIGNATURE, shown: TYPED_SIGNATURE },
+] as const
+
+async function measureQuoteCard(page: import('@playwright/test').Page, card: import('@playwright/test').Locator, quote: number): Promise<QuoteResult[]> {
+  await card.scrollIntoViewIfNeeded()
+  const runs: QuoteRun[] = await card.evaluate((root) => {
+    const parse = (c: string) => c.match(/[\d.]+/g)!.map(Number)
+    const box = root.getBoundingClientRect()
+    root.querySelectorAll('[data-contrast-probe]').forEach((el) => el.removeAttribute('data-contrast-probe'))
+    return [...root.querySelectorAll<HTMLElement>('*')]
+      .filter((el) => [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent!.trim()))
+      .map((el, i) => {
+        el.dataset.contrastProbe = String(i)
+        const cs = getComputedStyle(el)
+        const range = document.createRange()
+        range.selectNodeContents(el)
+        return {
+          // CSS-module class names carry a hash; name each run by the
+          // source class it was built from.
+          probe: ['quoteText', 'signatureText', 'sponsorLabel'].find((k) => String(el.className).includes(k)) ?? String(el.className),
+          text: el.textContent!.trim().slice(0, 40),
+          fg: parse(cs.color),
+          rects: [...range.getClientRects()]
+            .filter((r) => r.width > 0 && r.height > 0)
+            .map((r) => [r.left - box.left, r.top - box.top, r.right - box.left, r.bottom - box.top]),
+        }
+      })
+  })
+  expect(runs.map((r) => r.probe)).toEqual(expect.arrayContaining(['quoteText', 'signatureText', 'sponsorLabel']))
+
+  // Hide only the glyphs; every surface and decoration stays painted. The
+  // style is removed again so the next quote line is probed with its text
+  // visible to the selectors above.
+  const hide = await page.addStyleTag({ content: '[data-contrast-probe] { color: transparent !important; caret-color: transparent !important }' })
+  const png = (await card.screenshot({ animations: 'disabled' })).toString('base64')
+  await hide.evaluate((el) => (el as Element).remove())
+
+  return page.evaluate(async ({ png, runs, quote }) => {
+    const lin = (c: number) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4 }
+    const lum = (rgb: number[]) => 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2])
+    const ratio = (a: number[], b: number[]) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05) }
+    const img = new Image()
+    img.src = `data:image/png;base64,${png}`
+    await img.decode()
+    const canvas = document.createElement('canvas')
+    canvas.width = img.naturalWidth
+    canvas.height = img.naturalHeight
+    const ctx = canvas.getContext('2d')!
+    ctx.drawImage(img, 0, 0)
+    const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    return runs.map((run) => {
+      const alpha = run.fg.length > 3 ? run.fg[3] : 1
+      let worst = Infinity
+      let worstBg: number[] = []
+      for (const [l, t, r, b] of run.rects) {
+        for (let y = Math.max(0, Math.floor(t)); y < Math.min(canvas.height, Math.ceil(b)); y++) {
+          for (let x = Math.max(0, Math.floor(l)); x < Math.min(canvas.width, Math.ceil(r)); x++) {
+            const i = (y * canvas.width + x) * 4
+            const bg = [data[i], data[i + 1], data[i + 2]]
+            const fg = [0, 1, 2].map((k) => alpha * run.fg[k] + (1 - alpha) * bg[k])
+            const c = ratio(fg, bg)
+            if (c < worst) { worst = c; worstBg = bg }
+          }
+        }
+      }
+      return { quote, probe: run.probe, text: run.text, worst: Number(worst.toFixed(2)), worstBg }
+    })
+  }, { png, runs, quote })
+}
+
+for (const width of [320, 375, 768, 1024, 1280]) {
+  for (const signature of SIGNATURES) {
+    test(`quote card 文字對漸層底色的實際像素對比 ≥ 4.5 at ${width}（${signature.name} signature）`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 })
+      await page.goto('/ai-mode-playground/')
+      await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+      const card = page.locator('[class*="quoteCard"]')
+      const options = page.getByRole('list', { name: UI.quote.optionsLabel }).getByRole('button')
+      await expect(options).toHaveCount(QUOTE_OPTIONS.length)
+
+      const results: QuoteResult[] = []
+      for (const [index, quote] of QUOTE_OPTIONS.entries()) {
+        await options.nth(index).click()
+        await expect(options.nth(index)).toHaveAttribute('aria-pressed', 'true')
+        // Picking a different line clears the signature, so it is typed
+        // again for every line.
+        if (signature.typed) await page.getByRole('textbox', { name: UI.quote.signatureLabel }).fill(signature.typed)
+        await expect(card.getByRole('blockquote')).toHaveText(`“${quote}”`)
+        await expect(card.locator('[class*="signatureText"]')).toHaveText(signature.shown)
+        results.push(...await measureQuoteCard(page, card, index))
+      }
+      // Every quote line was really measured, not just the first.
+      expect(new Set(results.filter((r) => r.probe === 'quoteText').map((r) => r.quote))).toEqual(new Set([0, 1, 2]))
+
+      // eslint-disable-next-line no-console
+      console.log(`quote card pixels @${width} (${signature.name}):`, JSON.stringify(results))
+      for (const r of results) {
+        expect(Number.isFinite(r.worst), `quote ${r.quote} ${r.probe} sampled no pixels`).toBe(true)
+        expect(r.worst, `quote ${r.quote} ${r.probe} "${r.text}" = ${r.worst} on rgb(${r.worstBg.join(', ')})`).toBeGreaterThanOrEqual(4.5)
+      }
+    })
+  }
+}

@@ -1,80 +1,33 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { AiModePlaygroundWidget } from './AiModePlaygroundWidget'
-import { SignalLedger } from './SignalLedger'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import {
-  ARTICLE,
-  CHAT_CONTENT,
-  LedgerEvent,
-  LedgerLens,
-  PlaygroundMode,
-  LISTEN_CONTENT,
-  modeTabId,
-  QUOTE_CONTENT,
-  readLensFromSearch,
-  resolveLensCopy,
-} from './ai-mode-playground-data'
+  ANNOUNCE,
+  EXPERIENCE_LABELS,
+  LENS_LABELS,
+  UI,
+} from './ai-mode-playground-copy'
+import type { ExperienceId, PlaygroundLens, ShareAction } from './ai-mode-playground-copy'
+import { DEFAULT_LENS, readLensFromSearch } from './ai-mode-playground-data'
+import { deriveCaptures, INITIAL_STATE, playgroundReducer } from './playground-logic'
+import type { PlaygroundAction } from './playground-logic'
+import { DecisionFlow } from './DecisionFlow'
+import { useNavOffset } from './useNavOffset'
+import { ExperiencePanel } from './ExperiencePanel'
 import styles from './AiModePlayground.module.css'
 
-const MODES: Array<{ id: PlaygroundMode; label: string; sublabel: string }> = [
-  { id: 'chat', label: 'Chat', sublabel: 'Ask' },
-  { id: 'quote', label: 'Make a quote', sublabel: 'Amplify' },
-  { id: 'listen', label: 'Listen', sublabel: 'Attend' },
-]
-
-type ResetSchedule =
-  | { kind: 'animation-frame'; handle: number }
-  | { kind: 'timeout'; handle: number }
-
-const PLAYGROUND_TOP_OFFSET = 18
-
-function getSiteHeaderBottom() {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return 0
-
-  return Array.from(document.querySelectorAll<HTMLElement>('header, nav')).reduce((bottom, element) => {
-    const position = window.getComputedStyle(element).position
-    if (position !== 'fixed' && position !== 'sticky') return bottom
-
-    const rect = element.getBoundingClientRect()
-    if (!Number.isFinite(rect.height) || rect.height <= 0) return bottom
-    return Math.max(bottom, rect.height)
-  }, 0)
-}
+type PendingEffect = 'chat' | 'signal' | null
 
 export function AiModePlayground() {
-  const [mode, setMode] = useState<PlaygroundMode>('chat')
-  const [lens, setLens] = useState<LedgerLens>('brands')
-  const [events, setEvents] = useState<LedgerEvent[]>([])
-  const [scrollDepth, setScrollDepth] = useState(0)
-  const [widgetImpression, setWidgetImpression] = useState(false)
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
-  const [quoteFeedback, setQuoteFeedback] = useState<string | null>(null)
-  const [quoteSignature, setQuoteSignature] = useState('')
-  const [quoteGenerated, setQuoteGenerated] = useState(false)
-  const [quoteActionStatus, setQuoteActionStatus] = useState<string | null>(null)
-  const [audioPlaying, setAudioPlaying] = useState(false)
-  const [audioElapsedSeconds, setAudioElapsedSeconds] = useState(0)
-  const [resetEpoch, setResetEpoch] = useState(0)
-  const [resetting, setResetting] = useState(false)
-
-  const articleRef = useRef<HTMLElement>(null)
-  const playgroundRef = useRef<HTMLElement>(null)
-  const widgetRef = useRef<HTMLDivElement>(null)
-  const modeTabRefs = useRef<(HTMLButtonElement | null)[]>([])
-  const resetEpochRef = useRef(0)
-  const resettingRef = useRef(false)
-  const eventSequenceRef = useRef(0)
-  const widgetClickedRef = useRef(false)
-  const widgetImpressionRef = useRef(false)
-  const scrollDepthRef = useRef(0)
-  const impressionArmedRef = useRef(true)
-  const scrollTrackingArmedRef = useRef(true)
-  const sponsoredAttentionEmittedRef = useRef(false)
-  const quoteAmplificationEmittedRef = useRef(false)
-  const trackingCleanupRef = useRef<(() => void) | null>(null)
-  const audioTimerRef = useRef<number | null>(null)
-  const resetScheduleRef = useRef<ResetSchedule | null>(null)
+  const [state, dispatch] = useReducer(playgroundReducer, INITIAL_STATE)
+  const [lens, setLens] = useState<PlaygroundLens>(DEFAULT_LENS)
+  const [announcement, setAnnouncement] = useState('')
+  const rootRef = useRef<HTMLDivElement>(null)
+  const signalRef = useRef<HTMLParagraphElement>(null)
+  const pendingEffectRef = useRef<PendingEffect>(null)
+  const previousListenStatusRef = useRef(state.listen.status)
+  const announceHandleRef = useRef<{ kind: 'raf' | 'timeout'; id: number } | null>(null)
+  useNavOffset(rootRef)
 
   // The deep-linked lens is read from the URL here rather than through
   // `useSearchParams`: on a prerendered route that hook opts everything below
@@ -88,6 +41,40 @@ export function AiModePlayground() {
     if (fromUrl) setLens(fromUrl)
   }, [])
 
+  const cancelPendingAnnouncement = useCallback(() => {
+    const handle = announceHandleRef.current
+    announceHandleRef.current = null
+    if (!handle) return
+    if (handle.kind === 'raf') window.cancelAnimationFrame?.(handle.id)
+    else window.clearTimeout(handle.id)
+  }, [])
+
+  const announce = useCallback((value: string) => {
+    cancelPendingAnnouncement()
+    setAnnouncement('')
+    const setNext = () => {
+      announceHandleRef.current = null
+      setAnnouncement(value)
+    }
+    announceHandleRef.current =
+      typeof window.requestAnimationFrame === 'function'
+        ? { kind: 'raf', id: window.requestAnimationFrame(setNext) }
+        : { kind: 'timeout', id: window.setTimeout(setNext, 0) }
+  }, [cancelPendingAnnouncement])
+
+  useEffect(() => cancelPendingAnnouncement, [cancelPendingAnnouncement])
+
+  // A focus effect is only queued when the action actually changes state. The
+  // reducer is pure, so running it here first is safe; if it hands the same
+  // state back, the effect below would never run and a queued focus move would
+  // linger until some unrelated later change (typing a signature) fired it.
+  const dispatchWithEffect = (action: PlaygroundAction, effect: PendingEffect) => {
+    if (playgroundReducer(state, action) === state) return false
+    pendingEffectRef.current = effect
+    dispatch(action)
+    return true
+  }
+
   // Keep the address bar honest: once the user switches lens by hand, a
   // copied URL has to reopen on the lens they are looking at. `replaceState`
   // rather than `pushState` so tab switching does not stack history entries
@@ -99,366 +86,140 @@ export function AiModePlayground() {
   //
   // The first argument is `null`, not `window.history.state`: Next patches
   // `replaceState` and early-returns to the unpatched one whenever the state
-  // handed to it already carries `__NA` — which Next's own `HistoryUpdater`
-  // stamps onto every entry — so passing the current state straight back
-  // would skip Next's canonical-URL sync and leave it on the old lens. With
-  // `null`, Next's `copyNextJsInternalHistoryState` puts `__NA` and the
-  // internal tree back itself and the canonical URL follows the address bar.
-  const handleLensChange = useCallback((nextLens: LedgerLens) => {
+  // handed to it already carries `__NA` — which Next's own `HistoryUpdater` stamps
+  // onto every entry — so passing the current state straight back would skip Next's
+  // canonical-URL sync and leave it on the old lens. With `null`, Next's
+  // `copyNextJsInternalHistoryState` puts `__NA` and the internal tree back itself and
+  // the canonical URL follows the address bar.
+  const handleLensChange = useCallback((nextLens: PlaygroundLens) => {
+    if (nextLens === lens) return
     setLens(nextLens)
     const params = new URLSearchParams(window.location.search)
     params.set('lens', nextLens)
-    window.history.replaceState(
-      null,
-      '',
-      `${window.location.pathname}?${params.toString()}${window.location.hash}`,
-    )
-  }, [])
+    window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}${window.location.hash}`)
+    // Same rule as the stage 01/02 completion ticks: only the capture of the
+    // experience on screen counts, so a Chat answer does not claim a capture
+    // while Quote is open and still showing its empty defaults.
+    const hasCurrentCapture = Boolean(deriveCaptures(state)[state.experience])
+    announce(hasCurrentCapture ? ANNOUNCE.customerSwitchedWithCapture : ANNOUNCE.customerSwitched(LENS_LABELS[nextLens]))
+  }, [announce, lens, state])
 
-  const emitEvent = useCallback((event: Omit<LedgerEvent, 'id' | 'lensCopy'>) => {
-    if (resettingRef.current || resetEpochRef.current !== resetEpoch) return
-    const lensCopy = resolveLensCopy({ ...event, ...event.context })
-    const nextEvent: LedgerEvent = {
-      ...event,
-      id: `${resetEpochRef.current}-${++eventSequenceRef.current}`,
-      lensCopy,
-    }
-    setEvents((current) => [nextEvent, ...current])
-  }, [resetEpoch])
-
-  const isWidgetVisible = useCallback(() => {
-    const widget = widgetRef.current
-    if (!widget) return false
-    const rect = widget.getBoundingClientRect()
-    return rect.top < window.innerHeight && rect.bottom > 0
-  }, [])
-
-  const emitWidgetImpression = useCallback(() => {
-    if (resettingRef.current || widgetImpressionRef.current || !impressionArmedRef.current || !isWidgetVisible()) return
-    widgetImpressionRef.current = true
-    setWidgetImpression(true)
-    emitEvent({
-      kind: 'widget_impression',
-      title: 'Widget entered viewport',
-      detail: 'The user reached the article-end experience.',
-      tone: 'raw',
-      context: { mode },
-    })
-  }, [emitEvent, isWidgetVisible, mode])
-
-  const handleQuestion = (index: number) => {
-    if (resettingRef.current) return
-    impressionArmedRef.current = true
-    emitWidgetImpression()
-    setSelectedIndex(index)
-    if (!widgetClickedRef.current) {
-      widgetClickedRef.current = true
-      emitEvent({ kind: 'widget_click', title: CHAT_CONTENT.questions[index], detail: 'The user interacted with the widget.', tone: 'raw', context: { mode: 'chat' } })
-    }
-    CHAT_CONTENT.signals.forEach((signal) => emitEvent({ ...signal, tone: 'signal', context: { mode: 'chat' } }))
+  const handleSelectExperience = (id: ExperienceId) => {
+    // Re-selecting the tab already selected is a no-op: nothing to re-announce.
+    if (id === state.experience) return
+    dispatch({ type: 'experience/select', id })
+    announce(ANNOUNCE.experienceSelected(EXPERIENCE_LABELS[id]))
   }
 
-  const handleQuote = (index: number) => {
-    if (resettingRef.current) return
-    impressionArmedRef.current = true
-    emitWidgetImpression()
-    if (selectedIndex !== index) {
-      setQuoteGenerated(false)
-      setQuoteActionStatus(null)
-      quoteAmplificationEmittedRef.current = false
-    }
-    setSelectedIndex(index)
-    if (!widgetClickedRef.current) {
-      widgetClickedRef.current = true
-      emitEvent({ kind: 'widget_click', title: QUOTE_CONTENT.options[index].text, detail: 'The user interacted with the widget.', tone: 'raw', context: { mode: 'quote' } })
-    }
-    const resonance = QUOTE_CONTENT.signals.find((signal) => signal.kind === 'content_resonance')
-    if (resonance) emitEvent({ ...resonance, tone: 'signal', context: { mode: 'quote' } })
+  const handleReset = () => {
+    // ExperiencePanel moves focus to the current tab itself; no queued effect.
+    const label = EXPERIENCE_LABELS[state.experience]
+    dispatch({ type: 'experience/reset' })
+    announce(ANNOUNCE.reset(label))
   }
 
-  const handleGenerateQuote = () => {
-    if (resettingRef.current || selectedIndex === null || !quoteFeedback) return
-    setQuoteGenerated(true)
-    if (!quoteAmplificationEmittedRef.current) {
-      quoteAmplificationEmittedRef.current = true
-      const amplification = QUOTE_CONTENT.signals.find((signal) => signal.kind === 'amplification_ready')
-      if (amplification) emitEvent({ ...amplification, tone: 'signal', context: { mode: 'quote' } })
-    }
+  const handleChooseQuestion = (index: 0 | 1 | 2) => {
+    // Re-choosing the answer already chosen is a no-op: no re-announce, no focus move.
+    if (!dispatchWithEffect({ type: 'chat/choose', index }, 'chat')) return
+    announce(ANNOUNCE.chatAnswered)
   }
 
-  const handleListen = () => {
-    if (resettingRef.current) return
-    const starting = !audioPlaying
-    setAudioPlaying(starting)
-    if (!starting) return
-    impressionArmedRef.current = true
-    emitWidgetImpression()
-    if (!widgetClickedRef.current) {
-      widgetClickedRef.current = true
-      emitEvent({ kind: 'widget_click', title: 'Listening started', detail: 'The user interacted with the widget.', tone: 'raw', context: { mode: 'listen' } })
-      LISTEN_CONTENT.signals.forEach((signal) => emitEvent({ ...signal, tone: 'signal', context: { mode: 'listen' } }))
+  const handleSelectQuote = (index: 0 | 1 | 2) => {
+    // Feedback picked before any line: this line is the one that completes
+    // Quote, so it gets the same focus move and announcement as the reverse order.
+    if (state.quote.index === null && state.quote.feedback) {
+      if (!dispatchWithEffect({ type: 'quote/select', index }, 'signal')) return
+      announce(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+      return
     }
+    // Re-selecting the line already selected changes nothing: no re-announce.
+    if (!dispatchWithEffect({ type: 'quote/select', index }, null)) return
+    announce(ANNOUNCE.quoteSelected)
   }
 
-  const clearAudioTimer = useCallback(() => {
-    if (audioTimerRef.current !== null) {
-      window.clearInterval(audioTimerRef.current)
-      audioTimerRef.current = null
-    }
-  }, [])
-
-  const clearResetSchedule = useCallback(() => {
-    const resetSchedule = resetScheduleRef.current
-    if (resetSchedule !== null) {
-      if (resetSchedule.kind === 'animation-frame') {
-        window.cancelAnimationFrame(resetSchedule.handle)
-      } else {
-        window.clearTimeout(resetSchedule.handle)
-      }
-      resetScheduleRef.current = null
-    }
-  }, [])
-
-  const handleReset = useCallback((nextMode: PlaygroundMode = 'chat') => {
-    if (resettingRef.current) return
-    resettingRef.current = true
-    trackingCleanupRef.current?.()
-    trackingCleanupRef.current = null
-    clearAudioTimer()
-    clearResetSchedule()
-    const nextEpoch = resetEpochRef.current + 1
-    resetEpochRef.current = nextEpoch
-    const playground = playgroundRef.current
-    const headerBottom = getSiteHeaderBottom()
-    const scrollTarget = playground
-      ? Math.max(0, playground.getBoundingClientRect().top + window.scrollY - (headerBottom + PLAYGROUND_TOP_OFFSET))
-      : 0
-    setResetting(true)
-    setResetEpoch(nextEpoch)
-    setMode(nextMode)
-    setEvents([])
-    setScrollDepth(0)
-    setWidgetImpression(false)
-    setSelectedIndex(null)
-    setQuoteFeedback(null)
-    setQuoteSignature('')
-    setQuoteGenerated(false)
-    setQuoteActionStatus(null)
-    setAudioPlaying(false)
-    setAudioElapsedSeconds(0)
-    widgetClickedRef.current = false
-    widgetImpressionRef.current = false
-    scrollDepthRef.current = 0
-    impressionArmedRef.current = false
-    scrollTrackingArmedRef.current = false
-    sponsoredAttentionEmittedRef.current = false
-    quoteAmplificationEmittedRef.current = false
-    window.scrollTo({ top: scrollTarget, left: 0, behavior: 'auto' })
-
-    const finishReset = () => {
-      resetScheduleRef.current = null
-      if (!resettingRef.current || resetEpochRef.current !== nextEpoch) return
-      resettingRef.current = false
-      setResetting(false)
-      window.scrollTo({ top: scrollTarget, left: 0, behavior: 'auto' })
-    }
-    if (typeof window.requestAnimationFrame === 'function') {
-      resetScheduleRef.current = { kind: 'animation-frame', handle: window.requestAnimationFrame(finishReset) }
-    } else {
-      resetScheduleRef.current = { kind: 'timeout', handle: window.setTimeout(finishReset, 0) }
-    }
-  }, [clearAudioTimer, clearResetSchedule])
-
-  const handleModeChange = (nextMode: PlaygroundMode) => {
-    if (nextMode !== mode) handleReset(nextMode)
+  const handleFeedback = (value: string) => {
+    // Re-activating the checked radio is a no-op: no re-announce, no focus move.
+    if (!dispatchWithEffect({ type: 'quote/feedback', value }, state.quote.index !== null ? 'signal' : null)) return
+    announce(state.quote.index === null ? ANNOUNCE.feedbackSelected(value) : ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
   }
 
-  // ARIA APG tabs with MANUAL activation, unlike the lens tablist on the
-  // right. Selecting a mode runs handleReset, so automatic activation would
-  // wipe the playground at every tab the user arrows past on the way to the
-  // one they want. Arrows and Home/End move focus only; Enter/Space commits.
-  //
-  // Only MODES get refs, so the disabled `More to come` tab is skipped by
-  // construction — it can never take focus or be activated.
-  function handleModeKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
-    const focused = modeTabRefs.current.indexOf(document.activeElement as HTMLButtonElement)
-    const current = focused === -1 ? MODES.findIndex((item) => item.id === mode) : focused
-    let next: number
-    switch (event.key) {
-      case 'ArrowRight':
-      case 'ArrowDown':
-        next = (current + 1) % MODES.length
-        break
-      case 'ArrowLeft':
-      case 'ArrowUp':
-        next = (current - 1 + MODES.length) % MODES.length
-        break
-      case 'Home':
-        next = 0
-        break
-      case 'End':
-        next = MODES.length - 1
-        break
-      case 'Enter':
-      case ' ':
-        // preventDefault suppresses the button's own click activation, so the
-        // mode changes exactly once rather than once here and once natively.
-        event.preventDefault()
-        if (current !== -1) handleModeChange(MODES[current].id)
-        return
-      default:
-        return
-    }
-    event.preventDefault()
-    modeTabRefs.current[next]?.focus()
+  const handleSignature = (value: string) => dispatch({ type: 'quote/signature', value })
+
+  const handleShare = (action: ShareAction) => {
+    if (state.quote.shareActions.includes(action)) return
+    if (!dispatchWithEffect({ type: 'quote/share', action }, 'signal')) return
+    announce(ANNOUNCE.shareRecorded(UI.quote.actions[action]))
+  }
+
+  const handleListenToggle = () => {
+    const isPlaying = state.listen.status === 'playing'
+    dispatch({ type: 'listen/toggle' })
+    announce(isPlaying ? ANNOUNCE.listenPaused : ANNOUNCE.listenPlaying)
+  }
+
+  const handleListenReplay = () => {
+    dispatch({ type: 'listen/replay' })
+    announce(ANNOUNCE.listenPlaying)
   }
 
   useEffect(() => {
-    if (!audioPlaying || resetting) return
-    const timerEpoch = resetEpochRef.current
-    audioTimerRef.current = window.setInterval(() => {
-      if (resettingRef.current || resetEpochRef.current !== timerEpoch) {
-        clearAudioTimer()
-        return
-      }
-      setAudioElapsedSeconds((current) => {
-        const next = Math.min(LISTEN_CONTENT.durationSeconds, current + 1)
-        if (next >= LISTEN_CONTENT.sponsoredAttentionThresholdSeconds && !sponsoredAttentionEmittedRef.current) {
-          sponsoredAttentionEmittedRef.current = true
-          emitEvent({ kind: 'business-signal', title: 'Brand moment reached', detail: 'sponsored_attention shows sustained attention around the audio experience.', tone: 'signal', context: { mode: 'listen', signalKind: 'sponsored_attention' } })
-        }
-        if (next >= LISTEN_CONTENT.durationSeconds) setAudioPlaying(false)
-        return next
-      })
-    }, 1000)
-    return clearAudioTimer
-  }, [audioPlaying, clearAudioTimer, emitEvent, resetting])
+    if (state.listen.status !== 'playing') return
+    const timer = window.setInterval(() => dispatch({ type: 'listen/tick' }), 1000)
+    return () => window.clearInterval(timer)
+  }, [state.listen.status])
 
   useEffect(() => {
-    if (resetting) return
-    const mountedEpoch = resetEpochRef.current
-    const article = articleRef.current
-    const widget = widgetRef.current
-    if (!article || !widget) return
+    const previous = previousListenStatusRef.current
+    previousListenStatusRef.current = state.listen.status
+    if (state.listen.status === 'completed' && previous !== 'completed') {
+      pendingEffectRef.current = 'signal'
+      announce(ANNOUNCE.completed(EXPERIENCE_LABELS.listen))
+    }
+  }, [announce, state.listen.status])
 
-    const onScroll = () => {
-      if (resettingRef.current || mountedEpoch !== resetEpochRef.current || !scrollTrackingArmedRef.current) return
-      impressionArmedRef.current = true
-      const rect = article.getBoundingClientRect()
-      const progress = Math.max(0, Math.min(100, ((window.innerHeight - rect.top) / Math.max(1, rect.height)) * 100))
-      for (const threshold of [25, 50, 75, 100]) {
-        if (progress >= threshold && scrollDepthRef.current < threshold) {
-          scrollDepthRef.current = threshold
-          setScrollDepth(threshold)
-          emitEvent({ kind: 'article_scroll', title: `${threshold}% scroll depth`, detail: 'The user continued through the article.', tone: 'raw', context: { mode, threshold } })
-        }
-      }
-    }
-    const onScrollIntent = (event: Event) => {
-      if (resettingRef.current || mountedEpoch !== resetEpochRef.current) return
-      if (event.type === 'keydown' && !['ArrowDown', 'ArrowUp', 'End', 'Home', 'PageDown', 'PageUp', ' '].includes((event as KeyboardEvent).key)) return
-      scrollTrackingArmedRef.current = true
-    }
-    const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver((entries) => {
-      if (resettingRef.current || mountedEpoch !== resetEpochRef.current || !impressionArmedRef.current) return
-      if (entries.some((entry) => entry.target === widget && entry.isIntersecting)) emitWidgetImpression()
-    }, { threshold: 0.2 })
+  useEffect(() => {
+    const pending = pendingEffectRef.current
+    if (!pending) return
+    pendingEffectRef.current = null
+    // 'instant', not 'auto': 'auto' defers to the computed `scroll-behavior`,
+    // and globals.css sets `html { scroll-behavior: smooth }`, so reduced-motion
+    // users would still get a smooth scroll.
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const behavior: ScrollBehavior = reduced ? 'instant' : 'smooth'
+    // Chat and every other completion land the same way: the focused signal
+    // copy is centred rather than aligned to the top, so the sticky nav +
+    // customer tabs shell cannot cover it, even on short phone viewports.
+    signalRef.current?.scrollIntoView?.({ block: 'center', behavior })
+    signalRef.current?.focus({ preventScroll: true })
+  }, [state])
 
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('wheel', onScrollIntent, { passive: true })
-    window.addEventListener('touchmove', onScrollIntent, { passive: true })
-    window.addEventListener('keydown', onScrollIntent)
-    observer?.observe(widget)
-
-    const cleanup = () => {
-      observer?.disconnect()
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('wheel', onScrollIntent)
-      window.removeEventListener('touchmove', onScrollIntent)
-      window.removeEventListener('keydown', onScrollIntent)
-    }
-    trackingCleanupRef.current = cleanup
-    return () => {
-      cleanup()
-      if (trackingCleanupRef.current === cleanup) trackingCleanupRef.current = null
-    }
-  }, [emitEvent, emitWidgetImpression, mode, resetEpoch, resetting])
+  const captures = deriveCaptures(state)
 
   return (
-    <section className={styles.playgroundSection} aria-labelledby="playground-heading">
-      <div className={styles.container}>
-        <div className={styles.sectionIntro}>
-          <div><span className={styles.eyebrow}>Try the experience</span><h2 className="section-heading mb-4 text-ink" id="playground-heading">A small surface for a big shift.</h2></div>
-          <p className="mx-auto max-w-xl text-base leading-relaxed text-ink-muted">Choose a mode to see how one article can meet different user intent.</p>
-        </div>
-        <section ref={playgroundRef} className={styles.playground} aria-label="Mlytics AI Mode playground">
-          <div className={styles.workspace}>
-            <div className={styles.modeBar}>
-              <span className={styles.modeLabel}>Choose an experience</span>
-              <div className={styles.modeTabs} role="tablist" aria-label="AI Mode experiences" onKeyDown={handleModeKeyDown}>
-                {MODES.map((item, index) => (
-                  <button
-                    key={item.id}
-                    ref={(node) => { modeTabRefs.current[index] = node }}
-                    id={modeTabId(item.id)}
-                    type="button"
-                    role="tab"
-                    aria-selected={mode === item.id}
-                    aria-controls="ai-mode-widget"
-                    tabIndex={mode === item.id ? 0 : -1}
-                    onClick={() => handleModeChange(item.id)}
-                  >
-                    {item.label}<small>{item.sublabel}</small>
-                  </button>
-                ))}
-                <button type="button" role="tab" aria-selected="false" aria-disabled="true" tabIndex={-1} disabled>More to come<small>Coming soon</small></button>
-              </div>
-            </div>
-            <div className={styles.userPanel}>
-              <div className={styles.userColumn}>
-                <div className={styles.userSubheader}>What the user sees</div>
-                <article ref={articleRef} className={styles.article} aria-labelledby="article-title">
-                  <div className={styles.articleContext}><span><b>MEDIA ARTICLE</b></span><span>Mlytics AI Mode extends this story</span></div>
-                  <div className={styles.articleKicker}>{ARTICLE.kicker}</div>
-                  <h2 id="article-title">{ARTICLE.title}</h2>
-                  <p className={styles.standfirst}>{ARTICLE.standfirst}</p>
-                  <div className={styles.rule} />
-                  {ARTICLE.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-                  <AiModePlaygroundWidget
-                    mode={mode}
-                    selectedIndex={selectedIndex}
-                    quoteFeedback={quoteFeedback}
-                    quoteSignature={quoteSignature}
-                    quoteGenerated={quoteGenerated}
-                    quoteActionStatus={quoteActionStatus}
-                    audioPlaying={audioPlaying}
-                    audioElapsedSeconds={audioElapsedSeconds}
-                    widgetRef={widgetRef}
-                    onQuestion={handleQuestion}
-                    onQuote={handleQuote}
-                    onFeedback={setQuoteFeedback}
-                    onSignature={setQuoteSignature}
-                    onGenerateQuote={handleGenerateQuote}
-                    onQuoteAction={(action) => {
-                      setQuoteActionStatus(action === 'download' ? 'quote card downloaded' : `${action.toUpperCase()} share recorded`)
-                      if (action !== 'download' && !events.some((event) => event.kind === 'share')) {
-                        const copy = lens === 'brands' ? 'Content carried outward' : 'User amplification completed'
-                        emitEvent({ kind: 'share', title: copy, detail: 'The selected quote moved beyond the article through a local mock share action.', tone: 'raw', context: { mode: 'quote' } })
-                      }
-                    }}
-                    onAskAnother={() => setSelectedIndex(null)}
-                    onListen={handleListen}
-                  />
-                </article>
-              </div>
-            </div>
-          </div>
-          <SignalLedger lens={lens} mode={mode} events={events} scrollDepth={scrollDepth} widgetImpression={widgetImpression} onLensChange={handleLensChange} />
-          <button className={styles.startOver} type="button" aria-label="Start over" disabled={resetting} onClick={() => handleReset()}>
-            <span className={styles.startOverIcon} aria-hidden="true">↻</span><span className={styles.startOverLabel}>START OVER</span>
-          </button>
-        </section>
+    <div ref={rootRef} className={styles.playground} data-playground-root>
+      <ExperiencePanel
+        state={state}
+        onSelectExperience={handleSelectExperience}
+        onReset={handleReset}
+        onChooseQuestion={handleChooseQuestion}
+        onSelectQuote={handleSelectQuote}
+        onFeedback={handleFeedback}
+        onSignature={handleSignature}
+        onShare={handleShare}
+        onListenToggle={handleListenToggle}
+        onListenReplay={handleListenReplay}
+      />
+      <DecisionFlow
+        lens={lens}
+        onLensChange={handleLensChange}
+        experience={state.experience}
+        chatQuestionIndex={state.chatQuestionIndex}
+        captures={captures}
+        signalRef={signalRef}
+      />
+      <div className={styles.announcer} role="status" aria-live="polite" aria-atomic="true">
+        {announcement}
       </div>
-    </section>
+    </div>
   )
 }

@@ -9,4 +9,31 @@
 .hero {
   position: relative;
   overflow: hidden;
+  padding-inline: 24px;
+}
+
+.heroInner {
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+/* Font size and weight come from the Tailwind utilities on the element;
+   this sets the prototype's tighter tracking and leading. */
+.heroTitle {
+  max-width: 768px;
+  margin: 0 auto;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+
+.heroCopy {
+  margin-top: 18px;
+  line-height: 1.65;
+}
+
+@media (max-width: 560px) {
+  .hero {
+    padding-inline: 18px;
+  }
 }
