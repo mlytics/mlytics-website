@@ -1,5 +1,8 @@
 .playground {
   --playground-sticky-top: 65px;
+  /* The canvas padding, written once: DecisionFlow pads .canvas with it and
+     ExperiencePanel insets its module by it so their edges line up. */
+  --canvas-pad: clamp(20px, 3vw, 34px);
   display: grid;
   gap: 24px;
   width: min(1152px, calc(100% - 32px));

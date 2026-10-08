@@ -121,6 +121,9 @@ describe('DecisionFlow', () => {
     renderFlow({ experience: 'quote', captures: { chat: CAPTURE.chat('Question') } })
     expect(document.querySelector('[data-stage="01"]')).toHaveAttribute('data-complete', 'false')
     expect(document.querySelector('[data-stage="02"]')).toHaveAttribute('data-complete', 'false')
+    // The stage box mirrors the state so its CSS can stay single-class.
+    expect(document.querySelector('[data-stage="01"] > [data-complete]')).toHaveAttribute('data-complete', 'false')
+    expect(document.querySelector('[data-stage="01"] > [data-state]')).toHaveAttribute('data-state', document.querySelector('[data-stage="01"]')!.getAttribute('data-state')!)
     expect(screen.getByText(EXPERIENCE_DEFAULT_OBSERVATION.quote)).toBeInTheDocument()
   })
 
@@ -147,6 +150,9 @@ describe('DecisionFlow', () => {
     expect(screen.getByText(PATHS['content-owners'][0].chatVariants[1].question)).toBeInTheDocument()
     expect(document.querySelector('[data-stage="01"]')).toHaveAttribute('data-complete', 'true')
     expect(document.querySelector('[data-stage="02"]')).toHaveAttribute('data-complete', 'true')
+    // The stage box mirrors the state so its CSS can stay single-class.
+    expect(document.querySelector('[data-stage="01"] > [data-complete]')).toHaveAttribute('data-complete', 'true')
+    expect(document.querySelector('[data-stage="01"] > [data-state]')).toHaveAttribute('data-state', document.querySelector('[data-stage="01"]')!.getAttribute('data-state')!)
   })
 
   it('switches path content by lens and renders all evidence fields and CTA links', () => {

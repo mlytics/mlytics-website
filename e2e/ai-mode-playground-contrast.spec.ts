@@ -66,6 +66,12 @@ const HELPERS = `
   const exempt = (el) =>
     el.closest('[aria-hidden="true"]') || el.closest(':disabled') || el.closest('[aria-disabled="true"]')
 
+  // The quote card paints a gradient plus decorations under its text, and
+  // bgOf() can only see the solid colour beneath the gradient, so it reports a
+  // background the text never sits on. Its text is measured from real pixels
+  // by the dedicated quote-card test below instead.
+  const onGradient = (el) => el.closest('[class*="quoteCard"]')
+
   const painted = (el) => {
     const r = el.getBoundingClientRect()
     return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'
@@ -74,7 +80,7 @@ const HELPERS = `
   const scan = (selectors) => selectors
     .flatMap((sel) => [...document.querySelectorAll(sel)])
     .flatMap((root) => [root, ...root.querySelectorAll('*')])
-    .filter((el) => ownText(el) && !exempt(el) && painted(el))
+    .filter((el) => ownText(el) && !exempt(el) && !onGradient(el) && painted(el))
     .map((el) => ({ ...measure(el), text: ownText(el).slice(0, 40), selector: el.className || el.tagName }))
 `
 
@@ -325,3 +331,92 @@ test('每一類控制項的 focus ring 對相鄰底色 ≥ 3:1（WCAG 1.4.11）'
     expect(r.ratio, `${name} = ${r.ratio} (${r.bands.join(' + ')} on ${r.worstBg})`).toBeGreaterThanOrEqual(3)
   }
 })
+
+// The quote card's text sits on a 145deg gradient with a halo ring and a large
+// quote-mark decoration behind it, so no computed background-color describes
+// what is under any given glyph. This test photographs the card with its text
+// made transparent and takes the worst real pixel under every line box of
+// every text run, compositing the text colour (alpha included) over each one.
+// Every run is held to 4.5:1, the same bar as the rest of this spec, even the
+// quote itself, which is large enough that WCAG would accept 3:1.
+type QuoteRun = { probe: string; text: string; fg: number[]; rects: number[][] }
+type QuoteResult = { probe: string; text: string; worst: number; worstBg: number[] }
+
+for (const width of [320, 375, 768, 1280]) {
+  test(`quote card 文字對漸層底色的實際像素對比 ≥ 4.5 at ${width}`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/ai-mode-playground/')
+    await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+    await page.getByRole('button', { name: /Before you choose/ }).click()
+    const card = page.locator('[class*="quoteCard"]')
+    await expect(card).toBeVisible()
+    await card.scrollIntoViewIfNeeded()
+
+    const runs: QuoteRun[] = await card.evaluate((root) => {
+      const parse = (c: string) => c.match(/[\d.]+/g)!.map(Number)
+      const box = root.getBoundingClientRect()
+      return [...root.querySelectorAll<HTMLElement>('*')]
+        .filter((el) => [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent!.trim()))
+        .map((el, i) => {
+          el.dataset.contrastProbe = String(i)
+          const cs = getComputedStyle(el)
+          const range = document.createRange()
+          range.selectNodeContents(el)
+          return {
+            // CSS-module class names carry a hash; name each run by the
+            // source class it was built from.
+            probe: ['quoteText', 'signatureText', 'sponsorLabel'].find((k) => String(el.className).includes(k)) ?? String(el.className),
+            text: el.textContent!.trim().slice(0, 40),
+            fg: parse(cs.color),
+            rects: [...range.getClientRects()]
+              .filter((r) => r.width > 0 && r.height > 0)
+              .map((r) => [r.left - box.left, r.top - box.top, r.right - box.left, r.bottom - box.top]),
+          }
+        })
+    })
+    expect(runs.map((r) => r.probe)).toEqual(expect.arrayContaining(['quoteText', 'signatureText', 'sponsorLabel']))
+
+    // Hide only the glyphs; every surface and decoration stays painted.
+    await page.addStyleTag({ content: '[data-contrast-probe] { color: transparent !important; caret-color: transparent !important }' })
+    const png = (await card.screenshot({ animations: 'disabled' })).toString('base64')
+
+    const results: QuoteResult[] = await page.evaluate(async ({ png, runs }) => {
+      const lin = (c: number) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4 }
+      const lum = (rgb: number[]) => 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2])
+      const ratio = (a: number[], b: number[]) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05) }
+      const img = new Image()
+      img.src = `data:image/png;base64,${png}`
+      await img.decode()
+      const canvas = document.createElement('canvas')
+      canvas.width = img.naturalWidth
+      canvas.height = img.naturalHeight
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0)
+      const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      return runs.map((run) => {
+        const alpha = run.fg.length > 3 ? run.fg[3] : 1
+        let worst = Infinity
+        let worstBg: number[] = []
+        for (const [l, t, r, b] of run.rects) {
+          for (let y = Math.max(0, Math.floor(t)); y < Math.min(canvas.height, Math.ceil(b)); y++) {
+            for (let x = Math.max(0, Math.floor(l)); x < Math.min(canvas.width, Math.ceil(r)); x++) {
+              const i = (y * canvas.width + x) * 4
+              const bg = [data[i], data[i + 1], data[i + 2]]
+              const fg = [0, 1, 2].map((k) => alpha * run.fg[k] + (1 - alpha) * bg[k])
+              const c = ratio(fg, bg)
+              if (c < worst) { worst = c; worstBg = bg }
+            }
+          }
+        }
+        return { probe: run.probe, text: run.text, worst: Number(worst.toFixed(2)), worstBg }
+      })
+    }, { png, runs })
+
+    // eslint-disable-next-line no-console
+    console.log(`quote card pixels @${width}:`, JSON.stringify(results))
+    for (const r of results) {
+      expect(Number.isFinite(r.worst), `${r.probe} sampled no pixels`).toBe(true)
+      expect(r.worst, `${r.probe} "${r.text}" = ${r.worst} on rgb(${r.worstBg.join(', ')})`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+}

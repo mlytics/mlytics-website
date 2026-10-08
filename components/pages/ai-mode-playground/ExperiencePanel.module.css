@@ -1,8 +1,9 @@
 .panel {
   /* Inset by the canvas padding so the module's edges line up with the
      canvas content below it (prototype .experience-module). */
+  --panel-pad: clamp(20px, 3vw, 32px);
   justify-self: center;
-  width: calc(100% - 2 * clamp(20px, 3vw, 34px));
+  width: calc(100% - 2 * var(--canvas-pad));
   min-width: 0;
   border: 1px solid var(--color-line);
   border-radius: 18px;
@@ -60,14 +61,14 @@
 
 .instruction {
   margin: 0;
-  padding: 18px clamp(20px, 3vw, 32px) 0;
+  padding: 18px var(--panel-pad) 0;
   color: var(--color-ink-muted);
   font-size: .78rem;
   line-height: 1.5;
 }
 
 .panelBody {
-  padding: 12px clamp(20px, 3vw, 32px) clamp(20px, 3vw, 32px);
+  padding: 12px var(--panel-pad) var(--panel-pad);
   border-bottom: 1px solid var(--color-line);
   border-radius: 0 0 17px 17px;
   background: var(--bg-white);
@@ -84,8 +85,9 @@
 
 .cardHeader {
   display: flex;
-  /* Reset is pinned top-right (owner decision): a title that wraps grows
-     downward and Reset stays on its first line. */
+  /* Reset is pinned top-right (owner decision): its top edge sits on the
+     title's top edge, and a title that wraps grows downward without moving
+     it. No margin offset, so nothing here depends on the title's size. */
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
@@ -117,9 +119,6 @@
   color: var(--color-ink-muted);
   font-size: var(--font-size-caption);
   font-weight: 700;
-  /* Centre Reset on the title's first line: (title line box - Reset's 34px
-     min-height) / 2. 24px x 1.375 = 33px line box -> -0.5px. */
-  margin-top: calc((var(--font-size-h3) * 1.375 - 34px) / 2);
 }
 
 .reset:hover {
@@ -289,7 +288,8 @@
   bottom: -48px;
   color: rgba(168, 197, 195, .16);
   font: 700 15rem/.75 Georgia, serif;
-  content: '“';
+  /* Empty alt text: screen readers skip the decoration. */
+  content: '“' / '';
 }
 
 .quoteText {
@@ -307,7 +307,9 @@
   position: relative;
   z-index: 1;
   margin: 0;
-  color: rgba(255, 255, 255, .78);
+  /* Solid white: at .78 it fell to 3.6-4.1:1 over the light end of the
+     gradient and the quote-mark decoration. */
+  color: var(--bg-white);
   font-size: .78rem;
   line-height: 1.5;
   letter-spacing: .02em;
@@ -317,9 +319,13 @@
   position: relative;
   z-index: 1;
   display: flex;
+  /* When the label and the full-size logo cannot share a line, the logo
+     wraps under the label instead of being squeezed or clipped by the
+     card's overflow: hidden. */
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px 12px;
   margin-top: 24px;
   padding: 8px 10px 8px 12px;
   border: 1px solid rgba(255, 255, 255, .2);
@@ -332,11 +338,14 @@
   color: var(--bg-dark);
   letter-spacing: .08em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .sponsorLogo {
   display: block;
-  width: 115px;
+  flex: 0 1 auto;
+  width: min(115px, 100%);
+  min-width: 0;
   height: auto;
 }
 
@@ -493,14 +502,23 @@
     font-size: 1.125rem;
   }
 
-  /* Same first-line centring for the 18px title:
-     18px x 1.375 = 24.75px line box -> (24.75 - 34) / 2 = -4.625px. */
-  .reset {
-    margin-top: calc((1.125rem * 1.375 - 34px) / 2);
-  }
-
   .feedback {
     grid-template-columns: 1fr;
+  }
+
+  /* At 320 the quote card is only ~146px wide, too narrow for the one-line
+     SPONSORED BY label inside the pill. Give the card back some width from
+     the preview frame and its own side padding. */
+  .preview {
+    padding: 8px;
+  }
+
+  .quoteCard {
+    padding-inline: 12px;
+  }
+
+  .sponsor {
+    padding-inline: 10px;
   }
 }
 

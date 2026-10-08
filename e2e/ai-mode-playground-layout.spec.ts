@@ -97,6 +97,10 @@ test('sticky lens shell, active rail, and mobile canvas remain usable', async ({
   await page.locator('[data-stage="05"]').scrollIntoViewIfNeeded()
   await expect(page.locator('[data-stage="05"]')).toHaveAttribute('data-state', 'active')
   await expect(page.locator('[data-stage="01"]')).toHaveAttribute('data-state', 'past')
+  // The state styling is keyed on stageMain's own attributes (single-class
+  // selectors), so it must still land on the box.
+  await expect(page.locator('[data-stage="05"] [class*="stageMain"]')).toHaveCSS('border-top-color', 'rgba(34, 93, 89, 0.34)')
+  await expect(page.locator('[data-stage="01"] [class*="stageMain"]')).toHaveCSS('border-top-color', 'rgba(34, 93, 89, 0.2)')
 
   await page.setViewportSize({ width: 375, height: 812 })
   await page.goto('/ai-mode-playground/')
@@ -478,11 +482,11 @@ test.describe('prototype parity', () => {
     })
   }
 
-  // Owner decision: Reset stays on the title row, pinned top-right. Its
-  // vertical centre sits on the centre of the title's FIRST line, so a title
-  // that wraps grows downward without dragging Reset with it.
+  // Owner decision: Reset stays on the title row, pinned top-right, with its
+  // TOP edge on the title's top edge, so a title that wraps grows downward
+  // without dragging Reset with it.
   for (const { width, height } of [{ width: 320, height: 720 }, { width: 375, height: 812 }, { width: 1280, height: 800 }]) {
-    test(`experience card Reset is pinned to the title's first line at ${width}`, async ({ page }) => {
+    test(`experience card Reset top-aligns with the title at ${width}`, async ({ page }) => {
       await page.setViewportSize({ width, height })
       await page.goto('/ai-mode-playground/')
       const lineCounts: Record<string, number> = {}
@@ -500,8 +504,8 @@ test.describe('prototype parity', () => {
           return {
             alignItems: getComputedStyle(el).alignItems,
             lines: Math.round(t.height / lineHeight),
-            firstLineCenter: t.top + lineHeight / 2,
-            resetCenter: r.top + r.height / 2,
+            titleTop: t.top,
+            resetTop: r.top,
             resetRight: r.right,
             headerRight: h.right,
             titleRight: t.right,
@@ -509,12 +513,12 @@ test.describe('prototype parity', () => {
         })
         lineCounts[key] = m.lines
         expect(m.alignItems, `${key} header alignment`).toBe('flex-start')
-        expect(Math.abs(m.resetCenter - m.firstLineCenter), `${key} Reset centre vs title first line`).toBeLessThanOrEqual(2)
+        expect(Math.abs(m.resetTop - m.titleTop), `${key} Reset top vs title top`).toBeLessThanOrEqual(1)
         expect(Math.abs(m.resetRight - m.headerRight), `${key} Reset right edge`).toBeLessThanOrEqual(1)
         expect(m.titleRight, `${key} title does not run under Reset`).toBeLessThanOrEqual(m.resetRight)
       }
       // The case this decision exists for: at 320 the Quote title wraps, and
-      // Reset must still sit on its first line (asserted above), not the middle.
+      // Reset must still sit at its top (asserted above), not the middle.
       if (width === 320) expect(lineCounts.quote, 'Quote title wraps at 320').toBeGreaterThan(1)
       if (width === 1280) for (const key of ['chat', 'quote', 'listen']) expect(lineCounts[key], `${key} is one line on desktop`).toBe(1)
     })
@@ -540,7 +544,7 @@ test.describe('prototype parity', () => {
         after: { content: after.content, fontFamily: after.fontFamily, position: after.position },
       }
     })
-    expect(style.backgroundImage).toMatch(/^linear-gradient\(145deg, rgb\(26, 61, 58\) 0%, rgb\(34, 93, 89\) 62%/)
+    expect(style.backgroundImage).toMatch(/^linear-gradient\(145deg, rgb\(26, 61, 58\) 0%, rgb\(34, 93, 89\) 62%, rgb\(45, 122, 116\) 100%\)/)
     expect(style.position).toBe('relative')
     expect(style.overflow).toBe('hidden')
     expect(style.isolation).toBe('isolate')
@@ -550,7 +554,9 @@ test.describe('prototype parity', () => {
     expect(style.before.borderRadius).toBe('50%')
     // Two halo rings around the circle.
     expect(style.before.boxShadow.match(/rgba?\(/g)).toHaveLength(2)
-    expect(style.after.content).toBe('"“"')
+    // The quote mark is decoration: empty alt text keeps it out of the
+    // accessibility tree.
+    expect(style.after.content).toBe('"“" / ""')
     expect(style.after.fontFamily).toMatch(/Georgia/)
     expect(style.after.position).toBe('absolute')
     // The share row sits 24px below the card.
@@ -558,6 +564,46 @@ test.describe('prototype parity', () => {
     const shareBox = (await page.locator('[class*="shareActions"]').boundingBox())!
     expect(Math.abs(shareBox.y - (cardBox.y + cardBox.height) - 24)).toBeLessThanOrEqual(1)
   })
+
+  // The card clips its decorations (overflow: hidden), so a sponsor row that
+  // does not fit would cut the logo off. The label stays on one line, and the
+  // logo shrinks or wraps under it instead.
+  for (const { width, height } of [{ width: 320, height: 720 }, { width: 375, height: 812 }, { width: 768, height: 1024 }, { width: 1280, height: 800 }]) {
+    test(`the quote card's sponsor row fits without clipping the logo at ${width}`, async ({ page }) => {
+      await page.setViewportSize({ width, height })
+      await page.goto('/ai-mode-playground/')
+      await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+      await page.getByRole('button', { name: /Before you choose/ }).click()
+      const card = page.locator('[class*="quoteCard"]')
+      const logo = card.getByRole('img', { name: 'Mlytics' })
+      await expect(logo).toBeVisible()
+      await expect.poll(() => logo.evaluate((img) => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0)).toBe(true)
+      const m = await card.evaluate((el) => {
+        const rect = (e: Element) => { const r = e.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height } }
+        const sponsor = el.querySelector('[class*="sponsor"]')!
+        const label = el.querySelector('[class*="sponsorLabel"]')!
+        const img = el.querySelector('img') as HTMLImageElement
+        const range = document.createRange()
+        range.selectNodeContents(label)
+        return {
+          card: rect(el),
+          sponsor: rect(sponsor),
+          label: rect(label),
+          logo: rect(img),
+          labelLines: new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size,
+          aspect: img.naturalWidth / img.naturalHeight,
+        }
+      })
+      const inside = (inner: typeof m.logo, outer: typeof m.card) =>
+        inner.left >= outer.left - 0.5 && inner.right <= outer.right + 0.5 && inner.top >= outer.top - 0.5 && inner.bottom <= outer.bottom + 0.5
+      expect(inside(m.logo, m.card), `logo ${JSON.stringify(m.logo)} inside card ${JSON.stringify(m.card)}`).toBe(true)
+      expect(inside(m.logo, m.sponsor), `logo ${JSON.stringify(m.logo)} inside sponsor ${JSON.stringify(m.sponsor)}`).toBe(true)
+      expect(inside(m.label, m.sponsor), `label ${JSON.stringify(m.label)} inside sponsor ${JSON.stringify(m.sponsor)}`).toBe(true)
+      expect(m.labelLines, 'SPONSORED BY stays on one line').toBe(1)
+      // Shrinking keeps the logo's proportions, it never squashes.
+      expect(Math.abs(m.logo.width / m.logo.height - m.aspect), 'logo aspect ratio').toBeLessThanOrEqual(0.1)
+    })
+  }
 
   test('stage 01 and 02 copy sit in a boxed surface', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })

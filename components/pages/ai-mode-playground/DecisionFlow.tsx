@@ -54,7 +54,7 @@ function Stage({
       <div className={styles.stageRail} aria-hidden="true">
         <span className={styles.stageNode} data-stage-node>{number}</span>
       </div>
-      <div className={styles.stageMain}>
+      <div className={styles.stageMain} data-state={state.position} data-complete={String(state.complete)}>
         <div className={styles.stageHead}>
           <p className={styles.stageKicker}>{label}</p>
           <h3 className={styles.stageTitle} id={`progress-stage-${number}`}>

@@ -1,6 +1,6 @@
 .canvas {
   min-width: 0;
-  padding: clamp(20px, 3vw, 34px);
+  padding: var(--canvas-pad);
   background: var(--bg-white);
 }
 
@@ -249,12 +249,14 @@
   color: var(--color-primary);
 }
 
-.stage[data-state='active'] .stageMain {
+/* stageMain carries the stage's state attributes itself, so these stay
+   single-class selectors. */
+.stageMain[data-state='active'] {
   border-color: rgba(34, 93, 89, .34);
   box-shadow: 0 8px 20px rgba(34, 93, 89, .08);
 }
 
-.stage[data-state='past'] .stageMain {
+.stageMain[data-state='past'] {
   border-color: rgba(34, 93, 89, .2);
 }
 
@@ -264,7 +266,7 @@
   color: var(--bg-white);
 }
 
-.stage[data-complete='true'] .stageMain {
+.stageMain[data-complete='true'] {
   border-color: rgba(34, 93, 89, .34);
 }
 
