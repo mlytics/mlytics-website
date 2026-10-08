@@ -71,6 +71,22 @@ describe('deriveCaptures', () => {
 })
 
 describe('playgroundReducer', () => {
+  it('returns the same state object when re-choosing the already-chosen Chat answer', () => {
+    const state = playgroundReducer(INITIAL_STATE, { type: 'chat/choose', index: 1 })
+    expect(playgroundReducer(state, { type: 'chat/choose', index: 1 })).toBe(state)
+    expect(playgroundReducer(state, { type: 'chat/choose', index: 2 })).not.toBe(state)
+    expect(playgroundReducer(state, { type: 'chat/choose', index: 2 }).chatQuestionIndex).toBe(2)
+  })
+
+  it('returns the same state object when re-selecting the already-selected feedback', () => {
+    const state = playgroundReducer(
+      playgroundReducer(INITIAL_STATE, { type: 'quote/select', index: 0 }),
+      { type: 'quote/feedback', value: 'Helpful' },
+    )
+    expect(playgroundReducer(state, { type: 'quote/feedback', value: 'Helpful' })).toBe(state)
+    expect(playgroundReducer(state, { type: 'quote/feedback', value: 'Resonates' })).not.toBe(state)
+  })
+
   it('clears quote details only when selecting a different quote', () => {
     let state = playgroundReducer(INITIAL_STATE, { type: 'quote/select', index: 0 })
     state = playgroundReducer(state, { type: 'quote/feedback', value: 'Helpful' })

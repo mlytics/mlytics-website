@@ -223,3 +223,49 @@ test('Listen progresses and incomplete playback resets when changing experience'
   await page.getByRole('tab', { name: EXPERIENCE_LABELS.listen, exact: true }).click()
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
 })
+
+for (const viewport of [{ width: 1280, height: 800 }, { width: 375, height: 812 }]) {
+  test(`Quote feedback brings the focused stage 02 signal fully into view below the sticky shell at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+    await page.setViewportSize(viewport)
+    await page.goto('/ai-mode-playground/')
+    await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+    await page.getByRole('button', { name: /Before you choose/ }).click()
+    await page.getByRole('radio', { name: 'Helpful', exact: true }).focus()
+    await page.keyboard.press('Space')
+
+    const signal = page.locator('#stage-02-copy')
+    await expect(signal).toBeFocused()
+    // Smooth scrolling and the nav's hide/show both move things: wait until
+    // scroll position and the signal's box hold still for several frames.
+    await page.evaluate(() => new Promise<void>((resolve) => {
+      const element = document.getElementById('stage-02-copy')!
+      let last = ''
+      let stable = 0
+      const tick = () => {
+        const key = `${window.scrollY}:${element.getBoundingClientRect().top}`
+        stable = key === last ? stable + 1 : 0
+        last = key
+        if (stable >= 10) resolve()
+        else requestAnimationFrame(tick)
+      }
+      requestAnimationFrame(tick)
+    }))
+    const geometry = await page.evaluate(() => {
+      const signalRect = document.getElementById('stage-02-copy')!.getBoundingClientRect()
+      const shellRect = document.querySelector('[class*="customerTabsShell"]')!.getBoundingClientRect()
+      const navBottom = [...document.querySelectorAll('header, nav')]
+        .map((element) => element.getBoundingClientRect().bottom)
+        .reduce((max, bottom) => Math.max(max, bottom), 0)
+      return {
+        top: signalRect.top,
+        bottom: signalRect.bottom,
+        coveredUntil: Math.max(shellRect.bottom, navBottom),
+        viewportHeight: window.innerHeight,
+        active: document.activeElement?.id,
+      }
+    })
+    expect(geometry.active).toBe('stage-02-copy')
+    expect(geometry.top).toBeGreaterThanOrEqual(geometry.coveredUntil)
+    expect(geometry.bottom).toBeLessThanOrEqual(geometry.viewportHeight)
+  })
+}

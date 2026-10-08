@@ -67,7 +67,9 @@ describe('AiModePlayground interactions', () => {
     await user.click(experienceTab(EXPERIENCE_LABELS.quote))
     await user.click(customerTab(LENS_LABELS.brands))
     await act(async () => { vi.runAllTimers() })
-    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.customerSwitchedWithCapture)
+    // Only the current experience's capture counts: the Chat answer does not
+    // make the switch "with capture" while Quote is open and empty.
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.customerSwitched(LENS_LABELS.brands))
     await user.click(experienceTab(EXPERIENCE_LABELS.chat))
     expect(screen.getByText(PATHS.brands[0].chatVariants[0].question)).toBeInTheDocument()
 
@@ -79,6 +81,21 @@ describe('AiModePlayground interactions', () => {
     await user.click(customerTab(LENS_LABELS.brands))
     await act(async () => { vi.runAllTimers() })
     expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.customerSwitched(LENS_LABELS.brands))
+  })
+
+  it('announces the lens switch with capture only when the current experience has one', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(screen.getByRole('button', { name: CHAT_QUESTIONS[0] }))
+    await user.click(customerTab(LENS_LABELS.brands))
+    await act(async () => { vi.runAllTimers() })
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.customerSwitchedWithCapture)
+
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(screen.getByRole('button', { name: /Before you choose/ }))
+    await user.click(customerTab(LENS_LABELS['content-owners']))
+    await act(async () => { vi.runAllTimers() })
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.customerSwitchedWithCapture)
   })
 
   it('uses experience defaults when switching and restores the independent Chat capture', async () => {
@@ -100,6 +117,8 @@ describe('AiModePlayground interactions', () => {
     await user.click(screen.getByRole('radio', { name: 'Helpful' }))
     await act(async () => { vi.runAllTimers() })
     expect(document.getElementById('stage-02-copy')).toHaveFocus()
+    expect(scrolledElement).toBe(document.getElementById('stage-02-copy'))
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenLastCalledWith({ block: 'center', behavior: 'smooth' })
     expect(screen.getByText(/responded “Helpful”/)).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
     await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
@@ -130,6 +149,45 @@ describe('AiModePlayground interactions', () => {
     await act(async () => { vi.runAllTimers() })
     expect(input).toHaveValue('A')
     expect(document.activeElement).toBe(input)
+  })
+
+  it('ignores re-activating the checked feedback radio: nothing is re-announced and focus stays put', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(screen.getByRole('button', { name: /Before you choose/ }))
+    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+    await act(async () => { vi.runAllTimers() })
+    expect(document.getElementById('stage-02-copy')).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+
+    const helpful = screen.getByRole('radio', { name: 'Helpful' })
+    helpful.focus()
+    const requestFrame = vi.spyOn(window, 'requestAnimationFrame')
+    const scrollCalls = vi.mocked(HTMLElement.prototype.scrollIntoView).mock.calls.length
+    await user.keyboard(' ')
+    await act(async () => { vi.runAllTimers() })
+    expect(helpful).toHaveAttribute('aria-checked', 'true')
+    expect(requestFrame).not.toHaveBeenCalled()
+    expect(vi.mocked(HTMLElement.prototype.scrollIntoView).mock.calls.length).toBe(scrollCalls)
+    expect(helpful).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+  })
+
+  it('ignores re-choosing the chosen Chat answer: nothing is re-announced and focus stays put', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(screen.getByRole('button', { name: CHAT_QUESTIONS[0] }))
+    await act(async () => { vi.runAllTimers() })
+    expect(document.getElementById('stage-02-copy')).toHaveFocus()
+
+    const answer = screen.getByRole('button', { name: CHAT_QUESTIONS[0] })
+    const requestFrame = vi.spyOn(window, 'requestAnimationFrame')
+    await user.click(answer)
+    await act(async () => { vi.runAllTimers() })
+    expect(requestFrame).not.toHaveBeenCalled()
+    expect(answer).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.chatAnswered)
   })
 
   it('focuses the current experience tab exactly once on reset', async () => {

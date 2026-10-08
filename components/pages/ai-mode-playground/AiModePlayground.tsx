@@ -98,8 +98,11 @@ export function AiModePlayground() {
     const params = new URLSearchParams(window.location.search)
     params.set('lens', nextLens)
     window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}${window.location.hash}`)
-    const captures = deriveCaptures(state)
-    announce(Object.keys(captures).length > 0 ? ANNOUNCE.customerSwitchedWithCapture : ANNOUNCE.customerSwitched(LENS_LABELS[nextLens]))
+    // Same rule as the stage 01/02 completion ticks: only the capture of the
+    // experience on screen counts, so a Chat answer does not claim a capture
+    // while Quote is open and still showing its empty defaults.
+    const hasCurrentCapture = Boolean(deriveCaptures(state)[state.experience])
+    announce(hasCurrentCapture ? ANNOUNCE.customerSwitchedWithCapture : ANNOUNCE.customerSwitched(LENS_LABELS[nextLens]))
   }, [announce, lens, state])
 
   const handleSelectExperience = (id: ExperienceId) => {
@@ -115,7 +118,8 @@ export function AiModePlayground() {
   }
 
   const handleChooseQuestion = (index: 0 | 1 | 2) => {
-    dispatchWithEffect({ type: 'chat/choose', index }, 'chat')
+    // Re-choosing the answer already chosen is a no-op: no re-announce, no focus move.
+    if (!dispatchWithEffect({ type: 'chat/choose', index }, 'chat')) return
     announce(ANNOUNCE.chatAnswered)
   }
 
@@ -125,7 +129,8 @@ export function AiModePlayground() {
   }
 
   const handleFeedback = (value: string) => {
-    dispatchWithEffect({ type: 'quote/feedback', value }, state.quote.index !== null ? 'signal' : null)
+    // Re-activating the checked radio is a no-op: no re-announce, no focus move.
+    if (!dispatchWithEffect({ type: 'quote/feedback', value }, state.quote.index !== null ? 'signal' : null)) return
     announce(state.quote.index === null ? ANNOUNCE.feedbackSelected(value) : ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
   }
 
@@ -172,6 +177,9 @@ export function AiModePlayground() {
       titleRef.current?.scrollIntoView?.({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
       signalRef.current?.focus({ preventScroll: true })
     } else {
+      // Centre rather than align to the top so the sticky nav + customer tabs
+      // shell cannot cover the signal copy once it is scrolled into view.
+      signalRef.current?.scrollIntoView?.({ block: 'center', behavior: reduced ? 'auto' : 'smooth' })
       signalRef.current?.focus({ preventScroll: true })
     }
   }, [state])

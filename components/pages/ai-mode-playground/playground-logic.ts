@@ -61,6 +61,7 @@ export function playgroundReducer(state: PlaygroundState, action: PlaygroundActi
       return { ...state, listen: { status: 'idle', elapsed: 0 } }
     }
     case 'chat/choose':
+      if (state.chatQuestionIndex === action.index) return state
       return { ...state, chatQuestionIndex: action.index }
     case 'quote/select': {
       if (state.quote.index === action.index) return state
@@ -71,6 +72,7 @@ export function playgroundReducer(state: PlaygroundState, action: PlaygroundActi
       return { ...state, quote }
     }
     case 'quote/feedback':
+      if (state.quote.feedback === action.value) return state
       return { ...state, quote: { ...state.quote, feedback: action.value } }
     case 'quote/signature':
       return { ...state, quote: { ...state.quote, signature: action.value } }
