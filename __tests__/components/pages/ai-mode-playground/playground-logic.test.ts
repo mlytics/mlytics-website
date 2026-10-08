@@ -174,15 +174,19 @@ describe('pure helpers', () => {
   })
 
   it('derives stage state and progress fill', () => {
-    expect(stageStates(5, 2, {})).toEqual([
+    expect(stageStates(5, 2, {}, 'chat')).toEqual([
       { position: 'past', complete: false },
       { position: 'past', complete: false },
       { position: 'active', complete: false },
       { position: 'upcoming', complete: false },
       { position: 'upcoming', complete: false },
     ])
-    expect(stageStates(5, 2, { chat: CAPTURE.chat(CHAT_QUESTIONS[0]) }).slice(0, 2).every((stage) => stage.complete)).toBe(true)
-    expect(stageStates(5, 2, { chat: CAPTURE.chat(CHAT_QUESTIONS[0]) }).slice(2).every((stage) => !stage.complete)).toBe(true)
+    expect(stageStates(5, 2, { chat: CAPTURE.chat(CHAT_QUESTIONS[0]) }, 'chat').slice(0, 2).every((stage) => stage.complete)).toBe(true)
+    expect(stageStates(5, 2, { chat: CAPTURE.chat(CHAT_QUESTIONS[0]) }, 'chat').slice(2).every((stage) => !stage.complete)).toBe(true)
+    // Stages 01/02 follow the capture of the experience on screen, not any capture.
+    expect(stageStates(5, 2, { chat: CAPTURE.chat(CHAT_QUESTIONS[0]) }, 'quote').map((stage) => stage.complete)).toEqual([false, false, false, false, false])
+    expect(stageStates(5, 2, { listen: CAPTURE.listenStarted }, 'listen').slice(0, 2).map((stage) => stage.complete)).toEqual([true, true])
+    expect(stageStates(5, 2, { listen: { observation: 'seen', rawSignal: '' } }, 'listen').slice(0, 2).map((stage) => stage.complete)).toEqual([true, false])
     expect(progressFillPx({ activeIndex: 4, count: 5, nodeCenterFromFlowTop: 50, lastStageBottomFromFlowTop: 8 })).toBe(0)
     expect(progressFillPx({ activeIndex: 4, count: 5, nodeCenterFromFlowTop: 50, lastStageBottomFromFlowTop: 80 })).toBe(62)
     expect(progressFillPx({ activeIndex: 2, count: 5, nodeCenterFromFlowTop: 50, lastStageBottomFromFlowTop: 80 })).toBe(32)

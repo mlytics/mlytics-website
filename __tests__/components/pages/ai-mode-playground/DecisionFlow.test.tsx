@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs'
-import { render, screen, within } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createRef } from 'react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DecisionFlow } from '@/components/pages/ai-mode-playground/DecisionFlow'
+import { trackCTA } from '@/lib/analytics'
 import {
   CAPTURE,
   CUSTOMER_CTA,
@@ -13,10 +14,16 @@ import {
   UI,
 } from '@/components/pages/ai-mode-playground/ai-mode-playground-copy'
 
+vi.mock('@/lib/analytics', () => ({ trackCTA: vi.fn() }))
+
 beforeEach(() => {
   vi.stubGlobal('IntersectionObserver', vi.fn(function IntersectionObserver() {
     return { observe: vi.fn(), disconnect: vi.fn() }
   }))
+})
+
+afterEach(() => {
+  vi.mocked(trackCTA).mockClear()
 })
 
 function renderFlow(overrides: Partial<React.ComponentProps<typeof DecisionFlow>> = {}) {
@@ -42,10 +49,18 @@ describe('DecisionFlow', () => {
     const contentTab = screen.getByRole('tab', { name: LENS_LABELS['content-owners'] })
     expect(contentTab).toHaveAttribute('aria-selected', 'true')
     expect(contentTab).toHaveAttribute('tabindex', '0')
-    expect(screen.getByRole('region', { name: LENS_LABELS['content-owners'] })).not.toHaveAttribute('hidden')
+    const contentPanel = screen.getByRole('tabpanel', { name: LENS_LABELS['content-owners'] })
+    expect(contentPanel).not.toHaveAttribute('hidden')
+    expect(contentPanel).toHaveAttribute('id', 'customer-panel-content-owners')
+    expect(contentPanel).toHaveAttribute('aria-labelledby', 'customer-tab-content-owners')
+    expect(contentTab).toHaveAttribute('aria-controls', 'customer-panel-content-owners')
     const brandsPanel = document.getElementById('customer-panel-brands')!
+    expect(brandsPanel).toHaveAttribute('role', 'tabpanel')
+    expect(brandsPanel).toHaveAttribute('aria-labelledby', 'customer-tab-brands')
     expect(brandsPanel).toHaveAttribute('hidden')
     expect(brandsPanel).toBeEmptyDOMElement()
+    expect(screen.getByRole('group', { name: UI.canvas.flowLabel })).toContainElement(contentPanel)
+    expect(document.querySelectorAll('[data-stage-node]')).toHaveLength(5)
   })
 
   it('activates the brands lens by click and by arrow key', async () => {
@@ -60,6 +75,50 @@ describe('DecisionFlow', () => {
     await user.keyboard('{ArrowRight}')
     expect(onLensChange).toHaveBeenCalledWith('brands')
     expect(brandsTab).toHaveFocus()
+  })
+
+  it('treats re-selecting the active lens as a no-op for click, Home, and End at the edge', async () => {
+    const user = userEvent.setup()
+    const { onLensChange } = renderFlow()
+    const contentTab = screen.getByRole('tab', { name: LENS_LABELS['content-owners'] })
+    await user.click(contentTab)
+    contentTab.focus()
+    await user.keyboard('{Home}')
+    expect(contentTab).toHaveFocus()
+    expect(onLensChange).not.toHaveBeenCalled()
+
+    cleanup()
+    const brands = renderFlow({ lens: 'brands' })
+    const brandsTab = screen.getByRole('tab', { name: LENS_LABELS.brands })
+    brandsTab.focus()
+    await user.keyboard('{End}')
+    expect(brandsTab).toHaveFocus()
+    await user.click(brandsTab)
+    expect(brands.onLensChange).not.toHaveBeenCalled()
+  })
+
+  it.each(['content-owners', 'brands'] as const)('tracks both CTAs with the %s lens-specific position', async (lens) => {
+    const user = userEvent.setup()
+    renderFlow({ lens })
+    const stopNavigation = (event: MouseEvent) => event.preventDefault()
+    document.addEventListener('click', stopNavigation)
+    try {
+      await user.click(screen.getByRole('link', { name: UI.cta.bookDemo }))
+      await user.click(screen.getByRole('link', { name: CUSTOMER_CTA[lens].label }))
+    } finally {
+      document.removeEventListener('click', stopNavigation)
+    }
+    expect(vi.mocked(trackCTA).mock.calls).toEqual([
+      [UI.cta.bookDemo, `ai-mode-playground-flow-${lens}`],
+      [CUSTOMER_CTA[lens].label, `ai-mode-playground-flow-${lens}`],
+    ])
+  })
+
+  it('marks stages 01/02 complete only for the current experience capture', () => {
+    renderFlow({ experience: 'quote', captures: { chat: CAPTURE.chat('Question') } })
+    expect(document.querySelector('[data-stage="01"]')).toHaveAttribute('data-complete', 'false')
+    expect(document.querySelector('[data-stage="02"]')).toHaveAttribute('data-complete', 'false')
+    expect(screen.getByText(EXPERIENCE_DEFAULT_OBSERVATION.quote)).toBeInTheDocument()
   })
 
   it('renders default and captured stage copy with completion state', () => {

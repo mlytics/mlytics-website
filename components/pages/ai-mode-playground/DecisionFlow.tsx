@@ -53,7 +53,7 @@ function Stage({
       aria-labelledby={`progress-stage-${number}`}
     >
       <div className={styles.stageRail} aria-hidden="true">
-        <span className={styles.stageNode}>{number}</span>
+        <span className={styles.stageNode} data-stage-node>{number}</span>
       </div>
       <div className={styles.stageMain}>
         <div className={styles.stageHead}>
@@ -109,8 +109,8 @@ export function DecisionFlow({
   titleRef,
 }: DecisionFlowProps) {
   const flowRef = useRef<HTMLDivElement>(null)
-  const activeStageIndex = useProgressRail(flowRef, lens)
-  const states = stageStates(5, activeStageIndex, captures)
+  const activeStageIndex = useProgressRail(flowRef, lens, `${experience}:${chatQuestionIndex ?? ''}`)
+  const states = stageStates(5, activeStageIndex, captures, experience)
   const activePaths = PATHS[lens]
   const capture = captures[experience]
 
@@ -121,7 +121,7 @@ export function DecisionFlow({
     event.preventDefault()
     const nextLens = LENSES[nextIndex]
     document.getElementById(`customer-tab-${nextLens}`)?.focus()
-    onLensChange(nextLens)
+    if (nextLens !== lens) onLensChange(nextLens)
   }
 
   const renderStage03Cell = (path: (typeof activePaths)[number]) => {
@@ -204,7 +204,9 @@ export function DecisionFlow({
               aria-selected={lens === item}
               aria-controls={`customer-panel-${item}`}
               tabIndex={lens === item ? 0 : -1}
-              onClick={() => onLensChange(item)}
+              onClick={() => {
+                if (item !== lens) onLensChange(item)
+              }}
               onKeyDown={handleCustomerKeyDown}
             >
               {LENS_LABELS[item]}
@@ -212,7 +214,7 @@ export function DecisionFlow({
           ))}
         </div>
       </div>
-      <div className={styles.progressFlow} ref={flowRef} aria-label={UI.canvas.flowLabel}>
+      <div className={styles.progressFlow} ref={flowRef} role="group" aria-label={UI.canvas.flowLabel}>
         <Stage
           number="01"
           label={UI.stages.s01.label}
@@ -239,7 +241,7 @@ export function DecisionFlow({
                 className={styles.customerPanel}
                 id={`customer-panel-${item}`}
                 key={item}
-                role="region"
+                role="tabpanel"
                 aria-labelledby={`customer-tab-${item}`}
                 hidden
               />
@@ -251,7 +253,7 @@ export function DecisionFlow({
               className={styles.customerPanel}
               id={`customer-panel-${item}`}
               key={item}
-              role="region"
+              role="tabpanel"
               aria-labelledby={`customer-tab-${item}`}
             >
               <PathHeaders paths={activePaths} />
@@ -275,14 +277,14 @@ export function DecisionFlow({
                     <Link
                       className={styles.ctaPrimary}
                       href="/book-a-demo"
-                      onClick={() => trackCTA(UI.cta.bookDemo, 'ai-mode-playground-flow')}
+                      onClick={() => trackCTA(UI.cta.bookDemo, `ai-mode-playground-flow-${item}`)}
                     >
                       {UI.cta.bookDemo}
                     </Link>
                     <Link
                       className={styles.ctaSecondary}
                       href={CUSTOMER_CTA[item].href}
-                      onClick={() => trackCTA(CUSTOMER_CTA[item].label, 'ai-mode-playground-flow')}
+                      onClick={() => trackCTA(CUSTOMER_CTA[item].label, `ai-mode-playground-flow-${item}`)}
                     >
                       {CUSTOMER_CTA[item].label}
                     </Link>

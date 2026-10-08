@@ -1,4 +1,4 @@
-import { useRef, type KeyboardEvent } from 'react'
+import { useRef, useState, type FocusEvent, type KeyboardEvent } from 'react'
 import {
   CHAT_QUESTIONS,
   EXPERIENCE_INSTRUCTIONS,
@@ -10,12 +10,11 @@ import {
 } from './ai-mode-playground-copy'
 import type { ExperienceId, ShareAction } from './ai-mode-playground-copy'
 import { formatTime, nextTabIndex } from './playground-logic'
-import type { Captures, PlaygroundState } from './playground-logic'
+import type { PlaygroundState } from './playground-logic'
 import styles from './ExperiencePanel.module.css'
 
 export type ExperiencePanelProps = {
   state: PlaygroundState
-  captures: Captures
   onSelectExperience: (id: ExperienceId) => void
   onReset: () => void
   onChooseQuestion: (index: 0 | 1 | 2) => void
@@ -42,6 +41,12 @@ export function ExperiencePanel({
   onListenReplay,
 }: ExperiencePanelProps) {
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const feedbackRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const checkedFeedbackIndex = QUOTE_FEEDBACK_OPTIONS.indexOf(state.quote.feedback)
+  // While focus is inside the group, the focused radio is the tabbable one;
+  // once focus leaves, the checked radio (or the first) takes over again.
+  const [focusedFeedbackIndex, setFocusedFeedbackIndex] = useState<number | null>(null)
+  const tabbableFeedbackIndex = focusedFeedbackIndex ?? (checkedFeedbackIndex >= 0 ? checkedFeedbackIndex : 0)
   const selectedQuote = state.quote.index
   const listenLabel =
     state.listen.status === 'completed'
@@ -61,6 +66,26 @@ export function ExperiencePanel({
       event.preventDefault()
       onSelectExperience(EXPERIENCES[index])
     }
+  }
+
+  // Radio group keyboard (owner decision): arrows and Home/End move focus only,
+  // wrapping at either end; Space/Enter (native button activation) or a click
+  // selects. Selection is what triggers the focus move to the raw signal.
+  const handleFeedbackKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const count = QUOTE_FEEDBACK_OPTIONS.length
+    let next: number | null = null
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % count
+    else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + count) % count
+    else if (event.key === 'Home') next = 0
+    else if (event.key === 'End') next = count - 1
+    if (next === null) return
+    event.preventDefault()
+    setFocusedFeedbackIndex(next)
+    feedbackRefs.current[next]?.focus()
+  }
+
+  const handleFeedbackBlur = (event: FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocusedFeedbackIndex(null)
   }
 
   const handleReset = () => {
@@ -144,15 +169,19 @@ export function ExperiencePanel({
                 </div>
                 <div className={styles.step}>
                   <p className={styles.stepLabel}>{UI.quote.step2}</p>
-                  <div className={styles.feedback} role="radiogroup" aria-label={UI.quote.feedbackLabel}>
-                    {QUOTE_FEEDBACK_OPTIONS.map((feedback) => (
+                  <div className={styles.feedback} role="radiogroup" aria-label={UI.quote.feedbackLabel} onBlur={handleFeedbackBlur}>
+                    {QUOTE_FEEDBACK_OPTIONS.map((feedback, index) => (
                       <button
                         className={styles.feedbackOption}
                         key={feedback}
                         type="button"
                         role="radio"
                         aria-checked={state.quote.feedback === feedback}
+                        tabIndex={index === tabbableFeedbackIndex ? 0 : -1}
+                        ref={(element) => { feedbackRefs.current[index] = element }}
                         onClick={() => onFeedback(feedback)}
+                        onFocus={() => setFocusedFeedbackIndex(index)}
+                        onKeyDown={(event) => handleFeedbackKeyDown(event, index)}
                       >
                         {feedback}
                       </button>

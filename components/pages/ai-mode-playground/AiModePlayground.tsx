@@ -10,12 +10,13 @@ import {
 import type { ExperienceId, PlaygroundLens, ShareAction } from './ai-mode-playground-copy'
 import { DEFAULT_LENS, readLensFromSearch } from './ai-mode-playground-data'
 import { deriveCaptures, INITIAL_STATE, playgroundReducer } from './playground-logic'
+import type { PlaygroundAction } from './playground-logic'
 import { DecisionFlow } from './DecisionFlow'
 import { useNavOffset } from './useNavOffset'
 import { ExperiencePanel } from './ExperiencePanel'
 import styles from './AiModePlayground.module.css'
 
-type PendingEffect = 'chat' | 'signal' | 'reset' | null
+type PendingEffect = 'chat' | 'signal' | null
 
 export function AiModePlayground() {
   const [state, dispatch] = useReducer(playgroundReducer, INITIAL_STATE)
@@ -26,6 +27,7 @@ export function AiModePlayground() {
   const signalRef = useRef<HTMLParagraphElement>(null)
   const pendingEffectRef = useRef<PendingEffect>(null)
   const previousListenStatusRef = useRef(state.listen.status)
+  const announceHandleRef = useRef<{ kind: 'raf' | 'timeout'; id: number } | null>(null)
   useNavOffset(rootRef)
 
   // The deep-linked lens is read from the URL here rather than through
@@ -40,12 +42,39 @@ export function AiModePlayground() {
     if (fromUrl) setLens(fromUrl)
   }, [])
 
-  const announce = useCallback((value: string) => {
-    setAnnouncement('')
-    const setNext = () => setAnnouncement(value)
-    if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(setNext)
-    else window.setTimeout(setNext, 0)
+  const cancelPendingAnnouncement = useCallback(() => {
+    const handle = announceHandleRef.current
+    announceHandleRef.current = null
+    if (!handle) return
+    if (handle.kind === 'raf') window.cancelAnimationFrame?.(handle.id)
+    else window.clearTimeout(handle.id)
   }, [])
+
+  const announce = useCallback((value: string) => {
+    cancelPendingAnnouncement()
+    setAnnouncement('')
+    const setNext = () => {
+      announceHandleRef.current = null
+      setAnnouncement(value)
+    }
+    announceHandleRef.current =
+      typeof window.requestAnimationFrame === 'function'
+        ? { kind: 'raf', id: window.requestAnimationFrame(setNext) }
+        : { kind: 'timeout', id: window.setTimeout(setNext, 0) }
+  }, [cancelPendingAnnouncement])
+
+  useEffect(() => cancelPendingAnnouncement, [cancelPendingAnnouncement])
+
+  // A focus effect is only queued when the action actually changes state. The
+  // reducer is pure, so running it here first is safe; if it hands the same
+  // state back, the effect below would never run and a queued focus move would
+  // linger until some unrelated later change (typing a signature) fired it.
+  const dispatchWithEffect = (action: PlaygroundAction, effect: PendingEffect) => {
+    if (playgroundReducer(state, action) === state) return false
+    pendingEffectRef.current = effect
+    dispatch(action)
+    return true
+  }
 
   // Keep the address bar honest: once the user switches lens by hand, a
   // copied URL has to reopen on the lens they are looking at. `replaceState`
@@ -64,13 +93,14 @@ export function AiModePlayground() {
   // `copyNextJsInternalHistoryState` puts `__NA` and the internal tree back itself and
   // the canonical URL follows the address bar.
   const handleLensChange = useCallback((nextLens: PlaygroundLens) => {
+    if (nextLens === lens) return
     setLens(nextLens)
     const params = new URLSearchParams(window.location.search)
     params.set('lens', nextLens)
     window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}${window.location.hash}`)
     const captures = deriveCaptures(state)
     announce(Object.keys(captures).length > 0 ? ANNOUNCE.customerSwitchedWithCapture : ANNOUNCE.customerSwitched(LENS_LABELS[nextLens]))
-  }, [announce, state])
+  }, [announce, lens, state])
 
   const handleSelectExperience = (id: ExperienceId) => {
     dispatch({ type: 'experience/select', id })
@@ -78,15 +108,14 @@ export function AiModePlayground() {
   }
 
   const handleReset = () => {
+    // ExperiencePanel moves focus to the current tab itself; no queued effect.
     const label = EXPERIENCE_LABELS[state.experience]
-    pendingEffectRef.current = 'reset'
     dispatch({ type: 'experience/reset' })
     announce(ANNOUNCE.reset(label))
   }
 
   const handleChooseQuestion = (index: 0 | 1 | 2) => {
-    pendingEffectRef.current = 'chat'
-    dispatch({ type: 'chat/choose', index })
+    dispatchWithEffect({ type: 'chat/choose', index }, 'chat')
     announce(ANNOUNCE.chatAnswered)
   }
 
@@ -96,16 +125,15 @@ export function AiModePlayground() {
   }
 
   const handleFeedback = (value: string) => {
-    if (state.quote.index !== null) pendingEffectRef.current = 'signal'
-    dispatch({ type: 'quote/feedback', value })
+    dispatchWithEffect({ type: 'quote/feedback', value }, state.quote.index !== null ? 'signal' : null)
     announce(state.quote.index === null ? ANNOUNCE.feedbackSelected(value) : ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
   }
 
   const handleSignature = (value: string) => dispatch({ type: 'quote/signature', value })
 
   const handleShare = (action: ShareAction) => {
-    pendingEffectRef.current = 'signal'
-    dispatch({ type: 'quote/share', action })
+    if (state.quote.shareActions.includes(action)) return
+    if (!dispatchWithEffect({ type: 'quote/share', action }, 'signal')) return
     announce(ANNOUNCE.shareRecorded(UI.quote.actions[action]))
   }
 
@@ -143,10 +171,8 @@ export function AiModePlayground() {
     if (pending === 'chat') {
       titleRef.current?.scrollIntoView?.({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
       signalRef.current?.focus({ preventScroll: true })
-    } else if (pending === 'signal') {
-      signalRef.current?.focus({ preventScroll: true })
     } else {
-      document.getElementById(`experience-tab-${state.experience}`)?.focus()
+      signalRef.current?.focus({ preventScroll: true })
     }
   }, [state])
 
@@ -156,7 +182,6 @@ export function AiModePlayground() {
     <div ref={rootRef} className={styles.playground} data-playground-root>
       <ExperiencePanel
         state={state}
-        captures={captures}
         onSelectExperience={handleSelectExperience}
         onReset={handleReset}
         onChooseQuestion={handleChooseQuestion}

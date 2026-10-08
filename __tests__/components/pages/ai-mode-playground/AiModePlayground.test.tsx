@@ -72,6 +72,9 @@ describe('AiModePlayground interactions', () => {
     expect(screen.getByText(PATHS.brands[0].chatVariants[0].question)).toBeInTheDocument()
 
     cleanup()
+    // The first switch rewrote the URL to ?lens=brands; start the second
+    // mount from the default lens again so the click is a real switch.
+    window.history.replaceState({}, '', '/ai-mode-playground/')
     render(<AiModePlayground />)
     await user.click(customerTab(LENS_LABELS.brands))
     await act(async () => { vi.runAllTimers() })
@@ -101,6 +104,59 @@ describe('AiModePlayground interactions', () => {
     expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
     await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
     expect(document.getElementById('stage-02-copy')).toHaveTextContent(UI.quote.actions.line)
+  })
+
+  it('ignores a repeated share action so a later keystroke keeps focus and nothing is re-announced', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(screen.getByRole('button', { name: /Before you choose/ }))
+    await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
+    await act(async () => { vi.runAllTimers() })
+    expect(document.getElementById('stage-02-copy')).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.shareRecorded(UI.quote.actions.line))
+
+    const requestFrame = vi.spyOn(window, 'requestAnimationFrame')
+    const lineButton = screen.getByRole('button', { name: UI.quote.actions.line })
+    await user.click(lineButton)
+    await act(async () => { vi.runAllTimers() })
+    expect(requestFrame).not.toHaveBeenCalled()
+    expect(lineButton).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.shareRecorded(UI.quote.actions.line))
+
+    const input = screen.getByRole('textbox', { name: UI.quote.signatureLabel })
+    await user.click(input)
+    await user.type(input, 'A')
+    await act(async () => { vi.runAllTimers() })
+    expect(input).toHaveValue('A')
+    expect(document.activeElement).toBe(input)
+  })
+
+  it('focuses the current experience tab exactly once on reset', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(screen.getByRole('button', { name: CHAT_QUESTIONS[0] }))
+    await act(async () => { vi.runAllTimers() })
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
+    await user.click(screen.getByRole('button', { name: UI.reset }))
+    await act(async () => { vi.runAllTimers() })
+    const chatTab = experienceTab(EXPERIENCE_LABELS.chat)
+    expect(focus.mock.contexts.filter((element) => element === chatTab)).toHaveLength(1)
+    expect(chatTab).toHaveFocus()
+  })
+
+  it('cancels a queued announcement when unmounted', async () => {
+    const requestFrame = vi.fn(() => 42)
+    const cancelFrame = vi.fn()
+    vi.stubGlobal('requestAnimationFrame', requestFrame)
+    vi.stubGlobal('cancelAnimationFrame', cancelFrame)
+    const user = userEvent.setup()
+    const { unmount } = render(<AiModePlayground />)
+    await user.click(screen.getByRole('button', { name: CHAT_QUESTIONS[0] }))
+    expect(requestFrame).toHaveBeenCalled()
+    expect(cancelFrame).not.toHaveBeenCalled()
+    unmount()
+    expect(cancelFrame).toHaveBeenCalledWith(42)
   })
 
   it('captures Listen start and completion at 32 seconds', async () => {

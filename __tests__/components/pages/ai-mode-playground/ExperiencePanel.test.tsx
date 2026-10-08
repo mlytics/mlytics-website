@@ -6,11 +6,11 @@ import { ExperiencePanel } from '@/components/pages/ai-mode-playground/Experienc
 import {
   EXPERIENCE_INSTRUCTIONS,
   EXPERIENCE_LABELS,
+  QUOTE_FEEDBACK_OPTIONS,
   QUOTE_OPTIONS,
   UI,
 } from '@/components/pages/ai-mode-playground/ai-mode-playground-copy'
 import {
-  deriveCaptures,
   INITIAL_STATE,
   playgroundReducer,
   type PlaygroundState,
@@ -21,7 +21,6 @@ function Harness({ initial = INITIAL_STATE, callbacks = {} }: { initial?: Playgr
   return (
     <ExperiencePanel
       state={state}
-      captures={deriveCaptures(state)}
       onSelectExperience={(id) => { callbacks.select?.(id); dispatch({ type: 'experience/select', id }) }}
       onReset={() => { callbacks.reset?.(); dispatch({ type: 'experience/reset' }) }}
       onChooseQuestion={(index) => { callbacks.choose?.(index); dispatch({ type: 'chat/choose', index }) }}
@@ -107,6 +106,54 @@ describe('ExperiencePanel', () => {
     expect(screen.getByRole('radio', { name: 'Resonates' })).toHaveAttribute('aria-checked', 'false')
     await user.click(screen.getByRole('button', { name: UI.quote.actions.fb }))
     expect(callbacks.share).toHaveBeenCalledWith('fb')
+  })
+
+  it('moves focus through feedback radios with arrows/Home/End and selects only on Space', async () => {
+    const user = userEvent.setup()
+    const feedback = vi.fn()
+    const quoteState = { ...INITIAL_STATE, experience: 'quote' as const, quote: { index: 0 as const, feedback: '', signature: '', shareActions: [] } }
+    render(<Harness initial={quoteState} callbacks={{ feedback }} />)
+    const radios = screen.getAllByRole('radio')
+    const tabindexes = () => radios.map((radio) => radio.getAttribute('tabindex'))
+    const checked = () => radios.map((radio) => radio.getAttribute('aria-checked'))
+    expect(radios.map((radio) => radio.textContent)).toEqual([...QUOTE_FEEDBACK_OPTIONS])
+    // Nothing checked: only the first radio is in the tab order.
+    expect(tabindexes()).toEqual(['0', '-1', '-1'])
+
+    radios[0].focus()
+    await user.keyboard('{ArrowRight}')
+    expect(radios[1]).toHaveFocus()
+    expect(tabindexes()).toEqual(['-1', '0', '-1'])
+    await user.keyboard('{ArrowDown}')
+    expect(radios[2]).toHaveFocus()
+    await user.keyboard('{ArrowRight}')
+    expect(radios[0]).toHaveFocus()
+    await user.keyboard('{ArrowLeft}')
+    expect(radios[2]).toHaveFocus()
+    await user.keyboard('{ArrowUp}')
+    expect(radios[1]).toHaveFocus()
+    await user.keyboard('{Home}')
+    expect(radios[0]).toHaveFocus()
+    await user.keyboard('{End}')
+    expect(radios[2]).toHaveFocus()
+    expect(tabindexes()).toEqual(['-1', '-1', '0'])
+    // Focus movement alone never selects.
+    expect(feedback).not.toHaveBeenCalled()
+    expect(checked()).toEqual(['false', 'false', 'false'])
+
+    await user.keyboard('{ArrowLeft}')
+    await user.keyboard(' ')
+    expect(feedback).toHaveBeenCalledOnce()
+    expect(feedback).toHaveBeenLastCalledWith(QUOTE_FEEDBACK_OPTIONS[1])
+    expect(checked()).toEqual(['false', 'true', 'false'])
+
+    // Leaving the group hands the tab stop back to the checked radio.
+    await user.keyboard('{ArrowRight}')
+    expect(tabindexes()).toEqual(['-1', '-1', '0'])
+    await user.tab()
+    expect(radios[2]).not.toHaveFocus()
+    expect(tabindexes()).toEqual(['-1', '0', '-1'])
+    expect(feedback).toHaveBeenCalledOnce()
   })
 
   it('renders Listen progress and changes play/pause/replay labels without a status role', async () => {

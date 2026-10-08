@@ -198,7 +198,8 @@ test('chat answer scrolls to the canvas and switches stage copy', async ({ page 
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/ai-mode-playground/')
   await page.getByRole('button', { name: CHAT_QUESTIONS[0], exact: true }).click()
-  await expect(page.locator('#stage-03-copy')).toHaveCount(0)
+  // A Chat answer moves focus to the stage 02 raw-signal copy.
+  await expect(page.locator('#stage-02-copy')).toBeFocused()
   await expect(page.locator('[data-stage="03"] [class*="cellBody"]').first()).toContainText('Are one product’s specs worth turning into a searchable piece')
   await expect.poll(async () => (await page.locator('#canvas-title').boundingBox())?.y ?? -1).toBeGreaterThanOrEqual(65)
   await expect.poll(async () => (await page.locator('#canvas-title').boundingBox())?.y ?? -1).toBeLessThanOrEqual(140)

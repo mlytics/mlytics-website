@@ -1,7 +1,6 @@
 import {
   CAPTURE,
   CHAT_QUESTIONS,
-  EXPERIENCE_DEFAULT_OBSERVATION,
   LISTEN_DURATION_SECONDS,
   QUOTE_OPTIONS,
   UI,
@@ -149,9 +148,20 @@ export function pickActiveStage(tops: number[], visible: boolean[], anchor: numb
 
 export type StageState = { position: 'active' | 'past' | 'upcoming'; complete: boolean }
 
-export function stageStates(count: number, activeIndex: number, captures: Captures): StageState[] {
-  const hasInteractionCapture = Object.values(captures).some(Boolean)
-  const hasSignalCapture = Object.values(captures).some((capture) => Boolean(capture?.rawSignal))
+/**
+ * Stages 01 and 02 show the current experience's capture, so their completion
+ * follows that capture only — a Chat answer does not tick them while Quote is
+ * open and still showing its empty defaults.
+ */
+export function stageStates(
+  count: number,
+  activeIndex: number,
+  captures: Captures,
+  experience: ExperienceId,
+): StageState[] {
+  const capture = captures[experience]
+  const hasInteractionCapture = Boolean(capture)
+  const hasSignalCapture = Boolean(capture?.rawSignal)
   return Array.from({ length: count }, (_, index) => ({
     position: index < activeIndex ? 'past' : index === activeIndex ? 'active' : 'upcoming',
     complete: index === 0 ? hasInteractionCapture : index === 1 ? hasSignalCapture : false,
@@ -173,4 +183,3 @@ export function progressFillPx({
   return Math.max(0, distance - 18)
 }
 
-export { EXPERIENCE_DEFAULT_OBSERVATION }
