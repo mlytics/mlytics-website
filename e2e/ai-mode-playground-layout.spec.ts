@@ -605,6 +605,46 @@ test.describe('prototype parity', () => {
     })
   }
 
+  // A typed signature can be one unbroken run (an email, a URL). The card
+  // clips with overflow: hidden, so a run that cannot wrap is cut off
+  // silently instead of scrolling. It has to wrap inside the card.
+  // No spaces or hyphens, so the browser has no ordinary break opportunity.
+  const UNBROKEN_SIGNATURE = 'jordanleemontgomery@acmepublishinggroupinternational.example'
+  for (const { width, height } of [{ width: 320, height: 720 }, { width: 375, height: 812 }, { width: 768, height: 1024 }, { width: 1280, height: 800 }]) {
+    test(`a long unbroken signature wraps inside the quote card at ${width}`, async ({ page }) => {
+      expect(UNBROKEN_SIGNATURE).toHaveLength(60)
+      expect(UNBROKEN_SIGNATURE).not.toMatch(/[\s-]/)
+      await page.setViewportSize({ width, height })
+      await page.goto('/ai-mode-playground/')
+      await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+      await page.getByRole('button', { name: /Before you choose/ }).click()
+      await page.getByRole('textbox', { name: UI.quote.signatureLabel }).fill(UNBROKEN_SIGNATURE)
+      const card = page.locator('[class*="quoteCard"]')
+      const signature = card.locator('[class*="signatureText"]')
+      await expect(signature).toHaveText(UNBROKEN_SIGNATURE)
+      const m = await signature.evaluate((el) => {
+        const rect = (e: Element) => { const r = e.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom } }
+        const range = document.createRange()
+        range.selectNodeContents(el)
+        const text = range.getBoundingClientRect()
+        return {
+          scrollWidth: el.scrollWidth,
+          clientWidth: el.clientWidth,
+          signature: rect(el),
+          // The glyphs themselves, not just the box: an overflowing run
+          // spills out of a fixed-width box without growing it.
+          text: { left: text.left, top: text.top, right: text.right, bottom: text.bottom },
+          card: rect(el.closest('[class*="quoteCard"]')!),
+        }
+      })
+      const inside = (inner: typeof m.card, outer: typeof m.card) =>
+        inner.left >= outer.left - 0.5 && inner.right <= outer.right + 0.5 && inner.top >= outer.top - 0.5 && inner.bottom <= outer.bottom + 0.5
+      expect(m.scrollWidth, `signature scrollWidth ${m.scrollWidth} vs clientWidth ${m.clientWidth}`).toBeLessThanOrEqual(m.clientWidth + 1)
+      expect(inside(m.signature, m.card), `signature ${JSON.stringify(m.signature)} inside card ${JSON.stringify(m.card)}`).toBe(true)
+      expect(inside(m.text, m.card), `signature text ${JSON.stringify(m.text)} inside card ${JSON.stringify(m.card)}`).toBe(true)
+    })
+  }
+
   test('stage 01 and 02 copy sit in a boxed surface', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/ai-mode-playground/')
