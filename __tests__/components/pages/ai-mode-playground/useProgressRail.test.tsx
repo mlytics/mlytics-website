@@ -76,6 +76,33 @@ describe('useProgressRail', () => {
     expect(flow.style.getPropertyValue('--progress-fill')).toBe('620px')
   })
 
+  it('picks the visible stage whose node centre is nearest 35% of the viewport height', async () => {
+    mockRects()
+    const { container } = render(<Harness rebindKey="content-owners" />)
+    await waitFor(() => expect(observers).toHaveLength(1))
+    // Node centres: stage 02 at 338, stage 03 at 538; their midpoint is 438.
+    // innerHeight 1240 → anchor 434 (stage 02); 1260 → 441 (stage 03). A
+    // factor of .34 or .36 would flip one of the two outcomes.
+    const fire = (innerHeight: number) => {
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: innerHeight })
+      act(() => {
+        observers[0].callback(
+          ['02', '03'].map((n) => ({ target: container.querySelector(`[data-stage="${n}"]`)!, isIntersecting: true }) as IntersectionObserverEntry),
+          {} as IntersectionObserver,
+        )
+      })
+    }
+    const original = window.innerHeight
+    try {
+      fire(1240)
+      expect(screen.getByTestId('active-index')).toHaveTextContent('1')
+      fire(1260)
+      expect(screen.getByTestId('active-index')).toHaveTextContent('2')
+    } finally {
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: original })
+    }
+  })
+
   it('re-measures the fill when the flow resizes', async () => {
     mockRects()
     vi.stubGlobal('ResizeObserver', vi.fn(function ResizeObserver(callback: () => void) {

@@ -22,7 +22,6 @@ export type DecisionFlowProps = {
   chatQuestionIndex: number | null
   captures: Captures
   signalRef: RefObject<HTMLParagraphElement | null>
-  titleRef: RefObject<HTMLHeadingElement | null>
 }
 
 const LENSES: PlaygroundLens[] = ['content-owners', 'brands']
@@ -63,9 +62,11 @@ function Stage({
           </h3>
         </div>
         {copyId ? (
-          <p className={styles.stageCopy} id={copyId} tabIndex={-1} ref={copyRef}>
-            {children}
-          </p>
+          <div className={styles.stageBody}>
+            <p className={styles.stageCopy} id={copyId} tabIndex={-1} ref={copyRef}>
+              {children}
+            </p>
+          </div>
         ) : (
           children
         )}
@@ -86,7 +87,7 @@ function Cell({ children, pathName }: { children: React.ReactNode; pathName: str
 function PathHeaders({ paths }: { paths: readonly [{ name: string }, { name: string }] }) {
   return (
     <div className={styles.pathsHead}>
-        <h3 className={styles.pathsTitle}>{UI.stages.pathsHead.title}</h3>
+      <h3 className={styles.pathsTitle}>{UI.stages.pathsHead.title}</h3>
       <ul className={styles.pathHeaders} aria-label={UI.stages.pathsHead.listLabel}>
         {paths.map((path) => (
           <li className={styles.pathHeader} key={path.name}>
@@ -106,7 +107,6 @@ export function DecisionFlow({
   chatQuestionIndex,
   captures,
   signalRef,
-  titleRef,
 }: DecisionFlowProps) {
   const flowRef = useRef<HTMLDivElement>(null)
   const activeStageIndex = useProgressRail(flowRef, lens, `${experience}:${chatQuestionIndex ?? ''}`)
@@ -185,7 +185,7 @@ export function DecisionFlow({
     <section className={styles.canvas} aria-labelledby="canvas-title">
       <div className={styles.canvasHead}>
         <p className={styles.canvasSectionLabel}>{UI.canvas.sectionLabel}</p>
-        <h2 className={styles.canvasTitle} id="canvas-title" ref={titleRef}>
+        <h2 className={styles.canvasTitle} id="canvas-title">
           {UI.canvas.title}
         </h2>
       </div>

@@ -263,6 +263,42 @@ describe('AiModePlayground interactions', () => {
     expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.chatAnswered)
   })
 
+  it('ignores re-selecting the selected Quote line: nothing is re-announced', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    const line = screen.getByRole('button', { name: /Before you choose/ })
+    await user.click(line)
+    await act(async () => { vi.runAllTimers() })
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.quoteSelected)
+
+    const requestFrame = vi.spyOn(window, 'requestAnimationFrame')
+    await user.click(line)
+    await act(async () => { vi.runAllTimers() })
+    expect(requestFrame).not.toHaveBeenCalled()
+    expect(line).toHaveAttribute('aria-pressed', 'true')
+    expect(line).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.quoteSelected)
+  })
+
+  it('ignores re-selecting the selected experience tab: nothing is re-announced', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await act(async () => { vi.runAllTimers() })
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.experienceSelected(EXPERIENCE_LABELS.quote))
+
+    const requestFrame = vi.spyOn(window, 'requestAnimationFrame')
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    experienceTab(EXPERIENCE_LABELS.quote).focus()
+    await user.keyboard('{Enter}')
+    await user.keyboard(' ')
+    await act(async () => { vi.runAllTimers() })
+    expect(requestFrame).not.toHaveBeenCalled()
+    expect(experienceTab(EXPERIENCE_LABELS.quote)).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.experienceSelected(EXPERIENCE_LABELS.quote))
+  })
+
   it('focuses the current experience tab exactly once on reset', async () => {
     const user = setupTimers()
     render(<AiModePlayground />)
@@ -356,6 +392,11 @@ describe('AiModePlayground interactions', () => {
     assertNoForbiddenWords()
     await user.click(experienceTab(EXPERIENCE_LABELS.listen))
     await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    assertNoForbiddenWords()
+    // The Brands lens renders its own path, evidence, and CTA copy.
+    await user.click(customerTab(LENS_LABELS.brands))
+    expect(customerTab(LENS_LABELS.brands)).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByText(PATHS.brands[0].question)).toBeInTheDocument()
     assertNoForbiddenWords()
   })
 

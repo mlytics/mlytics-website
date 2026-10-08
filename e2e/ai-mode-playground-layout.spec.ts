@@ -204,6 +204,18 @@ test('chat answer focuses the stage 02 signal and switches stage copy', async ({
   await expect(page.locator('[data-stage="03"] [class*="cellBody"]').first()).toContainText('Are one product’s specs worth turning into a searchable piece')
 })
 
+test('stage 05 CTA sits 18px below the stage grid at 1280', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.goto('/ai-mode-playground/')
+  const stage05 = page.locator('[data-stage="05"]')
+  await stage05.scrollIntoViewIfNeeded()
+  const grid = await stage05.locator('[class*="stageGrid"]').boundingBox()
+  const cta = await stage05.locator('[role="group"][aria-labelledby^="cta-title-"]').boundingBox()
+  expect(grid).not.toBeNull()
+  expect(cta).not.toBeNull()
+  expect(Math.abs(cta!.y - (grid!.y + grid!.height) - 18)).toBeLessThanOrEqual(1)
+})
+
 test('path tags are visually hidden on desktop but present in the DOM', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/ai-mode-playground/')
@@ -222,6 +234,36 @@ test('Listen progresses and incomplete playback resets when changing experience'
   await page.getByRole('tab', { name: EXPERIENCE_LABELS.listen, exact: true }).click()
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
 })
+
+const expectVisibleListenIcon = async (page: Page, label: string) => {
+  const toggle = page.getByRole('button', { name: label, exact: true })
+  const icon = toggle.locator('svg')
+  await expect(icon).toHaveCount(1)
+  await expect(icon).toBeVisible()
+  await expect(icon).toHaveAttribute('aria-hidden', 'true')
+  const box = await icon.boundingBox()
+  expect(box).not.toBeNull()
+  expect(box!.width).toBeGreaterThan(0)
+  expect(box!.height).toBeGreaterThan(0)
+  const toggleBox = (await toggle.boundingBox())!
+  expect(box!.x).toBeGreaterThanOrEqual(toggleBox.x)
+  expect(box!.y).toBeGreaterThanOrEqual(toggleBox.y)
+  expect(box!.x + box!.width).toBeLessThanOrEqual(toggleBox.x + toggleBox.width)
+  expect(box!.y + box!.height).toBeLessThanOrEqual(toggleBox.y + toggleBox.height)
+  const color = await icon.evaluate((element) => getComputedStyle(element).color)
+  expect(color).toBe('rgb(255, 255, 255)')
+}
+
+for (const viewport of [{ width: 1280, height: 900 }, { width: 375, height: 812 }]) {
+  test(`Listen toggle shows a visible play and pause icon at ${viewport.width}`, async ({ page }) => {
+    await page.setViewportSize(viewport)
+    await page.goto('/ai-mode-playground/')
+    await page.getByRole('tab', { name: EXPERIENCE_LABELS.listen, exact: true }).click()
+    await expectVisibleListenIcon(page, UI.listen.play)
+    await page.getByRole('button', { name: UI.listen.play, exact: true }).click()
+    await expectVisibleListenIcon(page, UI.listen.pause)
+  })
+}
 
 const completions = [
   {
@@ -350,6 +392,144 @@ test.describe('with prefers-reduced-motion: reduce', () => {
       expect(samples).toEqual(samples.map(() => samples[0]))
       // Every scroll event saw the same position: there was one jump, no glide.
       expect(new Set(scrollLog)).toEqual(new Set([samples[0]]))
+    })
+  }
+})
+
+test('landscape phone: the stage 02 focus target and its ring stay in view below the nav at 568×320', async ({ page }) => {
+  await page.setViewportSize({ width: 568, height: 320 })
+  await page.goto('/ai-mode-playground/')
+  // On a 320px-tall viewport the shell must not be sticky, or it covers most
+  // of the space the completion scrolls the signal into.
+  await expect(page.locator('[class*="customerTabsShell"]')).toHaveCSS('position', 'relative')
+  await page.getByRole('button', { name: CHAT_QUESTIONS[0], exact: true }).focus()
+  await page.keyboard.press('Enter')
+  const signal = page.locator('#stage-02-copy')
+  await expect(signal).toBeFocused()
+  await waitForSignalToSettle(page)
+  const geometry = await page.evaluate(() => {
+    const element = document.getElementById('stage-02-copy')!
+    const style = getComputedStyle(element)
+    const rect = element.getBoundingClientRect()
+    const ring = (parseFloat(style.outlineOffset) || 0) + (parseFloat(style.outlineWidth) || 0)
+    const navBottom = Math.max(0, ...[...document.querySelectorAll('header, nav')].map((n) => n.getBoundingClientRect().bottom))
+    // Whatever is painted on top at the text's centre and at the ring's top and
+    // bottom edges must not be the customer tabs shell or the site nav.
+    const covers = [...document.querySelectorAll('[class*="customerTabsShell"], header, nav')]
+    const cx = rect.left + rect.width / 2
+    const coveredPoints = [[cx, rect.top + rect.height / 2], [cx, rect.top - ring + 1], [cx, rect.bottom + ring - 1]]
+      .filter(([x, y]) => {
+        const hit = document.elementFromPoint(x, y)
+        return !hit || covers.some((cover) => cover.contains(hit))
+      })
+    return {
+      coveredPoints,
+      focusVisible: element.matches(':focus-visible'),
+      ring,
+      text: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
+      ringBox: { top: rect.top - ring, bottom: rect.bottom + ring, left: rect.left - ring, right: rect.right + ring },
+      navBottom,
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+    }
+  })
+  expect(geometry.focusVisible).toBe(true)
+  expect(geometry.ring).toBeGreaterThan(0)
+  expect(geometry.coveredPoints).toEqual([])
+  for (const box of [geometry.text, geometry.ringBox]) {
+    expect(box.top).toBeGreaterThanOrEqual(geometry.navBottom)
+    expect(box.bottom).toBeLessThanOrEqual(geometry.viewport.height)
+    expect(box.left).toBeGreaterThanOrEqual(0)
+    expect(box.right).toBeLessThanOrEqual(geometry.viewport.width)
+  }
+})
+
+test.describe('prototype parity', () => {
+  test('section headings render bold (Tailwind preflight resets h1–h6 to inherit)', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.goto('/ai-mode-playground/')
+    const headings = [
+      page.locator('[class*="cardTitle"]').first(),
+      page.locator('#canvas-title'),
+      page.locator('#progress-stage-01'),
+      page.locator('#progress-stage-05'),
+      page.locator('[class*="pathsTitle"]'),
+      page.locator('[class*="ctaTitle"]'),
+    ]
+    for (const heading of headings) await expect(heading).toHaveCSS('font-weight', '700')
+    await expect(page.locator('#canvas-title')).toHaveCSS('font-size', '36px')
+    const pathsTitle = page.locator('[class*="pathsTitle"]')
+    await expect(pathsTitle).toHaveCSS('font-size', '24px')
+    await expect(pathsTitle).toHaveCSS('text-transform', 'none')
+    await expect(pathsTitle).toHaveCSS('color', 'rgb(26, 61, 58)')
+    await page.setViewportSize({ width: 375, height: 812 })
+    await expect(page.locator('#canvas-title')).toHaveCSS('font-size', '28.8px')
+  })
+
+  test('the quote card has its gradient and both decorations', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.goto('/ai-mode-playground/')
+    await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+    await page.getByRole('button', { name: /Before you choose/ }).click()
+    const card = page.locator('[class*="quoteCard"]')
+    await expect(card).toBeVisible()
+    const style = await card.evaluate((element) => {
+      const own = getComputedStyle(element)
+      const before = getComputedStyle(element, '::before')
+      const after = getComputedStyle(element, '::after')
+      return {
+        backgroundImage: own.backgroundImage,
+        position: own.position,
+        overflow: own.overflow,
+        isolation: own.isolation,
+        before: { content: before.content, width: before.width, height: before.height, borderRadius: before.borderRadius, boxShadow: before.boxShadow },
+        after: { content: after.content, fontFamily: after.fontFamily, position: after.position },
+      }
+    })
+    expect(style.backgroundImage).toMatch(/^linear-gradient\(145deg, rgb\(26, 61, 58\) 0%, rgb\(34, 93, 89\) 62%/)
+    expect(style.position).toBe('relative')
+    expect(style.overflow).toBe('hidden')
+    expect(style.isolation).toBe('isolate')
+    expect(style.before.content).toBe('""')
+    expect(style.before.width).toBe('220px')
+    expect(style.before.height).toBe('220px')
+    expect(style.before.borderRadius).toBe('50%')
+    // Two halo rings around the circle.
+    expect(style.before.boxShadow.match(/rgba?\(/g)).toHaveLength(2)
+    expect(style.after.content).toBe('"“"')
+    expect(style.after.fontFamily).toMatch(/Georgia/)
+    expect(style.after.position).toBe('absolute')
+    // The share row sits 24px below the card.
+    const cardBox = (await card.boundingBox())!
+    const shareBox = (await page.locator('[class*="shareActions"]').boundingBox())!
+    expect(Math.abs(shareBox.y - (cardBox.y + cardBox.height) - 24)).toBeLessThanOrEqual(1)
+  })
+
+  test('stage 01 and 02 copy sit in a boxed surface', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.goto('/ai-mode-playground/')
+    for (const id of ['#stage-01-copy', '#stage-02-copy']) {
+      const box = page.locator(id).locator('..')
+      await expect(box).toHaveCSS('padding', '14px')
+      await expect(box).toHaveCSS('border-top-width', '1px')
+      await expect(box).toHaveCSS('border-top-color', 'rgba(34, 93, 89, 0.16)')
+      await expect(box).toHaveCSS('border-radius', '10px')
+      await expect(box).toHaveCSS('background-color', 'rgba(255, 255, 255, 0.72)')
+    }
+  })
+
+  for (const { width, height, x, w } of [{ width: 1280, height: 800, x: 98, w: 1084 }, { width: 375, height: 812, x: 36, w: 303 }]) {
+    test(`the experience module lines up with the canvas content at ${width}`, async ({ page }) => {
+      await page.setViewportSize({ width, height })
+      await page.goto('/ai-mode-playground/')
+      const module = await page.getByRole('tablist', { name: UI.experienceTablistLabel }).locator('..').boundingBox()
+      const canvasHead = await page.locator('#canvas-title').locator('..').boundingBox()
+      expect(module).not.toBeNull()
+      expect(canvasHead).not.toBeNull()
+      expect(Math.abs(module!.x - canvasHead!.x)).toBeLessThanOrEqual(1)
+      expect(Math.abs(module!.width - canvasHead!.width)).toBeLessThanOrEqual(1)
+      // Pinned to the prototype's measured geometry.
+      expect(Math.abs(module!.x - x)).toBeLessThanOrEqual(1)
+      expect(Math.abs(module!.width - w)).toBeLessThanOrEqual(1)
     })
   }
 })

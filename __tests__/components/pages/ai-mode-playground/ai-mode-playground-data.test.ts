@@ -68,4 +68,11 @@ describe('readLensFromSearch', () => {
     expect(readLensFromSearch('?lens=')).toBeNull()
     expect(readLensFromSearch('?lens=Brands')).toBeNull()
   })
+
+  it('returns null for names inherited from Object.prototype', () => {
+    expect(readLensFromSearch('?lens=toString')).toBeNull()
+    expect(readLensFromSearch('?lens=constructor')).toBeNull()
+    expect(readLensFromSearch('?lens=__proto__')).toBeNull()
+    expect(readLensFromSearch('?lens=hasOwnProperty')).toBeNull()
+  })
 })

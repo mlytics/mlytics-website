@@ -23,7 +23,6 @@ export function AiModePlayground() {
   const [lens, setLens] = useState<PlaygroundLens>(DEFAULT_LENS)
   const [announcement, setAnnouncement] = useState('')
   const rootRef = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLHeadingElement>(null)
   const signalRef = useRef<HTMLParagraphElement>(null)
   const pendingEffectRef = useRef<PendingEffect>(null)
   const previousListenStatusRef = useRef(state.listen.status)
@@ -106,6 +105,8 @@ export function AiModePlayground() {
   }, [announce, lens, state])
 
   const handleSelectExperience = (id: ExperienceId) => {
+    // Re-selecting the tab already selected is a no-op: nothing to re-announce.
+    if (id === state.experience) return
     dispatch({ type: 'experience/select', id })
     announce(ANNOUNCE.experienceSelected(EXPERIENCE_LABELS[id]))
   }
@@ -131,7 +132,8 @@ export function AiModePlayground() {
       announce(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
       return
     }
-    dispatch({ type: 'quote/select', index })
+    // Re-selecting the line already selected changes nothing: no re-announce.
+    if (!dispatchWithEffect({ type: 'quote/select', index }, null)) return
     announce(ANNOUNCE.quoteSelected)
   }
 
@@ -214,7 +216,6 @@ export function AiModePlayground() {
         chatQuestionIndex={state.chatQuestionIndex}
         captures={captures}
         signalRef={signalRef}
-        titleRef={titleRef}
       />
       <div className={styles.announcer} role="status" aria-live="polite" aria-atomic="true">
         {announcement}

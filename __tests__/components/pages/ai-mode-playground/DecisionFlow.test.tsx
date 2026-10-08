@@ -35,7 +35,6 @@ function renderFlow(overrides: Partial<React.ComponentProps<typeof DecisionFlow>
     chatQuestionIndex: null,
     captures: {},
     signalRef: createRef<HTMLParagraphElement>(),
-    titleRef: createRef<HTMLHeadingElement>(),
     ...overrides,
   }
   return { ...render(<DecisionFlow {...props} />), onLensChange }
@@ -71,8 +70,12 @@ describe('DecisionFlow', () => {
     await user.click(brandsTab)
     expect(onLensChange).toHaveBeenCalledWith('brands')
 
+    // Clear the click's call so the arrow-key assertion can only pass if the
+    // keydown handler itself activates the lens.
+    onLensChange.mockClear()
     contentTab.focus()
     await user.keyboard('{ArrowRight}')
+    expect(onLensChange).toHaveBeenCalledTimes(1)
     expect(onLensChange).toHaveBeenCalledWith('brands')
     expect(brandsTab).toHaveFocus()
   })
@@ -137,7 +140,6 @@ describe('DecisionFlow', () => {
         chatQuestionIndex={1}
         captures={{ chat: capture }}
         signalRef={createRef<HTMLParagraphElement>()}
-        titleRef={createRef<HTMLHeadingElement>()}
       />,
     )
     expect(screen.getByText(capture.observation)).toBeInTheDocument()
@@ -182,7 +184,6 @@ describe('DecisionFlow', () => {
         chatQuestionIndex={1}
         captures={{}}
         signalRef={createRef<HTMLParagraphElement>()}
-        titleRef={createRef<HTMLHeadingElement>()}
       />,
     )
     expect(screen.getByText(PATHS['content-owners'][1].decision)).toBeInTheDocument()
@@ -203,5 +204,7 @@ describe('DecisionFlow CSS contract', () => {
     const flowCss = readFileSync('components/pages/ai-mode-playground/DecisionFlow.module.css', 'utf8')
     expect(flowCss).toMatch(/@media\s*\(max-width:\s*760px\)[\s\S]*\.cellPathTag\s*\{/)
     expect(flowCss).toMatch(/\.customerTabsShell\s*\{[\s\S]*position:\s*sticky[\s\S]*top:\s*var\(--playground-sticky-top\)/)
+    // Landscape phones drop the sticky shell so it cannot cover the stage 02 focus target.
+    expect(flowCss).toMatch(/@media\s*\(max-height:\s*420px\)\s*\{\s*\.customerTabsShell\s*\{[^}]*position:\s*relative;[^}]*top:\s*auto;/)
   })
 })

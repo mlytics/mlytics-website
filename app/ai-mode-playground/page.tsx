@@ -21,21 +21,18 @@ export const metadata: Metadata = {
 export default function AiModePlaygroundPage() {
   return (
     <div className={`${styles.routeSurface} section-white`}>
-      <section
-        className={`${styles.hero} ai-mode-playground-hero section-dark pt-32 pb-12 text-center`}
-        style={{ borderBottom: '1px solid rgba(168,197,195,0.12)' }}
-      >
-        <div className="max-w-3xl mx-auto px-6">
+      <section className={`${styles.hero} ai-mode-playground-hero section-dark pt-32 pb-12 text-center`}>
+        <div className={styles.heroInner}>
           <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
-            style={{ background: 'rgba(34,93,89,0.4)', color: 'var(--color-on-dark)', border: '1px solid rgba(34,93,89,0.6)' }}
+            className="inline-flex items-center text-xs font-bold uppercase tracking-[.12em] leading-none mb-4 px-2.5 py-1.5 rounded-full"
+            style={{ background: 'rgba(34,93,89,0.4)', color: 'var(--color-on-dark)', border: '1px solid rgba(168,197,195,0.45)' }}
           >
             {HERO.eyebrow}
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4 text-balance">
+          <h1 className={`${styles.heroTitle} text-4xl md:text-5xl font-bold text-white text-balance`}>
             {HERO.title}
           </h1>
-          <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--color-on-dark)' }}>
+          <p className={`${styles.heroCopy} text-base max-w-xl mx-auto`} style={{ color: 'var(--color-on-dark)' }}>
             {HERO.copy}
           </p>
         </div>

@@ -1,12 +1,10 @@
 .playground {
-  --signal: var(--color-primary);
-  --offer: var(--color-gold);
   --playground-sticky-top: 65px;
   display: grid;
-  gap: 18px;
-  width: min(1180px, calc(100% - 32px));
+  gap: 24px;
+  width: min(1152px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 40px 0 72px;
+  padding: 28px 0 72px;
 }
 
 .announcer {
@@ -19,16 +17,10 @@
   white-space: nowrap;
 }
 
-@media (max-width: 760px) {
-  .playground {
-    width: min(100% - 24px, 1180px);
-    padding-top: 24px;
-  }
-}
-
 @media (max-width: 560px) {
   .playground {
+    gap: 20px;
     width: 100%;
-    padding: 16px;
+    padding: 14px 16px 16px;
   }
 }

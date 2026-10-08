@@ -12,7 +12,6 @@
 
 .canvasSectionLabel,
 .stageKicker,
-.pathsTitle,
 .pathHeaderKicker,
 .cellKicker,
 .cellLabel,
@@ -26,13 +25,21 @@
   text-transform: uppercase;
 }
 
+/* Section labels (prototype .section-label) track wider than cell kickers. */
+.canvasSectionLabel,
+.stageKicker,
+.pathHeaderKicker,
+.ctaKicker {
+  letter-spacing: .12em;
+}
+
 .canvasTitle {
   margin: 0;
   color: var(--bg-dark);
-  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-size: var(--font-size-h2);
+  font-weight: 700;
   line-height: 1.15;
   letter-spacing: -.03em;
-  scroll-margin-top: calc(var(--playground-sticky-top) + 16px);
 }
 
 .customerPrompt {
@@ -49,7 +56,7 @@
   color: var(--color-primary);
   font-size: var(--font-size-caption);
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: .1em;
   line-height: 1.5;
   text-transform: uppercase;
 }
@@ -177,7 +184,10 @@
   background: var(--bg-white);
   color: var(--color-ink-muted);
   font-size: var(--font-size-caption);
-  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
 }
 
 .stageMain {
@@ -192,15 +202,26 @@
 
 .stageHead {
   display: grid;
-  gap: 2px;
-  margin-bottom: 10px;
+  gap: 5px;
+  margin-bottom: 12px;
 }
 
 .stageTitle {
   margin: 0;
   color: var(--bg-dark);
   font-size: var(--font-size-h3);
-  line-height: 1.25;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Stage 01/02 copy sits in the same boxed surface as the path cells. */
+.stageBody {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(34, 93, 89, .16);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .72);
+  color: var(--color-ink-muted);
 }
 
 .stageCopy {
@@ -219,6 +240,7 @@
   border-color: var(--color-primary);
   background: var(--color-primary);
   color: var(--bg-white);
+  box-shadow: 0 0 0 4px rgba(34, 93, 89, .1);
   transform: scale(1.06);
 }
 
@@ -232,20 +254,40 @@
   box-shadow: 0 8px 20px rgba(34, 93, 89, .08);
 }
 
+.stage[data-state='past'] .stageMain {
+  border-color: rgba(34, 93, 89, .2);
+}
+
 .stage[data-complete='true'] .stageNode {
   border-color: var(--color-primary);
   background: var(--color-primary);
   color: var(--bg-white);
 }
 
+.stage[data-complete='true'] .stageMain {
+  border-color: rgba(34, 93, 89, .34);
+}
+
 .pathsHead {
   display: grid;
-  gap: 12px;
+  gap: 14px;
   margin-inline-start: calc(var(--progress-rail-width) + var(--progress-rail-gap));
   padding: 14px;
   border: 1px solid var(--color-line);
   border-radius: 14px;
   background: rgba(34, 93, 89, .04);
+}
+
+.pathsTitle {
+  margin: 2px 0 6px;
+  color: var(--bg-dark);
+  font-size: var(--font-size-h3);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.pathHeaderKicker {
+  margin-bottom: 8px;
 }
 
 .pathHeaders {
@@ -269,9 +311,9 @@
 }
 
 .pathHeaderName {
-  margin: 2px 0 0;
+  margin: 0;
   color: var(--bg-dark);
-  font-size: var(--font-size-small);
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1.35;
 }
@@ -304,15 +346,19 @@
   font-size: var(--font-size-caption);
 }
 
+.cellKicker {
+  margin-bottom: 9px;
+}
+
 .cellBody {
   margin: 0;
-  color: var(--color-ink-muted);
+  color: var(--color-ink);
   font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
 .cellBody + .cellBody {
-  margin-top: 10px;
+  margin-top: 9px;
 }
 
 .evidence + .evidence {
@@ -324,26 +370,31 @@
 .cta {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
+  gap: 20px;
   align-items: center;
-  margin-top: 2px;
-  padding: 18px;
-  border: 1px solid rgba(34, 93, 89, .16);
+  margin-top: 18px;
+  padding: 18px 20px;
+  border: 1px solid var(--color-line);
   border-radius: 14px;
-  background: rgba(168, 197, 195, .25);
+  background: rgba(34, 93, 89, .06);
+}
+
+.ctaKicker {
+  margin-bottom: 7px;
 }
 
 .ctaTitle {
-  margin: 3px 0 0;
+  margin: 0;
   color: var(--bg-dark);
-  font-size: var(--font-size-small);
-  line-height: 1.35;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.25;
 }
 
 .ctaDescription {
   margin: 8px 0 0;
   color: var(--color-ink-muted);
-  font-size: var(--font-size-small);
+  font-size: .84rem;
   line-height: 1.5;
 }
 
@@ -372,15 +423,16 @@
   border-radius: 9999px;
   background: var(--color-primary);
   color: var(--bg-white);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .ctaSecondary {
-  border: 1px solid var(--color-primary);
+  padding-inline: 20px;
+  border: 1.5px solid var(--color-primary);
   border-radius: 9999px;
   background: var(--bg-white);
   color: var(--color-primary);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 @media (max-width: 760px) {
@@ -420,6 +472,14 @@
 }
 
 @media (max-width: 560px) {
+  .canvasTitle {
+    font-size: 1.8rem;
+  }
+
+  .stageBody {
+    margin-top: 12px;
+  }
+
   .progressFlow {
     --progress-rail-width: 34px;
     --progress-rail-gap: 8px;
@@ -451,6 +511,15 @@
   .ctaPrimary,
   .ctaSecondary {
     width: 100%;
+  }
+}
+
+/* Landscape phones: a sticky shell would take most of a ~320px-tall viewport
+   and cover the stage 02 signal that a completion scrolls to and focuses. */
+@media (max-height: 420px) {
+  .customerTabsShell {
+    position: relative;
+    top: auto;
   }
 }
 

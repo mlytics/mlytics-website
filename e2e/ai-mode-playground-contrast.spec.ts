@@ -111,10 +111,10 @@ test('Task 9 逐項：每個 tab 狀態與內文的實測對比', async ({ page 
     const scope = document.querySelector('${SCOPE}')
     const find = (selector) => scope.querySelector(selector)
     return {
-      'modeTab unselected': measure(find('#experience-tab-quote')),
-      'modeTab selected': measure(find('#experience-tab-chat')),
-      'lensTab unselected': measure(find('#customer-tab-brands')),
-      'lensTab selected': measure(find('#customer-tab-content-owners')),
+      'experience tab unselected': measure(find('#experience-tab-quote')),
+      'experience tab selected': measure(find('#experience-tab-chat')),
+      'customer tab unselected': measure(find('#customer-tab-brands')),
+      'customer tab selected': measure(find('#customer-tab-content-owners')),
       cellKicker: measure(find('[class*="cellKicker"]')),
       cellLabel: measure(find('[class*="cellLabel"]')),
       stageKicker: measure(find('[class*="stageKicker"]')),
@@ -127,7 +127,7 @@ test('Task 9 逐項：每個 tab 狀態與內文的實測對比', async ({ page 
   for (const [name, r] of Object.entries(results)) expect(r, `${name} = ${r}`).toBeGreaterThanOrEqual(4.5)
 })
 
-test('選取中的 mode tab 使用 gold token 作為底線', async ({ page }) => {
+test('選取中的 experience tab 使用 gold token 作為底線', async ({ page }) => {
   await page.goto('/ai-mode-playground/')
   const border = await page.evaluate(`getComputedStyle(document.querySelector('${SCOPE} [role="tablist"][aria-label="${UI.experienceTablistLabel}"] [role="tab"][aria-selected="true"]')).borderBottomColor`)
   expect(border).toBe('rgb(245, 158, 11)') // --color-gold
@@ -182,8 +182,8 @@ test('playground 互動後狀態所有文字對比 ≥ 4.5', async ({ page }) =>
 // paints, not against the control's own fill.
 //
 // Only the four side midpoints are sampled. The bounding box corners are not
-// on the ring at all once the control is rounded (`.startOver` is a pill at
-// focus), so sampling them would report a background the ring never touches.
+// on the ring at all once the control is rounded (the Reset button is a pill),
+// so sampling them would report a background the ring never touches.
 //
 // An indicator may be made of more than one band: an outline plus a
 // box-shadow ring reads as one indicator, and it is enough for ONE band to
@@ -229,15 +229,21 @@ type Ring = {
 
 // `finder` is a DOM expression rather than a Playwright locator: the ring has
 // to be measured inside the page, where `:has-text()` and friends do not exist.
-async function measureRing(page: import('@playwright/test').Page, finder: string): Promise<Ring> {
-  // Chromium only matches :focus-visible on a programmatically focused button
-  // when the last interaction was a keypress, so prime keyboard modality first.
-  // Tab moves focus away; the focus() below takes it straight back.
-  await page.keyboard.press('Tab')
-  await page.evaluate(`(() => { ${finder}.focus() })()`)
-  // .startOver animates its width over .18s on focus, and switching mode runs
-  // handleReset, which scrolls the page back to the top of the playground on
-  // the next frame. Both have to land before the ring is located.
+async function measureRing(
+  page: import('@playwright/test').Page,
+  finder: string,
+  { refocus = true }: { refocus?: boolean } = {},
+): Promise<Ring> {
+  if (refocus) {
+    // Chromium only matches :focus-visible on a programmatically focused button
+    // when the last interaction was a keypress, so prime keyboard modality first.
+    // Tab moves focus away; the focus() below takes it straight back.
+    await page.keyboard.press('Tab')
+    await page.evaluate(`(() => { ${finder}.focus() })()`)
+  }
+  // Let any scroll the page itself started (a completion scrolls the stage 02
+  // signal into view with an explicit smooth behaviour) and any hover/focus
+  // transition land before the ring is located, then centre the control.
   await page.waitForTimeout(400)
   await page.evaluate(`(() => { ${finder}.scrollIntoView({ block: 'center' }) })()`)
   return page.evaluate(`(() => {
@@ -247,8 +253,8 @@ async function measureRing(page: import('@playwright/test').Page, finder: string
   })()`)
 }
 
-const MODE_TAB = `[role="tablist"][aria-label="${UI.experienceTablistLabel}"] [role="tab"]`
-const LENS_TAB = `[role="tablist"][aria-label="${UI.canvas.customerTablistLabel}"] [role="tab"]`
+const EXPERIENCE_TAB = `[role="tablist"][aria-label="${UI.experienceTablistLabel}"] [role="tab"]`
+const CUSTOMER_TAB = `[role="tablist"][aria-label="${UI.canvas.customerTablistLabel}"] [role="tab"]`
 const byText = (text: string) =>
   `[...document.querySelectorAll('button')].find((b) => b.textContent.includes(${JSON.stringify(text)}))`
 const first = (selector: string) => `document.querySelector(${JSON.stringify(selector)})`
@@ -261,8 +267,8 @@ test('每一類控制項的 focus ring 對相鄰底色 ≥ 3:1（WCAG 1.4.11）'
   await page.addStyleTag({ content: '*, html { scroll-behavior: auto !important }' })
   const results: Record<string, { ratio: number; bands: string[]; worstBg: string; at: number[] }> = {}
 
-  const check = async (name: string, finder: string) => {
-    const ring = await measureRing(page, finder)
+  const check = async (name: string, finder: string, options?: { refocus?: boolean }) => {
+    const ring = await measureRing(page, finder, options)
     expect(ring.focusVisible, `${name} 沒有進入 :focus-visible，量到的不是 focus ring`).toBe(true)
     expect(ring.width, `${name} 沒有 outline`).toBeGreaterThan(0)
     expect(ring.samples.length, `${name} 的 ring 四邊沒有全部取到相鄰底色`).toBe(4)
@@ -283,22 +289,30 @@ test('每一類控制項的 focus ring 對相鄰底色 ≥ 3:1（WCAG 1.4.11）'
     }
   }
 
-  await check('modeTabs button', first(MODE_TAB))
-  await check('lensTabs button', first(LENS_TAB))
+  await check('experience tab', first(EXPERIENCE_TAB))
+  await check('customer tab', first(CUSTOMER_TAB))
   await check('choice (chat question)', first('button[class*="choice"]'))
-  await check('startOver', first('button[class*="reset"]'))
+  await check('reset', first('button[class*="reset"]'))
 
-  // Quote mode unlocks four more of the eight control classes the rule covers.
+  // A keyboard Chat answer moves focus to the stage 02 raw-signal copy. Its
+  // ring is measured where the app put it, without re-focusing: the copy sits
+  // in a boxed surface now, so the ring has to clear that box, not the page.
+  await page.locator('button[class*="choice"]').first().focus()
+  await page.keyboard.press('Enter')
+  await expect(page.locator('#stage-02-copy')).toBeFocused()
+  await check('stage 02 signal (after keyboard Chat answer)', first('#stage-02-copy'), { refocus: false })
+
+  // Entering Quote renders its step controls and the signature input at once;
+  // the share buttons only appear once a line is selected.
   await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
   await expect(page.getByText(UI.quote.step1)).toBeVisible()
   await check('choice (quote option)', first('button[class*="choice"]'))
   await check('quoteFeedbackChoice', first('[role="radiogroup"][aria-label="' + UI.quote.feedbackLabel + '"] [role="radio"]'))
+  await check('quote signature input', first('input[class*="signatureInput"]'))
 
   await page.locator('button[class*="choice"]').first().click()
   await page.getByRole('radio', { name: 'Helpful', exact: true }).click()
   await check('quoteAction', first('button[class*="shareButton"]'))
-  // The signature input only exists once a quote is selected (above).
-  await check('quote signature input', first('input[class*="signatureInput"]'))
 
   await page.getByRole('tab', { name: EXPERIENCE_LABELS.listen, exact: true }).click()
   await check('listenToggle', first('button[class*="listenToggle"]'))

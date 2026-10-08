@@ -180,4 +180,52 @@ describe('ExperiencePanel', () => {
     expect(replay).toHaveBeenCalledOnce()
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
   })
+
+  const iconPaths = (button: HTMLElement) => {
+    const svgs = button.querySelectorAll('svg')
+    expect(svgs).toHaveLength(1)
+    const svg = svgs[0]
+    expect(svg).toHaveAttribute('aria-hidden', 'true')
+    expect(svg).toHaveAttribute('focusable', 'false')
+    expect(svg).toHaveAttribute('viewBox', '0 0 24 24')
+    expect(svg).toHaveAttribute('width', '18')
+    expect(svg).toHaveAttribute('height', '18')
+    return { svg, paths: Array.from(svg.querySelectorAll('path')) }
+  }
+
+  it.each([
+    ['idle', { status: 'idle', elapsed: 0 }, UI.listen.play],
+    ['paused', { status: 'paused', elapsed: 7 }, UI.listen.play],
+  ] as const)('renders the play icon on the Listen toggle when %s', (_name, listen, label) => {
+    render(<Harness initial={{ ...INITIAL_STATE, experience: 'listen', listen }} />)
+    const button = screen.getByRole('button', { name: label })
+    const { svg, paths } = iconPaths(button)
+    expect(svg).toHaveAttribute('fill', 'currentColor')
+    expect(paths.map((path) => path.getAttribute('d'))).toEqual(['M8 5v14l11-7L8 5Z'])
+    expect(button).toHaveTextContent(label)
+  })
+
+  it('renders the pause icon on the Listen toggle while playing', () => {
+    render(<Harness initial={{ ...INITIAL_STATE, experience: 'listen', listen: { status: 'playing', elapsed: 5 } }} />)
+    const button = screen.getByRole('button', { name: UI.listen.pause })
+    const { svg, paths } = iconPaths(button)
+    expect(svg).toHaveAttribute('fill', 'currentColor')
+    expect(paths.map((path) => path.getAttribute('d'))).toEqual(['M7 5h3v14H7zM14 5h3v14h-3z'])
+    expect(button).toHaveTextContent(UI.listen.pause)
+  })
+
+  it('renders the stroked replay icon on the Listen toggle when completed', () => {
+    render(<Harness initial={{ ...INITIAL_STATE, experience: 'listen', listen: { status: 'completed', elapsed: 32 } }} />)
+    const button = screen.getByRole('button', { name: UI.listen.replay })
+    const { svg, paths } = iconPaths(button)
+    expect(svg).toHaveAttribute('fill', 'none')
+    expect(paths.map((path) => path.getAttribute('d'))).toEqual(['M20 11a8 8 0 1 0 2 5.3', 'M20 4v7h-7'])
+    for (const path of paths) {
+      expect(path).toHaveAttribute('stroke', 'currentColor')
+      expect(path).toHaveAttribute('stroke-width', '2')
+      expect(path).toHaveAttribute('stroke-linecap', 'round')
+    }
+    expect(paths[1]).toHaveAttribute('stroke-linejoin', 'round')
+    expect(button).toHaveTextContent(UI.listen.replay)
+  })
 })
