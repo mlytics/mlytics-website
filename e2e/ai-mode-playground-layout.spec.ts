@@ -465,6 +465,61 @@ test.describe('prototype parity', () => {
     await expect(page.locator('#canvas-title')).toHaveCSS('font-size', '28.8px')
   })
 
+  for (const { width, height, size } of [{ width: 375, height: 812, size: '18px' }, { width: 1280, height: 800, size: '24px' }]) {
+    test(`experience card titles are ${size} at ${width}`, async ({ page }) => {
+      await page.setViewportSize({ width, height })
+      await page.goto('/ai-mode-playground/')
+      for (const label of [EXPERIENCE_LABELS.chat, EXPERIENCE_LABELS.quote, EXPERIENCE_LABELS.listen]) {
+        await experienceTabs(page).getByRole('tab', { name: label, exact: true }).click()
+        const title = page.locator('[class*="cardTitle"]').filter({ visible: true })
+        await expect(title).toHaveCount(1)
+        await expect(title).toHaveCSS('font-size', size)
+      }
+    })
+  }
+
+  // Owner decision: Reset stays on the title row, pinned top-right. Its
+  // vertical centre sits on the centre of the title's FIRST line, so a title
+  // that wraps grows downward without dragging Reset with it.
+  for (const { width, height } of [{ width: 320, height: 720 }, { width: 375, height: 812 }, { width: 1280, height: 800 }]) {
+    test(`experience card Reset is pinned to the title's first line at ${width}`, async ({ page }) => {
+      await page.setViewportSize({ width, height })
+      await page.goto('/ai-mode-playground/')
+      const lineCounts: Record<string, number> = {}
+      for (const [key, label] of [['chat', EXPERIENCE_LABELS.chat], ['quote', EXPERIENCE_LABELS.quote], ['listen', EXPERIENCE_LABELS.listen]] as const) {
+        await experienceTabs(page).getByRole('tab', { name: label, exact: true }).click()
+        const header = page.locator('[class*="cardHeader"]').filter({ visible: true })
+        await expect(header).toHaveCount(1)
+        const m = await header.evaluate((el) => {
+          const title = el.querySelector('h3') as HTMLElement
+          const reset = el.querySelector('button') as HTMLElement
+          const t = title.getBoundingClientRect()
+          const r = reset.getBoundingClientRect()
+          const h = el.getBoundingClientRect()
+          const lineHeight = parseFloat(getComputedStyle(title).lineHeight)
+          return {
+            alignItems: getComputedStyle(el).alignItems,
+            lines: Math.round(t.height / lineHeight),
+            firstLineCenter: t.top + lineHeight / 2,
+            resetCenter: r.top + r.height / 2,
+            resetRight: r.right,
+            headerRight: h.right,
+            titleRight: t.right,
+          }
+        })
+        lineCounts[key] = m.lines
+        expect(m.alignItems, `${key} header alignment`).toBe('flex-start')
+        expect(Math.abs(m.resetCenter - m.firstLineCenter), `${key} Reset centre vs title first line`).toBeLessThanOrEqual(2)
+        expect(Math.abs(m.resetRight - m.headerRight), `${key} Reset right edge`).toBeLessThanOrEqual(1)
+        expect(m.titleRight, `${key} title does not run under Reset`).toBeLessThanOrEqual(m.resetRight)
+      }
+      // The case this decision exists for: at 320 the Quote title wraps, and
+      // Reset must still sit on its first line (asserted above), not the middle.
+      if (width === 320) expect(lineCounts.quote, 'Quote title wraps at 320').toBeGreaterThan(1)
+      if (width === 1280) for (const key of ['chat', 'quote', 'listen']) expect(lineCounts[key], `${key} is one line on desktop`).toBe(1)
+    })
+  }
+
   test('the quote card has its gradient and both decorations', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/ai-mode-playground/')

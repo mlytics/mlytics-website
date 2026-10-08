@@ -84,7 +84,9 @@
 
 .cardHeader {
   display: flex;
-  align-items: center;
+  /* Reset is pinned top-right (owner decision): a title that wraps grows
+     downward and Reset stays on its first line. */
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
@@ -115,6 +117,9 @@
   color: var(--color-ink-muted);
   font-size: var(--font-size-caption);
   font-weight: 700;
+  /* Centre Reset on the title's first line: (title line box - Reset's 34px
+     min-height) / 2. 24px x 1.375 = 33px line box -> -0.5px. */
+  margin-top: calc((var(--font-size-h3) * 1.375 - 34px) / 2);
 }
 
 .reset:hover {
@@ -479,6 +484,19 @@
 
   .instruction {
     padding-inline: 16px;
+  }
+
+  /* 18px on phones, matching the site's mobile card-title precedent
+     (publishers KnowledgeBaseSection: text-lg). The unitless 1.375
+     line-height carries over, so the ratio matches desktop. */
+  .cardTitle {
+    font-size: 1.125rem;
+  }
+
+  /* Same first-line centring for the 18px title:
+     18px x 1.375 = 24.75px line box -> (24.75 - 34) / 2 = -4.625px. */
+  .reset {
+    margin-top: calc((1.125rem * 1.375 - 34px) / 2);
   }
 
   .feedback {
