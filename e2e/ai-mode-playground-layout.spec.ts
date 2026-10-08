@@ -194,15 +194,14 @@ test('sticky lens shell follows the desktop nav as it hides and shows, leaving n
   expect(shown.stripCovered).toBe(true)
 })
 
-test('chat answer scrolls to the canvas and switches stage copy', async ({ page }) => {
+test('chat answer focuses the stage 02 signal and switches stage copy', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/ai-mode-playground/')
   await page.getByRole('button', { name: CHAT_QUESTIONS[0], exact: true }).click()
-  // A Chat answer moves focus to the stage 02 raw-signal copy.
+  // A Chat answer moves focus to the stage 02 raw-signal copy; the loop at the
+  // end of this file checks that it lands fully in view below the sticky shell.
   await expect(page.locator('#stage-02-copy')).toBeFocused()
   await expect(page.locator('[data-stage="03"] [class*="cellBody"]').first()).toContainText('Are one product’s specs worth turning into a searchable piece')
-  await expect.poll(async () => (await page.locator('#canvas-title').boundingBox())?.y ?? -1).toBeGreaterThanOrEqual(65)
-  await expect.poll(async () => (await page.locator('#canvas-title').boundingBox())?.y ?? -1).toBeLessThanOrEqual(140)
 })
 
 test('path tags are visually hidden on desktop but present in the DOM', async ({ page }) => {
@@ -224,48 +223,133 @@ test('Listen progresses and incomplete playback resets when changing experience'
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
 })
 
-for (const viewport of [{ width: 1280, height: 800 }, { width: 375, height: 812 }]) {
-  test(`Quote feedback brings the focused stage 02 signal fully into view below the sticky shell at ${viewport.width}×${viewport.height}`, async ({ page }) => {
-    await page.setViewportSize(viewport)
-    await page.goto('/ai-mode-playground/')
-    await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
-    await page.getByRole('button', { name: /Before you choose/ }).click()
-    await page.getByRole('radio', { name: 'Helpful', exact: true }).focus()
-    await page.keyboard.press('Space')
+const completions = [
+  {
+    name: 'Quote feedback',
+    complete: async (page: Page) => {
+      await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+      await page.getByRole('button', { name: /Before you choose/ }).click()
+      await page.getByRole('radio', { name: 'Helpful', exact: true }).focus()
+      await page.keyboard.press('Space')
+    },
+  },
+  {
+    name: 'A Chat answer',
+    complete: async (page: Page) => {
+      await page.getByRole('button', { name: CHAT_QUESTIONS[0], exact: true }).focus()
+      await page.keyboard.press('Enter')
+    },
+  },
+]
 
-    const signal = page.locator('#stage-02-copy')
-    await expect(signal).toBeFocused()
-    // Smooth scrolling and the nav's hide/show both move things: wait until
-    // scroll position and the signal's box hold still for several frames.
-    await page.evaluate(() => new Promise<void>((resolve) => {
-      const element = document.getElementById('stage-02-copy')!
-      let last = ''
-      let stable = 0
-      const tick = () => {
-        const key = `${window.scrollY}:${element.getBoundingClientRect().top}`
-        stable = key === last ? stable + 1 : 0
-        last = key
-        if (stable >= 10) resolve()
-        else requestAnimationFrame(tick)
-      }
-      requestAnimationFrame(tick)
-    }))
-    const geometry = await page.evaluate(() => {
-      const signalRect = document.getElementById('stage-02-copy')!.getBoundingClientRect()
-      const shellRect = document.querySelector('[class*="customerTabsShell"]')!.getBoundingClientRect()
-      const navBottom = [...document.querySelectorAll('header, nav')]
-        .map((element) => element.getBoundingClientRect().bottom)
-        .reduce((max, bottom) => Math.max(max, bottom), 0)
-      return {
-        top: signalRect.top,
-        bottom: signalRect.bottom,
-        coveredUntil: Math.max(shellRect.bottom, navBottom),
-        viewportHeight: window.innerHeight,
-        active: document.activeElement?.id,
-      }
+const waitForSignalToSettle = (page: Page) => page.evaluate(() => new Promise<void>((resolve) => {
+  const element = document.getElementById('stage-02-copy')!
+  let last = ''
+  let stable = 0
+  const tick = () => {
+    const key = `${window.scrollY}:${element.getBoundingClientRect().top}`
+    stable = key === last ? stable + 1 : 0
+    last = key
+    if (stable >= 10) resolve()
+    else requestAnimationFrame(tick)
+  }
+  requestAnimationFrame(tick)
+}))
+
+for (const viewport of [{ width: 1280, height: 800 }, { width: 375, height: 812 }, { width: 375, height: 667 }]) {
+  for (const { name, complete } of completions) {
+    test(`${name} brings the focused stage 02 signal fully into view below the sticky shell at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+      await page.setViewportSize(viewport)
+      await page.goto('/ai-mode-playground/')
+      await complete(page)
+
+      const signal = page.locator('#stage-02-copy')
+      await expect(signal).toBeFocused()
+      // Smooth scrolling and the nav's hide/show both move things: wait until
+      // scroll position and the signal's box hold still for several frames.
+      await waitForSignalToSettle(page)
+      const geometry = await page.evaluate(() => {
+        const signalRect = document.getElementById('stage-02-copy')!.getBoundingClientRect()
+        const shellRect = document.querySelector('[class*="customerTabsShell"]')!.getBoundingClientRect()
+        const navBottom = [...document.querySelectorAll('header, nav')]
+          .map((element) => element.getBoundingClientRect().bottom)
+          .reduce((max, bottom) => Math.max(max, bottom), 0)
+        return {
+          top: signalRect.top,
+          bottom: signalRect.bottom,
+          coveredUntil: Math.max(shellRect.bottom, navBottom),
+          viewportHeight: window.innerHeight,
+          active: document.activeElement?.id,
+        }
+      })
+      expect(geometry.active).toBe('stage-02-copy')
+      expect(geometry.top).toBeGreaterThanOrEqual(geometry.coveredUntil)
+      expect(geometry.bottom).toBeLessThanOrEqual(geometry.viewportHeight)
     })
-    expect(geometry.active).toBe('stage-02-copy')
-    expect(geometry.top).toBeGreaterThanOrEqual(geometry.coveredUntil)
-    expect(geometry.bottom).toBeLessThanOrEqual(geometry.viewportHeight)
-  })
+  }
 }
+
+test.describe('with prefers-reduced-motion: reduce', () => {
+  const reducedMotionCases = [
+    {
+      name: 'A Chat answer',
+      prepare: async () => {},
+      trigger: (page: Page) => page.getByRole('button', { name: CHAT_QUESTIONS[0], exact: true }),
+      key: 'Enter',
+    },
+    {
+      name: 'Quote feedback',
+      prepare: async (page: Page) => {
+        await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+        await page.getByRole('button', { name: /Before you choose/ }).click()
+      },
+      trigger: (page: Page) => page.getByRole('radio', { name: 'Helpful', exact: true }),
+      key: 'Space',
+    },
+  ]
+
+  for (const { name, prepare, trigger, key } of reducedMotionCases) {
+    test(`${name} jumps straight to the signal with no intermediate scroll frames`, async ({ page }) => {
+      // A stacked phone layout puts the signal well below the control, so the
+      // completion has a real distance to scroll.
+      await page.setViewportSize({ width: 375, height: 667 })
+      // `test.use({ reducedMotion })` does not reach the page under this
+      // project config; emulateMedia does, and the check below proves it.
+      await page.emulateMedia({ reducedMotion: 'reduce' })
+      await page.goto('/ai-mode-playground/')
+      expect(await page.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true)
+      // The page-wide smooth scroll is still in force; the scroll call itself
+      // has to opt out of it.
+      expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe('smooth')
+      await prepare(page)
+      const control = trigger(page)
+      await control.scrollIntoViewIfNeeded()
+      await waitForSignalToSettle(page)
+      const before = await page.evaluate(() => window.scrollY)
+      await page.evaluate(() => {
+        const log: number[] = []
+        ;(window as unknown as { __scrollLog: number[] }).__scrollLog = log
+        window.addEventListener('scroll', () => log.push(window.scrollY), { passive: true })
+      })
+      await control.focus()
+      await page.keyboard.press(key)
+      await expect(page.locator('#stage-02-copy')).toBeFocused()
+      // Sample scrollY on the next few frames: an instant scroll is already at
+      // its final value on the first sample; a smooth one is still moving.
+      const samples = await page.evaluate(() => new Promise<number[]>((resolve) => {
+        const values: number[] = []
+        const tick = () => {
+          values.push(window.scrollY)
+          if (values.length >= 6) resolve(values)
+          else requestAnimationFrame(tick)
+        }
+        requestAnimationFrame(tick)
+      }))
+      const scrollLog = await page.evaluate(() => (window as unknown as { __scrollLog: number[] }).__scrollLog)
+      expect(samples[0]).not.toBe(before)
+      expect(samples).toEqual(samples.map(() => samples[0]))
+      // Every scroll event saw the same position: there was one jump, no glide.
+      expect(new Set(scrollLog)).toEqual(new Set([samples[0]]))
+    })
+  }
+})

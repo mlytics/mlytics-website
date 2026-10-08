@@ -124,6 +124,13 @@ export function AiModePlayground() {
   }
 
   const handleSelectQuote = (index: 0 | 1 | 2) => {
+    // Feedback picked before any line: this line is the one that completes
+    // Quote, so it gets the same focus move and announcement as the reverse order.
+    if (state.quote.index === null && state.quote.feedback) {
+      if (!dispatchWithEffect({ type: 'quote/select', index }, 'signal')) return
+      announce(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+      return
+    }
     dispatch({ type: 'quote/select', index })
     announce(ANNOUNCE.quoteSelected)
   }
@@ -172,16 +179,16 @@ export function AiModePlayground() {
     const pending = pendingEffectRef.current
     if (!pending) return
     pendingEffectRef.current = null
+    // 'instant', not 'auto': 'auto' defers to the computed `scroll-behavior`,
+    // and globals.css sets `html { scroll-behavior: smooth }`, so reduced-motion
+    // users would still get a smooth scroll.
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    if (pending === 'chat') {
-      titleRef.current?.scrollIntoView?.({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
-      signalRef.current?.focus({ preventScroll: true })
-    } else {
-      // Centre rather than align to the top so the sticky nav + customer tabs
-      // shell cannot cover the signal copy once it is scrolled into view.
-      signalRef.current?.scrollIntoView?.({ block: 'center', behavior: reduced ? 'auto' : 'smooth' })
-      signalRef.current?.focus({ preventScroll: true })
-    }
+    const behavior: ScrollBehavior = reduced ? 'instant' : 'smooth'
+    // Chat and every other completion land the same way: the focused signal
+    // copy is centred rather than aligned to the top, so the sticky nav +
+    // customer tabs shell cannot cover it, even on short phone viewports.
+    signalRef.current?.scrollIntoView?.({ block: 'center', behavior })
+    signalRef.current?.focus({ preventScroll: true })
   }, [state])
 
   const captures = deriveCaptures(state)

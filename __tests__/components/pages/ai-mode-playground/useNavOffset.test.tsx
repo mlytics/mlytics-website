@@ -139,6 +139,18 @@ describe('useNavOffset', () => {
     expect(frames).toHaveLength(0)
   })
 
+  for (const type of ['scroll', 'resize'] as const) {
+    it(`stops listening to window ${type} after unmount`, () => {
+      const { unmount } = render(<Harness />)
+      // Mount writes synchronously and queues no frame, so a still-attached
+      // listener would queue one on the next event.
+      expect(frames).toHaveLength(0)
+      unmount()
+      window.dispatchEvent(new Event(type))
+      expect(frames).toHaveLength(0)
+    })
+  }
+
   it('does nothing when there is no fixed nav', () => {
     nav.style.position = 'static'
     const { getByTestId } = render(<Harness />)

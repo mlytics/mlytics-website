@@ -47,14 +47,19 @@ function setupTimers() {
 }
 
 describe('AiModePlayground interactions', () => {
-  it('captures a Chat answer, focuses the raw signal, scrolls the canvas, and announces it', async () => {
+  it('captures a Chat answer, centres and focuses the raw signal, and announces it', async () => {
     const user = setupTimers()
     render(<AiModePlayground />)
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
     await user.click(screen.getByRole('button', { name: CHAT_QUESTIONS[0] }))
     await act(async () => { vi.runAllTimers() })
-    expect(scrolledElement).toBe(document.getElementById('canvas-title'))
-    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' })
-    expect(document.getElementById('stage-02-copy')).toHaveFocus()
+    const signal = document.getElementById('stage-02-copy')
+    expect(scrolledElement).toBe(signal)
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(1)
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ block: 'center', behavior: 'smooth' })
+    expect(focus.mock.contexts.filter((element) => element === signal)).toHaveLength(1)
+    expect(focus.mock.calls[focus.mock.contexts.indexOf(signal)]).toEqual([{ preventScroll: true }])
+    expect(signal).toHaveFocus()
     expect(screen.getByText(PATHS['content-owners'][0].chatVariants[0].question)).toBeInTheDocument()
     expect(screen.getAllByRole('status')).toHaveLength(1)
     expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.chatAnswered)
@@ -114,8 +119,12 @@ describe('AiModePlayground interactions', () => {
     render(<AiModePlayground />)
     await user.click(experienceTab(EXPERIENCE_LABELS.quote))
     await user.click(screen.getByRole('button', { name: /Before you choose/ }))
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
     await user.click(screen.getByRole('radio', { name: 'Helpful' }))
     await act(async () => { vi.runAllTimers() })
+    const signal = document.getElementById('stage-02-copy')
+    expect(focus.mock.contexts.filter((element) => element === signal)).toHaveLength(1)
+    expect(focus.mock.calls[focus.mock.contexts.indexOf(signal)]).toEqual([{ preventScroll: true }])
     expect(document.getElementById('stage-02-copy')).toHaveFocus()
     expect(scrolledElement).toBe(document.getElementById('stage-02-copy'))
     expect(HTMLElement.prototype.scrollIntoView).toHaveBeenLastCalledWith({ block: 'center', behavior: 'smooth' })
@@ -124,6 +133,70 @@ describe('AiModePlayground interactions', () => {
     await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
     expect(document.getElementById('stage-02-copy')).toHaveTextContent(UI.quote.actions.line)
   })
+
+  it('completes Quote when a line is picked after the feedback: focuses the signal and announces completion', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+    await act(async () => { vi.runAllTimers() })
+    // Feedback alone does not complete Quote: no focus move, no scroll.
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.feedbackSelected('Helpful'))
+    expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
+    expect(document.getElementById('stage-02-copy')).not.toHaveFocus()
+
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
+    await user.click(screen.getByRole('button', { name: /Before you choose/ }))
+    await act(async () => { vi.runAllTimers() })
+    const signal = document.getElementById('stage-02-copy')
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+    expect(screen.getByRole('status')).not.toHaveTextContent(ANNOUNCE.quoteSelected)
+    expect(scrolledElement).toBe(signal)
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(1)
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ block: 'center', behavior: 'smooth' })
+    expect(focus.mock.calls[focus.mock.contexts.indexOf(signal)]).toEqual([{ preventScroll: true }])
+    expect(signal).toHaveFocus()
+    expect(screen.getByText(/responded “Helpful”/)).toBeInTheDocument()
+  })
+
+  it('still announces a plain line selection when no feedback has been picked yet', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    const lineButton = screen.getByRole('button', { name: /Before you choose/ })
+    await user.click(lineButton)
+    await act(async () => { vi.runAllTimers() })
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.quoteSelected)
+    expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
+    expect(document.getElementById('stage-02-copy')).not.toHaveFocus()
+  })
+
+  for (const [name, complete] of [
+    ['Chat answer', async (user: ReturnType<typeof userEvent.setup>) => {
+      await user.click(screen.getByRole('button', { name: CHAT_QUESTIONS[0] }))
+    }],
+    ['completed Quote', async (user: ReturnType<typeof userEvent.setup>) => {
+      await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+      await user.click(screen.getByRole('button', { name: /Before you choose/ }))
+      await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+    }],
+  ] as const) {
+    it(`scrolls instantly for reduced-motion users after a ${name}, overriding the smooth html scroll-behavior`, async () => {
+      vi.stubGlobal('matchMedia', vi.fn((query: string) => ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+      })))
+      const user = setupTimers()
+      render(<AiModePlayground />)
+      await complete(user)
+      await act(async () => { vi.runAllTimers() })
+      expect(scrolledElement).toBe(document.getElementById('stage-02-copy'))
+      expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(1)
+      expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ block: 'center', behavior: 'instant' })
+      expect(document.getElementById('stage-02-copy')).toHaveFocus()
+    })
+  }
 
   it('ignores a repeated share action so a later keystroke keeps focus and nothing is re-announced', async () => {
     const user = setupTimers()
