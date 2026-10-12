@@ -223,6 +223,10 @@ describe('playgroundReducer: media events', () => {
     expect(playgroundReducer(errored, { type: 'listen/complete' })).toBe(errored)
   })
 
+  it('ignores a stale error unless playing or paused', () => {
+    for (const state of [idle, completed, errored]) expect(playgroundReducer(state, { type: 'listen/error' })).toBe(state)
+  })
+
   it('guards mediaPause and mediaPlay', () => {
     expect(playgroundReducer(playing, { type: 'listen/mediaPause' }).listen).toEqual({ status: 'paused', elapsed: 3 })
     for (const state of [paused, idle, completed, errored]) expect(playgroundReducer(state, { type: 'listen/mediaPause' })).toBe(state)
@@ -230,10 +234,14 @@ describe('playgroundReducer: media events', () => {
     for (const state of [playing, idle, completed, errored]) expect(playgroundReducer(state, { type: 'listen/mediaPlay' })).toBe(state)
   })
 
-  it('moves to error keeping elapsed, gives no listen capture, and retries through replay', () => {
+  it('moves to error keeping elapsed and the last partial signal, and retries through replay', () => {
     const next = playgroundReducer(playing, { type: 'listen/error' })
     expect(next.listen).toEqual({ status: 'error', elapsed: 3 })
-    expect(deriveCaptures(next)).not.toHaveProperty('listen')
+    expect(deriveCaptures(next).listen).toEqual(CAPTURE.listen({ status: 'error', elapsed: 3 }))
+    expect(playgroundReducer(paused, { type: 'listen/error' }).listen).toEqual({ status: 'error', elapsed: 3 })
+    const atStart = playgroundReducer({ ...playing, listen: { status: 'playing', elapsed: 0 } }, { type: 'listen/error' })
+    expect(atStart.listen.status).toBe('error')
+    expect(deriveCaptures(atStart)).not.toHaveProperty('listen')
     expect(playgroundReducer(next, { type: 'listen/error' })).toBe(next)
     expect(playgroundReducer(next, { type: 'listen/replay' }).listen).toEqual({ status: 'playing', elapsed: 0 })
   })
@@ -255,7 +263,7 @@ describe('CAPTURE.listen', () => {
     [2, 7],
   ])('playing at %i s (before the opening sponsor finishes) is state 1 at %i%%', (e, pct) => {
     expect(CAPTURE.listen({ status: 'playing', elapsed: e })).toEqual({
-      observation: 'The user pressed play and started listening to the article’s audio overview.',
+      observation: 'The user pressed play and started the article’s audio overview.',
       rawSignal: `Played so far: ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: in progress.`,
     })
   })
@@ -266,7 +274,7 @@ describe('CAPTURE.listen', () => {
     [26, 96],
   ])('playing at %i s (past the opening sponsor) is state 2 at %i%%', (e, pct) => {
     expect(CAPTURE.listen({ status: 'playing', elapsed: e })).toEqual({
-      observation: `The user is listening to the audio overview and has played past the opening sponsor message ${opening}.`,
+      observation: `The audio overview is playing and has played past the opening sponsor message ${opening}.`,
       rawSignal: `Played so far: ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: played. Closing sponsor message: not yet played.`,
     })
   })
@@ -276,7 +284,7 @@ describe('CAPTURE.listen', () => {
     [12, 44],
   ])('paused at %i s (after the opening sponsor) is state 3 at %i%%', (e, pct) => {
     expect(CAPTURE.listen({ status: 'paused', elapsed: e })).toEqual({
-      observation: `The user listened for ${e} seconds (${pct}%), then paused. The opening sponsor message ${opening} played.`,
+      observation: `The user paused the audio at ${e} seconds (${pct}%). The opening sponsor message ${opening} played.`,
       rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: played. Closing sponsor message: not played.`,
     })
   })
@@ -287,21 +295,35 @@ describe('CAPTURE.listen', () => {
     [2, '2 seconds', 7],
   ])('paused at %i s (before the opening sponsor finishes) is state 4: "%s" at %i%%', (e, listened, pct) => {
     expect(CAPTURE.listen({ status: 'paused', elapsed: e })).toEqual({
-      observation: `The user listened for ${listened} (${pct}%), then paused before the opening sponsor message ${opening} finished.`,
+      observation: `The user paused the audio at ${listened} (${pct}%), before the opening sponsor message ${opening} finished.`,
       rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: not finished.`,
     })
   })
 
   it('completed is state 5 with both sponsor impressions', () => {
     expect(CAPTURE.listen({ status: 'completed', elapsed: 27 })).toEqual({
-      observation: `The user listened to the full 27-second audio overview. Both sponsor messages ${opening} played.`,
+      observation: `The user played the full 27-second audio overview. Both sponsor messages ${opening} played.`,
       rawSignal: `Played: 27 of 27 seconds (100%). Sponsor message impressions ${opening}: 2 of 2.`,
     })
   })
 
-  it('gives no listen capture when idle or errored', () => {
+  it('gives no listen capture when idle or when an error hit before any audio played', () => {
     expect(deriveCaptures({ ...INITIAL_STATE, listen: { status: 'idle', elapsed: 0 } })).not.toHaveProperty('listen')
-    expect(deriveCaptures({ ...INITIAL_STATE, listen: { status: 'error', elapsed: 5 } })).not.toHaveProperty('listen')
+    expect(deriveCaptures({ ...INITIAL_STATE, listen: { status: 'error', elapsed: 0 } })).not.toHaveProperty('listen')
+  })
+
+  it.each([
+    [1, '1 second', 4, false],
+    [2, '2 seconds', 7, false],
+    [3, '3 seconds', 11, true],
+    [12, '12 seconds', 44, true],
+  ])('an error at %i s keeps the partial signal ("%s", %i%%)', (e, seconds, pct, openingPlayed) => {
+    const expected = {
+      observation: `The audio stopped at ${seconds} (${pct}%) because playback failed.${openingPlayed ? ` The opening sponsor message ${opening} played.` : ''}`,
+      rawSignal: `Stopped by a playback error at ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: ${openingPlayed ? 'played' : 'not finished'}.`,
+    }
+    expect(CAPTURE.listen({ status: 'error', elapsed: e })).toEqual(expected)
+    expect(deriveCaptures({ ...INITIAL_STATE, listen: { status: 'error', elapsed: e } }).listen).toEqual(expected)
   })
 })
 

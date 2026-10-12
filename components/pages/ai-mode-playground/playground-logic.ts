@@ -113,7 +113,8 @@ export function playgroundReducer(state: PlaygroundState, action: PlaygroundActi
       if (state.listen.status !== 'paused') return state
       return { ...state, listen: { ...state.listen, status: 'playing' } }
     case 'listen/error':
-      if (state.listen.status === 'error') return state
+      // Only a live session can fail; a late error after stop/reset/completion is stale.
+      if (state.listen.status !== 'playing' && state.listen.status !== 'paused') return state
       return { ...state, listen: { ...state.listen, status: 'error' } }
   }
 }
@@ -130,6 +131,8 @@ export function deriveCaptures(state: PlaygroundState): Captures {
   }
   const { status, elapsed } = state.listen
   if (status === 'playing' || status === 'paused' || status === 'completed') captures.listen = CAPTURE.listen({ status, elapsed })
+  // Error mid-playback keeps the last partial signal; an error before any audio played has none.
+  if (status === 'error' && elapsed > 0) captures.listen = CAPTURE.listen({ status, elapsed })
   return captures
 }
 

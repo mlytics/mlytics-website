@@ -46,6 +46,7 @@ afterEach(() => {
 const experienceTab = (label: string) => screen.getByRole('tab', { name: label })
 const customerTab = (label: string) => screen.getByRole('tab', { name: label })
 const listenAudio = () => document.querySelector('audio') as HTMLAudioElement
+const CAPTURE_COMPLETED_OBSERVATION = 'The user played the full 27-second audio overview. Both sponsor messages (demo sponsor: Mlytics) played.'
 
 function setupTimers() {
   vi.useFakeTimers({ shouldAdvanceTime: true })
@@ -358,12 +359,12 @@ describe('AiModePlayground interactions', () => {
     await user.click(experienceTab(EXPERIENCE_LABELS.listen))
     await user.click(screen.getByRole('button', { name: UI.listen.play }))
     expect(media.play).toHaveBeenCalledOnce()
-    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The user pressed play and started listening to the article’s audio overview.')
+    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The user pressed play and started the article’s audio overview.')
     await act(async () => { media.tick(listenAudio(), 5.4) })
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '5')
     await act(async () => { media.end(listenAudio()) })
     await act(async () => { vi.runOnlyPendingTimers() })
-    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The user listened to the full 27-second audio overview. Both sponsor messages (demo sponsor: Mlytics) played.')
+    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The user played the full 27-second audio overview. Both sponsor messages (demo sponsor: Mlytics) played.')
     expect(document.getElementById('stage-02-copy')).toHaveTextContent('Played: 27 of 27 seconds (100%). Sponsor message impressions (demo sponsor: Mlytics): 2 of 2.')
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '27')
     expect(screen.getByRole('button', { name: UI.listen.replay })).toBeInTheDocument()
@@ -421,7 +422,7 @@ describe('AiModePlayground interactions', () => {
     await act(async () => { vi.runOnlyPendingTimers() })
     expect(screen.getByRole('button', { name: UI.listen.play })).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.listenPaused)
-    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The user listened for 0 seconds (0%), then paused before the opening sponsor message (demo sponsor: Mlytics) finished.')
+    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The user paused the audio at 0 seconds (0%), before the opening sponsor message (demo sponsor: Mlytics) finished.')
   })
 
   it('replays from the start after completion', async () => {
@@ -584,7 +585,13 @@ describe('AiModePlayground interactions', () => {
     await user.click(screen.getByRole('button', { name: UI.listen.play }))
     await act(async () => { media.tick(listenAudio(), 13.9) })
     await act(async () => { vi.advanceTimersByTime(100) })
-    expect(parseFloat(fill.style.width)).toBeCloseTo((13 / 27) * 100, 5)
+    // One ratio source: currentTime / the element's real duration (26.641 s in the stub).
+    expect(parseFloat(fill.style.width)).toBeCloseTo((13.9 / 26.641) * 100, 5)
+    // Pausing keeps the same ratio, so the bar does not jump.
+    await user.click(screen.getByRole('button', { name: UI.listen.pause }))
+    expect(parseFloat(fill.style.width)).toBeCloseTo((13.9 / 26.641) * 100, 5)
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    expect(parseFloat(fill.style.width)).toBeCloseTo((13.9 / 26.641) * 100, 5)
     await act(async () => { media.end(listenAudio()) })
     expect(fill.style.width).toBe('100%')
   })
@@ -718,6 +725,162 @@ describe('AiModePlayground interactions', () => {
       listenAudio().dispatchEvent(new Event('volumechange'))
     })
     expect(screen.getByRole('button', { name: UI.listen.mute })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  const watchAnnouncements = () => {
+    const status = screen.getByRole('status')
+    const seen: string[] = []
+    const observer = new MutationObserver(() => seen.push(status.textContent ?? ''))
+    observer.observe(status, { childList: true, characterData: true, subtree: true })
+    return { seen, stop: () => observer.disconnect() }
+  }
+
+  it.each([
+    ['a tab switch', async (user: ReturnType<typeof setupTimers>) => {
+      await user.click(experienceTab(EXPERIENCE_LABELS.chat))
+    }],
+    ['Reset', async (user: ReturnType<typeof setupTimers>) => {
+      await user.click(screen.getByRole('button', { name: UI.reset }))
+    }],
+    ['completion', async () => {
+      await act(async () => { media.end(listenAudio()) })
+    }],
+  ] as const)('ignores a late media error after %s: no state change, no announcement', async (_name, leave) => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.tick(listenAudio(), 5.2) })
+    await leave(user)
+    await act(async () => { vi.runOnlyPendingTimers() })
+    const before = document.getElementById('stage-01-copy')?.textContent
+    const statusBefore = screen.getByRole('status').textContent
+    const watch = watchAnnouncements()
+    await act(async () => { media.fail(listenAudio()) })
+    await act(async () => { vi.runOnlyPendingTimers() })
+    watch.stop()
+    expect(watch.seen).toEqual([])
+    expect(screen.getByRole('status').textContent).toBe(statusBefore)
+    expect(screen.getByRole('status')).not.toHaveTextContent(ANNOUNCE.listenError)
+    expect(document.getElementById('stage-01-copy')?.textContent).toBe(before)
+    if (screen.queryByRole('tab', { name: EXPERIENCE_LABELS.listen, selected: false })) {
+      await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    }
+    expect(document.getElementById('listen-error')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: UI.listen.retry })).not.toBeInTheDocument()
+  })
+
+  it('pauses a media-key resume while the UI is idle, keeping currentTime where stop() left it', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.tick(listenAudio(), 5.2) })
+    await user.click(experienceTab(EXPERIENCE_LABELS.chat))
+    expect(listenAudio().currentTime).toBe(0)
+    // OS/hardware media key: play() without any UI click.
+    await act(async () => { void listenAudio().play() })
+    expect(listenAudio().paused).toBe(true)
+    expect(listenAudio().currentTime).toBe(0)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    expect(screen.getByRole('button', { name: UI.listen.play })).toBeInTheDocument()
+    expect(screen.getByText(EXPERIENCE_DEFAULT_OBSERVATION.listen)).toBeInTheDocument()
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+  })
+
+  it('pauses a media-key resume after completion and stays completed', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.end(listenAudio()) })
+    await act(async () => { void listenAudio().play() })
+    expect(listenAudio().paused).toBe(true)
+    expect(screen.getByRole('button', { name: UI.listen.replay })).toBeInTheDocument()
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '27')
+    expect(document.getElementById('stage-01-copy')).toHaveTextContent(CAPTURE_COMPLETED_OBSERVATION)
+  })
+
+  it('the screen-reader status says Paused while paused', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    expect(screen.getByText(UI.listen.status.ready)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    expect(screen.getByText(UI.listen.status.playing)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: UI.listen.pause }))
+    expect(screen.getByText(UI.listen.status.paused)).toBeInTheDocument()
+    expect(screen.queryByText(UI.listen.status.ready)).not.toBeInTheDocument()
+  })
+
+  it('an error mid-playback keeps the last partial signal', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.tick(listenAudio(), 5.2) })
+    await act(async () => { media.fail(listenAudio()) })
+    expect(document.getElementById('listen-error')).toHaveTextContent('The audio couldn’t play. Try again.')
+    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The audio stopped at 5 seconds (19%) because playback failed. The opening sponsor message (demo sponsor: Mlytics) played.')
+    expect(document.getElementById('stage-02-copy')).toHaveTextContent('Stopped by a playback error at 5 of 27 seconds (19%). Opening sponsor message (demo sponsor: Mlytics): played.')
+  })
+
+  describe('with media events queued asynchronously (closer to a browser)', () => {
+    beforeEach(() => { media = stubMedia({ async: true }) })
+
+    it('toggle play/pause ends in the state of the last click', async () => {
+      const user = setupTimers()
+      render(<AiModePlayground />)
+      await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+      await user.click(screen.getByRole('button', { name: UI.listen.play }))
+      await act(async () => { await Promise.resolve() })
+      expect(screen.getByRole('button', { name: UI.listen.pause })).toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: UI.listen.pause }))
+      await act(async () => { await Promise.resolve() })
+      expect(listenAudio().paused).toBe(true)
+      expect(screen.getByRole('button', { name: UI.listen.play })).toBeInTheDocument()
+      expect(screen.getByText(UI.listen.status.paused)).toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: UI.listen.play }))
+      await act(async () => { await Promise.resolve() })
+      expect(listenAudio().paused).toBe(false)
+      expect(screen.getByRole('button', { name: UI.listen.pause })).toBeInTheDocument()
+    })
+
+    it('Replay after completion plays from 0 and is not undone by the queued play event', async () => {
+      const user = setupTimers()
+      render(<AiModePlayground />)
+      await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+      await user.click(screen.getByRole('button', { name: UI.listen.play }))
+      await act(async () => { await Promise.resolve() })
+      await act(async () => { media.end(listenAudio()) })
+      await user.click(screen.getByRole('button', { name: UI.listen.replay }))
+      await act(async () => { await Promise.resolve() })
+      expect(listenAudio().paused).toBe(false)
+      expect(listenAudio().currentTime).toBe(0)
+      expect(screen.getByRole('button', { name: UI.listen.pause })).toBeInTheDocument()
+      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+    })
+
+    it('a queued error after a tab switch changes nothing and announces nothing', async () => {
+      const user = setupTimers()
+      render(<AiModePlayground />)
+      await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+      await user.click(screen.getByRole('button', { name: UI.listen.play }))
+      await act(async () => { await Promise.resolve() })
+      await user.click(experienceTab(EXPERIENCE_LABELS.chat))
+      await act(async () => { vi.runOnlyPendingTimers() })
+      const watch = watchAnnouncements()
+      await act(async () => {
+        queueMicrotask(() => media.fail(listenAudio()))
+        await Promise.resolve()
+      })
+      await act(async () => { vi.runOnlyPendingTimers() })
+      watch.stop()
+      expect(watch.seen).toEqual([])
+      await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+      expect(document.getElementById('listen-error')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: UI.listen.play })).toBeInTheDocument()
+    })
   })
 
   it('resets only the current Quote slice while the Chat capture survives', async () => {

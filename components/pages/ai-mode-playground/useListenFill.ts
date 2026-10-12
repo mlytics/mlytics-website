@@ -4,6 +4,18 @@ import { LISTEN_DURATION_SECONDS } from './ai-mode-playground-copy'
 import { activeSentenceIndex } from './playground-logic'
 import type { ListenStatus } from './playground-logic'
 
+/**
+ * The one ratio source for the fill everywhere (playing, reduced motion,
+ * paused, error): currentTime / duration, where duration is the element's own
+ * when known, else LISTEN_DURATION_SECONDS. Displayed totals and signals keep
+ * the rounded 27 s; only the bar uses the real 26.64 s so it never jumps.
+ */
+export function playbackRatio(audio: HTMLAudioElement | null, fallbackElapsed: number): number {
+  const duration = audio && Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : LISTEN_DURATION_SECONDS
+  const time = audio ? audio.currentTime : fallbackElapsed
+  return Math.min(1, Math.max(0, time / duration))
+}
+
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
 
@@ -59,16 +71,14 @@ export function useListenFill(
     }
   }, [audioRef, smooth, tracking, updateSentence])
 
-  // Every state where the width comes from state (or the paused position).
+  // Every state outside the rAF loop. Idle is 0 and completed is 100% (the
+  // ended behaviour); paused, error and reduced-motion playing use the same
+  // ratio as the loop, refreshed on each whole-second timeupdate.
   useEffect(() => {
     const fill = fillRef.current
     if (!active || smooth || !fill) return
-    let ratio = status === 'completed' ? 1 : elapsed / LISTEN_DURATION_SECONDS
-    const audio = audioRef.current
-    if (status === 'paused' && audio && Number.isFinite(audio.duration) && audio.duration > 0) {
-      ratio = audio.currentTime / audio.duration
-    }
-    fill.style.width = `${Math.min(1, Math.max(0, ratio)) * 100}%`
+    const ratio = status === 'completed' ? 1 : status === 'idle' ? 0 : playbackRatio(audioRef.current, elapsed)
+    fill.style.width = `${ratio * 100}%`
   }, [active, audioRef, elapsed, smooth, status])
 
   useEffect(() => {
@@ -77,9 +87,7 @@ export function useListenFill(
     const step = () => {
       const fill = fillRef.current
       const audio = audioRef.current
-      if (fill && audio && Number.isFinite(audio.duration) && audio.duration > 0) {
-        fill.style.width = `${Math.min(1, Math.max(0, audio.currentTime / audio.duration)) * 100}%`
-      }
+      if (fill && audio) fill.style.width = `${playbackRatio(audio, 0) * 100}%`
       if (audio) updateSentence(activeSentenceIndex(audio.currentTime))
       frame = window.requestAnimationFrame(step)
     }

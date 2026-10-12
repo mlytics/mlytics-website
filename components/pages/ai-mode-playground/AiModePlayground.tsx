@@ -68,7 +68,7 @@ export function AiModePlayground() {
   useEffect(() => cancelPendingAnnouncement, [cancelPendingAnnouncement])
 
   const handleListenError = useCallback(() => announce(ANNOUNCE.listenError), [announce])
-  const listenAudio = useListenAudio(dispatch, handleListenError)
+  const listenAudio = useListenAudio(dispatch, handleListenError, state.listen.status)
   const { fillRef: listenFillRef, activeSentence } = useListenFill(listenAudio.audioRef, state.listen.status, state.listen.elapsed, state.experience === 'listen')
 
   // A focus effect is only queued when the action actually changes state. The

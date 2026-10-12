@@ -424,7 +424,7 @@ export const UI: {
     error: string
     progressLabel: string
     progressValueText: (elapsed: number, total: number) => string
-    status: { ready: string; playing: string; completed: string; unavailable: string }
+    status: { ready: string; playing: string; paused: string; completed: string; unavailable: string }
   }
   canvas: { sectionLabel: string; title: string; customerPrompt: string; customerTablistLabel: string; flowLabel: string }
   stages: {
@@ -468,10 +468,10 @@ export const UI: {
     retry: 'Try again',
     transcript: 'Transcript',
     mute: 'Mute',
-    error: 'The audio couldn’t load. Check your connection and try again.',
+    error: 'The audio couldn’t play. Try again.',
     progressLabel: 'Audio progress',
     progressValueText: (elapsed, total) => `${elapsed} of ${total} seconds`,
-    status: { ready: 'Ready to play', playing: 'Playing', completed: 'Completed', unavailable: 'Audio unavailable' },
+    status: { ready: 'Ready to play', playing: 'Playing', paused: 'Paused', completed: 'Completed', unavailable: 'Audio unavailable' },
   },
   canvas: {
     sectionLabel: 'Customer decision flow',
@@ -536,7 +536,7 @@ const joinList = (items: string[]) => {
 export const CAPTURE: {
   chat: (question: string) => { observation: string; rawSignal: string }
   quote: (args: { quote: string; feedback: string; shareActions: string[] }) => { observation: string; rawSignal: string }
-  listen: (args: { status: 'playing' | 'paused' | 'completed'; elapsed: number }) => { observation: string; rawSignal: string }
+  listen: (args: { status: 'playing' | 'paused' | 'completed' | 'error'; elapsed: number }) => { observation: string; rawSignal: string }
 } = {
   chat: (question) => ({
     observation: `The user picked “${question}”, and the AI answered in full, grounded in the article rather than made up.`,
@@ -565,32 +565,39 @@ export const CAPTURE: {
     const total = LISTEN_DURATION_SECONDS
     if (status === 'completed') {
       return {
-        observation: `The user listened to the full ${total}-second audio overview. Both sponsor messages (demo sponsor: Mlytics) played.`,
+        observation: `The user played the full ${total}-second audio overview. Both sponsor messages (demo sponsor: Mlytics) played.`,
         rawSignal: `Played: ${total} of ${total} seconds (100%). Sponsor message impressions (demo sponsor: Mlytics): 2 of 2.`,
       }
     }
     const e = elapsed
     const pct = Math.round((e / total) * 100)
-    const listenedFor = `${e} ${e === 1 ? 'second' : 'seconds'}`
+    const seconds = `${e} ${e === 1 ? 'second' : 'seconds'}`
     const openingPlayed = e >= LISTEN_OPENING_SPONSOR_END_SECONDS
+    // A playback error keeps the last partial signal (elapsed > 0 only; the caller gates that).
+    if (status === 'error') {
+      return {
+        observation: `The audio stopped at ${seconds} (${pct}%) because playback failed.${openingPlayed ? ' The opening sponsor message (demo sponsor: Mlytics) played.' : ''}`,
+        rawSignal: `Stopped by a playback error at ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): ${openingPlayed ? 'played' : 'not finished'}.`,
+      }
+    }
     if (status === 'playing') {
       return openingPlayed
         ? {
-            observation: 'The user is listening to the audio overview and has played past the opening sponsor message (demo sponsor: Mlytics).',
+            observation: 'The audio overview is playing and has played past the opening sponsor message (demo sponsor: Mlytics).',
             rawSignal: `Played so far: ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): played. Closing sponsor message: not yet played.`,
           }
         : {
-            observation: 'The user pressed play and started listening to the article’s audio overview.',
+            observation: 'The user pressed play and started the article’s audio overview.',
             rawSignal: `Played so far: ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): in progress.`,
           }
     }
     return openingPlayed
       ? {
-          observation: `The user listened for ${listenedFor} (${pct}%), then paused. The opening sponsor message (demo sponsor: Mlytics) played.`,
+          observation: `The user paused the audio at ${seconds} (${pct}%). The opening sponsor message (demo sponsor: Mlytics) played.`,
           rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): played. Closing sponsor message: not played.`,
         }
       : {
-          observation: `The user listened for ${listenedFor} (${pct}%), then paused before the opening sponsor message (demo sponsor: Mlytics) finished.`,
+          observation: `The user paused the audio at ${seconds} (${pct}%), before the opening sponsor message (demo sponsor: Mlytics) finished.`,
           rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): not finished.`,
         }
   },

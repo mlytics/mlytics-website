@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Dispatch } from 'react'
-import type { PlaygroundAction } from './playground-logic'
+import type { ListenStatus, PlaygroundAction } from './playground-logic'
 
 /**
  * Binds the Listen experience to a real `<audio>` element. The element is the
@@ -10,10 +10,22 @@ import type { PlaygroundAction } from './playground-logic'
  *
  * `play` / `restart` / `retry` must be called synchronously inside the click
  * handler so iOS Safari treats playback as user-initiated.
+ *
+ * Media events only count while a session is live: status playing/paused, or
+ * a user-started play() still in flight. A late `error` after stop/reset/tab
+ * switch is ignored, and a resume from OS/hardware media keys while the UI is
+ * idle or completed is paused straight back.
  */
-export function useListenAudio(dispatch: Dispatch<PlaygroundAction>, onError: () => void) {
+export function useListenAudio(dispatch: Dispatch<PlaygroundAction>, onError: () => void, status: ListenStatus) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const onErrorRef = useRef(onError)
+  // Current status for event handlers without stale closures. A layout effect
+  // keeps it in step during commit, before any media task can run.
+  const statusRef = useRef(status)
+  // True from a user-initiated play() until its `play` event or promise
+  // settles. Handlers dispatch before calling play(), but the commit can land
+  // after a synchronous `play` event, so status alone cannot tell them apart.
+  const userPlayPendingRef = useRef(false)
   // A failed load can surface twice (play() rejects and the element fires
   // `error`); only the first one reports until the user tries again.
   const failedRef = useRef(false)
@@ -26,21 +38,35 @@ export function useListenAudio(dispatch: Dispatch<PlaygroundAction>, onError: ()
     onErrorRef.current = onError
   }, [onError])
 
+  useLayoutEffect(() => {
+    statusRef.current = status
+  }, [status])
+
+  const isLive = useCallback(
+    () => userPlayPendingRef.current || statusRef.current === 'playing' || statusRef.current === 'paused',
+    [],
+  )
+
   const fail = useCallback(() => {
-    if (failedRef.current) return
+    if (failedRef.current || !isLive()) return
     failedRef.current = true
     dispatch({ type: 'listen/error' })
     onErrorRef.current()
-  }, [dispatch])
+  }, [dispatch, isLive])
 
   const play = useCallback(() => {
     const audio = audioRef.current
     if (!audio) return
     failedRef.current = false
+    userPlayPendingRef.current = true
     // AbortError means a later pause()/load() interrupted this play() — not a failure.
-    Promise.resolve(audio.play()).catch((error: unknown) => {
-      if ((error as { name?: string } | null)?.name !== 'AbortError') fail()
-    })
+    Promise.resolve(audio.play()).then(
+      () => { userPlayPendingRef.current = false },
+      (error: unknown) => {
+        if ((error as { name?: string } | null)?.name !== 'AbortError') fail()
+        userPlayPendingRef.current = false
+      },
+    )
   }, [fail])
 
   const pause = useCallback(() => {
@@ -69,6 +95,7 @@ export function useListenAudio(dispatch: Dispatch<PlaygroundAction>, onError: ()
   const stop = useCallback(() => {
     const audio = audioRef.current
     if (!audio) return
+    userPlayPendingRef.current = false
     if (!audio.paused) audio.pause()
     audio.currentTime = 0
   }, [])
@@ -94,7 +121,16 @@ export function useListenAudio(dispatch: Dispatch<PlaygroundAction>, onError: ()
       onPause: () => {
         if (!audioRef.current?.ended) dispatch({ type: 'listen/mediaPause' })
       },
-      onPlay: () => dispatch({ type: 'listen/mediaPlay' }),
+      onPlay: () => {
+        if (userPlayPendingRef.current || statusRef.current === 'playing' || statusRef.current === 'paused') {
+          userPlayPendingRef.current = false
+          dispatch({ type: 'listen/mediaPlay' })
+          return
+        }
+        // Media keys resumed the element while the UI is idle/completed/error:
+        // undo it, leaving currentTime where stop() or the end left it.
+        audioRef.current?.pause()
+      },
       onError: () => fail(),
       // Keeps the button in step if mute changes outside it (e.g. OS media controls).
       onVolumeChange: () => setMuted(Boolean(audioRef.current?.muted)),

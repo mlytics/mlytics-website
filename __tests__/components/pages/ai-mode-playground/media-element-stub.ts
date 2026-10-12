@@ -10,7 +10,13 @@ export const STUB_DURATION = 26.641
 
 type MediaState = { paused: boolean; ended: boolean; currentTime: number }
 
-export function stubMedia() {
+/**
+ * `async: true` queues the play/pause events that play()/pause() fire as
+ * microtasks instead of dispatching them synchronously, closer to a browser,
+ * which fires them from a queued task. The test drivers (tick/end/fail) stay
+ * synchronous either way.
+ */
+export function stubMedia({ async = false }: { async?: boolean } = {}) {
   const states = new WeakMap<HTMLMediaElement, MediaState>()
   const pendingRejections: string[] = []
   const stateOf = (element: HTMLMediaElement) => {
@@ -22,6 +28,10 @@ export function stubMedia() {
     return state
   }
   const fire = (element: HTMLMediaElement, type: string) => element.dispatchEvent(new Event(type))
+  const fireFromMethod = (element: HTMLMediaElement, type: string) => {
+    if (async) queueMicrotask(() => fire(element, type))
+    else fire(element, type)
+  }
   const proto = HTMLMediaElement.prototype
 
   const play = vi.spyOn(proto, 'play').mockImplementation(function (this: HTMLMediaElement) {
@@ -38,7 +48,7 @@ export function stubMedia() {
     }
     if (state.paused) {
       state.paused = false
-      fire(this, 'play')
+      fireFromMethod(this, 'play')
     }
     return Promise.resolve()
   })
@@ -46,7 +56,7 @@ export function stubMedia() {
     const state = stateOf(this)
     if (state.paused) return
     state.paused = true
-    fire(this, 'pause')
+    fireFromMethod(this, 'pause')
   })
   const load = vi.spyOn(proto, 'load').mockImplementation(function (this: HTMLMediaElement) {
     const state = stateOf(this)

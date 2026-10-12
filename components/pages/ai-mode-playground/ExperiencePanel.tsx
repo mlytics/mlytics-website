@@ -310,7 +310,9 @@ export function ExperiencePanel({
                   ? UI.listen.status.completed
                   : listenStatus === 'playing'
                     ? UI.listen.status.playing
-                    : listenStatus === 'error'
+                    : listenStatus === 'paused'
+                      ? UI.listen.status.paused
+                      : listenStatus === 'error'
                       ? UI.listen.status.unavailable
                       : UI.listen.status.ready}
               </span>

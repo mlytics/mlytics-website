@@ -78,11 +78,12 @@
 | UI.listen.pause | 暫停 | Pause | |
 | UI.listen.replay | 重新播放 | Replay | |
 | UI.listen.retry | 再試一次 | Try again | 音訊載入失敗時，播放鍵改為此標籤。 |
-| UI.listen.error | 音訊無法載入，請檢查網路後再試一次 | The audio couldn’t load. Check your connection and try again. | 載入失敗時顯示在播放器下方；不會改用假計時器代替。 |
+| UI.listen.error | 音訊無法播放，請再試一次。 | The audio couldn’t play. Try again. | 播放失敗時顯示在播放器下方（不論原因是網路或格式，文案一律通用）；不會改用假計時器代替。ANNOUNCE.listenError 不變。 |
 | UI.listen.transcript | 逐字稿 | Transcript | 可展開的逐字稿標題（WCAG 1.2.1），預設收合。 |
 | UI.listen.mute | 靜音 | Mute | 靜音切換鈕的固定名稱（不隨狀態改變），狀態由 aria-pressed 表達；只是播放偏好，不影響任何訊號或擷取文字。 |
 | UI.listen.status.ready | 準備播放 | Ready to play | |
 | UI.listen.status.playing | 播放中 | Playing | |
+| UI.listen.status.paused | 已暫停 | Paused | 僅供螢幕閱讀器的狀態文字；暫停時不再顯示「準備播放」。 |
 | UI.listen.status.completed | 已完成 | Completed | |
 | UI.listen.status.unavailable | 無法播放音訊 | Audio unavailable | 僅供螢幕閱讀器的狀態文字。 |
 | LISTEN_TRANSCRIPT[0][0] | 本段音訊摘要由 Mlytics 贊助播出。 | This audio overview is brought to you by Mlytics. | 開始時間 0.00 秒。音訊為英文旁白，中文欄僅供審稿參考、不會出現在頁面上；英文須與音訊逐字一致。逐字稿以「段落 → 句子」儲存，播放／暫停時正在念的句子會以主色標示（aria-current），不另行播報。開始時間以 RMS 靜音偵測量自 -v1 原始 WAV（20 ms 視窗、低於峰值 2%、至少 180 ms），找到的 10 個停頓對應 7 個句界與 3 個逗號停頓；音檔一換版（-vN）就必須重新量測。 |
@@ -130,16 +131,18 @@
 | CAPTURE.quote → rawSignal 片段 1 | 使用者挑了「{金句}」這句話 | The user picked the line “{line}” | 中文用「，」串接；英文依片段數量自動組成 “A and B.” 或 “A, B, and C.”。 |
 | CAPTURE.quote → rawSignal 片段 2 | 覺得這句話「{回饋}」 | responded “{feedback}” | 「覺得這句話『真的嗎？』」直譯不通，改成中性的 responded。 |
 | CAPTURE.quote → rawSignal 片段 3 | 按了 {LINE、FB、通用} 分享鍵（按下不等於分享成功） | clicked the {LINE, FB, and generic} share button(s) (a click doesn’t confirm the share went through) | 保留「按下≠分享成功」的但書。按鈕名稱來自 SHARE_CAPTURE_NAMES：Share 鍵寫作 generic，避免出現「Share share button」。 |
-| CAPTURE.listen — observation | 使用者按下播放，開始聽這篇文章的語音摘要。 | The user pressed play and started listening to the article’s audio overview. | 狀態 1 播放中，e < 3。階段 01 顯示。取代舊的 listenStarted／listenCompleted 固定文案。{total} = LISTEN_DURATION_SECONDS（27），{pct} = round(e／total × 100)。開頭贊助口播在 e ≥ LISTEN_OPENING_SPONSOR_END_SECONDS（3，對應量測：開頭句 2.64 秒結束、下一句 3.12 秒開始）時算播過；結尾贊助口播只在完成時算。刻意用「已播放／played」而非「聽過」：我們只知道音訊有播放，不知道使用者是否真的聽到。e = 1 時 observation 用單數「1 second」；「{e} of {total} seconds」以總長為單位，維持複數。idle／error 不產生 listen 訊號。 |
+| CAPTURE.listen — observation | 使用者按下播放，開始播放這篇文章的語音摘要。 | The user pressed play and started the article’s audio overview. | 狀態 1 播放中，e < 3。階段 01 顯示。取代舊的 listenStarted／listenCompleted 固定文案。{total} = LISTEN_DURATION_SECONDS（27），{pct} = round(e／total × 100)。開頭贊助口播在 e ≥ LISTEN_OPENING_SPONSOR_END_SECONDS（3，對應量測：開頭句 2.64 秒結束、下一句 3.12 秒開始）時算播過；結尾贊助口播只在完成時算。刻意用「已播放／played」而非「聽過／listened」（observation 也一樣）：我們只知道音訊有播放，不知道使用者是否真的聽到；靜音也不改變訊號。e = 1 時 observation 用單數「1 second」；「{e} of {total} seconds」以總長為單位，維持複數。idle／error 不產生 listen 訊號。 |
 | CAPTURE.listen — rawSignal | 已播放：{e}／{total} 秒（{pct}%）。開頭贊助口播（示範贊助商：Mlytics）：播放中。 | Played so far: {e} of {total} seconds ({pct}%). Opening sponsor message (demo sponsor: Mlytics): in progress. | 狀態 1 播放中，e < 3。階段 02 顯示，播放中每過一整秒即時更新（非 live region，不播報）。 |
-| CAPTURE.listen — observation | 使用者正在聽語音摘要，已播過開頭的贊助口播（示範贊助商：Mlytics）。 | The user is listening to the audio overview and has played past the opening sponsor message (demo sponsor: Mlytics). | 狀態 2 播放中，e ≥ 3。階段 01 顯示。 |
+| CAPTURE.listen — observation | 語音摘要播放中，已播過開頭的贊助口播（示範贊助商：Mlytics）。 | The audio overview is playing and has played past the opening sponsor message (demo sponsor: Mlytics). | 狀態 2 播放中，e ≥ 3。階段 01 顯示。 |
 | CAPTURE.listen — rawSignal | 已播放：{e}／{total} 秒（{pct}%）。開頭贊助口播（示範贊助商：Mlytics）：已播放。結尾贊助口播：尚未播放。 | Played so far: {e} of {total} seconds ({pct}%). Opening sponsor message (demo sponsor: Mlytics): played. Closing sponsor message: not yet played. | 狀態 2 播放中，e ≥ 3。階段 02 顯示，播放中每過一整秒即時更新（非 live region，不播報）。 |
-| CAPTURE.listen — observation | 使用者聽了 {e} 秒（{pct}%）後暫停，期間播過開頭的贊助口播（示範贊助商：Mlytics）。 | The user listened for {e} seconds ({pct}%), then paused. The opening sponsor message (demo sponsor: Mlytics) played. | 狀態 3 暫停，e ≥ 3。階段 01 顯示。例：12 秒 → 44%；2 秒 → 7%。 |
+| CAPTURE.listen — observation | 使用者在 {e} 秒（{pct}%）暫停，開頭的贊助口播（示範贊助商：Mlytics）已播放。 | The user paused the audio at {e} seconds ({pct}%). The opening sponsor message (demo sponsor: Mlytics) played. | 狀態 3 暫停，e ≥ 3。階段 01 顯示。例：12 秒 → 44%；2 秒 → 7%。 |
 | CAPTURE.listen — rawSignal | 在 {e}／{total} 秒（{pct}%）暫停。開頭贊助口播（示範贊助商：Mlytics）：已播放。結尾贊助口播：未播放。 | Paused at {e} of {total} seconds ({pct}%). Opening sponsor message (demo sponsor: Mlytics): played. Closing sponsor message: not played. | 狀態 3 暫停，e ≥ 3。階段 02 顯示，播放中每過一整秒即時更新（非 live region，不播報）。 |
-| CAPTURE.listen — observation | 使用者聽了 {e} 秒（{pct}%）就暫停，開頭的贊助口播（示範贊助商：Mlytics）還沒播完。 | The user listened for {e} seconds ({pct}%), then paused before the opening sponsor message (demo sponsor: Mlytics) finished. | 狀態 4 暫停，e < 3。階段 01 顯示。 |
+| CAPTURE.listen — observation | 使用者在 {e} 秒（{pct}%）暫停，開頭的贊助口播（示範贊助商：Mlytics）還沒播完。 | The user paused the audio at {e} seconds ({pct}%), before the opening sponsor message (demo sponsor: Mlytics) finished. | 狀態 4 暫停，e < 3。階段 01 顯示。 |
 | CAPTURE.listen — rawSignal | 在 {e}／{total} 秒（{pct}%）暫停。開頭贊助口播（示範贊助商：Mlytics）：未播完。 | Paused at {e} of {total} seconds ({pct}%). Opening sponsor message (demo sponsor: Mlytics): not finished. | 狀態 4 暫停，e < 3。階段 02 顯示，播放中每過一整秒即時更新（非 live region，不播報）。 |
-| CAPTURE.listen — observation | 使用者從頭聽完 {total} 秒的語音摘要，開頭與結尾的贊助口播（示範贊助商：Mlytics）都播放過。 | The user listened to the full {total}-second audio overview. Both sponsor messages (demo sponsor: Mlytics) played. | 狀態 5 已完成。階段 01 顯示。 |
+| CAPTURE.listen — observation | 使用者播完 {total} 秒的語音摘要，開頭與結尾的贊助口播（示範贊助商：Mlytics）都已播放。 | The user played the full {total}-second audio overview. Both sponsor messages (demo sponsor: Mlytics) played. | 狀態 5 已完成。階段 01 顯示。 |
 | CAPTURE.listen — rawSignal | 已播放：{total}／{total} 秒（100%）。贊助口播曝光（示範贊助商：Mlytics）：2／2 次。 | Played: {total} of {total} seconds (100%). Sponsor message impressions (demo sponsor: Mlytics): 2 of 2. | 狀態 5 已完成。階段 02 顯示，播放中每過一整秒即時更新（非 live region，不播報）。 |
+| CAPTURE.listen — observation（播放錯誤） | 播放錯誤導致音訊停在 {e} 秒（{pct}%）。（e ≥ 3 時再加：開頭的贊助口播（示範贊助商：Mlytics）已播放。） | The audio stopped at {e} seconds ({pct}%) because playback failed. (+ “ The opening sponsor message (demo sponsor: Mlytics) played.” when e ≥ 3) | 狀態 6 播放錯誤，且 e > 0：保留中斷前最後的部分訊號。e = 0（還沒播出任何音訊就失敗）不產生訊號。e = 1 用單數 1 second。 |
+| CAPTURE.listen — rawSignal（播放錯誤） | 因播放錯誤停在 {e}／{total} 秒（{pct}%）。開頭贊助口播（示範贊助商：Mlytics）：{已播放｜未播完}。 | Stopped by a playback error at {e} of {total} seconds ({pct}%). Opening sponsor message (demo sponsor: Mlytics): {played｜not finished}. | 狀態 6。e ≥ 3 為 played／已播放，否則 not finished／未播完。 |
 
 ### 3c. 路徑標頭與階段 03–05 欄位標籤
 
