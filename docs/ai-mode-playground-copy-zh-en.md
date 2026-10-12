@@ -31,8 +31,8 @@
 | EXPERIENCE_LABELS.quote | Quote | Quote | |
 | EXPERIENCE_LABELS.listen | Listen | Listen | |
 | EXPERIENCE_INSTRUCTIONS.chat | 試著像你的使用者一樣，選一個問題體驗看看。 | Step into your users’ shoes: pick a question and see what happens. | 「試著像你的使用者一樣」譯為 step into your users’ shoes，慣用語。 |
-| EXPERIENCE_INSTRUCTIONS.quote | 試著像你的使用者一樣，選一句最有共鳴的話，再留下你的感受。 | Step into your users’ shoes: pick the line that resonates most, then tell us how it lands. | 「留下你的感受」譯為 tell us how it lands（這句話給你什麼感覺），比 leave your feelings 自然。 |
-| EXPERIENCE_INSTRUCTIONS.listen | 試著像你的使用者一樣，按播放，觀察開始與完成的訊號。 | Step into your users’ shoes: press play, then watch the start and completion signals come in. | |
+| EXPERIENCE_INSTRUCTIONS.quote | 站在使用者的角度：選出最有共鳴的一句，說說你的感受，再分享出去。 | Step into your users’ shoes: pick the line that resonates most, tell us how it lands, then share it. | 「留下你的感受」譯為 tell us how it lands（這句話給你什麼感覺），比 leave your feelings 自然。 |
+| EXPERIENCE_INSTRUCTIONS.listen | 站在使用者的角度：按下播放，看訊號隨著收聽即時更新。 | Step into your users’ shoes: press play, then watch the signals update as you listen. | |
 | UI.reset | 重設 | Reset | |
 
 ### 2a. Chat
@@ -64,20 +64,35 @@
 | UI.quote.sponsoredBy | Sponsored by | Sponsored by | |
 | UI.quote.actions.line | LINE | LINE | 已由產品負責人確認維持 LINE。 |
 | UI.quote.actions.fb | FB | FB | |
-| UI.quote.actions.download | Download | Download | |
+| UI.quote.actions.share | 分享 | Share | 原 Download 改為通用分享鍵（圖示 Share2）；在 rawSignal 裡稱作「generic」（見 CAPTURE.quote 片段 3）。 |
+| UI.quote.revealSignal | 查看訊號 | See the signal | 選了金句與感受後出現的連結（不帶箭頭）；跳到 stage 02，不記錄分享。 |
 
 ### 2c. Listen
 
 | 位置 | 中文原文 | English | 備註 |
 |---|---|---|---|
 | UI.listen.title | 用聲音繼續探索 | Keep exploring by ear | |
-| LISTEN_DURATION_SECONDS | 32 | 32 | 數值，非文案。 |
+| LISTEN_DURATION_SECONDS | 27 | 27 | 數值，非文案。實際音訊長 26.641 秒，顯示取整為 27。 |
+| LISTEN_AUDIO_SRC | — | /audio/ai-mode-listen-overview-v1.m4a | 非文案：音訊檔路徑。檔名帶版本號，任何重新編碼都要把 -vN 加一，避免快取到舊檔。 |
 | UI.listen.play | 播放 | Play | |
 | UI.listen.pause | 暫停 | Pause | |
 | UI.listen.replay | 重新播放 | Replay | |
+| UI.listen.retry | 再試一次 | Try again | 音訊載入失敗時，播放鍵改為此標籤。 |
+| UI.listen.error | 音訊無法載入，請檢查網路後再試一次 | The audio couldn’t load. Check your connection and try again. | 載入失敗時顯示在播放器下方；不會改用假計時器代替。 |
+| UI.listen.transcript | 逐字稿 | Transcript | 可展開的逐字稿標題（WCAG 1.2.1），預設收合。 |
+| UI.listen.mute | 靜音 | Mute | 靜音切換鈕的固定名稱（不隨狀態改變），狀態由 aria-pressed 表達；只是播放偏好，不影響任何訊號或擷取文字。 |
 | UI.listen.status.ready | 準備播放 | Ready to play | |
 | UI.listen.status.playing | 播放中 | Playing | |
 | UI.listen.status.completed | 已完成 | Completed | |
+| UI.listen.status.unavailable | 無法播放音訊 | Audio unavailable | 僅供螢幕閱讀器的狀態文字。 |
+| LISTEN_TRANSCRIPT[0][0] | 本段音訊摘要由 Mlytics 贊助播出。 | This audio overview is brought to you by Mlytics. | 開始時間 0.00 秒。音訊為英文旁白，中文欄僅供審稿參考、不會出現在頁面上；英文須與音訊逐字一致。逐字稿以「段落 → 句子」儲存，播放／暫停時正在念的句子會以主色標示（aria-current），不另行播報。開始時間以 RMS 靜音偵測量自 -v1 原始 WAV（20 ms 視窗、低於峰值 2%、至少 180 ms），找到的 10 個停頓對應 7 個句界與 3 個逗號停頓；音檔一換版（-vN）就必須重新量測。 |
+| LISTEN_TRANSCRIPT[1][0] | 在考慮 iPhone 18 Pro 嗎？ | Thinking about the iPhone 18 Pro? | 開始時間 3.12 秒。 |
+| LISTEN_TRANSCRIPT[1][1] | 以下是今天這篇報導的精簡版。 | Here’s the short version of today’s story. | 開始時間 5.32 秒。 |
+| LISTEN_TRANSCRIPT[1][2] | 文章介紹了新機有哪些新功能、和 iPhone Duo 比較起來如何，以及它在今年旗艦手機中的定位。 | The article walks through what’s new, how it compares with the iPhone Duo, and where it sits among this year’s flagship phones. | 開始時間 7.78 秒。 |
+| LISTEN_TRANSCRIPT[1][3] | 如果你正在考慮，先從你最在意的地方開始：相機、電池續航，或價格。 | If you’re deciding, start with what matters most to you: the camera, battery life, or price. | 開始時間 14.22 秒。 |
+| LISTEN_TRANSCRIPT[1][4] | 細節再回到完整文章閱讀。 | Then come back to the full article for the details. | 開始時間 19.70 秒。 |
+| LISTEN_TRANSCRIPT[2][0] | 感謝收聽。 | Thanks for listening. | 開始時間 22.66 秒。 |
+| LISTEN_TRANSCRIPT[2][1] | 本段摘要由 Mlytics 贊助播出。 | This overview was brought to you by Mlytics. | 開始時間 24.06 秒。 |
 | （未使用） | 步驟 1 / 2 | — | 原型 `experiences.quote.step` 只寫進不存在的 `#step-counter`，畫面上看不到，契約也沒有此欄位，故未翻譯。 |
 
 ## 3. 客戶決策流程（Canvas）
@@ -98,7 +113,7 @@
 | UI.stages.s01.title | 使用者做了什麼 | What the user did | |
 | EXPERIENCE_DEFAULT_OBSERVATION.chat | 使用者選擇一個問題，AI 會根據文章內容給出有憑有據的回答。 | The user picks a question, and the AI gives a grounded answer drawn from the article. | 「有憑有據」= grounded（AI 領域通用術語）。 |
 | EXPERIENCE_DEFAULT_OBSERVATION.quote | 使用者選擇一段金句，並在分享前留下回饋。 | The user picks a standout line and leaves feedback before sharing it. | |
-| EXPERIENCE_DEFAULT_OBSERVATION.listen | 使用者開始播放一段 32 秒的內容脈絡音訊。 | The user starts a 32-second audio overview of the article’s context. | 「內容脈絡音訊」直譯不通，改為 audio overview of the article’s context。 |
+| EXPERIENCE_DEFAULT_OBSERVATION.listen | 使用者開始播放一段 27 秒的內容脈絡音訊。 | The user starts a 27-second audio overview of the article’s context. | 「內容脈絡音訊」直譯不通，改為 audio overview of the article’s context。 |
 | UI.stages.s02.label | 捕捉到的資料 | Captured data | |
 | UI.stages.s02.title | 這次互動產生的原始資料 | Raw data from this interaction | |
 | UI.stages.s02.empty | 完成上方體驗後，就能看到這次互動產生的原始資料。 | Complete an experience above to see the raw data it generates. | |
@@ -114,11 +129,17 @@
 | CAPTURE.quote → observation（有回饋） | 使用者挑了「{金句}」這句話，並留下「{回饋}」的回饋。 | The user picked the line “{line}” and left the feedback “{feedback}”. | 回饋為 “Really?” 時不再補句點。 |
 | CAPTURE.quote → rawSignal 片段 1 | 使用者挑了「{金句}」這句話 | The user picked the line “{line}” | 中文用「，」串接；英文依片段數量自動組成 “A and B.” 或 “A, B, and C.”。 |
 | CAPTURE.quote → rawSignal 片段 2 | 覺得這句話「{回饋}」 | responded “{feedback}” | 「覺得這句話『真的嗎？』」直譯不通，改成中性的 responded。 |
-| CAPTURE.quote → rawSignal 片段 3 | 按了 {LINE、FB} 的分享鍵（按下不等於分享成功） | clicked the {LINE and FB} share button(s) (a click doesn’t confirm the share went through) | 保留「按下≠分享成功」的但書。 |
-| CAPTURE.listenStarted.observation | 使用者按下播放，開始收聽這段內容脈絡音訊。 | The user pressed play and started listening to the audio overview of the article’s context. | |
-| CAPTURE.listenStarted.rawSignal | 使用者按下播放，開始收聽這段 32 秒的音訊。 | The user pressed play and started the 32-second audio. | |
-| CAPTURE.listenCompleted.observation | 使用者從頭到尾聽完了這段 32 秒的音訊。 | The user listened to the 32-second audio from start to finish. | 原文 observation 與 rawSignal 同句，照樣保留相同。 |
-| CAPTURE.listenCompleted.rawSignal | 使用者從頭到尾聽完了這段 32 秒的音訊。 | The user listened to the 32-second audio from start to finish. | |
+| CAPTURE.quote → rawSignal 片段 3 | 按了 {LINE、FB、通用} 分享鍵（按下不等於分享成功） | clicked the {LINE, FB, and generic} share button(s) (a click doesn’t confirm the share went through) | 保留「按下≠分享成功」的但書。按鈕名稱來自 SHARE_CAPTURE_NAMES：Share 鍵寫作 generic，避免出現「Share share button」。 |
+| CAPTURE.listen — observation | 使用者按下播放，開始聽這篇文章的語音摘要。 | The user pressed play and started listening to the article’s audio overview. | 狀態 1 播放中，e < 3。階段 01 顯示。取代舊的 listenStarted／listenCompleted 固定文案。{total} = LISTEN_DURATION_SECONDS（27），{pct} = round(e／total × 100)。開頭贊助口播在 e ≥ LISTEN_OPENING_SPONSOR_END_SECONDS（3，對應量測：開頭句 2.64 秒結束、下一句 3.12 秒開始）時算播過；結尾贊助口播只在完成時算。刻意用「已播放／played」而非「聽過」：我們只知道音訊有播放，不知道使用者是否真的聽到。e = 1 時 observation 用單數「1 second」；「{e} of {total} seconds」以總長為單位，維持複數。idle／error 不產生 listen 訊號。 |
+| CAPTURE.listen — rawSignal | 已播放：{e}／{total} 秒（{pct}%）。開頭贊助口播（示範贊助商：Mlytics）：播放中。 | Played so far: {e} of {total} seconds ({pct}%). Opening sponsor message (demo sponsor: Mlytics): in progress. | 狀態 1 播放中，e < 3。階段 02 顯示，播放中每過一整秒即時更新（非 live region，不播報）。 |
+| CAPTURE.listen — observation | 使用者正在聽語音摘要，已播過開頭的贊助口播（示範贊助商：Mlytics）。 | The user is listening to the audio overview and has played past the opening sponsor message (demo sponsor: Mlytics). | 狀態 2 播放中，e ≥ 3。階段 01 顯示。 |
+| CAPTURE.listen — rawSignal | 已播放：{e}／{total} 秒（{pct}%）。開頭贊助口播（示範贊助商：Mlytics）：已播放。結尾贊助口播：尚未播放。 | Played so far: {e} of {total} seconds ({pct}%). Opening sponsor message (demo sponsor: Mlytics): played. Closing sponsor message: not yet played. | 狀態 2 播放中，e ≥ 3。階段 02 顯示，播放中每過一整秒即時更新（非 live region，不播報）。 |
+| CAPTURE.listen — observation | 使用者聽了 {e} 秒（{pct}%）後暫停，期間播過開頭的贊助口播（示範贊助商：Mlytics）。 | The user listened for {e} seconds ({pct}%), then paused. The opening sponsor message (demo sponsor: Mlytics) played. | 狀態 3 暫停，e ≥ 3。階段 01 顯示。例：12 秒 → 44%；2 秒 → 7%。 |
+| CAPTURE.listen — rawSignal | 在 {e}／{total} 秒（{pct}%）暫停。開頭贊助口播（示範贊助商：Mlytics）：已播放。結尾贊助口播：未播放。 | Paused at {e} of {total} seconds ({pct}%). Opening sponsor message (demo sponsor: Mlytics): played. Closing sponsor message: not played. | 狀態 3 暫停，e ≥ 3。階段 02 顯示，播放中每過一整秒即時更新（非 live region，不播報）。 |
+| CAPTURE.listen — observation | 使用者聽了 {e} 秒（{pct}%）就暫停，開頭的贊助口播（示範贊助商：Mlytics）還沒播完。 | The user listened for {e} seconds ({pct}%), then paused before the opening sponsor message (demo sponsor: Mlytics) finished. | 狀態 4 暫停，e < 3。階段 01 顯示。 |
+| CAPTURE.listen — rawSignal | 在 {e}／{total} 秒（{pct}%）暫停。開頭贊助口播（示範贊助商：Mlytics）：未播完。 | Paused at {e} of {total} seconds ({pct}%). Opening sponsor message (demo sponsor: Mlytics): not finished. | 狀態 4 暫停，e < 3。階段 02 顯示，播放中每過一整秒即時更新（非 live region，不播報）。 |
+| CAPTURE.listen — observation | 使用者從頭聽完 {total} 秒的語音摘要，開頭與結尾的贊助口播（示範贊助商：Mlytics）都播放過。 | The user listened to the full {total}-second audio overview. Both sponsor messages (demo sponsor: Mlytics) played. | 狀態 5 已完成。階段 01 顯示。 |
+| CAPTURE.listen — rawSignal | 已播放：{total}／{total} 秒（100%）。贊助口播曝光（示範贊助商：Mlytics）：2／2 次。 | Played: {total} of {total} seconds (100%). Sponsor message impressions (demo sponsor: Mlytics): 2 of 2. | 狀態 5 已完成。階段 02 顯示，播放中每過一整秒即時更新（非 live region，不播報）。 |
 
 ### 3c. 路徑標頭與階段 03–05 欄位標籤
 
@@ -198,9 +219,9 @@
 | name | 品牌合作方案 | Brand Partnerships | |
 | question | AI Mode 讓讀者能跟你的內容即時互動——你的業務團隊能不能把這些互動時刻，包裝成品牌願意購買的合作方案？ | AI Mode lets users interact with your content in real time. Can your sales team package those moments into partnerships brands will pay for? | 破折號改為兩句，英文較易讀。 |
 | decision | 哪一種體驗、在什麼內容時刻，值得塑造成品牌合作單元？ | Which experience, at which content moment, is worth shaping into a brand partnership unit? | |
-| unit | 贊助式 Ask、品牌化 Quote、主題贊助，以及品牌客製 AI 助理。 | Sponsored Ask, branded Quote, topic sponsorships, and a custom brand AI assistant. | 句首大寫 Sponsored；句中為 sponsored Ask。 |
+| unit | 贊助式 Ask、品牌化 Quote、語音贊助口播、主題贊助，以及品牌客製 AI 助理。 | Sponsored Ask, branded Quote, sponsored audio messages, topic sponsorships, and a custom brand AI assistant. | 句首大寫 Sponsored；句中為 sponsored Ask。 |
 | value | 互動發生在什麼內容時刻、使用者對行動呼籲的反應，這些由 AI Mode 自動記錄，你的業務團隊只需要決定要不要把這個時刻包裝成合作方案。 | Which content moment an interaction happened in, and how users responded to the CTA — AI Mode records all of it automatically. Your sales team only decides whether to package that moment as a partnership. | |
-| evidence.observed | 互動脈絡、內容時刻、行動呼籲、後續選擇 | Interaction context, content moment, CTA, next choice | |
+| evidence.observed | 互動脈絡、內容時刻、行動呼籲、贊助曝光、後續選擇 | Interaction context, content moment, CTA, sponsor impressions, next choice | |
 | evidence.comparison | 比較不同合作脈絡 | Compare partnership contexts | |
 | evidence.supports | 可支援方案保留／調整決策。 | Informs whether to keep or adjust a package. | 「方案」此處譯 package（業務賣的合作套案）。 |
 
@@ -363,6 +384,7 @@
 | UI.quote.previewLabel | 社群分享預覽 | Social share preview | |
 | UI.quote.actionsLabel | 社群分享操作 | Social share actions | |
 | UI.listen.progressLabel | 音訊進度 | Audio progress | |
+| UI.listen.progressValueText | 第 {秒數} 秒，共 {總秒數} 秒（例：第 9 秒，共 27 秒） | {elapsed} of {total} seconds（例：9 of 27 seconds） | 進度條的 aria-valuetext，僅螢幕閱讀器播報。畫面上的時間顯示為 YouTube 格式「0:09 / 0:27」（m:ss，非文案）。 |
 | UI.canvas.customerTablistLabel | 選擇客戶類型 | Choose a customer type | |
 | UI.canvas.flowLabel | 01 到 05 的共享垂直進度流程 | Decision flow, steps 01 to 05 | 「共享垂直」是版面描述，對螢幕閱讀器使用者沒有意義，省略。 |
 | UI.stages.pathsHead.listLabel | 商業路徑 | Business paths | |
@@ -374,6 +396,7 @@
 | ANNOUNCE.chatAnswered | AI 已經給出回答；下面的客戶決策流程已經更新。 | The AI has answered. The customer decision flow below has been updated. | |
 | ANNOUNCE.quoteSelected | 已選擇一段金句。 | Line selected. | |
 | ANNOUNCE.feedbackSelected | 已選擇回饋：{回饋}。 | Feedback selected: {value}. | 回饋為 “Really?” 時不再補句點。 |
-| ANNOUNCE.shareRecorded | 已記錄 {LINE} 分享操作；共享訊號已更新。 | {label} share action recorded. Shared signals updated. | |
+| ANNOUNCE.shareRecorded | 已按下 {LINE} 按鈕；共享訊號已更新。 | {label} button clicked. Shared signals updated. | 只在同一輪的第二個以後的分享鍵播報；第一個分享鍵播報 ANNOUNCE.completed。 |
 | ANNOUNCE.listenPlaying | Listen 播放中；開始 Signal 已捕捉。 | Listen is playing. Start signal captured. | |
 | ANNOUNCE.listenPaused | Listen 已暫停。 | Listen paused. | |
+| ANNOUNCE.listenError | Listen 音訊無法載入。 | Listen audio couldn’t load. | 音訊載入失敗時播報一次。 |

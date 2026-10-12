@@ -49,7 +49,10 @@
 .feedbackOption:focus-visible,
 .signatureInput:focus-visible,
 .shareButton:focus-visible,
-.listenToggle:focus-visible {
+.revealSignal:focus-visible,
+.listenToggle:focus-visible,
+.listenMute:focus-visible,
+.transcriptSummary:focus-visible {
   outline: 3px solid var(--color-primary);
   outline-offset: 3px;
 }
@@ -252,55 +255,30 @@
 
 .quoteCard {
   position: relative;
-  isolation: isolate;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  /* Holds the card at one height across the three quote lines, so picking a
+     shorter line does not make the share row jump. */
   min-height: 248px;
   overflow: hidden;
-  padding: 28px 24px 22px;
-  border: 1px solid rgba(168, 197, 195, .28);
-  border-radius: 18px;
-  /* The trailing var(--bg-dark) gives the card a solid computed
-     background-color (the gradient's darkest stop) under the white text, so
-     anything that reads background-color instead of painting the image
-     (an a11y checker, a user stylesheet that drops background-image) sees a
-     dark ground rather than transparent. This repo's contrast spec no longer
-     relies on it: the generic scan skips the quote card (onGradient), and the
-     card's text is measured from real pixels by the quote-card pixel test. */
-  background: linear-gradient(145deg, var(--bg-dark) 0%, var(--color-primary) 62%, var(--color-primary-light) 100%), var(--bg-dark);
+  padding: 24px;
+  border: 1px solid rgba(168, 197, 195, .16);
+  border-radius: 16px;
+  /* A very soft mint glow in the top-right corner over a solid ground. The
+     solid var(--bg-dark) is the last layer, so the computed background-color
+     is the colour the white text sits on, and anything that reads
+     background-color instead of painting (an a11y checker, a user
+     stylesheet) sees the true ground. The generic contrast scan still skips
+     the quote card (onGradient); its text is measured from real pixels by
+     the quote-card pixel test. */
+  background: radial-gradient(circle at 100% 0%, rgba(168, 197, 195, .2) 0%, transparent 65%), var(--bg-dark);
   color: var(--color-on-dark);
-  box-shadow: 0 18px 36px rgba(26, 61, 58, .22);
-}
-
-/* Decoration: a ring with two halo bands at the top right, and a large
-   opening quote mark at the bottom right. Both sit under the card content. */
-.quoteCard::before {
-  position: absolute;
-  z-index: 0;
-  top: -92px;
-  right: -54px;
-  width: 220px;
-  height: 220px;
-  border: 1px solid rgba(168, 197, 195, .24);
-  border-radius: 50%;
-  box-shadow: 0 0 0 22px rgba(168, 197, 195, .05), 0 0 0 46px rgba(168, 197, 195, .035);
-  content: '';
-}
-
-.quoteCard::after {
-  position: absolute;
-  z-index: 0;
-  right: 24px;
-  bottom: -48px;
-  color: rgba(168, 197, 195, .16);
-  font: 700 15rem/.75 Georgia, serif;
-  /* Empty alt text: screen readers skip the decoration. */
-  content: '“' / '';
+  box-shadow: 0 8px 24px rgba(26, 61, 58, .12);
 }
 
 .quoteText {
-  position: relative;
-  z-index: 1;
-  margin: 32px 0 24px;
+  margin: 0 0 16px;
   color: var(--bg-white);
   font-size: clamp(1.2rem, 2.4vw, 1.55rem);
   font-weight: 750;
@@ -308,13 +286,26 @@
   letter-spacing: -.02em;
 }
 
+/* A gold opening quote mark above the quote, in normal flow; it is the
+   card's only quote symbol. Georgia draws a crisp curly mark, about 21px
+   tall at 62px. The box is trimmed to end at the glyph's bottom (.45em), so
+   the glyph sits ~10-12px above the quote's capitals. Empty alt text keeps
+   it out of the accessibility tree. */
+.quoteText::before {
+  display: block;
+  height: .45em;
+  margin-bottom: 2px;
+  color: var(--color-gold);
+  font: 700 62px/1 Georgia, serif;
+  letter-spacing: 0;
+  content: '“' / '';
+}
+
 .signatureText {
-  position: relative;
-  z-index: 1;
-  margin: 0;
-  /* Solid white: at .78 it fell to 3.6-4.1:1 over the light end of the
-     gradient and the quote-mark decoration. */
-  color: var(--bg-white);
+  /* The bottom margin keeps at least 24px above the sponsor footer when the
+     quote fills the card and the footer's margin-top: auto resolves to 0. */
+  margin: 0 0 24px;
+  color: var(--color-on-dark);
   font-size: .78rem;
   line-height: 1.5;
   letter-spacing: .02em;
@@ -323,28 +314,32 @@
   overflow-wrap: anywhere;
 }
 
+/* Decorative em dash before the signature; empty alt text keeps it out of
+   the accessibility tree. */
+.signatureText::before {
+  content: '— ' / '';
+}
+
+/* A small footer pinned to the bottom of the card by margin-top: auto. */
 .sponsor {
-  position: relative;
-  z-index: 1;
   display: flex;
-  /* When the label and the full-size logo cannot share a line, the logo
-     wraps under the label instead of being squeezed or clipped by the
-     card's overflow: hidden. */
+  /* When the label and the logo cannot share a line, the logo wraps under
+     the label instead of being squeezed or clipped by the card's
+     overflow: hidden. */
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px 12px;
-  margin-top: 24px;
-  padding: 8px 10px 8px 12px;
-  border: 1px solid rgba(255, 255, 255, .2);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, .94);
-  color: var(--bg-dark);
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(168, 197, 195, .16);
 }
 
 .sponsorLabel {
-  color: var(--bg-dark);
-  letter-spacing: .08em;
+  /* .85 is the minimum on-dark step that passes WCAG AA (globals.css). */
+  color: rgba(168, 197, 195, .85);
+  font-size: 10px;
+  letter-spacing: .1em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -352,19 +347,35 @@
 .sponsorLogo {
   display: block;
   flex: 0 1 auto;
-  width: min(115px, 100%);
+  width: min(72px, 100%);
   min-width: 0;
   height: auto;
+  /* Renders the brand logo solid white on the dark card. */
+  filter: brightness(0) invert(1);
+}
+
+/* The share buttons and the reveal link share one row, with the link
+   pushed to the right. When there is no room, the link wraps onto its own
+   line and, alone on that line, sits at the left. The preview grid's 12px
+   gap is the only space between the card and this row. */
+.shareRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .shareActions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
 }
 
 .shareButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   min-height: 36px;
   padding: 7px 11px;
   border: 1px solid var(--color-primary);
@@ -379,14 +390,51 @@
   background: rgba(34, 93, 89, .08);
 }
 
-.listenVisual {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  gap: 8px;
+/* Share button glyphs are monochrome (fill/stroke: currentColor). This one
+   rule sets their colour, so switching to var(--color-ink) or brand colours
+   later is a one-line change. */
+.shareIcon {
+  display: block;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+}
+
+/* Fallback completion for people who pick a line and a feeling but do not
+   share: moves to the captured signal without recording a share. */
+.revealSignal {
+  /* A flex item in .shareRow, so it shrinks to its text: the click target is
+     the link text, not the rest of the row. */
+  display: inline-flex;
   align-items: center;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.revealSignal:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* One row on one centerline at every width: [play] [bar] [time] [mute].
+   The bar is the only item that grows and shrinks. */
+.listenVisual {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .listenToggle {
+  flex: 0 0 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -427,37 +475,55 @@
   white-space: nowrap;
 }
 
-.listenTrack {
-  min-width: 0;
-}
-
+/* YouTube-style display bar, deliberately NOT seekable (owner decision:
+   scrubbing would let users fake the "listened to the end" signal), so no
+   thumb, no pointer cursor and no hover growth. The unplayed track is a tint
+   of the primary token rather than --color-line, which is the card border on
+   the same white surface and would read as a divider. */
 .listenProgress {
-  height: 10px;
+  flex: 1 1 auto;
+  min-width: 40px;
+  height: 4px;
   border-radius: 9999px;
-  background: rgba(34, 93, 89, .12);
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
   overflow: hidden;
 }
 
+/* Width is written per animation frame by useListenFill; no transition. */
 .listenFill {
   display: block;
+  width: 0;
   height: 100%;
   border-radius: inherit;
-  background: var(--color-gold);
-  transition: width 240ms linear;
+  background: var(--color-primary);
 }
 
-.listenMeta {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 9px;
+.listenTime {
+  flex: 0 0 auto;
   color: var(--color-ink-muted);
   font-size: var(--font-size-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.listenTime,
-.listenStatus {
-  min-width: 0;
+/* Secondary icon button: transparent, round, primary icon, 36px target like
+   the share buttons; the hover tint matches the share buttons' hover. */
+.listenMute {
+  flex: 0 0 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-primary);
+}
+
+.listenMute:hover {
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
 .listenStatus {
@@ -514,24 +580,111 @@
     grid-template-columns: 1fr;
   }
 
-  /* At 320 the quote card is only ~146px wide, too narrow for the one-line
-     SPONSORED BY label inside the pill. Give the card back some width from
-     the preview frame and its own side padding. */
-  .preview {
-    padding: 8px;
+  /* Phones: the three share buttons fit on one row as 36px icon-only
+     squares. The label is only visually hidden, so each button's accessible
+     name stays its visible-on-desktop text (LINE / FB / Share). */
+  .shareButton {
+    position: relative;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    gap: 0;
   }
 
-  .quoteCard {
-    padding-inline: 12px;
+  .shareLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    border: 0;
+    white-space: nowrap;
   }
 
-  .sponsor {
-    padding-inline: 10px;
+  /* Listen player stays one row down to 320 (owner "combo" decision): a
+     36px play button like the mobile share buttons, 8px gaps, and only the
+     current time (the total stays in the progressbar's aria-valuetext). The
+     bar is still the item that shrinks. */
+  .listenVisual {
+    gap: 8px;
   }
+
+  .listenToggle {
+    flex-basis: 36px;
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    min-height: 36px;
+  }
+
+  .listenTimeTotal {
+    display: none;
+  }
+}
+
+/* Shown only when the narrated audio cannot load; there is no timer fallback. */
+.listenError {
+  margin: 12px 0 0;
+  color: var(--color-warn-deep);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+}
+
+/* Text alternative for the narrated audio (WCAG 1.2.1). Kept quiet: a
+   caption-size link styled like "See the signal", closed by default. */
+.transcript {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-line);
+}
+
+.transcriptSummary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: var(--color-primary);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.transcriptSummary:hover {
+  text-decoration-thickness: 2px;
+}
+
+.transcriptParagraph {
+  margin: 8px 0 0;
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-caption);
+  line-height: 1.6;
+}
+
+/* The sentence being spoken. Background and an outset box-shadow in the same
+   tint (no padding, no weight change) so highlighting never shifts line
+   wrapping; `clone` keeps the rounded tint on every wrapped line. Inactive
+   sentences keep the paragraph's --color-ink-muted. */
+.transcriptSentence {
+  border-radius: 3px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.transcriptSentence[aria-current='true'] {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-primary);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .listenFill {
+  .transcriptSentence {
     transition: none;
   }
 }
+

@@ -1,9 +1,11 @@
-import { useRef, useState, type FocusEvent, type KeyboardEvent } from 'react'
+import { useRef, useState, type FocusEvent, type KeyboardEvent, type RefObject } from 'react'
+import { RotateCcw, Volume2, VolumeX } from 'lucide-react'
 import {
   CHAT_QUESTIONS,
   EXPERIENCE_INSTRUCTIONS,
   EXPERIENCE_LABELS,
   LISTEN_DURATION_SECONDS,
+  LISTEN_TRANSCRIPT,
   QUOTE_FEEDBACK_OPTIONS,
   QUOTE_OPTIONS,
   UI,
@@ -11,6 +13,7 @@ import {
 import type { ExperienceId, ShareAction } from './ai-mode-playground-copy'
 import { formatTime, nextTabIndex } from './playground-logic'
 import type { PlaygroundState } from './playground-logic'
+import { SHARE_ICONS } from './ShareIcons'
 import styles from './ExperiencePanel.module.css'
 
 export type ExperiencePanelProps = {
@@ -22,8 +25,17 @@ export type ExperiencePanelProps = {
   onFeedback: (value: string) => void
   onSignature: (value: string) => void
   onShare: (action: ShareAction) => void
+  onRevealSignal: () => void
   onListenToggle: () => void
   onListenReplay: () => void
+  onListenRetry: () => void
+  /** The playground writes the fill width on this node directly (smooth rAF motion). */
+  listenFillRef?: RefObject<HTMLSpanElement | null>
+  /** Flat index of the transcript sentence being spoken, -1 for none. */
+  activeSentence?: number
+  /** Player preference only; signals and captures never depend on it. */
+  listenMuted?: boolean
+  onListenToggleMute?: () => void
 }
 
 const EXPERIENCES: ExperienceId[] = ['chat', 'quote', 'listen']
@@ -37,8 +49,14 @@ export function ExperiencePanel({
   onFeedback,
   onSignature,
   onShare,
+  onRevealSignal,
   onListenToggle,
   onListenReplay,
+  onListenRetry,
+  listenFillRef,
+  activeSentence = -1,
+  listenMuted = false,
+  onListenToggleMute,
 }: ExperiencePanelProps) {
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
   const feedbackRefs = useRef<(HTMLButtonElement | null)[]>([])
@@ -48,12 +66,17 @@ export function ExperiencePanel({
   const [focusedFeedbackIndex, setFocusedFeedbackIndex] = useState<number | null>(null)
   const tabbableFeedbackIndex = focusedFeedbackIndex ?? (checkedFeedbackIndex >= 0 ? checkedFeedbackIndex : 0)
   const selectedQuote = state.quote.index
+  const listenStatus = state.listen.status
   const listenLabel =
-    state.listen.status === 'completed'
+    listenStatus === 'completed'
       ? UI.listen.replay
-      : state.listen.status === 'playing'
+      : listenStatus === 'playing'
         ? UI.listen.pause
-        : UI.listen.play
+        : listenStatus === 'error'
+          ? UI.listen.retry
+          : UI.listen.play
+  const onListenClick =
+    listenStatus === 'completed' ? onListenReplay : listenStatus === 'error' ? onListenRetry : onListenToggle
 
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const next = nextTabIndex(event.key, index, EXPERIENCES.length)
@@ -206,19 +229,30 @@ export function ExperiencePanel({
                 ) : (
                   <>
                     <div className={styles.quoteCard}>
-                      <blockquote className={styles.quoteText}>“{QUOTE_OPTIONS[selectedQuote]}”</blockquote>
+                      <blockquote className={styles.quoteText}>{QUOTE_OPTIONS[selectedQuote]}</blockquote>
                       <p className={styles.signatureText}>{state.quote.signature.trim() || UI.quote.anonymous}</p>
                       <div className={styles.sponsor}>
                         <span className={styles.sponsorLabel}>{UI.quote.sponsoredBy}</span>
                         <img className={styles.sponsorLogo} src="/logo.svg" alt="Mlytics" width={115} />
                       </div>
                     </div>
-                    <div className={styles.shareActions} role="group" aria-label={UI.quote.actionsLabel}>
-                      {(Object.keys(UI.quote.actions) as ShareAction[]).map((action) => (
-                        <button className={styles.shareButton} key={action} type="button" onClick={() => onShare(action)}>
-                          {UI.quote.actions[action]}
+                    <div className={styles.shareRow}>
+                      <div className={styles.shareActions} role="group" aria-label={UI.quote.actionsLabel}>
+                        {(Object.keys(UI.quote.actions) as ShareAction[]).map((action) => {
+                          const Icon = SHARE_ICONS[action]
+                          return (
+                            <button className={styles.shareButton} key={action} type="button" onClick={() => onShare(action)}>
+                              <Icon className={styles.shareIcon} aria-hidden="true" focusable="false" />
+                              <span className={styles.shareLabel}>{UI.quote.actions[action]}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                      {state.quote.feedback !== '' && (
+                        <button type="button" className={styles.revealSignal} onClick={onRevealSignal}>
+                          {UI.quote.revealSignal}
                         </button>
-                      ))}
+                      )}
                     </div>
                   </>
                 )}
@@ -237,14 +271,13 @@ export function ExperiencePanel({
                 className={styles.listenToggle}
                 type="button"
                 aria-label={listenLabel}
-                onClick={state.listen.status === 'completed' ? onListenReplay : onListenToggle}
+                aria-describedby={listenStatus === 'error' ? 'listen-error' : undefined}
+                onClick={onListenClick}
               >
-                {state.listen.status === 'completed' ? (
-                  <svg className={styles.listenIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-                    <path d="M20 11a8 8 0 1 0 2 5.3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    <path d="M20 4v7h-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                ) : state.listen.status === 'playing' ? (
+                {listenStatus === 'completed' ? (
+                  // lucide RotateCcw: the standard counter-clockwise replay glyph.
+                  <RotateCcw className={styles.listenIcon} size={18} aria-hidden="true" focusable="false" />
+                ) : listenStatus === 'playing' ? (
                   <svg className={styles.listenIcon} width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
                     <path d="M7 5h3v14H7zM14 5h3v14h-3z" />
                   </svg>
@@ -255,30 +288,76 @@ export function ExperiencePanel({
                 )}
                 <span className={styles.buttonLabel}>{listenLabel}</span>
               </button>
-              <div className={styles.listenTrack}>
-                <div
-                  className={styles.listenProgress}
-                  role="progressbar"
-                  aria-label={UI.listen.progressLabel}
-                  aria-valuemin={0}
-                  aria-valuemax={LISTEN_DURATION_SECONDS}
-                  aria-valuenow={state.listen.elapsed}
-                >
-                  <span className={styles.listenFill} style={{ width: `${(state.listen.elapsed / LISTEN_DURATION_SECONDS) * 100}%` }} />
-                </div>
-                <div className={styles.listenMeta}>
-                  <span className={styles.listenTime}>{formatTime(state.listen.elapsed)}</span>
-                  <span className={styles.listenTime}>{formatTime(LISTEN_DURATION_SECONDS)}</span>
-                  <span className={styles.listenStatus}>
-                    {state.listen.status === 'completed'
-                      ? UI.listen.status.completed
-                      : state.listen.status === 'playing'
-                        ? UI.listen.status.playing
-                        : UI.listen.status.ready}
-                  </span>
-                </div>
+              <div
+                className={styles.listenProgress}
+                role="progressbar"
+                aria-label={UI.listen.progressLabel}
+                aria-valuemin={0}
+                aria-valuemax={LISTEN_DURATION_SECONDS}
+                aria-valuenow={state.listen.elapsed}
+                aria-valuetext={UI.listen.progressValueText(state.listen.elapsed, LISTEN_DURATION_SECONDS)}
+              >
+                {/* Width is written by useListenFill, not React, so re-renders never fight the rAF motion. */}
+                <span className={styles.listenFill} ref={listenFillRef} />
               </div>
+              {/* The total is hidden on phones (display: none); aria-valuetext still says "N of 27 seconds". */}
+              <span className={styles.listenTime}>
+                <span>{formatTime(state.listen.elapsed)}</span>
+                <span className={styles.listenTimeTotal}>{` / ${formatTime(LISTEN_DURATION_SECONDS)}`}</span>
+              </span>
+              <span className={styles.listenStatus}>
+                {listenStatus === 'completed'
+                  ? UI.listen.status.completed
+                  : listenStatus === 'playing'
+                    ? UI.listen.status.playing
+                    : listenStatus === 'error'
+                      ? UI.listen.status.unavailable
+                      : UI.listen.status.ready}
+              </span>
+              {/* Toggle button: the name stays "Mute" and aria-pressed carries the state (WCAG 4.1.2). */}
+              <button
+                className={styles.listenMute}
+                type="button"
+                aria-label={UI.listen.mute}
+                aria-pressed={listenMuted}
+                onClick={onListenToggleMute}
+              >
+                {listenMuted ? (
+                  <VolumeX className={styles.listenIcon} size={18} aria-hidden="true" focusable="false" />
+                ) : (
+                  <Volume2 className={styles.listenIcon} size={18} aria-hidden="true" focusable="false" />
+                )}
+                <span className={styles.buttonLabel}>{UI.listen.mute}</span>
+              </button>
             </div>
+            {listenStatus === 'error' && (
+              <p className={styles.listenError} id="listen-error">{UI.listen.error}</p>
+            )}
+            <details className={styles.transcript}>
+              <summary className={styles.transcriptSummary}>{UI.listen.transcript}</summary>
+              {LISTEN_TRANSCRIPT.map((paragraph, paragraphIndex) => {
+                const offset = LISTEN_TRANSCRIPT.slice(0, paragraphIndex).reduce((sum, previous) => sum + previous.length, 0)
+                return (
+                  <p className={styles.transcriptParagraph} key={paragraphIndex}>
+                    {paragraph.map((sentence, sentenceIndex) => {
+                      const index = offset + sentenceIndex
+                      return (
+                        <span key={index}>
+                          {sentenceIndex > 0 && ' '}
+                          <span
+                            className={styles.transcriptSentence}
+                            data-sentence={index}
+                            aria-current={index === activeSentence ? 'true' : undefined}
+                          >
+                            {sentence.text}
+                          </span>
+                        </span>
+                      )
+                    })}
+                  </p>
+                )
+              })}
+            </details>
           </div>
         )}
       </div>

@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { Profiler } from 'react'
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -11,14 +12,18 @@ import {
   EXPERIENCE_LABELS,
   HERO,
   LENS_LABELS,
+  LISTEN_AUDIO_SRC,
   PATHS,
   UI,
 } from '@/components/pages/ai-mode-playground/ai-mode-playground-copy'
+import { stubMedia, type MediaStub } from './media-element-stub'
 
 let intersectionObserverCallback: IntersectionObserverCallback | null = null
 let scrolledElement: HTMLElement | null = null
+let media: MediaStub
 
 beforeEach(() => {
+  media = stubMedia()
   window.history.replaceState({}, '', '/ai-mode-playground/')
   vi.stubGlobal('IntersectionObserver', vi.fn(function IntersectionObserver(callback: IntersectionObserverCallback) {
     intersectionObserverCallback = callback
@@ -40,6 +45,7 @@ afterEach(() => {
 
 const experienceTab = (label: string) => screen.getByRole('tab', { name: label })
 const customerTab = (label: string) => screen.getByRole('tab', { name: label })
+const listenAudio = () => document.querySelector('audio') as HTMLAudioElement
 
 function setupTimers() {
   vi.useFakeTimers({ shouldAdvanceTime: true })
@@ -114,48 +120,59 @@ describe('AiModePlayground interactions', () => {
     expect(screen.getByText(/The user picked “iPhone 18 Pro full specs/)).toBeInTheDocument()
   })
 
-  it('focuses and announces a completed Quote, then records a LINE action', async () => {
+  it('picking a line and a feeling never moves focus; the first share completes Quote and later shares record in place', async () => {
     const user = setupTimers()
     render(<AiModePlayground />)
     await user.click(experienceTab(EXPERIENCE_LABELS.quote))
     await user.click(screen.getByRole('button', { name: /Before you choose/ }))
-    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
-    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+    const helpful = screen.getByRole('radio', { name: 'Helpful' })
+    await user.click(helpful)
     await act(async () => { vi.runAllTimers() })
     const signal = document.getElementById('stage-02-copy')
+    // Line + feeling only record and announce: no scroll, no focus move.
+    expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
+    expect(signal).not.toHaveFocus()
+    expect(helpful).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.feedbackSelected('Helpful'))
+    expect(screen.getByText(/responded “Helpful”/)).toBeInTheDocument()
+
+    // The first share completes Quote: one smooth centred scroll, one focus move.
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
+    await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
+    await act(async () => { vi.runAllTimers() })
     expect(focus.mock.contexts.filter((element) => element === signal)).toHaveLength(1)
     expect(focus.mock.calls[focus.mock.contexts.indexOf(signal)]).toEqual([{ preventScroll: true }])
-    expect(document.getElementById('stage-02-copy')).toHaveFocus()
-    expect(scrolledElement).toBe(document.getElementById('stage-02-copy'))
-    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenLastCalledWith({ block: 'center', behavior: 'smooth' })
-    expect(screen.getByText(/responded “Helpful”/)).toBeInTheDocument()
-    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
-    await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
-    expect(document.getElementById('stage-02-copy')).toHaveTextContent(UI.quote.actions.line)
-  })
-
-  it('completes Quote when a line is picked after the feedback: focuses the signal and announces completion', async () => {
-    const user = setupTimers()
-    render(<AiModePlayground />)
-    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
-    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
-    await act(async () => { vi.runAllTimers() })
-    // Feedback alone does not complete Quote: no focus move, no scroll.
-    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.feedbackSelected('Helpful'))
-    expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
-    expect(document.getElementById('stage-02-copy')).not.toHaveFocus()
-
-    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
-    await user.click(screen.getByRole('button', { name: /Before you choose/ }))
-    await act(async () => { vi.runAllTimers() })
-    const signal = document.getElementById('stage-02-copy')
-    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
-    expect(screen.getByRole('status')).not.toHaveTextContent(ANNOUNCE.quoteSelected)
+    expect(signal).toHaveFocus()
     expect(scrolledElement).toBe(signal)
     expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(1)
     expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ block: 'center', behavior: 'smooth' })
-    expect(focus.mock.calls[focus.mock.contexts.indexOf(signal)]).toEqual([{ preventScroll: true }])
-    expect(signal).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+
+    // A different, later share is recorded without another jump.
+    const fb = screen.getByRole('button', { name: UI.quote.actions.fb })
+    await user.click(fb)
+    await act(async () => { vi.runAllTimers() })
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(1)
+    expect(fb).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.shareRecorded(UI.quote.actions.fb))
+    expect(signal).toHaveTextContent('LINE and FB share buttons')
+  })
+
+  it('picking a line after the feedback does not complete Quote: no scroll, no focus move', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+    await act(async () => { vi.runAllTimers() })
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.feedbackSelected('Helpful'))
+
+    const line = screen.getByRole('button', { name: /Before you choose/ })
+    await user.click(line)
+    await act(async () => { vi.runAllTimers() })
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.quoteSelected)
+    expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
+    expect(document.getElementById('stage-02-copy')).not.toHaveFocus()
+    expect(line).toHaveFocus()
     expect(screen.getByText(/responded “Helpful”/)).toBeInTheDocument()
   })
 
@@ -175,10 +192,16 @@ describe('AiModePlayground interactions', () => {
     ['Chat answer', async (user: ReturnType<typeof userEvent.setup>) => {
       await user.click(screen.getByRole('button', { name: CHAT_QUESTIONS[0] }))
     }],
-    ['completed Quote', async (user: ReturnType<typeof userEvent.setup>) => {
+    ['Quote share', async (user: ReturnType<typeof userEvent.setup>) => {
+      await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+      await user.click(screen.getByRole('button', { name: /Before you choose/ }))
+      await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
+    }],
+    ['Quote reveal link', async (user: ReturnType<typeof userEvent.setup>) => {
       await user.click(experienceTab(EXPERIENCE_LABELS.quote))
       await user.click(screen.getByRole('button', { name: /Before you choose/ }))
       await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+      await user.click(screen.getByRole('button', { name: UI.quote.revealSignal }))
     }],
   ] as const) {
     it(`scrolls instantly for reduced-motion users after a ${name}, overriding the smooth html scroll-behavior`, async () => {
@@ -206,7 +229,7 @@ describe('AiModePlayground interactions', () => {
     await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
     await act(async () => { vi.runAllTimers() })
     expect(document.getElementById('stage-02-copy')).toHaveFocus()
-    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.shareRecorded(UI.quote.actions.line))
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
 
     const requestFrame = vi.spyOn(window, 'requestAnimationFrame')
     const lineButton = screen.getByRole('button', { name: UI.quote.actions.line })
@@ -214,7 +237,7 @@ describe('AiModePlayground interactions', () => {
     await act(async () => { vi.runAllTimers() })
     expect(requestFrame).not.toHaveBeenCalled()
     expect(lineButton).toHaveFocus()
-    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.shareRecorded(UI.quote.actions.line))
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
 
     const input = screen.getByRole('textbox', { name: UI.quote.signatureLabel })
     await user.click(input)
@@ -229,13 +252,14 @@ describe('AiModePlayground interactions', () => {
     render(<AiModePlayground />)
     await user.click(experienceTab(EXPERIENCE_LABELS.quote))
     await user.click(screen.getByRole('button', { name: /Before you choose/ }))
-    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
-    await act(async () => { vi.runAllTimers() })
-    expect(document.getElementById('stage-02-copy')).toHaveFocus()
-    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
-
     const helpful = screen.getByRole('radio', { name: 'Helpful' })
-    helpful.focus()
+    await user.click(helpful)
+    await act(async () => { vi.runAllTimers() })
+    // Picking a feeling records and announces only: focus stays on the radio.
+    expect(helpful).toHaveFocus()
+    expect(document.getElementById('stage-02-copy')).not.toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.feedbackSelected('Helpful'))
+
     const requestFrame = vi.spyOn(window, 'requestAnimationFrame')
     const scrollCalls = vi.mocked(HTMLElement.prototype.scrollIntoView).mock.calls.length
     await user.keyboard(' ')
@@ -243,8 +267,9 @@ describe('AiModePlayground interactions', () => {
     expect(helpful).toHaveAttribute('aria-checked', 'true')
     expect(requestFrame).not.toHaveBeenCalled()
     expect(vi.mocked(HTMLElement.prototype.scrollIntoView).mock.calls.length).toBe(scrollCalls)
+    expect(vi.mocked(HTMLElement.prototype.scrollIntoView)).not.toHaveBeenCalled()
     expect(helpful).toHaveFocus()
-    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.feedbackSelected('Helpful'))
   })
 
   it('ignores re-choosing the chosen Chat answer: nothing is re-announced and focus stays put', async () => {
@@ -326,30 +351,373 @@ describe('AiModePlayground interactions', () => {
     expect(cancelFrame).toHaveBeenCalledWith(42)
   })
 
-  it('captures Listen start and completion at 32 seconds', async () => {
+  it('captures Listen start and completion at 27 seconds', async () => {
     const user = setupTimers()
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
     render(<AiModePlayground />)
     await user.click(experienceTab(EXPERIENCE_LABELS.listen))
     await user.click(screen.getByRole('button', { name: UI.listen.play }))
-    expect(screen.getByText(/The user pressed play and started listening/)).toBeInTheDocument()
-    await act(async () => { vi.advanceTimersByTime(32000) })
-    await act(async () => { vi.runAllTimers() })
-    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The user listened to the 32-second audio from start to finish.')
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '32')
+    expect(media.play).toHaveBeenCalledOnce()
+    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The user pressed play and started listening to the article’s audio overview.')
+    await act(async () => { media.tick(listenAudio(), 5.4) })
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '5')
+    await act(async () => { media.end(listenAudio()) })
+    await act(async () => { vi.runOnlyPendingTimers() })
+    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The user listened to the full 27-second audio overview. Both sponsor messages (demo sponsor: Mlytics) played.')
+    expect(document.getElementById('stage-02-copy')).toHaveTextContent('Played: 27 of 27 seconds (100%). Sponsor message impressions (demo sponsor: Mlytics): 2 of 2.')
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '27')
+    expect(screen.getByRole('button', { name: UI.listen.replay })).toBeInTheDocument()
     expect(document.getElementById('stage-02-copy')).toHaveFocus()
+    expect(focus.mock.contexts.filter((element) => (element as HTMLElement).id === 'stage-02-copy')).toHaveLength(1)
     expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.listen))
   })
 
-  it('resets incomplete Listen when switching away and back', async () => {
+  it('renders a single hidden audio element pointing at the versioned overview', () => {
+    render(<AiModePlayground />)
+    const audios = document.querySelectorAll('audio')
+    expect(audios).toHaveLength(1)
+    expect(audios[0]).toHaveAttribute('src', LISTEN_AUDIO_SRC)
+    expect(audios[0]).toHaveAttribute('preload', 'none')
+    expect(audios[0]).not.toHaveAttribute('controls')
+  })
+
+  it('stops and rewinds incomplete Listen when switching away and back', async () => {
     const user = setupTimers()
     render(<AiModePlayground />)
     await user.click(experienceTab(EXPERIENCE_LABELS.listen))
     await user.click(screen.getByRole('button', { name: UI.listen.play }))
-    await act(async () => { vi.advanceTimersByTime(5000) })
+    await act(async () => { media.tick(listenAudio(), 5) })
     await user.click(experienceTab(EXPERIENCE_LABELS.chat))
+    expect(media.pause).toHaveBeenCalled()
+    expect(listenAudio().paused).toBe(true)
+    expect(listenAudio().currentTime).toBe(0)
     await user.click(experienceTab(EXPERIENCE_LABELS.listen))
     expect(screen.getByText(EXPERIENCE_DEFAULT_OBSERVATION.listen)).toBeInTheDocument()
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+  })
+
+  it('stops and rewinds the audio when Listen is reset', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.tick(listenAudio(), 5) })
+    await user.click(screen.getByRole('button', { name: UI.reset }))
+    expect(media.pause).toHaveBeenCalled()
+    expect(listenAudio().currentTime).toBe(0)
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+    expect(screen.getByRole('button', { name: UI.listen.play })).toBeInTheDocument()
+    expect(screen.getByText(EXPERIENCE_DEFAULT_OBSERVATION.listen)).toBeInTheDocument()
+  })
+
+  it('pauses the audio from the Pause button and announces it', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await user.click(screen.getByRole('button', { name: UI.listen.pause }))
+    expect(media.pause).toHaveBeenCalledOnce()
+    expect(listenAudio().paused).toBe(true)
+    await act(async () => { vi.runOnlyPendingTimers() })
+    expect(screen.getByRole('button', { name: UI.listen.play })).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.listenPaused)
+    expect(document.getElementById('stage-01-copy')).toHaveTextContent('The user listened for 0 seconds (0%), then paused before the opening sponsor message (demo sponsor: Mlytics) finished.')
+  })
+
+  it('replays from the start after completion', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.end(listenAudio()) })
+    media.setCurrentTime.mockClear()
+    media.play.mockClear()
+    await user.click(screen.getByRole('button', { name: UI.listen.replay }))
+    expect(media.setCurrentTime).toHaveBeenCalledWith(0)
+    expect(media.play).toHaveBeenCalledOnce()
+    expect(listenAudio().paused).toBe(false)
+    expect(listenAudio().currentTime).toBe(0)
+    expect(screen.getByRole('button', { name: UI.listen.pause })).toBeInTheDocument()
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+  })
+
+  it('follows an external pause without announcing it', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { vi.runOnlyPendingTimers() })
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.listenPlaying)
+    await act(async () => { listenAudio().pause() })
+    await act(async () => { vi.runOnlyPendingTimers() })
+    expect(screen.getByRole('button', { name: UI.listen.play })).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.listenPlaying)
+    await act(async () => { void listenAudio().play() })
+    expect(screen.getByRole('button', { name: UI.listen.pause })).toBeInTheDocument()
+  })
+
+  it('does not flash paused when playback ends, and completes once', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    const audio = listenAudio()
+    await act(async () => {
+      const state = media.stateOf(audio)
+      state.paused = true
+      state.ended = true
+      audio.dispatchEvent(new Event('pause'))
+    })
+    expect(screen.getByRole('button', { name: UI.listen.pause })).toBeInTheDocument()
+    await act(async () => { audio.dispatchEvent(new Event('ended')) })
+    await act(async () => { audio.dispatchEvent(new Event('ended')) })
+    await act(async () => { vi.runOnlyPendingTimers() })
+    expect(screen.getByRole('button', { name: UI.listen.replay })).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.listen))
+  })
+
+  it('shows an honest error state when play() is rejected, then retries', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    media.rejectNextPlay('NotSupportedError')
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { vi.runOnlyPendingTimers() })
+    expect(document.getElementById('listen-error')).toHaveTextContent(UI.listen.error)
+    const retry = screen.getByRole('button', { name: UI.listen.retry })
+    expect(retry).toHaveAttribute('aria-describedby', 'listen-error')
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.listenError)
+    expect(screen.getByText(EXPERIENCE_DEFAULT_OBSERVATION.listen)).toBeInTheDocument()
+    // The element's own error event after the rejection does not re-announce.
+    await act(async () => { media.fail(listenAudio()) })
+    media.play.mockClear()
+    await user.click(retry)
+    expect(media.load).toHaveBeenCalledOnce()
+    expect(media.play).toHaveBeenCalledOnce()
+    await act(async () => { vi.runOnlyPendingTimers() })
+    expect(screen.getByRole('button', { name: UI.listen.pause })).toBeInTheDocument()
+    expect(document.getElementById('listen-error')).not.toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.listenPlaying)
+  })
+
+  it('ignores an AbortError from an interrupted play()', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    media.rejectNextPlay('AbortError')
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { vi.runOnlyPendingTimers() })
+    expect(document.getElementById('listen-error')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: UI.listen.pause })).toBeInTheDocument()
+  })
+
+  it('moves to the error state when the media element fires error', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.fail(listenAudio()) })
+    await act(async () => { vi.runOnlyPendingTimers() })
+    expect(screen.getByRole('button', { name: UI.listen.retry })).toBeInTheDocument()
+    expect(document.getElementById('listen-error')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.listenError)
+  })
+
+  it('pauses the audio on unmount', async () => {
+    const user = setupTimers()
+    const { unmount } = render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    const audio = listenAudio()
+    media.pause.mockClear()
+    unmount()
+    expect(media.pause).toHaveBeenCalled()
+    expect(audio.paused).toBe(true)
+    expect(audio.currentTime).toBe(0)
+  })
+
+  it('moves the fill smoothly from the audio clock on animation frames while playing, without React state', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement
+    expect(fill.style.width).toBe('0%')
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    // Sub-second motion: the reducer still says 2 s, the bar follows currentTime exactly.
+    await act(async () => { media.tick(listenAudio(), 2.2) })
+    media.stateOf(listenAudio()).currentTime = 2.6641
+    await act(async () => { vi.advanceTimersByTime(20) })
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '2')
+    expect(parseFloat(fill.style.width)).toBeCloseTo(10, 5)
+    // Pausing stops the loop and keeps the exact paused position.
+    await user.click(screen.getByRole('button', { name: UI.listen.pause }))
+    media.stateOf(listenAudio()).currentTime = 20
+    await act(async () => { vi.advanceTimersByTime(100) })
+    expect(parseFloat(fill.style.width)).toBeCloseTo(10, 5)
+    await act(async () => { media.end(listenAudio()) })
+    expect(fill.style.width).toBe('100%')
+    await user.click(screen.getByRole('button', { name: UI.reset }))
+    expect(fill.style.width).toBe('0%')
+  })
+
+  it('cancels the animation frame loop on pause and on unmount', async () => {
+    const user = setupTimers()
+    const cancel = vi.spyOn(window, 'cancelAnimationFrame')
+    const { unmount } = render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    const before = cancel.mock.calls.length
+    await user.click(screen.getByRole('button', { name: UI.listen.pause }))
+    expect(cancel.mock.calls.length).toBeGreaterThan(before)
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    const beforeUnmount = cancel.mock.calls.length
+    unmount()
+    expect(cancel.mock.calls.length).toBeGreaterThan(beforeUnmount)
+  })
+
+  it('with reduced motion the fill steps with whole seconds and reaches 100% on completion', async () => {
+    vi.stubGlobal('matchMedia', vi.fn((query: string) => ({ matches: query.includes('reduce'), addListener: vi.fn(), removeListener: vi.fn() })))
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.tick(listenAudio(), 13.9) })
+    await act(async () => { vi.advanceTimersByTime(100) })
+    expect(parseFloat(fill.style.width)).toBeCloseTo((13 / 27) * 100, 5)
+    await act(async () => { media.end(listenAudio()) })
+    expect(fill.style.width).toBe('100%')
+  })
+
+  it('highlights the sentence being spoken while playing and paused, and clears it otherwise', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByText(UI.listen.transcript))
+    const current = () => Array.from(document.querySelectorAll('[data-sentence][aria-current="true"]')).map((element) => element.getAttribute('data-sentence'))
+    expect(current()).toEqual([])
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.tick(listenAudio(), 4); vi.advanceTimersByTime(20) })
+    expect(current()).toEqual(['1'])
+    await act(async () => { media.tick(listenAudio(), 15); vi.advanceTimersByTime(20) })
+    expect(current()).toEqual(['4'])
+    await user.click(screen.getByRole('button', { name: UI.listen.pause }))
+    expect(current()).toEqual(['4'])
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.end(listenAudio()) })
+    expect(current()).toEqual([])
+    await user.click(screen.getByRole('button', { name: UI.listen.replay }))
+    await act(async () => { media.tick(listenAudio(), 24.5); vi.advanceTimersByTime(20) })
+    expect(current()).toEqual(['7'])
+    await user.click(screen.getByRole('button', { name: UI.reset }))
+    expect(current()).toEqual([])
+    expect(screen.getByRole('status')).not.toHaveTextContent(/Mlytics/)
+  })
+
+  it('with reduced motion the highlight follows timeupdate', async () => {
+    vi.stubGlobal('matchMedia', vi.fn((query: string) => ({ matches: query.includes('reduce'), addListener: vi.fn(), removeListener: vi.fn() })))
+    const user = setupTimers()
+    const frames = vi.spyOn(window, 'requestAnimationFrame')
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    frames.mockClear()
+    await act(async () => { media.tick(listenAudio(), 5.5) })
+    expect(document.querySelector('[data-sentence="2"]')).toHaveAttribute('aria-current', 'true')
+    expect(frames).not.toHaveBeenCalled()
+  })
+
+  it('does not re-render the playground on animation frames when the sentence is unchanged', async () => {
+    const user = setupTimers()
+    let renders = 0
+    render(<Profiler id="playground" onRender={() => { renders += 1 }}><AiModePlayground /></Profiler>)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.tick(listenAudio(), 8.2); vi.advanceTimersByTime(20) })
+    await act(async () => { vi.runOnlyPendingTimers() })
+    const settled = renders
+    // ~60 frames of sub-second motion inside one sentence and one whole second.
+    for (let frame = 0; frame < 60; frame += 1) {
+      media.stateOf(listenAudio()).currentTime = 8.2 + frame * 0.01
+      await act(async () => { vi.advanceTimersByTime(16) })
+    }
+    expect(renders).toBe(settled)
+  })
+
+  it('updates the stage 02 signal live every whole second without announcing it', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { vi.runOnlyPendingTimers() })
+    const status = screen.getByRole('status')
+    expect(status).toHaveTextContent(ANNOUNCE.listenPlaying)
+    const stage02 = document.getElementById('stage-02-copy')!
+    // Stage 02 is not a live region and sits outside one.
+    expect(stage02.closest('[aria-live], [role="status"], [role="log"], [role="alert"]')).toBeNull()
+    const announcements: string[] = []
+    const observer = new MutationObserver(() => announcements.push(status.textContent ?? ''))
+    observer.observe(status, { childList: true, characterData: true, subtree: true })
+    await act(async () => { media.tick(listenAudio(), 5.2); vi.advanceTimersByTime(20) })
+    expect(stage02).toHaveTextContent('Played so far: 5 of 27 seconds (19%).')
+    await act(async () => { media.tick(listenAudio(), 6.1); vi.advanceTimersByTime(20) })
+    expect(stage02).toHaveTextContent('Played so far: 6 of 27 seconds (22%).')
+    await act(async () => { vi.runOnlyPendingTimers() })
+    observer.disconnect()
+    expect(announcements).toEqual([])
+    expect(status).toHaveTextContent(ANNOUNCE.listenPlaying)
+  })
+
+  it('mute is a stable-name toggle that sets audio.muted, works before play and persists, without touching signals', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    const mute = () => screen.getByRole('button', { name: UI.listen.mute })
+    expect(mute()).toHaveAttribute('aria-pressed', 'false')
+    expect(mute().querySelector('svg.lucide-volume-2')).not.toBeNull()
+    expect(listenAudio().muted).toBe(false)
+
+    // Pre-set before play.
+    await user.click(mute())
+    expect(listenAudio().muted).toBe(true)
+    expect(mute()).toHaveAttribute('aria-pressed', 'true')
+    expect(mute()).toHaveAccessibleName(UI.listen.mute)
+    expect(mute().querySelector('svg.lucide-volume-x')).not.toBeNull()
+
+    await user.click(screen.getByRole('button', { name: UI.listen.play }))
+    await act(async () => { media.tick(listenAudio(), 5.2); vi.advanceTimersByTime(20) })
+    const signals = () => [document.getElementById('stage-01-copy')?.textContent, document.getElementById('stage-02-copy')?.textContent]
+    const muted = signals()
+    await user.click(mute())
+    expect(listenAudio().muted).toBe(false)
+    expect(signals()).toEqual(muted)
+    expect(listenAudio().paused).toBe(false)
+    await user.click(mute())
+    expect(signals()).toEqual(muted)
+
+    // Persists across completion + Replay, Reset and a tab switch.
+    await act(async () => { media.end(listenAudio()) })
+    await user.click(screen.getByRole('button', { name: UI.listen.replay }))
+    expect(listenAudio().muted).toBe(true)
+    await user.click(screen.getByRole('button', { name: UI.reset }))
+    expect(listenAudio().muted).toBe(true)
+    expect(mute()).toHaveAttribute('aria-pressed', 'true')
+    await user.click(experienceTab(EXPERIENCE_LABELS.chat))
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    expect(listenAudio().muted).toBe(true)
+    expect(mute()).toHaveAttribute('aria-pressed', 'true')
+    expect(mute()).toHaveAccessibleName(UI.listen.mute)
+  })
+
+  it('follows a mute change made outside the button (volumechange)', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.listen))
+    await act(async () => {
+      listenAudio().muted = true
+      listenAudio().dispatchEvent(new Event('volumechange'))
+    })
+    expect(screen.getByRole('button', { name: UI.listen.mute })).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('resets only the current Quote slice while the Chat capture survives', async () => {
@@ -410,5 +778,106 @@ describe('AiModePlayground interactions', () => {
     expect(experienceTab(EXPERIENCE_LABELS.quote)).toHaveFocus()
     expect(chatTab).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText(/The user picked “iPhone 18 Pro full specs/)).toBeInTheDocument()
+  })
+})
+
+describe('Quote completion: share and reveal link', () => {
+  const reveal = () => screen.queryByRole('button', { name: UI.quote.revealSignal })
+  const line = (pattern: RegExp) => screen.getByRole('button', { name: pattern })
+
+  it('shows the reveal link only once a line and a feeling are both picked', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+    expect(reveal()).not.toBeInTheDocument()
+    await user.click(experienceTab(EXPERIENCE_LABELS.chat))
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(screen.getByRole('button', { name: UI.reset }))
+    await user.click(line(/Before you choose/))
+    expect(reveal()).not.toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+    expect(reveal()).toBeInTheDocument()
+  })
+
+  it('the reveal link focuses and scrolls to the signal once, announces completion, and records no share', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(line(/Before you choose/))
+    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+    const focus = vi.spyOn(HTMLElement.prototype, 'focus')
+    await user.click(reveal()!)
+    await act(async () => { vi.runAllTimers() })
+    const signal = document.getElementById('stage-02-copy')
+    expect(scrolledElement).toBe(signal)
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(1)
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ block: 'center', behavior: 'smooth' })
+    expect(focus.mock.contexts.filter((element) => element === signal)).toHaveLength(1)
+    expect(focus.mock.calls[focus.mock.contexts.indexOf(signal)]).toEqual([{ preventScroll: true }])
+    expect(signal).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+    expect(signal).not.toHaveTextContent(/share button/)
+    // The link stays available after it is used.
+    expect(reveal()).toBeInTheDocument()
+  })
+
+  it('picking a different line starts a new round: the reveal link hides until a feeling is picked again', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(line(/Before you choose/))
+    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+    expect(reveal()).toBeInTheDocument()
+    await user.click(line(/Useful answers/))
+    expect(reveal()).not.toBeInTheDocument()
+  })
+
+  it('the first share completes Quote even without a feeling', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(line(/Before you choose/))
+    await user.click(screen.getByRole('button', { name: UI.quote.actions.share }))
+    await act(async () => { vi.runAllTimers() })
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(1)
+    expect(document.getElementById('stage-02-copy')).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+    expect(document.getElementById('stage-02-copy')).toHaveTextContent('generic share button')
+  })
+
+  it('after the reveal link, the first share still completes Quote and the link stays visible', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(line(/Before you choose/))
+    await user.click(screen.getByRole('radio', { name: 'Helpful' }))
+    await user.click(reveal()!)
+    await act(async () => { vi.runAllTimers() })
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(1)
+    await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
+    await act(async () => { vi.runAllTimers() })
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(2)
+    expect(document.getElementById('stage-02-copy')).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+    expect(reveal()).toBeInTheDocument()
+  })
+
+  it('after a different line, the next share jumps again', async () => {
+    const user = setupTimers()
+    render(<AiModePlayground />)
+    await user.click(experienceTab(EXPERIENCE_LABELS.quote))
+    await user.click(line(/Before you choose/))
+    await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
+    await act(async () => { vi.runAllTimers() })
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(1)
+    await user.click(line(/Useful answers/))
+    await act(async () => { vi.runAllTimers() })
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(1)
+    await user.click(screen.getByRole('button', { name: UI.quote.actions.line }))
+    await act(async () => { vi.runAllTimers() })
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledTimes(2)
+    expect(document.getElementById('stage-02-copy')).toHaveFocus()
+    expect(screen.getByRole('status')).toHaveTextContent(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
   })
 })

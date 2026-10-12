@@ -2,12 +2,13 @@ import {
   CAPTURE,
   CHAT_QUESTIONS,
   LISTEN_DURATION_SECONDS,
+  LISTEN_TRANSCRIPT_SENTENCES,
   QUOTE_OPTIONS,
-  UI,
+  SHARE_CAPTURE_NAMES,
 } from './ai-mode-playground-copy'
 import type { BusinessPath, ExperienceId, ShareAction } from './ai-mode-playground-copy'
 
-export type ListenStatus = 'idle' | 'playing' | 'paused' | 'completed'
+export type ListenStatus = 'idle' | 'playing' | 'paused' | 'completed' | 'error'
 
 export type PlaygroundState = {
   experience: ExperienceId
@@ -41,7 +42,11 @@ export type PlaygroundAction =
   | { type: 'quote/share'; action: ShareAction }
   | { type: 'listen/toggle' }
   | { type: 'listen/replay' }
-  | { type: 'listen/tick' }
+  | { type: 'listen/progress'; elapsed: number }
+  | { type: 'listen/complete' }
+  | { type: 'listen/mediaPause' }
+  | { type: 'listen/mediaPlay' }
+  | { type: 'listen/error' }
 
 const resetQuote = () => ({ index: null, feedback: '', signature: '', shareActions: [] as ShareAction[] })
 
@@ -86,12 +91,30 @@ export function playgroundReducer(state: PlaygroundState, action: PlaygroundActi
     }
     case 'listen/replay':
       return { ...state, listen: { status: 'playing', elapsed: 0 } }
-    case 'listen/tick':
+    // Media-element events: the <audio> element is the only time source, and
+    // every guard hands the same state back when nothing changes so a stream of
+    // timeupdate events does not re-render the page.
+    case 'listen/progress': {
+      const { status } = state.listen
+      if (status !== 'playing' && status !== 'paused') return state
+      const elapsed = Math.min(LISTEN_DURATION_SECONDS, Math.max(0, Math.floor(action.elapsed)))
+      if (Number.isNaN(elapsed) || elapsed === state.listen.elapsed) return state
+      return { ...state, listen: { status, elapsed } }
+    }
+    case 'listen/complete': {
+      const { status } = state.listen
+      if (status !== 'playing' && status !== 'paused') return state
+      return { ...state, listen: { status: 'completed', elapsed: LISTEN_DURATION_SECONDS } }
+    }
+    case 'listen/mediaPause':
       if (state.listen.status !== 'playing') return state
-      if (state.listen.elapsed >= LISTEN_DURATION_SECONDS - 1) {
-        return { ...state, listen: { status: 'completed', elapsed: LISTEN_DURATION_SECONDS } }
-      }
-      return { ...state, listen: { status: 'playing', elapsed: state.listen.elapsed + 1 } }
+      return { ...state, listen: { ...state.listen, status: 'paused' } }
+    case 'listen/mediaPlay':
+      if (state.listen.status !== 'paused') return state
+      return { ...state, listen: { ...state.listen, status: 'playing' } }
+    case 'listen/error':
+      if (state.listen.status === 'error') return state
+      return { ...state, listen: { ...state.listen, status: 'error' } }
   }
 }
 
@@ -102,11 +125,11 @@ export function deriveCaptures(state: PlaygroundState): Captures {
     captures.quote = CAPTURE.quote({
       quote: QUOTE_OPTIONS[state.quote.index],
       feedback: state.quote.feedback,
-      shareActions: state.quote.shareActions.map((action) => UI.quote.actions[action]),
+      shareActions: state.quote.shareActions.map((action) => SHARE_CAPTURE_NAMES[action]),
     })
   }
-  if (state.listen.status === 'playing' || state.listen.status === 'paused') captures.listen = CAPTURE.listenStarted
-  if (state.listen.status === 'completed') captures.listen = CAPTURE.listenCompleted
+  const { status, elapsed } = state.listen
+  if (status === 'playing' || status === 'paused' || status === 'completed') captures.listen = CAPTURE.listen({ status, elapsed })
   return captures
 }
 
@@ -121,8 +144,28 @@ export function activePathContent(
   return path
 }
 
+/**
+ * Flat index of the transcript sentence being spoken at `time` seconds: the
+ * last sentence whose start is at or before it. -1 for a non-finite or
+ * negative time. Status gating (only while playing or paused) is the caller's.
+ */
+export function activeSentenceIndex(
+  time: number,
+  sentences: readonly { start: number }[] = LISTEN_TRANSCRIPT_SENTENCES,
+): number {
+  if (!Number.isFinite(time) || time < 0) return -1
+  let active = -1
+  for (let index = 0; index < sentences.length; index += 1) {
+    if (sentences[index].start <= time) active = index
+    else break
+  }
+  return active
+}
+
+/** m:ss, the YouTube player format (0:09, 1:05). */
 export function formatTime(seconds: number): string {
-  return `00:${String(Math.max(0, Math.floor(seconds))).padStart(2, '0')}`
+  const total = Math.max(0, Math.floor(seconds))
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
 }
 
 export function nextTabIndex(key: string, current: number, count: number): number | null {

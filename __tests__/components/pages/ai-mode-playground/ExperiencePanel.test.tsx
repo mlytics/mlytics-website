@@ -6,6 +6,9 @@ import { ExperiencePanel } from '@/components/pages/ai-mode-playground/Experienc
 import {
   EXPERIENCE_INSTRUCTIONS,
   EXPERIENCE_LABELS,
+  LISTEN_DURATION_SECONDS,
+  LISTEN_TRANSCRIPT_SENTENCES,
+  LISTEN_TRANSCRIPT_TEXT,
   QUOTE_FEEDBACK_OPTIONS,
   QUOTE_OPTIONS,
   UI,
@@ -28,8 +31,10 @@ function Harness({ initial = INITIAL_STATE, callbacks = {} }: { initial?: Playgr
       onFeedback={(value) => { callbacks.feedback?.(value); dispatch({ type: 'quote/feedback', value }) }}
       onSignature={(value) => { callbacks.signature?.(value); dispatch({ type: 'quote/signature', value }) }}
       onShare={(action) => { callbacks.share?.(action); dispatch({ type: 'quote/share', action }) }}
+      onRevealSignal={() => { callbacks.reveal?.() }}
       onListenToggle={() => { callbacks.toggle?.(); dispatch({ type: 'listen/toggle' }) }}
       onListenReplay={() => { callbacks.replay?.(); dispatch({ type: 'listen/replay' }) }}
+      onListenRetry={() => { callbacks.retry?.(); dispatch({ type: 'listen/replay' }) }}
     />
   )
 }
@@ -91,7 +96,8 @@ describe('ExperiencePanel', () => {
 
     const quoteState = { ...INITIAL_STATE, experience: 'quote' as const, quote: { index: 0 as const, feedback: '', signature: '', shareActions: [] } }
     rerender(<Harness key="quote-selected" initial={quoteState} callbacks={callbacks} />)
-    expect(screen.getByRole('blockquote')).toHaveTextContent(QUOTE_OPTIONS[0])
+    // The gold CSS mark is the only quote symbol: the text carries no inline marks.
+    expect(screen.getByRole('blockquote').textContent).toBe(QUOTE_OPTIONS[0])
     expect(screen.getByText(UI.quote.anonymous)).toBeInTheDocument()
     expect(screen.getByText(UI.quote.sponsoredBy)).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Mlytics' })).toHaveAttribute('src', '/logo.svg')
@@ -106,6 +112,36 @@ describe('ExperiencePanel', () => {
     expect(screen.getByRole('radio', { name: 'Resonates' })).toHaveAttribute('aria-checked', 'false')
     await user.click(screen.getByRole('button', { name: UI.quote.actions.fb }))
     expect(callbacks.share).toHaveBeenCalledWith('fb')
+  })
+
+  it('renders LINE, FB and Share buttons, each with one decorative icon', () => {
+    const quoteState = { ...INITIAL_STATE, experience: 'quote' as const, quote: { index: 0 as const, feedback: '', signature: '', shareActions: [] } }
+    render(<Harness initial={quoteState} />)
+    const group = screen.getByRole('group', { name: UI.quote.actionsLabel })
+    const buttons = Array.from(group.querySelectorAll('button'))
+    expect(buttons.map((button) => button.textContent)).toEqual(['LINE', 'FB', 'Share'])
+    for (const name of ['LINE', 'FB', 'Share']) {
+      const button = screen.getByRole('button', { name })
+      expect(button.querySelectorAll('svg')).toHaveLength(1)
+      expect(button.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(1)
+      expect(button.querySelector('svg')).toHaveAttribute('focusable', 'false')
+    }
+    expect(screen.queryByRole('button', { name: /Download/ })).not.toBeInTheDocument()
+  })
+
+  it('shows the reveal link only when a feeling is set, outside the share group, and calls onRevealSignal', async () => {
+    const user = userEvent.setup()
+    const reveal = vi.fn()
+    const lineOnly = { ...INITIAL_STATE, experience: 'quote' as const, quote: { index: 0 as const, feedback: '', signature: '', shareActions: [] } }
+    const { rerender } = render(<Harness initial={lineOnly} callbacks={{ reveal }} />)
+    expect(screen.queryByRole('button', { name: UI.quote.revealSignal })).not.toBeInTheDocument()
+
+    rerender(<Harness key="with-feeling" initial={{ ...lineOnly, quote: { ...lineOnly.quote, feedback: 'Helpful' } }} callbacks={{ reveal }} />)
+    const link = screen.getByRole('button', { name: UI.quote.revealSignal })
+    expect(link.textContent).toBe(UI.quote.revealSignal)
+    expect(screen.getByRole('group', { name: UI.quote.actionsLabel })).not.toContainElement(link)
+    await user.click(link)
+    expect(reveal).toHaveBeenCalledTimes(1)
   })
 
   it('moves focus through feedback radios with arrows/Home/End and selects only on Space', async () => {
@@ -163,8 +199,9 @@ describe('ExperiencePanel', () => {
     const { rerender } = render(<Harness initial={{ ...INITIAL_STATE, experience: 'listen' }} callbacks={{ toggle, replay }} />)
     expect(screen.getByRole('button', { name: UI.listen.play })).toBeInTheDocument()
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
-    expect(screen.getByText('00:00')).toBeInTheDocument()
-    expect(screen.getByText('00:32')).toBeInTheDocument()
+    expect(screen.getByText('0:00').parentElement).toHaveTextContent('0:00 / 0:27')
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuetext', '0 of 27 seconds')
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuemax', String(LISTEN_DURATION_SECONDS))
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: UI.listen.play }))
     expect(toggle).toHaveBeenCalledOnce()
@@ -172,10 +209,11 @@ describe('ExperiencePanel', () => {
     rerender(<Harness key="listen-playing" initial={{ ...INITIAL_STATE, experience: 'listen', listen: { status: 'playing', elapsed: 5 } }} callbacks={{ toggle, replay }} />)
     expect(screen.getByRole('button', { name: UI.listen.pause })).toBeInTheDocument()
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '5')
-    expect(screen.getByText('00:05')).toBeInTheDocument()
+    expect(screen.getByText('0:05').parentElement).toHaveTextContent('0:05 / 0:27')
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuetext', '5 of 27 seconds')
 
-    rerender(<Harness key="listen-completed" initial={{ ...INITIAL_STATE, experience: 'listen', listen: { status: 'completed', elapsed: 32 } }} callbacks={{ toggle, replay }} />)
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '32')
+    rerender(<Harness key="listen-completed" initial={{ ...INITIAL_STATE, experience: 'listen', listen: { status: 'completed', elapsed: 27 } }} callbacks={{ toggle, replay }} />)
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '27')
     await user.click(screen.getByRole('button', { name: UI.listen.replay }))
     expect(replay).toHaveBeenCalledOnce()
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
@@ -214,18 +252,88 @@ describe('ExperiencePanel', () => {
     expect(button).toHaveTextContent(UI.listen.pause)
   })
 
-  it('renders the stroked replay icon on the Listen toggle when completed', () => {
-    render(<Harness initial={{ ...INITIAL_STATE, experience: 'listen', listen: { status: 'completed', elapsed: 32 } }} />)
+  it('renders the lucide RotateCcw replay icon on the Listen toggle when completed', () => {
+    render(<Harness initial={{ ...INITIAL_STATE, experience: 'listen', listen: { status: 'completed', elapsed: 27 } }} />)
     const button = screen.getByRole('button', { name: UI.listen.replay })
     const { svg, paths } = iconPaths(button)
+    expect(svg).toHaveClass('lucide', 'lucide-rotate-ccw')
+    expect(svg.getAttribute('class')).toMatch(/listenIcon/)
     expect(svg).toHaveAttribute('fill', 'none')
-    expect(paths.map((path) => path.getAttribute('d'))).toEqual(['M20 11a8 8 0 1 0 2 5.3', 'M20 4v7h-7'])
-    for (const path of paths) {
-      expect(path).toHaveAttribute('stroke', 'currentColor')
-      expect(path).toHaveAttribute('stroke-width', '2')
-      expect(path).toHaveAttribute('stroke-linecap', 'round')
-    }
-    expect(paths[1]).toHaveAttribute('stroke-linejoin', 'round')
+    expect(svg).toHaveAttribute('stroke', 'currentColor')
+    expect(svg).toHaveAttribute('stroke-width', '2')
+    // The well-formed lucide glyph, not the old malformed arc + detached corner.
+    expect(paths.map((path) => path.getAttribute('d'))).toEqual(['M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8', 'M3 3v5h5'])
     expect(button).toHaveTextContent(UI.listen.replay)
   })
+
+  it('shows Try again with the play icon and a visible error message when the audio fails', async () => {
+    const user = userEvent.setup()
+    const retry = vi.fn()
+    render(<Harness initial={{ ...INITIAL_STATE, experience: 'listen', listen: { status: 'error', elapsed: 4 } }} callbacks={{ retry }} />)
+    const button = screen.getByRole('button', { name: UI.listen.retry })
+    const { paths } = iconPaths(button)
+    expect(paths.map((path) => path.getAttribute('d'))).toEqual(['M8 5v14l11-7L8 5Z'])
+    expect(button).toHaveAttribute('aria-describedby', 'listen-error')
+    expect(document.getElementById('listen-error')).toHaveTextContent(UI.listen.error)
+    expect(screen.getByText(UI.listen.status.unavailable)).toBeInTheDocument()
+    await user.click(button)
+    expect(retry).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button', { name: UI.listen.pause })).not.toHaveAttribute('aria-describedby')
+    expect(document.getElementById('listen-error')).not.toBeInTheDocument()
+  })
+
+  it('renders a closed transcript disclosure with the three narrated paragraphs', async () => {
+    const user = userEvent.setup()
+    render(<Harness initial={{ ...INITIAL_STATE, experience: 'listen' }} />)
+    const summary = screen.getByText(UI.listen.transcript)
+    expect(summary.tagName).toBe('SUMMARY')
+    const details = summary.closest('details')!
+    expect(details).not.toHaveAttribute('open')
+    const paragraphs = Array.from(details.querySelectorAll('p')).map((p) => p.textContent)
+    expect(paragraphs).toEqual([...LISTEN_TRANSCRIPT_TEXT])
+    expect(paragraphs).toHaveLength(3)
+    await user.click(summary)
+    expect(details).toHaveAttribute('open')
+  })
+
+  it('renders one span per transcript sentence and marks only the active one', () => {
+    const { rerender } = render(<ExperiencePanel {...panelProps(-1)} />)
+    const sentences = () => Array.from(document.querySelectorAll('[data-sentence]'))
+    expect(sentences().map((element) => element.textContent)).toEqual(LISTEN_TRANSCRIPT_SENTENCES.map((sentence) => sentence.text))
+    expect(document.querySelectorAll('[aria-current]')).toHaveLength(0)
+    rerender(<ExperiencePanel {...panelProps(4)} />)
+    expect(sentences().filter((element) => element.getAttribute('aria-current') === 'true').map((element) => element.getAttribute('data-sentence'))).toEqual(['4'])
+  })
+
+  it('splits the Listen time label into the current time and a separately hideable total', () => {
+    render(<Harness initial={{ ...INITIAL_STATE, experience: 'listen', listen: { status: 'paused', elapsed: 9 } }} />)
+    const current = screen.getByText('0:09')
+    const total = screen.getByText('/ 0:27')
+    expect(current.tagName).toBe('SPAN')
+    expect(total.tagName).toBe('SPAN')
+    expect(total.textContent).toBe(' / 0:27')
+    expect(current.parentElement).toBe(total.parentElement)
+    expect(current.parentElement).toHaveTextContent('0:09 / 0:27')
+    expect(current.parentElement!.children).toHaveLength(2)
+    expect(total.className).toMatch(/listenTimeTotal/)
+    // The total is still available to assistive tech through the progressbar.
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuetext', '9 of 27 seconds')
+  })
+})
+
+const noop = () => {}
+const panelProps = (activeSentence: number) => ({
+  state: { ...INITIAL_STATE, experience: 'listen' as const, listen: { status: 'playing' as const, elapsed: 15 } },
+  onSelectExperience: noop,
+  onReset: noop,
+  onChooseQuestion: noop,
+  onSelectQuote: noop,
+  onFeedback: noop,
+  onSignature: noop,
+  onShare: noop,
+  onRevealSignal: noop,
+  onListenToggle: noop,
+  onListenReplay: noop,
+  onListenRetry: noop,
+  activeSentence,
 })

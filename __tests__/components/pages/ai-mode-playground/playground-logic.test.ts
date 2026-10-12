@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   activePathContent,
+  activeSentenceIndex,
   deriveCaptures,
   formatTime,
   INITIAL_STATE,
@@ -15,6 +16,11 @@ import {
   CAPTURE,
   CHAT_QUESTIONS,
   EXPERIENCE_DEFAULT_OBSERVATION,
+  LISTEN_DURATION_SECONDS,
+  LISTEN_OPENING_SPONSOR_END_SECONDS,
+  LISTEN_TRANSCRIPT,
+  LISTEN_TRANSCRIPT_SENTENCES,
+  LISTEN_TRANSCRIPT_TEXT,
   PATHS,
   QUOTE_OPTIONS,
   UI,
@@ -58,14 +64,29 @@ describe('deriveCaptures', () => {
     )
   })
 
+  it('names the generic Share button "generic" in the capture, never "Share share"', () => {
+    let state = playgroundReducer(INITIAL_STATE, { type: 'quote/select', index: 0 })
+    for (const action of ['line', 'fb', 'share'] as const) state = playgroundReducer(state, { type: 'quote/share', action })
+    const all = deriveCaptures(state).quote?.rawSignal
+    expect(all).toContain('clicked the LINE, FB, and generic share buttons')
+    expect(all).not.toMatch(/Share share/i)
+
+    let alone = playgroundReducer(INITIAL_STATE, { type: 'quote/select', index: 0 })
+    alone = playgroundReducer(alone, { type: 'quote/share', action: 'share' })
+    expect(deriveCaptures(alone).quote?.rawSignal).toContain('clicked the generic share button')
+    expect(deriveCaptures(alone).quote?.rawSignal).not.toMatch(/Share share/i)
+  })
+
   it('maps listen lifecycle to started/completed captures', () => {
     let state = playgroundReducer(INITIAL_STATE, { type: 'listen/toggle' })
-    expect(deriveCaptures(state).listen).toEqual(CAPTURE.listenStarted)
+    expect(deriveCaptures(state).listen).toEqual(CAPTURE.listen({ status: 'playing', elapsed: 0 }))
     state = playgroundReducer(state, { type: 'listen/toggle' })
-    expect(deriveCaptures(state).listen).toEqual(CAPTURE.listenStarted)
+    expect(deriveCaptures(state).listen).toEqual(CAPTURE.listen({ status: 'paused', elapsed: 0 }))
     state = playgroundReducer(state, { type: 'listen/toggle' })
-    for (let i = 0; i < 32; i += 1) state = playgroundReducer(state, { type: 'listen/tick' })
-    expect(deriveCaptures(state).listen).toEqual(CAPTURE.listenCompleted)
+    state = playgroundReducer(state, { type: 'listen/progress', elapsed: 12.4 })
+    expect(deriveCaptures(state).listen?.rawSignal).toBe('Played so far: 12 of 27 seconds (44%). Opening sponsor message (demo sponsor: Mlytics): played. Closing sponsor message: not yet played.')
+    state = playgroundReducer(state, { type: 'listen/complete' })
+    expect(deriveCaptures(state).listen).toEqual(CAPTURE.listen({ status: 'completed', elapsed: 27 }))
     expect(deriveCaptures(INITIAL_STATE)).not.toHaveProperty('listen')
   })
 })
@@ -116,13 +137,13 @@ describe('playgroundReducer', () => {
   it('resets incomplete listen when leaving it but preserves completed listen', () => {
     let state = playgroundReducer(INITIAL_STATE, { type: 'experience/select', id: 'listen' })
     state = playgroundReducer(state, { type: 'listen/toggle' })
-    state = playgroundReducer(state, { type: 'listen/tick' })
+    state = playgroundReducer(state, { type: 'listen/progress', elapsed: 1 })
     expect(playgroundReducer(state, { type: 'experience/select', id: 'quote' }).listen).toEqual({ status: 'idle', elapsed: 0 })
 
     state = playgroundReducer(INITIAL_STATE, { type: 'experience/select', id: 'listen' })
     state = playgroundReducer(state, { type: 'listen/toggle' })
-    for (let i = 0; i < 32; i += 1) state = playgroundReducer(state, { type: 'listen/tick' })
-    expect(playgroundReducer(state, { type: 'experience/select', id: 'quote' }).listen).toEqual({ status: 'completed', elapsed: 32 })
+    state = playgroundReducer(state, { type: 'listen/complete' })
+    expect(playgroundReducer(state, { type: 'experience/select', id: 'quote' }).listen).toEqual({ status: 'completed', elapsed: 27 })
   })
 
   it('resets paused listen when leaving it', () => {
@@ -155,17 +176,157 @@ describe('playgroundReducer', () => {
     expect(state.chatQuestionIndex).toBe(1)
   })
 
-  it('completes listen at 32, ignores paused ticks, and restarts completed listen', () => {
+  it('completes listen at 27 and restarts completed listen', () => {
+    expect(LISTEN_DURATION_SECONDS).toBe(27)
     let state = playgroundReducer(INITIAL_STATE, { type: 'listen/toggle' })
-    for (let i = 0; i < 31; i += 1) state = playgroundReducer(state, { type: 'listen/tick' })
-    expect(state.listen).toEqual({ status: 'playing', elapsed: 31 })
-    state = playgroundReducer(state, { type: 'listen/toggle' })
-    expect(playgroundReducer(state, { type: 'listen/tick' })).toEqual(state)
-    state = { ...state, listen: { status: 'completed', elapsed: 32 } }
+    state = playgroundReducer(state, { type: 'listen/progress', elapsed: 26.6 })
+    expect(state.listen).toEqual({ status: 'playing', elapsed: 26 })
+    state = playgroundReducer(state, { type: 'listen/complete' })
+    expect(state.listen).toEqual({ status: 'completed', elapsed: 27 })
     const restarted = playgroundReducer(state, { type: 'listen/toggle' })
     expect(restarted.listen).toEqual({ status: 'playing', elapsed: 0 })
-    expect(deriveCaptures(restarted).listen).toEqual(CAPTURE.listenStarted)
+    expect(deriveCaptures(restarted).listen).toEqual(CAPTURE.listen({ status: 'playing', elapsed: 0 }))
     expect(playgroundReducer(state, { type: 'listen/replay' }).listen).toEqual({ status: 'playing', elapsed: 0 })
+  })
+})
+
+describe('playgroundReducer: media events', () => {
+  const playing = { ...INITIAL_STATE, experience: 'listen' as const, listen: { status: 'playing' as const, elapsed: 3 } }
+  const paused = { ...playing, listen: { status: 'paused' as const, elapsed: 3 } }
+  const idle = { ...playing, listen: { status: 'idle' as const, elapsed: 0 } }
+  const completed = { ...playing, listen: { status: 'completed' as const, elapsed: 27 } }
+  const errored = { ...playing, listen: { status: 'error' as const, elapsed: 3 } }
+
+  it('floors progress and returns the same reference when the second has not changed', () => {
+    expect(playgroundReducer(playing, { type: 'listen/progress', elapsed: 3.9 })).toBe(playing)
+    const next = playgroundReducer(playing, { type: 'listen/progress', elapsed: 5.4 })
+    expect(next.listen).toEqual({ status: 'playing', elapsed: 5 })
+    expect(playgroundReducer(next, { type: 'listen/progress', elapsed: 5.99 })).toBe(next)
+    expect(playgroundReducer(paused, { type: 'listen/progress', elapsed: 8 }).listen).toEqual({ status: 'paused', elapsed: 8 })
+  })
+
+  it('clamps progress to 0..LISTEN_DURATION_SECONDS', () => {
+    expect(playgroundReducer(playing, { type: 'listen/progress', elapsed: -4 }).listen.elapsed).toBe(0)
+    expect(playgroundReducer(playing, { type: 'listen/progress', elapsed: 99 }).listen.elapsed).toBe(LISTEN_DURATION_SECONDS)
+    expect(playgroundReducer(playing, { type: 'listen/progress', elapsed: Number.NaN })).toBe(playing)
+  })
+
+  it.each([['idle', idle], ['completed', completed], ['error', errored]] as const)('ignores progress when %s', (_name, state) => {
+    expect(playgroundReducer(state, { type: 'listen/progress', elapsed: 9 })).toBe(state)
+  })
+
+  it('completes only from playing or paused', () => {
+    expect(playgroundReducer(playing, { type: 'listen/complete' }).listen).toEqual({ status: 'completed', elapsed: 27 })
+    expect(playgroundReducer(paused, { type: 'listen/complete' }).listen).toEqual({ status: 'completed', elapsed: 27 })
+    expect(playgroundReducer(idle, { type: 'listen/complete' })).toBe(idle)
+    expect(playgroundReducer(completed, { type: 'listen/complete' })).toBe(completed)
+    expect(playgroundReducer(errored, { type: 'listen/complete' })).toBe(errored)
+  })
+
+  it('guards mediaPause and mediaPlay', () => {
+    expect(playgroundReducer(playing, { type: 'listen/mediaPause' }).listen).toEqual({ status: 'paused', elapsed: 3 })
+    for (const state of [paused, idle, completed, errored]) expect(playgroundReducer(state, { type: 'listen/mediaPause' })).toBe(state)
+    expect(playgroundReducer(paused, { type: 'listen/mediaPlay' }).listen).toEqual({ status: 'playing', elapsed: 3 })
+    for (const state of [playing, idle, completed, errored]) expect(playgroundReducer(state, { type: 'listen/mediaPlay' })).toBe(state)
+  })
+
+  it('moves to error keeping elapsed, gives no listen capture, and retries through replay', () => {
+    const next = playgroundReducer(playing, { type: 'listen/error' })
+    expect(next.listen).toEqual({ status: 'error', elapsed: 3 })
+    expect(deriveCaptures(next)).not.toHaveProperty('listen')
+    expect(playgroundReducer(next, { type: 'listen/error' })).toBe(next)
+    expect(playgroundReducer(next, { type: 'listen/replay' }).listen).toEqual({ status: 'playing', elapsed: 0 })
+  })
+})
+
+describe('CAPTURE.listen', () => {
+  const total = LISTEN_DURATION_SECONDS
+  const opening = '(demo sponsor: Mlytics)'
+
+  it('ties the opening sponsor threshold to the measured sentence timings', () => {
+    expect(LISTEN_OPENING_SPONSOR_END_SECONDS).toBe(3)
+    expect(LISTEN_TRANSCRIPT_SENTENCES[1].start).toBeGreaterThan(LISTEN_OPENING_SPONSOR_END_SECONDS - 1)
+    expect(LISTEN_TRANSCRIPT_SENTENCES[1].start).toBeLessThanOrEqual(LISTEN_OPENING_SPONSOR_END_SECONDS + 1)
+  })
+
+  it.each([
+    [0, 0],
+    [1, 4],
+    [2, 7],
+  ])('playing at %i s (before the opening sponsor finishes) is state 1 at %i%%', (e, pct) => {
+    expect(CAPTURE.listen({ status: 'playing', elapsed: e })).toEqual({
+      observation: 'The user pressed play and started listening to the article’s audio overview.',
+      rawSignal: `Played so far: ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: in progress.`,
+    })
+  })
+
+  it.each([
+    [3, 11],
+    [12, 44],
+    [26, 96],
+  ])('playing at %i s (past the opening sponsor) is state 2 at %i%%', (e, pct) => {
+    expect(CAPTURE.listen({ status: 'playing', elapsed: e })).toEqual({
+      observation: `The user is listening to the audio overview and has played past the opening sponsor message ${opening}.`,
+      rawSignal: `Played so far: ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: played. Closing sponsor message: not yet played.`,
+    })
+  })
+
+  it.each([
+    [3, 11],
+    [12, 44],
+  ])('paused at %i s (after the opening sponsor) is state 3 at %i%%', (e, pct) => {
+    expect(CAPTURE.listen({ status: 'paused', elapsed: e })).toEqual({
+      observation: `The user listened for ${e} seconds (${pct}%), then paused. The opening sponsor message ${opening} played.`,
+      rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: played. Closing sponsor message: not played.`,
+    })
+  })
+
+  it.each([
+    [0, '0 seconds', 0],
+    [1, '1 second', 4],
+    [2, '2 seconds', 7],
+  ])('paused at %i s (before the opening sponsor finishes) is state 4: "%s" at %i%%', (e, listened, pct) => {
+    expect(CAPTURE.listen({ status: 'paused', elapsed: e })).toEqual({
+      observation: `The user listened for ${listened} (${pct}%), then paused before the opening sponsor message ${opening} finished.`,
+      rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: not finished.`,
+    })
+  })
+
+  it('completed is state 5 with both sponsor impressions', () => {
+    expect(CAPTURE.listen({ status: 'completed', elapsed: 27 })).toEqual({
+      observation: `The user listened to the full 27-second audio overview. Both sponsor messages ${opening} played.`,
+      rawSignal: `Played: 27 of 27 seconds (100%). Sponsor message impressions ${opening}: 2 of 2.`,
+    })
+  })
+
+  it('gives no listen capture when idle or errored', () => {
+    expect(deriveCaptures({ ...INITIAL_STATE, listen: { status: 'idle', elapsed: 0 } })).not.toHaveProperty('listen')
+    expect(deriveCaptures({ ...INITIAL_STATE, listen: { status: 'error', elapsed: 5 } })).not.toHaveProperty('listen')
+  })
+})
+
+describe('activeSentenceIndex', () => {
+  it('returns the last sentence that has started, on the measured timings', () => {
+    expect(activeSentenceIndex(0)).toBe(0)
+    expect(activeSentenceIndex(3.11)).toBe(0)
+    expect(activeSentenceIndex(3.12)).toBe(1)
+    expect(activeSentenceIndex(4)).toBe(1)
+    expect(activeSentenceIndex(15)).toBe(4)
+    expect(activeSentenceIndex(24.06)).toBe(7)
+    expect(activeSentenceIndex(26.6)).toBe(7)
+    expect(activeSentenceIndex(99)).toBe(7)
+  })
+
+  it('returns -1 for negative or non-finite times', () => {
+    expect(activeSentenceIndex(-0.01)).toBe(-1)
+    expect(activeSentenceIndex(Number.NaN)).toBe(-1)
+    expect(activeSentenceIndex(Number.POSITIVE_INFINITY)).toBe(-1)
+  })
+
+  it('keeps the transcript verbatim and the timings ascending', () => {
+    expect(LISTEN_TRANSCRIPT.map((paragraph) => paragraph.length)).toEqual([1, 5, 2])
+    expect(LISTEN_TRANSCRIPT_SENTENCES.map((sentence) => sentence.start)).toEqual([0, 3.12, 5.32, 7.78, 14.22, 19.7, 22.66, 24.06])
+    expect(LISTEN_TRANSCRIPT_TEXT[1]).toBe('Thinking about the iPhone 18 Pro? Here’s the short version of today’s story. The article walks through what’s new, how it compares with the iPhone Duo, and where it sits among this year’s flagship phones. If you’re deciding, start with what matters most to you: the camera, battery life, or price. Then come back to the full article for the details.')
   })
 })
 
@@ -178,9 +339,11 @@ describe('pure helpers', () => {
     expect(nextTabIndex('Home', 2, 3)).toBe(0)
     expect(nextTabIndex('End', 0, 3)).toBe(2)
     expect(nextTabIndex('a', 0, 3)).toBeNull()
-    expect(formatTime(0)).toBe('00:00')
-    expect(formatTime(7)).toBe('00:07')
-    expect(formatTime(32)).toBe('00:32')
+    expect(formatTime(0)).toBe('0:00')
+    expect(formatTime(7)).toBe('0:07')
+    expect(formatTime(27)).toBe('0:27')
+    expect(formatTime(65)).toBe('1:05')
+    expect(formatTime(-3)).toBe('0:00')
   })
 
   it('picks the closest visible stage and ignores hidden stages', () => {
@@ -201,7 +364,7 @@ describe('pure helpers', () => {
     expect(stageStates(5, 2, { chat: CAPTURE.chat(CHAT_QUESTIONS[0]) }, 'chat').slice(2).every((stage) => !stage.complete)).toBe(true)
     // Stages 01/02 follow the capture of the experience on screen, not any capture.
     expect(stageStates(5, 2, { chat: CAPTURE.chat(CHAT_QUESTIONS[0]) }, 'quote').map((stage) => stage.complete)).toEqual([false, false, false, false, false])
-    expect(stageStates(5, 2, { listen: CAPTURE.listenStarted }, 'listen').slice(0, 2).map((stage) => stage.complete)).toEqual([true, true])
+    expect(stageStates(5, 2, { listen: CAPTURE.listen({ status: 'playing', elapsed: 0 }) }, 'listen').slice(0, 2).map((stage) => stage.complete)).toEqual([true, true])
     expect(stageStates(5, 2, { listen: { observation: 'seen', rawSignal: '' } }, 'listen').slice(0, 2).map((stage) => stage.complete)).toEqual([true, false])
     expect(progressFillPx({ activeIndex: 4, count: 5, nodeCenterFromFlowTop: 50, lastStageBottomFromFlowTop: 8 })).toBe(0)
     expect(progressFillPx({ activeIndex: 4, count: 5, nodeCenterFromFlowTop: 50, lastStageBottomFromFlowTop: 80 })).toBe(62)
