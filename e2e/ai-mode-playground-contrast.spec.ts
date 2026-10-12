@@ -320,6 +320,7 @@ test('每一類控制項的 focus ring 對相鄰底色 ≥ 3:1（WCAG 1.4.11）'
   await page.locator('button[class*="choice"]').first().click()
   await page.getByRole('radio', { name: 'Helpful', exact: true }).click()
   await check('quoteAction', first('button[class*="shareButton"]'))
+  await check('revealSignal', first('button[class*="revealSignal"]'))
 
   await page.getByRole('tab', { name: EXPERIENCE_LABELS.listen, exact: true }).click()
   await check('listenToggle', first('button[class*="listenToggle"]'))
@@ -386,7 +387,10 @@ async function measureQuoteCard(page: import('@playwright/test').Page, card: imp
   // Hide only the glyphs; every surface and decoration stays painted. The
   // style is removed again so the next quote line is probed with its text
   // visible to the selectors above.
-  const hide = await page.addStyleTag({ content: '[data-contrast-probe] { color: transparent !important; caret-color: transparent !important }' })
+  // nextjs-portal is Next's dev-only issues badge, fixed at the bottom left.
+  // At narrow widths it can cover the card in the screenshot; the static
+  // production export never renders it, so it is excluded from the pixels.
+  const hide = await page.addStyleTag({ content: '[data-contrast-probe] { color: transparent !important; caret-color: transparent !important } nextjs-portal { display: none !important }' })
   const png = (await card.screenshot({ animations: 'disabled' })).toString('base64')
   await hide.evaluate((el) => (el as Element).remove())
 
@@ -440,7 +444,7 @@ for (const width of [320, 375, 768, 1024, 1280]) {
         // Picking a different line clears the signature, so it is typed
         // again for every line.
         if (signature.typed) await page.getByRole('textbox', { name: UI.quote.signatureLabel }).fill(signature.typed)
-        await expect(card.getByRole('blockquote')).toHaveText(`“${quote}”`)
+        await expect(card.getByRole('blockquote')).toHaveText(quote)
         await expect(card.locator('[class*="signatureText"]')).toHaveText(signature.shown)
         results.push(...await measureQuoteCard(page, card, index))
       }

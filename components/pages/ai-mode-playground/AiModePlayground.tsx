@@ -5,6 +5,7 @@ import {
   ANNOUNCE,
   EXPERIENCE_LABELS,
   LENS_LABELS,
+  LISTEN_AUDIO_SRC,
   UI,
 } from './ai-mode-playground-copy'
 import type { ExperienceId, PlaygroundLens, ShareAction } from './ai-mode-playground-copy'
@@ -13,6 +14,8 @@ import { deriveCaptures, INITIAL_STATE, playgroundReducer } from './playground-l
 import type { PlaygroundAction } from './playground-logic'
 import { DecisionFlow } from './DecisionFlow'
 import { useNavOffset } from './useNavOffset'
+import { useListenAudio } from './useListenAudio'
+import { useListenFill } from './useListenFill'
 import { ExperiencePanel } from './ExperiencePanel'
 import styles from './AiModePlayground.module.css'
 
@@ -64,6 +67,10 @@ export function AiModePlayground() {
 
   useEffect(() => cancelPendingAnnouncement, [cancelPendingAnnouncement])
 
+  const handleListenError = useCallback(() => announce(ANNOUNCE.listenError), [announce])
+  const listenAudio = useListenAudio(dispatch, handleListenError, state.listen.status)
+  const { fillRef: listenFillRef, activeSentence } = useListenFill(listenAudio.audioRef, state.listen.status, state.listen.elapsed, state.experience === 'listen')
+
   // A focus effect is only queued when the action actually changes state. The
   // reducer is pure, so running it here first is safe; if it hands the same
   // state back, the effect below would never run and a queued focus move would
@@ -74,6 +81,19 @@ export function AiModePlayground() {
     dispatch(action)
     return true
   }
+
+  const focusSignal = useCallback(() => {
+    // 'instant', not 'auto': 'auto' defers to the computed `scroll-behavior`,
+    // and globals.css sets `html { scroll-behavior: smooth }`, so reduced-motion
+    // users would still get a smooth scroll.
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const behavior: ScrollBehavior = reduced ? 'instant' : 'smooth'
+    // Chat and every other completion land the same way: the focused signal
+    // copy is centred rather than aligned to the top, so the sticky nav +
+    // customer tabs shell cannot cover it, even on short phone viewports.
+    signalRef.current?.scrollIntoView?.({ block: 'center', behavior })
+    signalRef.current?.focus({ preventScroll: true })
+  }, [])
 
   // Keep the address bar honest: once the user switches lens by hand, a
   // copied URL has to reopen on the lens they are looking at. `replaceState`
@@ -107,6 +127,8 @@ export function AiModePlayground() {
   const handleSelectExperience = (id: ExperienceId) => {
     // Re-selecting the tab already selected is a no-op: nothing to re-announce.
     if (id === state.experience) return
+    // Leaving Listen always rewinds the audio, completed or not.
+    if (state.experience === 'listen') listenAudio.stop()
     dispatch({ type: 'experience/select', id })
     announce(ANNOUNCE.experienceSelected(EXPERIENCE_LABELS[id]))
   }
@@ -114,6 +136,7 @@ export function AiModePlayground() {
   const handleReset = () => {
     // ExperiencePanel moves focus to the current tab itself; no queued effect.
     const label = EXPERIENCE_LABELS[state.experience]
+    if (state.experience === 'listen') listenAudio.stop()
     dispatch({ type: 'experience/reset' })
     announce(ANNOUNCE.reset(label))
   }
@@ -124,49 +147,64 @@ export function AiModePlayground() {
     announce(ANNOUNCE.chatAnswered)
   }
 
+  // Quote completes on the first share click or on the reveal link, never on
+  // picking a line or a feeling: those only record and announce, so focus
+  // stays where the user is working. A new line starts a new round (the
+  // reducer clears its feedback and shares), so its first share jumps again.
   const handleSelectQuote = (index: 0 | 1 | 2) => {
-    // Feedback picked before any line: this line is the one that completes
-    // Quote, so it gets the same focus move and announcement as the reverse order.
-    if (state.quote.index === null && state.quote.feedback) {
-      if (!dispatchWithEffect({ type: 'quote/select', index }, 'signal')) return
-      announce(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
-      return
-    }
     // Re-selecting the line already selected changes nothing: no re-announce.
     if (!dispatchWithEffect({ type: 'quote/select', index }, null)) return
     announce(ANNOUNCE.quoteSelected)
   }
 
   const handleFeedback = (value: string) => {
-    // Re-activating the checked radio is a no-op: no re-announce, no focus move.
-    if (!dispatchWithEffect({ type: 'quote/feedback', value }, state.quote.index !== null ? 'signal' : null)) return
-    announce(state.quote.index === null ? ANNOUNCE.feedbackSelected(value) : ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+    // Re-activating the checked radio is a no-op: no re-announce.
+    if (!dispatchWithEffect({ type: 'quote/feedback', value }, null)) return
+    announce(ANNOUNCE.feedbackSelected(value))
   }
 
   const handleSignature = (value: string) => dispatch({ type: 'quote/signature', value })
 
+  // The first share of a round completes Quote and moves to the signal;
+  // later, different shares are recorded in place without a jump. Repeating a
+  // share already recorded changes nothing (the reducer returns the same state).
   const handleShare = (action: ShareAction) => {
-    if (state.quote.shareActions.includes(action)) return
-    if (!dispatchWithEffect({ type: 'quote/share', action }, 'signal')) return
-    announce(ANNOUNCE.shareRecorded(UI.quote.actions[action]))
+    const isFirst = state.quote.shareActions.length === 0
+    if (!dispatchWithEffect({ type: 'quote/share', action }, isFirst ? 'signal' : null)) return
+    announce(isFirst ? ANNOUNCE.completed(EXPERIENCE_LABELS.quote) : ANNOUNCE.shareRecorded(UI.quote.actions[action]))
   }
 
+  // Fallback completion once a line and a feeling are picked: moves to the
+  // signal and announces completion, but records no share.
+  const handleRevealSignal = () => {
+    if (state.quote.index === null || !state.quote.feedback) return
+    focusSignal()
+    announce(ANNOUNCE.completed(EXPERIENCE_LABELS.quote))
+  }
+
+  // The explicit action is dispatched before the media call: the element's own
+  // play/pause events then land on a state that already matches and are
+  // no-ops, whether the browser fires them synchronously or as a later task.
+  // The media call still runs synchronously inside the click (iOS autoplay).
   const handleListenToggle = () => {
     const isPlaying = state.listen.status === 'playing'
     dispatch({ type: 'listen/toggle' })
+    if (isPlaying) listenAudio.pause()
+    else listenAudio.play()
     announce(isPlaying ? ANNOUNCE.listenPaused : ANNOUNCE.listenPlaying)
   }
 
   const handleListenReplay = () => {
     dispatch({ type: 'listen/replay' })
+    listenAudio.restart()
     announce(ANNOUNCE.listenPlaying)
   }
 
-  useEffect(() => {
-    if (state.listen.status !== 'playing') return
-    const timer = window.setInterval(() => dispatch({ type: 'listen/tick' }), 1000)
-    return () => window.clearInterval(timer)
-  }, [state.listen.status])
+  const handleListenRetry = () => {
+    dispatch({ type: 'listen/replay' })
+    listenAudio.retry()
+    announce(ANNOUNCE.listenPlaying)
+  }
 
   useEffect(() => {
     const previous = previousListenStatusRef.current
@@ -181,17 +219,8 @@ export function AiModePlayground() {
     const pending = pendingEffectRef.current
     if (!pending) return
     pendingEffectRef.current = null
-    // 'instant', not 'auto': 'auto' defers to the computed `scroll-behavior`,
-    // and globals.css sets `html { scroll-behavior: smooth }`, so reduced-motion
-    // users would still get a smooth scroll.
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    const behavior: ScrollBehavior = reduced ? 'instant' : 'smooth'
-    // Chat and every other completion land the same way: the focused signal
-    // copy is centred rather than aligned to the top, so the sticky nav +
-    // customer tabs shell cannot cover it, even on short phone viewports.
-    signalRef.current?.scrollIntoView?.({ block: 'center', behavior })
-    signalRef.current?.focus({ preventScroll: true })
-  }, [state])
+    focusSignal()
+  }, [focusSignal, state])
 
   const captures = deriveCaptures(state)
 
@@ -206,8 +235,14 @@ export function AiModePlayground() {
         onFeedback={handleFeedback}
         onSignature={handleSignature}
         onShare={handleShare}
+        onRevealSignal={handleRevealSignal}
         onListenToggle={handleListenToggle}
         onListenReplay={handleListenReplay}
+        onListenRetry={handleListenRetry}
+        listenFillRef={listenFillRef}
+        activeSentence={activeSentence}
+        listenMuted={listenAudio.muted}
+        onListenToggleMute={listenAudio.toggleMute}
       />
       <DecisionFlow
         lens={lens}
@@ -217,6 +252,7 @@ export function AiModePlayground() {
         captures={captures}
         signalRef={signalRef}
       />
+      <audio ref={listenAudio.audioRef} src={LISTEN_AUDIO_SRC} preload="none" {...listenAudio.audioProps} />
       <div className={styles.announcer} role="status" aria-live="polite" aria-atomic="true">
         {announcement}
       </div>

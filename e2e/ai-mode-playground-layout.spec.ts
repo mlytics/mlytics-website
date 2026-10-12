@@ -233,7 +233,7 @@ test('Listen progresses and incomplete playback resets when changing experience'
   await page.goto('/ai-mode-playground/')
   await page.getByRole('tab', { name: EXPERIENCE_LABELS.listen, exact: true }).click()
   await page.getByRole('button', { name: UI.listen.play, exact: true }).click()
-  await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', /[2-9]|[12][0-9]/, { timeout: 3000 })
+  await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', /[2-9]|[12][0-9]/, { timeout: 10_000 })
   await page.getByRole('tab', { name: EXPERIENCE_LABELS.chat, exact: true }).click()
   await page.getByRole('tab', { name: EXPERIENCE_LABELS.listen, exact: true }).click()
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
@@ -271,12 +271,22 @@ for (const viewport of [{ width: 1280, height: 900 }, { width: 375, height: 812 
 
 const completions = [
   {
-    name: 'Quote feedback',
+    name: 'Quote share',
     complete: async (page: Page) => {
       await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
       await page.getByRole('button', { name: /Before you choose/ }).click()
-      await page.getByRole('radio', { name: 'Helpful', exact: true }).focus()
-      await page.keyboard.press('Space')
+      await page.getByRole('button', { name: UI.quote.actions.line, exact: true }).focus()
+      await page.keyboard.press('Enter')
+    },
+  },
+  {
+    name: 'Quote reveal link',
+    complete: async (page: Page) => {
+      await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+      await page.getByRole('button', { name: /Before you choose/ }).click()
+      await page.getByRole('radio', { name: 'Helpful', exact: true }).click()
+      await page.getByRole('button', { name: UI.quote.revealSignal, exact: true }).focus()
+      await page.keyboard.press('Enter')
     },
   },
   {
@@ -344,13 +354,23 @@ test.describe('with prefers-reduced-motion: reduce', () => {
       key: 'Enter',
     },
     {
-      name: 'Quote feedback',
+      name: 'Quote share',
       prepare: async (page: Page) => {
         await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
         await page.getByRole('button', { name: /Before you choose/ }).click()
       },
-      trigger: (page: Page) => page.getByRole('radio', { name: 'Helpful', exact: true }),
-      key: 'Space',
+      trigger: (page: Page) => page.getByRole('button', { name: UI.quote.actions.line, exact: true }),
+      key: 'Enter',
+    },
+    {
+      name: 'Quote reveal link',
+      prepare: async (page: Page) => {
+        await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+        await page.getByRole('button', { name: /Before you choose/ }).click()
+        await page.getByRole('radio', { name: 'Helpful', exact: true }).click()
+      },
+      trigger: (page: Page) => page.getByRole('button', { name: UI.quote.revealSignal, exact: true }),
+      key: 'Enter',
     },
   ]
 
@@ -398,6 +418,177 @@ test.describe('with prefers-reduced-motion: reduce', () => {
       expect(new Set(scrollLog)).toEqual(new Set([samples[0]]))
     })
   }
+})
+
+test.describe('Quote completion', () => {
+  const openQuoteLine = async (page: Page) => {
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.goto('/ai-mode-playground/')
+    await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+    await page.getByRole('button', { name: /Before you choose/ }).click()
+  }
+  const revealLink = (page: Page) => page.getByRole('button', { name: UI.quote.revealSignal, exact: true })
+  const shareButton = (page: Page, label: string) => page.getByRole('button', { name: label, exact: true })
+
+  test('picking a feeling does not jump: focus and scroll stay put', async ({ page }) => {
+    await openQuoteLine(page)
+    const helpful = page.getByRole('radio', { name: 'Helpful', exact: true })
+    await helpful.scrollIntoViewIfNeeded()
+    await waitForSignalToSettle(page)
+    const before = await page.evaluate(() => window.scrollY)
+    await helpful.focus()
+    await page.keyboard.press('Space')
+    await expect(helpful).toHaveAttribute('aria-checked', 'true')
+    await waitForSignalToSettle(page)
+    await expect(helpful).toBeFocused()
+    await expect(page.locator('#stage-02-copy')).not.toBeFocused()
+    expect(await page.evaluate(() => window.scrollY)).toBe(before)
+  })
+
+  test('the first share jumps once; a later FB share records without moving', async ({ page }) => {
+    await openQuoteLine(page)
+    await shareButton(page, UI.quote.actions.line).click()
+    await expect(page.locator('#stage-02-copy')).toBeFocused()
+    await waitForSignalToSettle(page)
+    const afterFirst = await page.evaluate(() => window.scrollY)
+    await shareButton(page, UI.quote.actions.fb).dispatchEvent('click')
+    await expect(page.locator('#stage-02-copy')).toContainText('LINE and FB')
+    await waitForSignalToSettle(page)
+    expect(await page.evaluate(() => window.scrollY)).toBe(afterFirst)
+  })
+
+  test('the reveal link appears after a feeling, moves to stage 02 without recording a share, and stays visible', async ({ page }) => {
+    await openQuoteLine(page)
+    await expect(revealLink(page)).toHaveCount(0)
+    await page.getByRole('radio', { name: 'Helpful', exact: true }).click()
+    await expect(revealLink(page)).toBeVisible()
+    // The link shrinks to its text: it does not stretch across the preview row.
+    await expect(revealLink(page)).toHaveText(UI.quote.revealSignal)
+    const linkWidth = await revealLink(page).evaluate((element) => {
+      const range = document.createRange()
+      range.selectNodeContents(element)
+      return { box: element.getBoundingClientRect().width, text: range.getBoundingClientRect().width, height: element.getBoundingClientRect().height }
+    })
+    expect(Math.abs(linkWidth.box - linkWidth.text)).toBeLessThanOrEqual(2)
+    expect(linkWidth.height).toBeGreaterThanOrEqual(24)
+    await revealLink(page).click()
+    const signal = page.locator('#stage-02-copy')
+    await expect(signal).toBeFocused()
+    await expect(signal).not.toContainText(/share button/)
+    await expect(revealLink(page)).toBeVisible()
+    await shareButton(page, UI.quote.actions.line).click()
+    await expect(revealLink(page)).toBeVisible()
+  })
+
+  test('LINE, FB and Share show a visible primary-colour icon each; there is no Download button', async ({ page }) => {
+    await openQuoteLine(page)
+    await expect(page.getByRole('button', { name: 'Download' })).toHaveCount(0)
+    const primary = await page.evaluate(() => {
+      // Resolve the token to a computed colour the same way the icon's will be.
+      const probe = document.createElement('span')
+      probe.style.color = 'var(--color-primary)'
+      document.body.appendChild(probe)
+      const value = getComputedStyle(probe).color
+      probe.remove()
+      return value
+    })
+    for (const label of [UI.quote.actions.line, UI.quote.actions.fb, UI.quote.actions.share]) {
+      const button = shareButton(page, label)
+      await expect(button).toBeVisible()
+      const icon = button.locator('svg')
+      await expect(icon).toHaveCount(1)
+      await expect(icon).toBeVisible()
+      await expect(icon).toHaveAttribute('aria-hidden', 'true')
+      const box = (await icon.boundingBox())!
+      expect(box.width).toBeGreaterThan(12)
+      expect(box.height).toBeGreaterThan(12)
+      expect(await icon.evaluate((element) => getComputedStyle(element).color)).toBe(primary)
+    }
+  })
+})
+
+test.describe('Quote share buttons by width', () => {
+  const openShareRow = async (page: Page, width: number) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/ai-mode-playground/')
+    await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
+    await page.getByRole('button', { name: /Before you choose/ }).click()
+    await page.getByRole('radio', { name: 'Helpful', exact: true }).click()
+  }
+  const labels = [UI.quote.actions.line, UI.quote.actions.fb, UI.quote.actions.share]
+  // Spacing inside the preview, border excluded: the page's 14px frame around
+  // the card and the share row at every width, with 12px between them.
+  const expectPreviewSpacing = async (page: Page) => {
+    const m = await page.evaluate(() => {
+      const r = (selector: string) => document.querySelector(selector)!.getBoundingClientRect()
+      const previewEl = document.querySelector('[class*="preview"][role="region"]')!
+      const border = parseFloat(getComputedStyle(previewEl).borderTopWidth)
+      const preview = previewEl.getBoundingClientRect()
+      const card = r('[class*="quoteCard"]')
+      const row = r('[class*="shareRow"]')
+      return { top: card.top - preview.top - border, between: row.top - card.bottom, bottom: preview.bottom - border - row.bottom }
+    })
+    expect(Math.abs(m.top - 14)).toBeLessThanOrEqual(1)
+    expect(Math.abs(m.between - 12)).toBeLessThanOrEqual(1)
+    expect(Math.abs(m.bottom - 14)).toBeLessThanOrEqual(1)
+  }
+
+  for (const width of [320, 375]) {
+    test(`at ${width} the share buttons are icon-only squares on one row with unchanged accessible names`, async ({ page }) => {
+      await openShareRow(page, width)
+      const boxes = []
+      for (const name of labels) {
+        // Exact accessible name survives the visually hidden label.
+        const button = page.getByRole('button', { name, exact: true })
+        await expect(button).toBeVisible()
+        const box = (await button.boundingBox())!
+        boxes.push(box)
+        // WCAG 2.5.8 target size, and square.
+        expect(box.width).toBeGreaterThanOrEqual(24)
+        expect(box.height).toBeGreaterThanOrEqual(24)
+        expect(Math.abs(box.width - box.height)).toBeLessThanOrEqual(1)
+        const label = await button.locator('[class*="shareLabel"]').evaluate((element) => {
+          const r = element.getBoundingClientRect()
+          return { width: r.width, height: r.height, text: element.textContent }
+        })
+        expect(label.text).toBe(name)
+        expect(label.width).toBeLessThanOrEqual(1)
+        expect(label.height).toBeLessThanOrEqual(1)
+        await expect(button.locator('svg')).toBeVisible()
+      }
+      // One row: every button shares the first one's top.
+      for (const box of boxes) expect(Math.abs(box.y - boxes[0].y)).toBeLessThanOrEqual(1)
+      // No room beside the buttons: the reveal link wraps onto its own line,
+      // 8px below them and left-aligned with them.
+      const reveal = (await page.getByRole('button', { name: UI.quote.revealSignal, exact: true }).boundingBox())!
+      expect(Math.abs(reveal.y - (boxes[0].y + boxes[0].height) - 8)).toBeLessThanOrEqual(1)
+      expect(Math.abs(reveal.x - boxes[0].x)).toBeLessThanOrEqual(1)
+      // The 14px frame holds at phone widths too (no narrow override).
+      await expectPreviewSpacing(page)
+      // No horizontal page scroll.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    })
+  }
+
+  test('at 1280 the share buttons keep their visible text labels', async ({ page }) => {
+    await openShareRow(page, 1280)
+    for (const name of labels) {
+      const button = page.getByRole('button', { name, exact: true })
+      const label = button.locator('[class*="shareLabel"]')
+      await expect(label).toHaveText(name)
+      const box = (await label.boundingBox())!
+      expect(box.width).toBeGreaterThan(10)
+      expect(box.height).toBeGreaterThan(10)
+      expect((await button.boundingBox())!.width).toBeGreaterThan(40)
+    }
+    await expectPreviewSpacing(page)
+    // The reveal link shares the share buttons' row, to the right of Share.
+    const share = (await page.getByRole('button', { name: UI.quote.actions.share, exact: true }).boundingBox())!
+    const reveal = (await page.getByRole('button', { name: UI.quote.revealSignal, exact: true }).boundingBox())!
+    expect(Math.abs((reveal.y + reveal.height / 2) - (share.y + share.height / 2))).toBeLessThanOrEqual(2)
+    expect(reveal.x).toBeGreaterThan(share.x + share.width)
+    expect(reveal.height).toBeGreaterThanOrEqual(24)
+  })
 })
 
 test('landscape phone: the stage 02 focus target and its ring stay in view below the nav at 568×320', async ({ page }) => {
@@ -524,45 +715,102 @@ test.describe('prototype parity', () => {
     })
   }
 
-  test('the quote card has its gradient and both decorations', async ({ page }) => {
+  test('the quote card is a dark card with a gold quote mark, soft glow and small sponsor footer', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/ai-mode-playground/')
     await page.getByRole('tab', { name: EXPERIENCE_LABELS.quote, exact: true }).click()
     await page.getByRole('button', { name: /Before you choose/ }).click()
     const card = page.locator('[class*="quoteCard"]')
     await expect(card).toBeVisible()
+    const logo = card.getByRole('img', { name: 'Mlytics' })
+    await expect.poll(() => logo.evaluate((img) => (img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0)).toBe(true)
     const style = await card.evaluate((element) => {
       const own = getComputedStyle(element)
-      const before = getComputedStyle(element, '::before')
-      const after = getComputedStyle(element, '::after')
+      const sponsorEl = element.querySelector('[class*="sponsor"]')!
+      const sponsor = getComputedStyle(sponsorEl)
+      const label = getComputedStyle(element.querySelector('[class*="sponsorLabel"]')!)
+      const signatureEl = element.querySelector('[class*="signatureText"]')!
+      const img = element.querySelector('img')!
+      const quoteEl = element.querySelector('[class*="quoteText"]')!
+      const mark = getComputedStyle(quoteEl, '::before')
+      const range = document.createRange()
+      range.selectNodeContents(quoteEl)
       return {
+        mark: {
+          content: mark.content,
+          color: mark.color,
+          fontSize: mark.fontSize,
+          display: mark.display,
+          // The pseudo-element is the first block in the quote, so the quote's
+          // text starts below the quote box's top by the mark plus its gap.
+          textOffset: range.getClientRects()[0].top - quoteEl.getBoundingClientRect().top,
+        },
         backgroundImage: own.backgroundImage,
-        position: own.position,
+        backgroundColor: own.backgroundColor,
+        display: own.display,
+        flexDirection: own.flexDirection,
+        borderColor: own.borderTopColor,
+        borderRadius: own.borderRadius,
+        padding: [own.paddingTop, own.paddingRight, own.paddingBottom, own.paddingLeft].join(' '),
         overflow: own.overflow,
-        isolation: own.isolation,
-        before: { content: before.content, width: before.width, height: before.height, borderRadius: before.borderRadius, boxShadow: before.boxShadow },
-        after: { content: after.content, fontFamily: after.fontFamily, position: after.position },
+        before: getComputedStyle(element, '::before').content,
+        after: getComputedStyle(element, '::after').content,
+        svgChildren: element.querySelectorAll('svg').length,
+        signatureColor: getComputedStyle(signatureEl).color,
+        signatureDash: getComputedStyle(signatureEl, '::before').content,
+        signatureGap: sponsorEl.getBoundingClientRect().top - signatureEl.getBoundingClientRect().bottom,
+        sponsorBottomGap: element.getBoundingClientRect().bottom - sponsorEl.getBoundingClientRect().bottom,
+        sponsor: {
+          backgroundColor: sponsor.backgroundColor,
+          borderTop: `${sponsor.borderTopWidth} ${sponsor.borderTopStyle} ${sponsor.borderTopColor}`,
+          borderBottomWidth: sponsor.borderBottomWidth,
+          borderRadius: sponsor.borderRadius,
+          paddingTop: sponsor.paddingTop,
+        },
+        label: { fontSize: label.fontSize, textTransform: label.textTransform, color: label.color },
+        logo: { width: img.getBoundingClientRect().width, filter: getComputedStyle(img).filter },
       }
     })
-    expect(style.backgroundImage).toMatch(/^linear-gradient\(145deg, rgb\(26, 61, 58\) 0%, rgb\(34, 93, 89\) 62%, rgb\(45, 122, 116\) 100%\)/)
-    expect(style.position).toBe('relative')
+    // A very soft mint glow over a solid ground; no texture, no card
+    // pseudo-element decorations.
+    expect(style.backgroundImage).toMatch(/^radial-gradient\(circle at 100% 0%, rgba\(168, 197, 195, 0\.2\) 0%, rgba\(0, 0, 0, 0\) 65%\), none$/)
+    expect(style.backgroundColor).toBe('rgb(26, 61, 58)')
+    // A gold opening quote mark, the card's only quote symbol, sits above the
+    // quote text (empty alt).
+    expect(style.mark.content).toBe('"“" / ""')
+    expect(style.mark.color).toBe('rgb(245, 158, 11)')
+    expect(style.mark.display).toBe('block')
+    // 62px Georgia renders a ~21px-tall glyph.
+    expect(style.mark.fontSize).toBe('62px')
+    expect(style.mark.textOffset).toBeGreaterThanOrEqual(20)
+    expect(style.display).toBe('flex')
+    expect(style.flexDirection).toBe('column')
+    expect(style.borderColor).toBe('rgba(168, 197, 195, 0.16)')
+    expect(style.borderRadius).toBe('16px')
     expect(style.overflow).toBe('hidden')
-    expect(style.isolation).toBe('isolate')
-    expect(style.before.content).toBe('""')
-    expect(style.before.width).toBe('220px')
-    expect(style.before.height).toBe('220px')
-    expect(style.before.borderRadius).toBe('50%')
-    // Two halo rings around the circle.
-    expect(style.before.boxShadow.match(/rgba?\(/g)).toHaveLength(2)
-    // The quote mark is decoration: empty alt text keeps it out of the
-    // accessibility tree.
-    expect(style.after.content).toBe('"“" / ""')
-    expect(style.after.fontFamily).toMatch(/Georgia/)
-    expect(style.after.position).toBe('absolute')
-    // The share row sits 24px below the card.
+    expect(style.before).toBe('none')
+    expect(style.after).toBe('none')
+    expect(style.svgChildren).toBe(0)
+    // Signature: on-dark colour with a decorative em dash (empty alt text).
+    expect(style.signatureColor).toBe('rgb(168, 197, 195)')
+    expect(style.signatureDash).toBe('"— " / ""')
+    expect(style.signatureGap).toBeGreaterThanOrEqual(24 - 0.5)
+    // Sponsor is a small footer at the bottom of the card, not a white pill.
+    expect(style.sponsor.backgroundColor).toBe('rgba(0, 0, 0, 0)')
+    expect(style.sponsor.borderTop).toBe('1px solid rgba(168, 197, 195, 0.16)')
+    expect(style.sponsor.borderBottomWidth).toBe('0px')
+    expect(style.sponsor.borderRadius).toBe('0px')
+    expect(style.sponsor.paddingTop).toBe('14px')
+    // 24px card padding plus the 1px border.
+    expect(Math.abs(style.sponsorBottomGap - 24 - 1)).toBeLessThanOrEqual(1)
+    expect(style.padding).toBe('24px 24px 24px 24px')
+    expect(style.label).toEqual({ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(168, 197, 195, 0.85)' })
+    expect(Math.abs(style.logo.width - 72)).toBeLessThanOrEqual(1)
+    expect(style.logo.filter).toBe('brightness(0) invert(1)')
+    // The share row sits 12px below the card (the page's sibling gap).
     const cardBox = (await card.boundingBox())!
     const shareBox = (await page.locator('[class*="shareActions"]').boundingBox())!
-    expect(Math.abs(shareBox.y - (cardBox.y + cardBox.height) - 24)).toBeLessThanOrEqual(1)
+    expect(Math.abs(shareBox.y - (cardBox.y + cardBox.height) - 12)).toBeLessThanOrEqual(1)
   })
 
   // The card clips its decorations (overflow: hidden), so a sponsor row that

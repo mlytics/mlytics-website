@@ -10,7 +10,7 @@
 export type PlaygroundLens = 'content-owners' | 'brands' // doubles as "customer type"; content-owners = Media & Content Owners
 export type ExperienceId = 'chat' | 'quote' | 'listen'
 export type QuoteFeedback = string // one of QUOTE_FEEDBACK_OPTIONS
-export type ShareAction = 'line' | 'fb' | 'download'
+export type ShareAction = 'line' | 'fb' | 'share'
 
 export type Evidence = { observed: string; comparison: string; supports: string }
 export type PathContent = { question: string; decision: string; unit: string; value: string; evidence: Evidence[] }
@@ -41,11 +41,59 @@ export const EXPERIENCE_LABELS: Record<ExperienceId, string> = {
 
 export const EXPERIENCE_INSTRUCTIONS: Record<ExperienceId, string> = {
   chat: 'Step into your users’ shoes: pick a question and see what happens.',
-  quote: 'Step into your users’ shoes: pick the line that resonates most, then tell us how it lands.',
-  listen: 'Step into your users’ shoes: press play, then watch the start and completion signals come in.',
+  quote: 'Step into your users’ shoes: pick the line that resonates most, tell us how it lands, then share it.',
+  listen: 'Step into your users’ shoes: press play, then watch the signals update as you listen.',
 }
 
-export const LISTEN_DURATION_SECONDS = 32
+export const LISTEN_DURATION_SECONDS = 27
+
+/**
+ * Whole-second `elapsed` at which the opening sponsor message counts as
+ * played. Tied to the measured sentence timings of LISTEN_TRANSCRIPT: the
+ * opening sponsor sentence ends at 2.64 s and the next sentence starts at
+ * 3.12 s, so 3 is the first whole second past it. Re-check with the timings
+ * whenever the audio (-vN) changes. The closing sponsor message only counts
+ * on completion.
+ */
+export const LISTEN_OPENING_SPONSOR_END_SECONDS = 3
+
+/** Narrated overview (Kokoro TTS, voice "heart"). Versioned filename: bump -vN on any re-encode. */
+export const LISTEN_AUDIO_SRC = '/audio/ai-mode-listen-overview-v1.m4a'
+
+export type TranscriptSentence = { text: string; start: number }
+
+/**
+ * Verbatim transcript of the Listen audio (WCAG 1.2.1), as paragraphs of
+ * sentences. `start` is the sentence's start time in seconds on the audio
+ * clock, used to highlight the sentence being spoken.
+ *
+ * Timings were measured from the source WAV of -v1 by RMS silence detection
+ * (20 ms windows, below 2% of peak, gaps of at least 180 ms): 10 gaps matched
+ * the script's 7 sentence breaks plus 3 comma pauses. If the audio file
+ * changes (LISTEN_AUDIO_SRC -vN bump), these timings MUST be re-measured.
+ */
+export const LISTEN_TRANSCRIPT: readonly (readonly TranscriptSentence[])[] = [
+  [{ text: 'This audio overview is brought to you by Mlytics.', start: 0 }],
+  [
+    { text: 'Thinking about the iPhone 18 Pro?', start: 3.12 },
+    { text: 'Here’s the short version of today’s story.', start: 5.32 },
+    { text: 'The article walks through what’s new, how it compares with the iPhone Duo, and where it sits among this year’s flagship phones.', start: 7.78 },
+    { text: 'If you’re deciding, start with what matters most to you: the camera, battery life, or price.', start: 14.22 },
+    { text: 'Then come back to the full article for the details.', start: 19.7 },
+  ],
+  [
+    { text: 'Thanks for listening.', start: 22.66 },
+    { text: 'This overview was brought to you by Mlytics.', start: 24.06 },
+  ],
+]
+
+/** Every sentence in reading order; a sentence's flat index is its position here. */
+export const LISTEN_TRANSCRIPT_SENTENCES: readonly TranscriptSentence[] = LISTEN_TRANSCRIPT.flat()
+
+/** Plain paragraph text, sentences joined by a single space. */
+export const LISTEN_TRANSCRIPT_TEXT: readonly string[] = LISTEN_TRANSCRIPT.map((paragraph) =>
+  paragraph.map((sentence) => sentence.text).join(' '),
+)
 
 export const EXPERIENCE_DEFAULT_OBSERVATION: Record<ExperienceId, string> = {
   chat: 'The user picks a question, and the AI gives a grounded answer drawn from the article.',
@@ -133,12 +181,12 @@ export const PATHS: Record<PlaygroundLens, readonly [BusinessPath, BusinessPath]
       question:
         'AI Mode lets users interact with your content in real time. Can your sales team package those moments into partnerships brands will pay for?',
       decision: 'Which experience, at which content moment, is worth shaping into a brand partnership unit?',
-      unit: 'Sponsored Ask, branded Quote, topic sponsorships, and a custom brand AI assistant.',
+      unit: 'Sponsored Ask, branded Quote, sponsored audio messages, topic sponsorships, and a custom brand AI assistant.',
       value:
         'Which content moment an interaction happened in, and how users responded to the CTA — AI Mode records all of it automatically. Your sales team only decides whether to package that moment as a partnership.',
       evidence: [
         {
-          observed: 'Interaction context, content moment, CTA, next choice',
+          observed: 'Interaction context, content moment, CTA, sponsor impressions, next choice',
           comparison: 'Compare partnership contexts',
           supports: 'Informs whether to keep or adjust a package.',
         },
@@ -363,14 +411,20 @@ export const UI: {
     sponsoredBy: string
     actionsLabel: string
     actions: Record<ShareAction, string>
+    revealSignal: string
   }
   listen: {
     title: string
     play: string
     pause: string
     replay: string
+    retry: string
+    transcript: string
+    mute: string
+    error: string
     progressLabel: string
-    status: { ready: string; playing: string; completed: string }
+    progressValueText: (elapsed: number, total: number) => string
+    status: { ready: string; playing: string; paused: string; completed: string; unavailable: string }
   }
   canvas: { sectionLabel: string; title: string; customerPrompt: string; customerTablistLabel: string; flowLabel: string }
   stages: {
@@ -403,15 +457,21 @@ export const UI: {
     anonymous: 'Anonymous user',
     sponsoredBy: 'Sponsored by',
     actionsLabel: 'Social share actions',
-    actions: { line: 'LINE', fb: 'FB', download: 'Download' },
+    actions: { line: 'LINE', fb: 'FB', share: 'Share' },
+    revealSignal: 'See the signal',
   },
   listen: {
     title: 'Keep exploring by ear',
     play: 'Play',
     pause: 'Pause',
     replay: 'Replay',
+    retry: 'Try again',
+    transcript: 'Transcript',
+    mute: 'Mute',
+    error: 'The audio couldn’t play. Try again.',
     progressLabel: 'Audio progress',
-    status: { ready: 'Ready to play', playing: 'Playing', completed: 'Completed' },
+    progressValueText: (elapsed, total) => `${elapsed} of ${total} seconds`,
+    status: { ready: 'Ready to play', playing: 'Playing', paused: 'Paused', completed: 'Completed', unavailable: 'Audio unavailable' },
   },
   canvas: {
     sectionLabel: 'Customer decision flow',
@@ -449,6 +509,13 @@ export const UI: {
   },
 }
 
+/**
+ * How each share button is named inside the captured raw signal. The generic
+ * Share button reads as "generic" there, so a capture says "the generic share
+ * button" rather than "the Share share button".
+ */
+export const SHARE_CAPTURE_NAMES: Record<ShareAction, string> = { line: 'LINE', fb: 'FB', share: 'generic' }
+
 // ---------------------------------------------------------------------------
 // Dynamic strings — pure functions, no JSX
 // ---------------------------------------------------------------------------
@@ -459,7 +526,7 @@ const withoutTrailingPeriod = (text: string) => text.replace(/\.$/, '')
 /** Ends a sentence with a period unless the embedded value already ends in . ? or ! */
 const endSentence = (text: string) => (/[.?!]$/.test(text) ? text : `${text}.`)
 
-/** ['LINE'] → 'LINE'; ['LINE','FB'] → 'LINE and FB'; ['LINE','FB','Download'] → 'LINE, FB, and Download' */
+/** ['LINE'] → 'LINE'; ['LINE','FB'] → 'LINE and FB'; ['LINE','FB','generic'] → 'LINE, FB, and generic' */
 const joinList = (items: string[]) => {
   if (items.length <= 1) return items.join('')
   if (items.length === 2) return `${items[0]} and ${items[1]}`
@@ -469,8 +536,7 @@ const joinList = (items: string[]) => {
 export const CAPTURE: {
   chat: (question: string) => { observation: string; rawSignal: string }
   quote: (args: { quote: string; feedback: string; shareActions: string[] }) => { observation: string; rawSignal: string }
-  listenStarted: { observation: string; rawSignal: string }
-  listenCompleted: { observation: string; rawSignal: string }
+  listen: (args: { status: 'playing' | 'paused' | 'completed' | 'error'; elapsed: number }) => { observation: string; rawSignal: string }
 } = {
   chat: (question) => ({
     observation: `The user picked “${question}”, and the AI answered in full, grounded in the article rather than made up.`,
@@ -491,13 +557,49 @@ export const CAPTURE: {
       : `The user picked the line “${line}”.`
     return { observation, rawSignal }
   },
-  listenStarted: {
-    observation: 'The user pressed play and started listening to the audio overview of the article’s context.',
-    rawSignal: `The user pressed play and started the ${LISTEN_DURATION_SECONDS}-second audio.`,
-  },
-  listenCompleted: {
-    observation: `The user listened to the ${LISTEN_DURATION_SECONDS}-second audio from start to finish.`,
-    rawSignal: `The user listened to the ${LISTEN_DURATION_SECONDS}-second audio from start to finish.`,
+  // Live Listen signal: re-derived from whole-second `elapsed`, so stage 02
+  // updates every second while playing (stage 02 is not a live region; nothing
+  // is announced per second). "Played" is deliberate: we know the audio
+  // played, not that the user heard it.
+  listen: ({ status, elapsed }) => {
+    const total = LISTEN_DURATION_SECONDS
+    if (status === 'completed') {
+      return {
+        observation: `The user played the full ${total}-second audio overview. Both sponsor messages (demo sponsor: Mlytics) played.`,
+        rawSignal: `Played: ${total} of ${total} seconds (100%). Sponsor message impressions (demo sponsor: Mlytics): 2 of 2.`,
+      }
+    }
+    const e = elapsed
+    const pct = Math.round((e / total) * 100)
+    const seconds = `${e} ${e === 1 ? 'second' : 'seconds'}`
+    const openingPlayed = e >= LISTEN_OPENING_SPONSOR_END_SECONDS
+    // A playback error keeps the last partial signal (elapsed > 0 only; the caller gates that).
+    if (status === 'error') {
+      return {
+        observation: `The audio stopped at ${seconds} (${pct}%) because playback failed.${openingPlayed ? ' The opening sponsor message (demo sponsor: Mlytics) played.' : ''}`,
+        rawSignal: `Stopped by a playback error at ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): ${openingPlayed ? 'played' : 'not finished'}.`,
+      }
+    }
+    if (status === 'playing') {
+      return openingPlayed
+        ? {
+            observation: 'The audio overview is playing and has played past the opening sponsor message (demo sponsor: Mlytics).',
+            rawSignal: `Played so far: ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): played. Closing sponsor message: not yet played.`,
+          }
+        : {
+            observation: 'The user pressed play and started the article’s audio overview.',
+            rawSignal: `Played so far: ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): in progress.`,
+          }
+    }
+    return openingPlayed
+      ? {
+          observation: `Playback paused at ${seconds} (${pct}%). The opening sponsor message (demo sponsor: Mlytics) played.`,
+          rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): played. Closing sponsor message: not played.`,
+        }
+      : {
+          observation: `Playback paused at ${seconds} (${pct}%), before the opening sponsor message (demo sponsor: Mlytics) finished.`,
+          rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): not finished.`,
+        }
   },
 }
 
@@ -513,6 +615,7 @@ export const ANNOUNCE: {
   shareRecorded: (label: string) => string
   listenPlaying: string
   listenPaused: string
+  listenError: string
 } = {
   experienceSelected: (label) => `${label} selected.`,
   customerSwitched: (lensLabel) => `Switched to ${lensLabel}.`,
@@ -522,7 +625,8 @@ export const ANNOUNCE: {
   chatAnswered: 'The AI has answered. The customer decision flow below has been updated.',
   quoteSelected: 'Line selected.',
   feedbackSelected: (value) => endSentence(`Feedback selected: ${value}`),
-  shareRecorded: (label) => `${label} share action recorded. Shared signals updated.`,
+  shareRecorded: (label) => `${label} button clicked. Shared signals updated.`,
   listenPlaying: 'Listen is playing. Start signal captured.',
   listenPaused: 'Listen paused.',
+  listenError: 'Listen audio couldn’t play.',
 }
