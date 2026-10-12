@@ -593,11 +593,11 @@ export const CAPTURE: {
     }
     return openingPlayed
       ? {
-          observation: `The user paused the audio at ${seconds} (${pct}%). The opening sponsor message (demo sponsor: Mlytics) played.`,
+          observation: `Playback paused at ${seconds} (${pct}%). The opening sponsor message (demo sponsor: Mlytics) played.`,
           rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): played. Closing sponsor message: not played.`,
         }
       : {
-          observation: `The user paused the audio at ${seconds} (${pct}%), before the opening sponsor message (demo sponsor: Mlytics) finished.`,
+          observation: `Playback paused at ${seconds} (${pct}%), before the opening sponsor message (demo sponsor: Mlytics) finished.`,
           rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message (demo sponsor: Mlytics): not finished.`,
         }
   },

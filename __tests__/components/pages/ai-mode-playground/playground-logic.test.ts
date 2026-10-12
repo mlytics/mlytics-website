@@ -284,7 +284,7 @@ describe('CAPTURE.listen', () => {
     [12, 44],
   ])('paused at %i s (after the opening sponsor) is state 3 at %i%%', (e, pct) => {
     expect(CAPTURE.listen({ status: 'paused', elapsed: e })).toEqual({
-      observation: `The user paused the audio at ${e} seconds (${pct}%). The opening sponsor message ${opening} played.`,
+      observation: `Playback paused at ${e} seconds (${pct}%). The opening sponsor message ${opening} played.`,
       rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: played. Closing sponsor message: not played.`,
     })
   })
@@ -295,7 +295,7 @@ describe('CAPTURE.listen', () => {
     [2, '2 seconds', 7],
   ])('paused at %i s (before the opening sponsor finishes) is state 4: "%s" at %i%%', (e, listened, pct) => {
     expect(CAPTURE.listen({ status: 'paused', elapsed: e })).toEqual({
-      observation: `The user paused the audio at ${listened} (${pct}%), before the opening sponsor message ${opening} finished.`,
+      observation: `Playback paused at ${listened} (${pct}%), before the opening sponsor message ${opening} finished.`,
       rawSignal: `Paused at ${e} of ${total} seconds (${pct}%). Opening sponsor message ${opening}: not finished.`,
     })
   })

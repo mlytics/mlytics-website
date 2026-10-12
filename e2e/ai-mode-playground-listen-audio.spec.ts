@@ -213,7 +213,7 @@ test('pausing real playback after the opening sponsor shows the paused signal', 
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '4', { timeout: 10_000 })
   await page.getByRole('button', { name: UI.listen.pause, exact: true }).click()
   await expect(page.locator('#stage-01-copy')).toHaveText(
-    /^The user paused the audio at \d+ seconds \(\d+%\)\. The opening sponsor message \(demo sponsor: Mlytics\) played\.$/,
+    /^Playback paused at \d+ seconds \(\d+%\)\. The opening sponsor message \(demo sponsor: Mlytics\) played\.$/,
   )
   await expect(page.locator('#stage-02-copy')).toContainText(
     /Paused at \d+ of 27 seconds \(\d+%\)\. Opening sponsor message \(demo sponsor: Mlytics\): played\. Closing sponsor message: not played\./,

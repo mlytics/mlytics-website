@@ -63,6 +63,10 @@ if [ $? -eq 0 ]; then
     gsutil -m setmeta -h "Content-Type:text/plain; charset=utf-8" "$BUCKET/**.txt"
     # 修正 .m4a 音檔的 Content-Type：gsutil 依副檔名猜測時可能標成非標準的 audio/mp4a-latm，Safari 等瀏覽器可能拒絕播放
     gsutil -m setmeta -h "Content-Type:audio/mp4" "$BUCKET/**.m4a"
+    if [ $? -ne 0 ]; then
+        echo "⚠️ .m4a Content-Type 修正失敗，請手動執行：gsutil -m setmeta -h \"Content-Type:audio/mp4\" \"$BUCKET/**.m4a\""
+        exit 1
+    fi
 else
     echo "❌ 上傳過程中發生錯誤。"
 fi

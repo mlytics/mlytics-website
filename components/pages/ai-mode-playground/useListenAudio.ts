@@ -16,6 +16,9 @@ import type { ListenStatus, PlaygroundAction } from './playground-logic'
  * switch is ignored, and a resume from OS/hardware media keys while the UI is
  * idle or completed is paused straight back.
  */
+// HTMLMediaElement.NETWORK_NO_SOURCE, inlined so it also works where the constant is absent.
+const NETWORK_NO_SOURCE = 3
+
 export function useListenAudio(dispatch: Dispatch<PlaygroundAction>, onError: () => void, status: ListenStatus) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const onErrorRef = useRef(onError)
@@ -52,6 +55,10 @@ export function useListenAudio(dispatch: Dispatch<PlaygroundAction>, onError: ()
     failedRef.current = true
     dispatch({ type: 'listen/error' })
     onErrorRef.current()
+    // Buffered audio must not keep playing under "Audio unavailable".
+    // currentTime is kept; the pause event is a reducer no-op on 'error'.
+    const audio = audioRef.current
+    if (audio && !audio.paused) audio.pause()
   }, [dispatch, isLive])
 
   const play = useCallback(() => {
@@ -59,6 +66,10 @@ export function useListenAudio(dispatch: Dispatch<PlaygroundAction>, onError: ()
     if (!audio) return
     failedRef.current = false
     userPlayPendingRef.current = true
+    // After an error, Reset or a tab switch leave the element holding a stale
+    // `error` (or no usable source); play() on it may never progress and never
+    // fire a new error. Reload first so the new session really starts.
+    if (audio.error || audio.networkState === NETWORK_NO_SOURCE) audio.load()
     // AbortError means a later pause()/load() interrupted this play() — not a failure.
     Promise.resolve(audio.play()).then(
       () => { userPlayPendingRef.current = false },
