@@ -124,6 +124,9 @@ describe('HeroSection', () => {
       expect(row).toHaveClass('flex', 'flex-col', 'gap-3', 'w-full', 'max-w-md', 'min-[640px]:flex-row')
       expect(formSlot).toHaveClass('w-full', 'min-[640px]:w-[28rem]')
       expect(link).toHaveClass('w-full', 'min-[640px]:w-auto', 'h-[50px]', 'border-primary', 'text-primary', 'bg-white', 'rounded-full')
+      // Hidden from lg (1024px) up, where the Nav's own Try AI Mode shows.
+      // jsdom applies no Tailwind CSS, so visibility itself is covered by e2e.
+      expect(link).toHaveClass('lg:hidden')
     })
 
     it('tracks clicks as home_hero', async () => {

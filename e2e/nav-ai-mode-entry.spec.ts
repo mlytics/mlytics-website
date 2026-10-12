@@ -194,7 +194,7 @@ const heroGeometry = async (page: Page) => {
   return { pill, btn, scrollWidth }
 }
 
-for (const width of [1280, 640]) {
+for (const width of [1023, 640]) {
   test.describe(`home hero row at ${width}`, () => {
     test.use({ viewport: { width, height: 800 } })
 
@@ -208,6 +208,28 @@ for (const width of [1280, 640]) {
       expect(btn.x - (pill.x + pill.width)).toBeLessThanOrEqual(13)
       // The input keeps its design width (InlineEmailCTA's max-w-md, 28rem).
       expect(pill.width).toBeCloseTo(448, 0)
+      expect(scrollWidth).toBeLessThanOrEqual(width)
+    })
+  })
+}
+
+// From lg (1024px) the Nav shows its own solid Try AI Mode, so the hero's
+// outline one is display:none and the input block sits alone, centred.
+for (const width of [1280, 1024]) {
+  test.describe(`home hero at ${width} (nav owns Try AI Mode)`, () => {
+    test.use({ viewport: { width, height: 800 } })
+
+    test('hero Try AI Mode is hidden; input block is centred at its design width', async ({ page }) => {
+      await page.goto('/')
+      const pillLoc = page.locator('section form > div').first()
+      await expect(pillLoc).toBeVisible()
+      await expect(page.locator('section a', { hasText: 'Try AI Mode' })).toBeHidden()
+      // The nav entry is the one on screen instead.
+      await expect(page.locator(`${DESKTOP_GROUP} a`, { hasText: 'Try AI Mode' })).toBeVisible()
+      const pill = (await pillLoc.boundingBox())!
+      const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth)
+      expect(pill.width).toBeCloseTo(448, 0)
+      expect(Math.abs(pill.x + pill.width / 2 - width / 2)).toBeLessThanOrEqual(2)
       expect(scrollWidth).toBeLessThanOrEqual(width)
     })
   })

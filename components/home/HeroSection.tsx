@@ -87,7 +87,12 @@ export function HeroSection() {
                 Top-aligned rather than centred: InlineEmailCTA grows an error
                 line under its pill, and centring would push the button down
                 when that appears. Height 50px = the pill's own height, so the
-                two line up exactly. */}
+                two line up exactly.
+                ≥ lg (1024px): the button is hidden (display:none) because the
+                Nav shows its own solid Try AI Mode button from the same `lg`
+                breakpoint (Nav's `hidden lg:flex`), so exactly one of the two
+                is ever on screen. The row then holds only the input block,
+                which the parent's items-center keeps horizontally centred. */}
             <div className="flex flex-col gap-3 w-full max-w-md min-[640px]:flex-row min-[640px]:items-start min-[640px]:w-auto min-[640px]:max-w-none">
               <div className="w-full min-[640px]:w-[28rem] min-[640px]:shrink-0">
                 <InlineEmailCTA ctaLabel="hero" pageName="Homepage Hero" />
@@ -95,7 +100,7 @@ export function HeroSection() {
               <Link
                 href="/ai-mode-playground"
                 onClick={() => trackCTA('Try AI Mode', 'home_hero')}
-                className="w-full min-[640px]:w-auto min-[640px]:shrink-0 h-[50px] inline-flex items-center justify-center px-[calc(1.25rem-1px)] rounded-full text-sm font-semibold whitespace-nowrap border border-primary bg-white text-primary transition-all hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="w-full min-[640px]:w-auto min-[640px]:shrink-0 h-[50px] inline-flex lg:hidden items-center justify-center px-[calc(1.25rem-1px)] rounded-full text-sm font-semibold whitespace-nowrap border border-primary bg-white text-primary transition-all hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 Try AI Mode
               </Link>
