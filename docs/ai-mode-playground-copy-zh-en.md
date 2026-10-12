@@ -402,4 +402,4 @@
 | ANNOUNCE.shareRecorded | 已按下 {LINE} 按鈕；共享訊號已更新。 | {label} button clicked. Shared signals updated. | 只在同一輪的第二個以後的分享鍵播報；第一個分享鍵播報 ANNOUNCE.completed。 |
 | ANNOUNCE.listenPlaying | Listen 播放中；開始 Signal 已捕捉。 | Listen is playing. Start signal captured. | |
 | ANNOUNCE.listenPaused | Listen 已暫停。 | Listen paused. | |
-| ANNOUNCE.listenError | Listen 音訊無法載入。 | Listen audio couldn’t load. | 音訊載入失敗時播報一次。 |
+| ANNOUNCE.listenError | Listen 音訊無法播放。 | Listen audio couldn’t play. | 播放失敗時播報一次；與畫面上的通用錯誤文案一致。 |

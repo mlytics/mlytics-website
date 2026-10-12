@@ -628,5 +628,5 @@ export const ANNOUNCE: {
   shareRecorded: (label) => `${label} button clicked. Shared signals updated.`,
   listenPlaying: 'Listen is playing. Start signal captured.',
   listenPaused: 'Listen paused.',
-  listenError: 'Listen audio couldn’t load.',
+  listenError: 'Listen audio couldn’t play.',
 }
