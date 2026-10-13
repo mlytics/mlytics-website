@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Nav } from '@/components/layout/Nav'
 import { trackCTA } from '@/lib/analytics'
@@ -23,34 +23,70 @@ vi.mock('next/link', () => ({
 
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useReducedMotion: () => false,
   motion: {
     div: ({
       children,
       initial: _i,
       animate: _a,
       exit: _e,
+      transition: _t,
       ...props
     }: React.HTMLAttributes<HTMLDivElement> & Record<string, unknown>) => <div {...props}>{children}</div>,
   },
 }))
 
+// Controllable matchMedia: `fireDesktop(true)` emits a change to ≥1024px.
+type Listener = (e: { matches: boolean }) => void
+let mqlListeners: Listener[] = []
+const fireDesktop = (matches: boolean) => act(() => { mqlListeners.forEach(l => l({ matches })) })
+
 const PRIMARY = ['bg-primary', 'text-white', 'rounded-full', 'px-4', 'py-2', 'text-sm', 'font-semibold']
 const SECONDARY = ['bg-white', 'text-primary', 'border-primary', 'border', 'rounded-full', 'text-sm', 'font-semibold']
+const AI_PATHS = ['/ai-mode-playground', '/ai-mode-playground/']
 
+const navEl = () => document.querySelector('nav') as HTMLElement
+
+// The desktop CTA group: the `hidden lg:flex` block holding Book a Demo inside <nav>.
 const ctaGroup = () => {
-  // The desktop CTA group is the only `hidden lg:flex` block that contains Book a Demo.
-  const book = screen.getAllByRole('link', { name: 'Book a Demo' })[0]
+  const book = within(navEl()).getByRole('link', { name: 'Book a Demo' })
   return book.parentElement as HTMLElement
 }
 
-const openMenu = async () => {
-  await userEvent.click(screen.getByRole('button', { name: 'Open menu' }))
-  // The mobile menu renders after the desktop group, so the last of each is the mobile one.
+const mobileBarLink = () => {
+  const links = within(navEl()).getAllByRole('link', { name: 'Try AI Mode' })
+  return links.find(l => l.parentElement?.className.includes('lg:hidden')) as HTMLElement
 }
+
+const hamburger = () => screen.getByRole('button', { name: 'Open menu', hidden: true })
+
+const openMenu = async () => {
+  await userEvent.click(hamburger())
+  return screen.getByRole('dialog', { name: 'Site menu' })
+}
+
+const bottomGrid = (dialog: HTMLElement) =>
+  within(dialog).getByRole('link', { name: 'Book a Demo' }).parentElement as HTMLElement
 
 beforeEach(() => {
   mockPathname = '/'
   vi.mocked(trackCTA).mockClear()
+  mqlListeners = []
+  vi.stubGlobal('matchMedia', vi.fn((query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: (_: string, l: Listener) => { mqlListeners.push(l) },
+    removeEventListener: (_: string, l: Listener) => { mqlListeners = mqlListeners.filter(x => x !== l) },
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+  })))
+  document.documentElement.style.overflow = ''
+  document.body.style.overflow = ''
+  document.body.style.paddingRight = ''
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
 })
 
 describe('Nav center links', () => {
@@ -63,21 +99,19 @@ describe('Nav center links', () => {
 })
 
 describe('Nav desktop CTA group', () => {
-  it('renders Try AI Mode then Book a Demo, with the right hrefs', () => {
+  it('renders Book a Demo then Try AI Mode, with the right hrefs and wrapper classes', () => {
     render(<Nav />)
     const group = ctaGroup()
-    expect(group.className).toContain('hidden')
-    expect(group.className).toContain('lg:flex')
-    expect(group.className).toContain('gap-3')
+    expect(group).toHaveClass('hidden', 'lg:flex', 'items-center', 'gap-3')
     const links = within(group).getAllByRole('link')
-    expect(links.map(l => l.textContent)).toEqual(['Try AI Mode', 'Book a Demo'])
-    expect(links[0]).toHaveAttribute('href', '/ai-mode-playground')
-    expect(links[1]).toHaveAttribute('href', '/book-a-demo')
+    expect(links.map(l => l.textContent)).toEqual(['Book a Demo', 'Try AI Mode'])
+    expect(links[0]).toHaveAttribute('href', '/book-a-demo')
+    expect(links[1]).toHaveAttribute('href', '/ai-mode-playground')
   })
 
-  it('styles Try AI Mode as primary and Book a Demo as secondary', () => {
+  it('styles Book a Demo as secondary (outline) and Try AI Mode as primary (solid)', () => {
     render(<Nav />)
-    const [tryAi, book] = within(ctaGroup()).getAllByRole('link')
+    const [book, tryAi] = within(ctaGroup()).getAllByRole('link')
     expect(tryAi).toHaveClass(...PRIMARY)
     expect(tryAi).not.toHaveClass('bg-white')
     expect(book).toHaveClass(...SECONDARY)
@@ -86,7 +120,7 @@ describe('Nav desktop CTA group', () => {
 
   it('tracks clicks with the nav position', async () => {
     render(<Nav />)
-    const [tryAi, book] = within(ctaGroup()).getAllByRole('link')
+    const [book, tryAi] = within(ctaGroup()).getAllByRole('link')
     await userEvent.click(tryAi)
     expect(trackCTA).toHaveBeenLastCalledWith('Try AI Mode', 'nav')
     await userEvent.click(book)
@@ -94,58 +128,283 @@ describe('Nav desktop CTA group', () => {
   })
 })
 
+describe('Nav mobile bar (<1024px)', () => {
+  it('shows a solid Try AI Mode link inside the lg:hidden wrapper, before the hamburger', () => {
+    render(<Nav />)
+    const link = mobileBarLink()
+    const wrapper = link.parentElement as HTMLElement
+    expect(wrapper).toHaveClass('flex', 'items-center', 'gap-2', 'lg:hidden')
+    expect(wrapper).not.toHaveClass('hidden')
+    expect(Array.from(wrapper.children)).toEqual([link, hamburger()])
+    expect(link).toHaveAttribute('href', '/ai-mode-playground')
+    expect(link).toHaveClass(...PRIMARY, 'whitespace-nowrap')
+  })
+
+  it('tracks with the nav_mobile_header position', async () => {
+    render(<Nav />)
+    await userEvent.click(mobileBarLink())
+    expect(trackCTA).toHaveBeenLastCalledWith('Try AI Mode', 'nav_mobile_header')
+  })
+
+  it('exposes the hamburger as a dialog trigger', () => {
+    render(<Nav />)
+    const btn = hamburger()
+    expect(btn).toHaveAttribute('aria-expanded', 'false')
+    expect(btn).toHaveAttribute('aria-controls', 'mobile-menu')
+    expect(btn).toHaveAttribute('aria-haspopup', 'dialog')
+    expect(btn).toHaveClass('-mr-[11px]', 'p-[11px]', 'text-primary')
+  })
+})
+
 describe('Nav aria-current', () => {
-  it('marks Try AI Mode as the current page on /ai-mode-playground (with or without trailing slash)', async () => {
-    for (const p of ['/ai-mode-playground', '/ai-mode-playground/']) {
+  it('marks every Try AI Mode as current on /ai-mode-playground (with or without trailing slash)', async () => {
+    for (const p of AI_PATHS) {
       mockPathname = p
       const { unmount } = render(<Nav />)
-      const [tryAi, book] = within(ctaGroup()).getAllByRole('link')
+      const [book, tryAi] = within(ctaGroup()).getAllByRole('link')
       expect(tryAi).toHaveAttribute('aria-current', 'page')
       expect(book).not.toHaveAttribute('aria-current')
-      await openMenu()
-      const mobileTry = screen.getAllByRole('link', { name: 'Try AI Mode' }).at(-1)!
-      expect(mobileTry).toHaveAttribute('aria-current', 'page')
+      expect(mobileBarLink()).toHaveAttribute('aria-current', 'page')
+      const dialog = await openMenu()
+      expect(within(dialog).getByRole('link', { name: 'Try AI Mode' })).toHaveAttribute('aria-current', 'page')
+      expect(within(dialog).getByRole('link', { name: 'Book a Demo' })).not.toHaveAttribute('aria-current')
       unmount()
     }
   })
 
-  it('does not mark Try AI Mode elsewhere', () => {
-    mockPathname = '/brands'
+  it('does not mark Try AI Mode elsewhere', async () => {
+    for (const p of ['/', '/brands', '/ai-mode-playground-old', '/ai-mode']) {
+      mockPathname = p
+      const { unmount } = render(<Nav />)
+      expect(within(ctaGroup()).getByRole('link', { name: 'Try AI Mode' })).not.toHaveAttribute('aria-current')
+      expect(mobileBarLink()).not.toHaveAttribute('aria-current')
+      const dialog = await openMenu()
+      expect(within(dialog).getByRole('link', { name: 'Try AI Mode' })).not.toHaveAttribute('aria-current')
+      unmount()
+    }
+  })
+
+  it('marks the active overlay link', async () => {
+    mockPathname = '/brands/'
     render(<Nav />)
-    const [tryAi] = within(ctaGroup()).getAllByRole('link')
-    expect(tryAi).not.toHaveAttribute('aria-current')
+    const dialog = await openMenu()
+    const brands = within(dialog).getByRole('link', { name: 'Brands' })
+    expect(brands).toHaveAttribute('aria-current', 'page')
+    expect(brands).toHaveClass('text-primary', 'font-semibold')
+    const devs = within(dialog).getByRole('link', { name: 'Developers' })
+    expect(devs).not.toHaveAttribute('aria-current')
+    expect(devs).toHaveClass('text-ink', 'font-medium')
   })
 })
 
-describe('Nav mobile menu', () => {
-  it('stacks Try AI Mode (solid) above Book a Demo (outline), both full width, after the links', async () => {
+describe('Nav mobile overlay', () => {
+  it('opens a full-screen modal dialog outside <nav> with header, links and bottom buttons', async () => {
     render(<Nav />)
-    await openMenu()
-    const tryAi = screen.getAllByRole('link', { name: 'Try AI Mode' }).at(-1)!
-    const book = screen.getAllByRole('link', { name: 'Book a Demo' }).at(-1)!
-    const container = tryAi.parentElement as HTMLElement
-    expect(book.parentElement).toBe(container)
-    const items = within(container).getAllByRole('link').map(l => l.textContent)
-    expect(items).toEqual([
-      'Media and Content', 'Brands', 'Developers', 'Partnership', 'Try AI Mode', 'Book a Demo',
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    const dialog = await openMenu()
+    expect(dialog).toHaveAttribute('aria-modal', 'true')
+    expect(dialog).toHaveAttribute('id', 'mobile-menu')
+    expect(dialog).toHaveClass('lg:hidden', 'fixed', 'inset-0', 'z-[60]', 'flex', 'flex-col', 'h-dvh', 'bg-white')
+    expect(navEl().contains(dialog)).toBe(false)
+    expect(dialog.querySelector('nav, header')).toBeNull()
+    expect(hamburger()).toHaveAttribute('aria-expanded', 'true')
+
+    const logo = within(dialog).getByRole('link', { name: 'Mlytics' })
+    expect(logo).toHaveAttribute('href', '/')
+    expect(within(dialog).getByRole('button', { name: 'Close menu' })).toBeInTheDocument()
+
+    const list = within(dialog).getByRole('list')
+    const items = within(list).getAllByRole('listitem')
+    expect(items).toHaveLength(4)
+    items.forEach(li => expect(li).toHaveClass('border-b', 'border-line'))
+    expect(within(list).getAllByRole('link').map(l => l.textContent)).toEqual([
+      'Media and Content', 'Brands', 'Developers', 'Partnership',
     ])
-    expect(tryAi).toHaveAttribute('href', '/ai-mode-playground')
-    expect(book).toHaveAttribute('href', '/book-a-demo')
-    for (const el of [tryAi, book]) expect(el).toHaveClass('block', 'w-full', 'mt-2', 'rounded-full')
-    expect(tryAi).toHaveClass('bg-primary', 'text-white', 'py-2.5')
-    expect(book).toHaveClass('bg-white', 'text-primary', 'border-primary', 'border')
+
+    const grid = bottomGrid(dialog)
+    expect(grid).toHaveClass('grid', 'grid-cols-2', 'gap-3')
+    const ctas = within(grid).getAllByRole('link')
+    expect(ctas.map(l => l.textContent)).toEqual(['Book a Demo', 'Try AI Mode'])
+    expect(ctas[0]).toHaveAttribute('href', '/book-a-demo')
+    expect(ctas[0]).toHaveClass('border', 'border-primary', 'bg-white', 'text-primary', 'h-11', 'rounded-full')
+    expect(ctas[1]).toHaveAttribute('href', '/ai-mode-playground')
+    expect(ctas[1]).toHaveClass('bg-primary', 'text-white', 'h-11', 'rounded-full')
   })
 
-  it('tracks with nav_mobile and closes the menu on click', async () => {
+  it('moves focus to Close menu after opening', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Close menu' })).toHaveFocus())
+  })
+
+  it('traps Tab and Shift+Tab inside the dialog', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    const close = within(dialog).getByRole('button', { name: 'Close menu' })
+    const lastCta = within(bottomGrid(dialog)).getByRole('link', { name: 'Try AI Mode' })
+    const logo = within(dialog).getByRole('link', { name: 'Mlytics' })
+    await waitFor(() => expect(close).toHaveFocus())
+
+    // Close is second in DOM order (after the logo), so Shift+Tab from it is
+    // left to the browser; the wrap happens from the logo.
+    fireEvent.keyDown(close, { key: 'Tab', shiftKey: true })
+    expect(close).toHaveFocus()
+    logo.focus()
+    fireEvent.keyDown(logo, { key: 'Tab', shiftKey: true })
+    expect(lastCta).toHaveFocus()
+
+    fireEvent.keyDown(lastCta, { key: 'Tab' })
+    expect(logo).toHaveFocus()
+  })
+
+  it('Shift+Tab from the first focusable wraps to the last, and focus outside goes to the first', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    const items = Array.from(dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'))
+    expect(items[0]).toHaveAccessibleName('Mlytics')
+    expect(items[1]).toHaveAccessibleName('Close menu')
+    expect(items.at(-1)).toHaveTextContent('Try AI Mode')
+    items[0].focus()
+    fireEvent.keyDown(items[0], { key: 'Tab', shiftKey: true })
+    expect(items.at(-1)).toHaveFocus()
+    ;(document.activeElement as HTMLElement).blur()
+    fireEvent.keyDown(dialog, { key: 'Tab' })
+    expect(items[0]).toHaveFocus()
+  })
+
+  it('Escape closes and returns focus to the hamburger', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    const close = within(dialog).getByRole('button', { name: 'Close menu' })
+    await waitFor(() => expect(close).toHaveFocus())
+    fireEvent.keyDown(close, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(hamburger()).toHaveFocus()
+    expect(hamburger()).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('the X button closes and returns focus to the hamburger', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Close menu' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(hamburger()).toHaveFocus()
+  })
+
+  it('locks page scroll while open and restores the previous values', async () => {
+    document.documentElement.style.overflow = 'scroll'
+    document.body.style.overflow = 'auto'
+    document.body.style.paddingRight = '3px'
     render(<Nav />)
     await openMenu()
-    await userEvent.click(screen.getAllByRole('link', { name: 'Try AI Mode' }).at(-1)!)
-    expect(trackCTA).toHaveBeenLastCalledWith('Try AI Mode', 'nav_mobile')
-    expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument()
+    expect(document.documentElement.style.overflow).toBe('hidden')
+    expect(document.body.style.overflow).toBe('hidden')
+    await userEvent.click(screen.getByRole('button', { name: 'Close menu' }))
+    expect(document.documentElement.style.overflow).toBe('scroll')
+    expect(document.body.style.overflow).toBe('auto')
+    expect(document.body.style.paddingRight).toBe('3px')
+  })
 
+  it('makes <nav>, <main> and <footer> inert while open', async () => {
+    render(<><Nav /><main>page</main><footer>foot</footer></>)
+    const main = document.querySelector('main')!
+    const footer = document.querySelector('footer')!
+    expect(navEl()).not.toHaveAttribute('inert')
     await openMenu()
-    await userEvent.click(screen.getAllByRole('link', { name: 'Book a Demo' }).at(-1)!)
+    expect(navEl()).toHaveAttribute('inert')
+    expect(main).toHaveAttribute('inert')
+    expect(footer).toHaveAttribute('inert')
+    await userEvent.click(screen.getByRole('button', { name: 'Close menu' }))
+    expect(navEl()).not.toHaveAttribute('inert')
+    expect(main).not.toHaveAttribute('inert')
+    expect(footer).not.toHaveAttribute('inert')
+  })
+
+  it('closes when a link is clicked', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    await userEvent.click(within(dialog).getByRole('link', { name: 'Developers' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    const again = await openMenu()
+    await userEvent.click(within(again).getByRole('link', { name: 'Mlytics' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(trackCTA).not.toHaveBeenCalled()
+  })
+
+  it('bottom CTAs track nav_mobile and close the menu', async () => {
+    render(<Nav />)
+    let dialog = await openMenu()
+    await userEvent.click(within(bottomGrid(dialog)).getByRole('link', { name: 'Try AI Mode' }))
+    expect(trackCTA).toHaveBeenLastCalledWith('Try AI Mode', 'nav_mobile')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    dialog = await openMenu()
+    await userEvent.click(within(bottomGrid(dialog)).getByRole('link', { name: 'Book a Demo' }))
     expect(trackCTA).toHaveBeenLastCalledWith('Book a Demo', 'nav_mobile')
-    expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('closes on route change', async () => {
+    const { rerender } = render(<Nav />)
+    await openMenu()
+    mockPathname = '/brands/'
+    rerender(<Nav />)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(document.documentElement.style.overflow).toBe('')
+    // Going back to the original path does not resurrect it.
+    mockPathname = '/'
+    rerender(<Nav />)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('closes when the viewport grows to ≥1024px, without moving focus to the hamburger', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Close menu' })).toHaveFocus())
+    fireDesktop(false)
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    fireDesktop(true)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(hamburger()).not.toHaveFocus()
+    expect(mqlListeners).toHaveLength(0)
+  })
+})
+
+describe('Nav scroll visibility', () => {
+  const setWidth = (w: number) => { Object.defineProperty(window, 'innerWidth', { configurable: true, value: w }) }
+  const scrollTo = (y: number) => act(() => {
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: y })
+    window.dispatchEvent(new Event('scroll'))
+  })
+  let originalWidth: number
+
+  beforeEach(() => { originalWidth = window.innerWidth })
+  afterEach(() => { setWidth(originalWidth); Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 }) })
+
+  it('hides on scroll down at desktop width', () => {
+    setWidth(1280)
+    render(<Nav />)
+    scrollTo(300)
+    expect(navEl().style.transform).toBe('translateY(-100%)')
+  })
+
+  it('shows the bar again after narrowing below 1024px (resize)', () => {
+    setWidth(1280)
+    render(<Nav />)
+    scrollTo(300)
+    expect(navEl().style.transform).toBe('translateY(-100%)')
+    setWidth(800)
+    act(() => { window.dispatchEvent(new Event('resize')) })
+    expect(navEl().style.transform).toBe('translateY(0)')
+  })
+
+  it('shows the bar again on the next scroll below 1024px', () => {
+    setWidth(1280)
+    render(<Nav />)
+    scrollTo(300)
+    expect(navEl().style.transform).toBe('translateY(-100%)')
+    setWidth(375)
+    scrollTo(600)
+    expect(navEl().style.transform).toBe('translateY(0)')
   })
 })
