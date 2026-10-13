@@ -97,16 +97,17 @@ const scrollToScrolledState = async (page: Page) => {
 test.describe('desktop 1280', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
-  test('Try AI Mode (primary) sits before Book a Demo (secondary); center links drop AI Mode', async ({ page }) => {
+  test('Book a Demo (secondary) sits left of Try AI Mode (primary); center links drop AI Mode', async ({ page }) => {
     await page.goto('/')
     const group = page.locator(DESKTOP_GROUP)
     const links = group.locator('a')
-    await expect(links).toHaveText(['Try AI Mode', 'Book a Demo'])
+    await expect(links).toHaveText(['Book a Demo', 'Try AI Mode'])
     await expect(links.nth(0)).toBeVisible()
     await expect(links.nth(1)).toBeVisible()
-    await expect(links.nth(0)).toHaveAttribute('href', /\/ai-mode-playground\/?$/)
-    await expect(links.nth(1)).toHaveAttribute('href', /\/book-a-demo\/?$/)
+    await expect(links.nth(0)).toHaveAttribute('href', /\/book-a-demo\/?$/)
+    await expect(links.nth(1)).toHaveAttribute('href', /\/ai-mode-playground\/?$/)
     const [a, b] = [await links.nth(0).boundingBox(), await links.nth(1).boundingBox()]
+    // Book a Demo ends before Try AI Mode starts.
     expect(a!.x + a!.width).toBeLessThan(b!.x)
     // Same height, so the pair reads as one group.
     expect(Math.abs(a!.height - b!.height)).toBeLessThanOrEqual(0.5)
@@ -137,7 +138,8 @@ test.describe('desktop 1280', () => {
 
   test('keyboard focus ring is visible on both nav buttons', async ({ page }) => {
     await page.goto('/')
-    for (const label of ['Try AI Mode', 'Book a Demo']) {
+    // Forward Tab order = DOM order: Book a Demo, then Try AI Mode.
+    for (const label of ['Book a Demo', 'Try AI Mode']) {
       let found = false
       for (let i = 0; i < 25 && !found; i++) {
         await page.keyboard.press('Tab')
@@ -157,96 +159,65 @@ test.describe('desktop 1280', () => {
   })
 })
 
-test.describe('mobile 375', () => {
-  test.use({ viewport: { width: 375, height: 812 } })
+// Below lg (1024px) the bar carries its own solid Try AI Mode between the logo
+// and the hamburger. It must fit on one line down to 320px.
+const MOBILE_BAR_BTN = 'nav.fixed div.lg\\:hidden a'
 
-  test('menu stacks Try AI Mode above Book a Demo, full width, and the page does not scroll sideways', async ({ page }) => {
-    await page.goto('/')
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375)
-
-    await page.getByRole('button', { name: 'Open menu' }).click()
-    const tryAi = page.locator('nav.fixed a:visible', { hasText: 'Try AI Mode' })
-    const book = page.locator('nav.fixed a:visible', { hasText: 'Book a Demo' })
-    await expect(tryAi).toBeVisible()
-    await expect(book).toBeVisible()
-    const [a, b] = [await tryAi.boundingBox(), await book.boundingBox()]
-    expect(a!.y + a!.height).toBeLessThanOrEqual(b!.y)
-    expect(Math.abs(a!.x - b!.x)).toBeLessThanOrEqual(1)
-    expect(Math.abs(a!.width - b!.width)).toBeLessThanOrEqual(1)
-    // Full width of the menu's padded content box (375 − 2×24px).
-    expect(a!.width).toBeGreaterThanOrEqual(375 - 48 - 1)
-
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375)
-
-    await tryAi.click()
-    await page.waitForURL(/\/ai-mode-playground\/?$/)
-    await expect(page.getByRole('button', { name: 'Open menu' })).toBeVisible()
-  })
-
-})
-
-// Hero: the input block is InlineEmailCTA's pill (`form > div`), not the form,
-// because the form also holds the (usually absent) error line.
-const heroGeometry = async (page: Page) => {
-  const pill = (await page.locator('section form > div').first().boundingBox())!
-  const btn = (await page.locator('section a', { hasText: 'Try AI Mode' }).boundingBox())!
-  const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth)
-  return { pill, btn, scrollWidth }
-}
-
-for (const width of [1023, 640]) {
-  test.describe(`home hero row at ${width}`, () => {
+for (const width of [320, 375, 768, 1023]) {
+  test.describe(`mobile bar at ${width}`, () => {
     test.use({ viewport: { width, height: 800 } })
 
-    test('Try AI Mode sits to the right of the input block, top and bottom aligned', async ({ page }) => {
+    test('logo, Try AI Mode and hamburger sit in one row without overlap or sideways scroll', async ({ page }) => {
       await page.goto('/')
-      await expect(page.locator('section a', { hasText: 'Try AI Mode' })).toBeVisible()
-      const { pill, btn, scrollWidth } = await heroGeometry(page)
-      expect(Math.abs(btn.y - pill.y)).toBeLessThanOrEqual(1)
-      expect(Math.abs(btn.y + btn.height - (pill.y + pill.height))).toBeLessThanOrEqual(1)
-      expect(btn.x).toBeGreaterThanOrEqual(pill.x + pill.width + 11) // ~12px gap
-      expect(btn.x - (pill.x + pill.width)).toBeLessThanOrEqual(13)
-      // The input keeps its design width (InlineEmailCTA's max-w-md, 28rem).
-      expect(pill.width).toBeCloseTo(448, 0)
-      expect(scrollWidth).toBeLessThanOrEqual(width)
+      const btn = page.locator(MOBILE_BAR_BTN, { hasText: 'Try AI Mode' })
+      await expect(btn).toBeVisible()
+      await expect(btn).toHaveAttribute('href', /\/ai-mode-playground\/?$/)
+      const logo = (await page.locator('nav.fixed > div > a[href="/"]').boundingBox())!
+      const b = (await btn.boundingBox())!
+      const burger = (await page.getByRole('button', { name: 'Open menu' }).boundingBox())!
+      expect(b.height).toBeGreaterThanOrEqual(36)
+      expect(b.height, 'single line, no wrap').toBeLessThan(40)
+      // Order and no overlap.
+      expect(logo.x + logo.width).toBeLessThanOrEqual(b.x)
+      expect(b.x + b.width).toBeLessThanOrEqual(burger.x)
+      // Everything inside the viewport.
+      expect(burger.x + burger.width).toBeLessThanOrEqual(width)
+      // Bar height unchanged.
+      const nav = (await page.locator('nav.fixed').boundingBox())!
+      expect(nav.height).toBe(65)
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
     })
   })
 }
 
-// From lg (1024px) the Nav shows its own solid Try AI Mode, so the hero's
-// outline one is display:none and the input block sits alone, centred.
-for (const width of [1280, 1024]) {
-  test.describe(`home hero at ${width} (nav owns Try AI Mode)`, () => {
+for (const width of [1024, 1280]) {
+  test.describe(`mobile bar at ${width}`, () => {
     test.use({ viewport: { width, height: 800 } })
 
-    test('hero Try AI Mode is hidden; input block is centred at its design width', async ({ page }) => {
+    test('mobile Try AI Mode and hamburger are hidden', async ({ page }) => {
+      await page.goto('/')
+      await expect(page.locator(DESKTOP_GROUP)).toBeVisible()
+      await expect(page.locator(MOBILE_BAR_BTN, { hasText: 'Try AI Mode' })).toBeHidden()
+      await expect(page.getByRole('button', { name: 'Open menu' })).toBeHidden()
+    })
+  })
+}
+
+// Hero: back to its pre-DATAI-555 state — the input block (InlineEmailCTA's
+// pill, `form > div`) alone and centred; no Try AI Mode at any width.
+for (const width of [320, 375, 640, 1023, 1280]) {
+  test.describe(`home hero at ${width}`, () => {
+    test.use({ viewport: { width, height: 800 } })
+
+    test('has no Try AI Mode; email pill is visible, centred and at its design width', async ({ page }) => {
       await page.goto('/')
       const pillLoc = page.locator('section form > div').first()
       await expect(pillLoc).toBeVisible()
-      await expect(page.locator('section a', { hasText: 'Try AI Mode' })).toBeHidden()
-      // The nav entry is the one on screen instead.
-      await expect(page.locator(`${DESKTOP_GROUP} a`, { hasText: 'Try AI Mode' })).toBeVisible()
+      await expect(page.locator('section a', { hasText: 'Try AI Mode' })).toHaveCount(0)
       const pill = (await pillLoc.boundingBox())!
-      const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth)
-      expect(pill.width).toBeCloseTo(448, 0)
       expect(Math.abs(pill.x + pill.width / 2 - width / 2)).toBeLessThanOrEqual(2)
-      expect(scrollWidth).toBeLessThanOrEqual(width)
-    })
-  })
-}
-
-for (const width of [375, 320]) {
-  test.describe(`home hero stacked at ${width}`, () => {
-    test.use({ viewport: { width, height: 812 } })
-
-    test('Try AI Mode sits below the input block at exactly its width, no sideways scroll', async ({ page }) => {
-      await page.goto('/')
-      await expect(page.locator('section a', { hasText: 'Try AI Mode' })).toBeVisible()
-      const { pill, btn, scrollWidth } = await heroGeometry(page)
-      expect(btn.y).toBeGreaterThanOrEqual(pill.y + pill.height)
-      expect(Math.abs(btn.width - pill.width)).toBeLessThanOrEqual(1)
-      expect(Math.abs(btn.x - pill.x)).toBeLessThanOrEqual(1)
-      expect(scrollWidth).toBeLessThanOrEqual(width)
+      expect(Math.abs(pill.width - Math.min(448, width - 48))).toBeLessThanOrEqual(1)
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
     })
   })
 }
