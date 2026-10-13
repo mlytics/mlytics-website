@@ -26,11 +26,6 @@ const MOBILE_BAR_POSITION = 'nav_mobile_header'
 // when the browser's default font size is larger than 16px.
 const DESKTOP_QUERY = '(min-width: 64rem)'
 
-// Whether the viewport is at the desktop breakpoint. Falls back to the 16px
-// equivalent where matchMedia is unavailable.
-const isDesktop = () =>
-  typeof window.matchMedia === 'function' ? window.matchMedia(DESKTOP_QUERY).matches : window.innerWidth >= 1024
-
 const FOCUS_RING = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
 
 // Primary: the solid pill Book a Demo used to wear.
@@ -51,6 +46,11 @@ const OVERLAY_BTN =
   'inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold transition-all'
 
 const FOCUSABLE = 'a[href], button:not([disabled])'
+
+// A tap on the hamburger this soon after closing is the second tap of a
+// double-tap on X (the fading dialog no longer catches clicks), so it is
+// ignored rather than reopening the menu.
+const REOPEN_GUARD_MS = 250
 
 // Exposes AnimatePresence's presence to a render prop, so the menu can turn
 // itself inert while its exit fade plays.
@@ -83,17 +83,28 @@ export function Nav() {
   // Whether closing should hand focus back to the hamburger. False when the
   // menu closes because the viewport grew to desktop (the hamburger is gone).
   const restoreFocus = useRef(true)
+  // When the menu last closed (Date.now()), for the reopen guard.
+  const lastClosedAt = useRef(0)
 
   const normalizedPathname = pathname.replace(/\/$/, '') || '/'
   const isAiModePage = normalizedPathname === AI_MODE_HREF
 
   const openMenu = () => {
+    if (Date.now() - lastClosedAt.current < REOPEN_GUARD_MS) return
     restoreFocus.current = true
     setMenuPath(pathname)
   }
-  const closeMenu = useCallback(() => setMenuPath(null), [])
+  const closeMenu = useCallback(() => {
+    lastClosedAt.current = Date.now()
+    setMenuPath(null)
+  }, [])
 
   useEffect(() => {
+    // Desktop = Tailwind `lg` (64rem), read from one MediaQueryList. Falls back
+    // to the 16px equivalent where matchMedia is unavailable.
+    const mql = typeof window.matchMedia === 'function' ? window.matchMedia(DESKTOP_QUERY) : null
+    const isDesktop = () => (mql ? mql.matches : window.innerWidth >= 1024)
+
     const handler = () => {
       const currentY = window.scrollY
       const diff = currentY - lastScrollY.current

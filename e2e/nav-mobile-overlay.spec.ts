@@ -126,23 +126,59 @@ test.describe('mobile overlay exit fade at 375', () => {
   test('the closing dialog is inert, aria-hidden and unclickable while it fades out', async ({ page }) => {
     await page.goto('/')
     await openOverlay(page)
-    // Close, then sample the dialog mid-fade (the fade is 180ms).
-    const during = await page.evaluate(async () => {
-      ;(document.querySelector('[aria-label="Close menu"]') as HTMLButtonElement).click()
-      await new Promise((r) => setTimeout(r, 40))
-      const el = document.getElementById('mobile-menu')
-      return el && {
+    // Close, then record the dialog's state on every frame until it is
+    // removed. No fixed-time sample: the fade length depends on the machine.
+    const result = await page.evaluate(async () => {
+      type Sample = { inert: boolean; ariaHidden: string | null; pointerEvents: string }
+      const read = (el: HTMLElement): Sample => ({
         inert: el.hasAttribute('inert'),
         ariaHidden: el.getAttribute('aria-hidden'),
         pointerEvents: getComputedStyle(el).pointerEvents,
-        opacity: Number(getComputedStyle(el).opacity),
+      })
+      const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
+      ;(document.querySelector('[aria-label="Close menu"]') as HTMLButtonElement).click()
+      await Promise.resolve()
+      await frame()
+      const el = document.getElementById('mobile-menu')
+      const first = el ? read(el) : null
+      const samples: Sample[] = first ? [first] : []
+      const deadline = performance.now() + 2000
+      while (performance.now() < deadline) {
+        await frame()
+        const cur = document.getElementById('mobile-menu')
+        if (!cur) return { first, samples, removed: true }
+        samples.push(read(cur))
       }
+      return { first, samples, removed: false }
     })
-    expect(during, 'dialog still mounted mid-fade').not.toBeNull()
-    expect(during!.opacity).toBeLessThan(1)
-    expect(during).toMatchObject({ inert: true, ariaHidden: 'true', pointerEvents: 'none' })
+    const closing = { inert: true, ariaHidden: 'true', pointerEvents: 'none' }
+    expect(result.first, 'dialog still mounted one frame after Close').not.toBeNull()
+    expect(result.first).toEqual(closing)
+    expect(result.removed, 'dialog removed within 2s').toBe(true)
+    expect(result.samples.length).toBeGreaterThanOrEqual(1)
+    for (const [n, sample] of result.samples.entries()) expect(sample, `frame ${n}`).toEqual(closing)
     await expect(page.locator('#mobile-menu')).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeFocused()
+  })
+})
+
+test.describe('mobile overlay double-tap on X at 375', () => {
+  test.use({ viewport: { width: 375, height: 700 } })
+
+  test('a second tap right after Close does not reopen the menu', async ({ page }) => {
+    await page.goto('/')
+    await openOverlay(page)
+    const close = (await dialog(page).getByRole('button', { name: 'Close menu' }).boundingBox())!
+    const x = close.x + close.width / 2
+    const y = close.y + close.height / 2
+    // Two taps at the X's position; the second lands on the hamburger beneath.
+    await page.mouse.click(x, y)
+    await page.mouse.click(x, y)
+    await page.waitForTimeout(400)
+    await expect(page.locator('#mobile-menu')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false')
+    // A deliberate tap later still opens it.
+    await openOverlay(page)
   })
 })
 

@@ -68,6 +68,9 @@ const openMenu = async () => {
   return screen.getByRole('dialog', { name: 'Site menu' })
 }
 
+// Reopening right after a close is ignored (double-tap guard, 250ms).
+const afterReopenGuard = () => new Promise(r => setTimeout(r, 260))
+
 const bottomGrid = (dialog: HTMLElement) =>
   within(dialog).getByRole('link', { name: 'Book a Demo' }).parentElement as HTMLElement
 
@@ -367,6 +370,7 @@ describe('Nav mobile overlay', () => {
     const dialog = await openMenu()
     await userEvent.click(within(dialog).getByRole('link', { name: 'Developers' }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    await afterReopenGuard()
     const again = await openMenu()
     await userEvent.click(within(again).getByRole('link', { name: 'Mlytics' }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -380,6 +384,7 @@ describe('Nav mobile overlay', () => {
     expect(trackCTA).toHaveBeenLastCalledWith('Try AI Mode', 'nav_mobile')
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 
+    await afterReopenGuard()
     dialog = await openMenu()
     await userEvent.click(within(bottomGrid(dialog)).getByRole('link', { name: 'Book a Demo' }))
     expect(trackCTA).toHaveBeenLastCalledWith('Book a Demo', 'nav_mobile')
@@ -397,6 +402,38 @@ describe('Nav mobile overlay', () => {
     mockPathname = '/'
     rerender(<Nav />)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('ignores a reopen within 250ms of closing (double-tap on X), then opens normally', () => {
+    vi.useFakeTimers()
+    try {
+      render(<Nav />)
+      fireEvent.click(hamburger())
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: 'Close menu' }))
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      // Second tap of the double-tap lands on the hamburger immediately.
+      fireEvent.click(hamburger())
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      act(() => { vi.advanceTimersByTime(200) })
+      fireEvent.click(hamburger())
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      act(() => { vi.advanceTimersByTime(100) })
+      fireEvent.click(hamburger())
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('creates the desktop MediaQueryList once for the scroll/resize handlers', () => {
+    render(<Nav />)
+    const calls = vi.mocked(window.matchMedia).mock.calls.length
+    for (let i = 0; i < 5; i++) {
+      window.dispatchEvent(new Event('scroll'))
+      window.dispatchEvent(new Event('resize'))
+    }
+    expect(vi.mocked(window.matchMedia).mock.calls.length).toBe(calls)
   })
 
   it('is interactive and announced while present', async () => {
