@@ -64,7 +64,7 @@ export function PlaygroundCTASection({
       >
         {body}
       </p>
-      {/* Matches the primary CTA in DecisiveEnginePageCTA / NotFoundContent —
+      {/* Matches the primary CTA on the 404 page —
           dark and light ground share the one button. */}
       <Link
         href={`/ai-mode-playground/?lens=${lens}`}
