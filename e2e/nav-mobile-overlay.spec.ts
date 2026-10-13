@@ -106,11 +106,43 @@ test.describe('mobile overlay blank-space click at 375', () => {
     expect(y).toBeGreaterThan(lastRow.y + lastRow.height)
     await page.mouse.click(375 / 2, y)
     expect(await page.evaluate(() => document.activeElement?.getAttribute('role'))).toBe('dialog')
+    // From the container, Shift+Tab enters the list at its last item.
+    await page.keyboard.press('Shift+Tab')
+    await expect(dialog(page).getByRole('link', { name: 'Try AI Mode' })).toBeFocused()
+    // Back on the container, Escape closes.
+    await page.mouse.click(375 / 2, y)
+    expect(await page.evaluate(() => document.activeElement?.getAttribute('role'))).toBe('dialog')
     await page.keyboard.press('Escape')
     await expect(dialog(page)).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeFocused()
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe(before)
     expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe('')
+  })
+})
+
+test.describe('mobile overlay exit fade at 375', () => {
+  test.use({ viewport: { width: 375, height: 700 } })
+
+  test('the closing dialog is inert, aria-hidden and unclickable while it fades out', async ({ page }) => {
+    await page.goto('/')
+    await openOverlay(page)
+    // Close, then sample the dialog mid-fade (the fade is 180ms).
+    const during = await page.evaluate(async () => {
+      ;(document.querySelector('[aria-label="Close menu"]') as HTMLButtonElement).click()
+      await new Promise((r) => setTimeout(r, 40))
+      const el = document.getElementById('mobile-menu')
+      return el && {
+        inert: el.hasAttribute('inert'),
+        ariaHidden: el.getAttribute('aria-hidden'),
+        pointerEvents: getComputedStyle(el).pointerEvents,
+        opacity: Number(getComputedStyle(el).opacity),
+      }
+    })
+    expect(during, 'dialog still mounted mid-fade').not.toBeNull()
+    expect(during!.opacity).toBeLessThan(1)
+    expect(during).toMatchObject({ inert: true, ariaHidden: 'true', pointerEvents: 'none' })
+    await expect(page.locator('#mobile-menu')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Open menu' })).toBeFocused()
   })
 })
 

@@ -21,9 +21,12 @@ vi.mock('next/link', () => ({
   ),
 }))
 
+// Presence as reported by AnimatePresence; false = the exit fade is playing.
+let mockIsPresent = true
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useReducedMotion: () => false,
+  useIsPresent: () => mockIsPresent,
   motion: {
     div: ({
       children,
@@ -70,10 +73,12 @@ const bottomGrid = (dialog: HTMLElement) =>
 
 beforeEach(() => {
   mockPathname = '/'
+  mockIsPresent = true
   vi.mocked(trackCTA).mockClear()
   mqlListeners = []
   vi.stubGlobal('matchMedia', vi.fn((query: string) => ({
-    matches: false,
+    // Only the Nav's desktop query (Tailwind `lg`, 64rem = 1024px at 16px) matches, by width.
+    get matches() { return query === '(min-width: 64rem)' && window.innerWidth >= 1024 },
     media: query,
     addEventListener: (_: string, l: Listener) => { mqlListeners.push(l) },
     removeEventListener: (_: string, l: Listener) => { mqlListeners = mqlListeners.filter(x => x !== l) },
@@ -288,6 +293,16 @@ describe('Nav mobile overlay', () => {
     expect(within(dialog).getByRole('link', { name: 'Mlytics' })).toHaveFocus()
   })
 
+  it('Shift+Tab from the focused dialog container goes to the last focusable', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Close menu' })).toHaveFocus())
+    await userEvent.click(dialog)
+    expect(document.activeElement).toBe(dialog)
+    await userEvent.tab({ shift: true })
+    expect(within(bottomGrid(dialog)).getByRole('link', { name: 'Try AI Mode' })).toHaveFocus()
+  })
+
   it('a click on blank space keeps Escape working: closes and returns focus to the hamburger', async () => {
     render(<Nav />)
     const dialog = await openMenu()
@@ -384,6 +399,32 @@ describe('Nav mobile overlay', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
+  it('is interactive and announced while present', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    expect(dialog).not.toHaveAttribute('inert')
+    expect(dialog).not.toHaveAttribute('aria-hidden')
+    expect(dialog).not.toHaveClass('pointer-events-none')
+  })
+
+  it('is inert, hidden from assistive tech and unclickable while its exit fade plays', async () => {
+    mockIsPresent = false
+    render(<Nav />)
+    await userEvent.click(hamburger())
+    const dialog = document.getElementById('mobile-menu') as HTMLElement
+    expect(dialog).toHaveAttribute('inert')
+    expect(dialog).toHaveAttribute('aria-hidden', 'true')
+    expect(dialog).toHaveClass('pointer-events-none')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('listens to the Tailwind lg query in rem', async () => {
+    render(<Nav />)
+    await openMenu()
+    expect(window.matchMedia).toHaveBeenCalledWith('(min-width: 64rem)')
+    expect(window.matchMedia).not.toHaveBeenCalledWith('(min-width: 1024px)')
+  })
+
   it('closes when the viewport grows to ≥1024px, without moving focus to the hamburger', async () => {
     render(<Nav />)
     const dialog = await openMenu()
@@ -422,6 +463,18 @@ describe('Nav scroll visibility', () => {
     expect(navEl().style.transform).toBe('translateY(-100%)')
     setWidth(800)
     act(() => { window.dispatchEvent(new Event('resize')) })
+    expect(navEl().style.transform).toBe('translateY(0)')
+  })
+
+  it('decides desktop by the matchMedia query, not innerWidth', () => {
+    // Width says desktop but the rem query does not match (e.g. a larger
+    // default font size): the bar must stay shown.
+    setWidth(1280)
+    vi.stubGlobal('matchMedia', vi.fn((query: string) => ({
+      matches: false, media: query, addEventListener: vi.fn(), removeEventListener: vi.fn(),
+    })))
+    render(<Nav />)
+    scrollTo(300)
     expect(navEl().style.transform).toBe('translateY(0)')
   })
 

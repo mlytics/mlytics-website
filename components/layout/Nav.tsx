@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
 import Link from 'next/link'
 
 import { usePathname } from 'next/navigation'
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { motion, AnimatePresence, useIsPresent, useReducedMotion } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { trackCTA } from '@/lib/analytics'
 
@@ -21,8 +21,15 @@ const AI_MODE_HREF = '/ai-mode-playground'
 // Analytics position for the solid Try AI Mode button in the <1024px nav bar.
 const MOBILE_BAR_POSITION = 'nav_mobile_header'
 
-// Matches Tailwind's `lg` breakpoint: the desktop nav takes over from here.
-const DESKTOP_QUERY = '(min-width: 1024px)'
+// Tailwind v4's `lg` breakpoint (64rem): the desktop nav takes over from here.
+// Written in rem, as Tailwind does, so it agrees with the `lg:` classes even
+// when the browser's default font size is larger than 16px.
+const DESKTOP_QUERY = '(min-width: 64rem)'
+
+// Whether the viewport is at the desktop breakpoint. Falls back to the 16px
+// equivalent where matchMedia is unavailable.
+const isDesktop = () =>
+  typeof window.matchMedia === 'function' ? window.matchMedia(DESKTOP_QUERY).matches : window.innerWidth >= 1024
 
 const FOCUS_RING = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
 
@@ -44,6 +51,13 @@ const OVERLAY_BTN =
   'inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold transition-all'
 
 const FOCUSABLE = 'a[href], button:not([disabled])'
+
+// Exposes AnimatePresence's presence to a render prop, so the menu can turn
+// itself inert while its exit fade plays.
+function PresenceGate({ children }: { children: (present: boolean) => ReactNode }) {
+  const present = useIsPresent()
+  return <>{children(present)}</>
+}
 
 export function Nav() {
   const pathname = usePathname()
@@ -86,10 +100,10 @@ export function Nav() {
 
       setScrolled(currentY > 20)
 
-      // Only apply hide/show on desktop (window width >= 1024). Below that the
-      // bar is always shown — including after the window narrows while it was
-      // hidden at desktop width.
-      if (window.innerWidth >= 1024) {
+      // Only apply hide/show on desktop (`lg`, 64rem). Below that the bar is
+      // always shown — including after the window narrows while it was hidden
+      // at desktop width.
+      if (isDesktop()) {
         if (currentY < 60) {
           setVisible(true)
         } else if (diff > 6) {
@@ -104,7 +118,7 @@ export function Nav() {
       lastScrollY.current = currentY
     }
     const onResize = () => {
-      if (window.innerWidth < 1024) setVisible(true)
+      if (!isDesktop()) setVisible(true)
     }
     window.addEventListener('scroll', handler, { passive: true })
     window.addEventListener('resize', onResize)
@@ -173,8 +187,10 @@ export function Nav() {
     const last = items[items.length - 1]
     const index = items.indexOf(document.activeElement as HTMLElement)
     if (index === -1) {
+      // Focus is on the dialog container (blank-space click): enter the list
+      // from the end the key points to.
       e.preventDefault()
-      first.focus()
+      ;(e.shiftKey ? last : first).focus()
     } else if (e.shiftKey && index === 0) {
       e.preventDefault()
       last.focus()
@@ -286,79 +302,86 @@ export function Nav() {
           e2e suites look the site bar up by those tags. */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            key="mobile-menu"
-            id="mobile-menu"
-            ref={dialogRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site menu"
-            onKeyDown={onDialogKeyDown}
-            // Focusable (not tabbable) so a click on blank space lands focus on
-            // the dialog rather than <body>; keydown then still reaches the
-            // Escape / focus-trap handler.
-            tabIndex={-1}
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reduceMotion ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            className="lg:hidden fixed inset-0 z-[60] flex flex-col h-dvh bg-white overflow-y-auto overscroll-contain outline-none"
-          >
-            <div className="shrink-0 border-b border-line">
-              <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-                <Link href="/" onClick={closeMenu} className={`flex items-center ${FOCUS_RING}`}>
-                  {logo}
-                </Link>
-                <button
-                  ref={closeButtonRef}
-                  type="button"
-                  className={`-mr-[11px] p-[11px] transition-colors ${logoColor} ${FOCUS_RING}`}
-                  onClick={closeMenu}
-                  aria-label="Close menu"
-                >
-                  <X size={22} />
-                </button>
-              </div>
-            </div>
-
-            <ul className="flex-1 px-6">
-              {NAV_LINKS.map(link => {
-                const active = normalizedPathname === link.href
-                return (
-                  <li key={link.href} className="border-b border-line">
-                    <Link
-                      href={link.href}
-                      onClick={closeMenu}
-                      aria-current={active ? 'page' : undefined}
-                      className={`flex items-center min-h-14 py-4 text-base ${
-                        active ? 'text-primary font-semibold' : 'text-ink font-medium'
-                      } ${FOCUS_RING}`}
-                    >
-                      {link.label}
+          <PresenceGate key="mobile-menu">
+            {present => (
+              <motion.div
+                id="mobile-menu"
+                ref={dialogRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Site menu"
+                onKeyDown={onDialogKeyDown}
+                // Focusable (not tabbable) so a click on blank space lands focus on
+                // the dialog rather than <body>; keydown then still reaches the
+                // Escape / focus-trap handler.
+                tabIndex={-1}
+                // While the exit fade plays the dialog is already closed: keep it
+                // out of the accessibility tree and unclickable.
+                inert={!present}
+                aria-hidden={present ? undefined : true}
+                initial={reduceMotion ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={reduceMotion ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
+                transition={{ duration: 0.18 }}
+                className={`lg:hidden fixed inset-0 z-[60] flex flex-col h-dvh bg-white overflow-y-auto overscroll-contain outline-none ${present ? '' : 'pointer-events-none'}`}
+              >
+                <div className="shrink-0 border-b border-line">
+                  <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+                    <Link href="/" onClick={closeMenu} className={`flex items-center ${FOCUS_RING}`}>
+                      {logo}
                     </Link>
-                  </li>
-                )
-              })}
-            </ul>
+                    <button
+                      ref={closeButtonRef}
+                      type="button"
+                      className={`-mr-[11px] p-[11px] transition-colors ${logoColor} ${FOCUS_RING}`}
+                      onClick={closeMenu}
+                      aria-label="Close menu"
+                    >
+                      <X size={22} />
+                    </button>
+                  </div>
+                </div>
 
-            <div className="shrink-0 grid grid-cols-2 gap-3 px-6 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] border-t border-line">
-              <Link
-                href="/book-a-demo"
-                onClick={() => { trackCTA('Book a Demo', 'nav_mobile'); closeMenu() }}
-                className={`${OVERLAY_BTN} border border-primary bg-white text-primary hover:bg-primary hover:text-white ${FOCUS_RING}`}
-              >
-                Book a Demo
-              </Link>
-              <Link
-                href={AI_MODE_HREF}
-                onClick={() => { trackCTA('Try AI Mode', 'nav_mobile'); closeMenu() }}
-                aria-current={isAiModePage ? 'page' : undefined}
-                className={`${OVERLAY_BTN} bg-primary text-white hover:opacity-90 ${FOCUS_RING}`}
-              >
-                Try AI Mode
-              </Link>
-            </div>
-          </motion.div>
+                <ul className="flex-1 px-6">
+                  {NAV_LINKS.map(link => {
+                    const active = normalizedPathname === link.href
+                    return (
+                      <li key={link.href} className="border-b border-line">
+                        <Link
+                          href={link.href}
+                          onClick={closeMenu}
+                          aria-current={active ? 'page' : undefined}
+                          className={`flex items-center min-h-14 py-4 text-base ${
+                            active ? 'text-primary font-semibold' : 'text-ink font-medium'
+                          } ${FOCUS_RING}`}
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+
+                <div className="shrink-0 grid grid-cols-2 gap-3 px-6 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] border-t border-line">
+                  <Link
+                    href="/book-a-demo"
+                    onClick={() => { trackCTA('Book a Demo', 'nav_mobile'); closeMenu() }}
+                    className={`${OVERLAY_BTN} border border-primary bg-white text-primary hover:bg-primary hover:text-white ${FOCUS_RING}`}
+                  >
+                    Book a Demo
+                  </Link>
+                  <Link
+                    href={AI_MODE_HREF}
+                    onClick={() => { trackCTA('Try AI Mode', 'nav_mobile'); closeMenu() }}
+                    aria-current={isAiModePage ? 'page' : undefined}
+                    className={`${OVERLAY_BTN} bg-primary text-white hover:opacity-90 ${FOCUS_RING}`}
+                  >
+                    Try AI Mode
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+          </PresenceGate>
         )}
       </AnimatePresence>
     </>
