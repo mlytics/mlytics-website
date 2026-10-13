@@ -92,6 +92,28 @@ for (const width of [320, 375]) {
   })
 }
 
+test.describe('mobile overlay blank-space click at 375', () => {
+  test.use({ viewport: { width: 375, height: 700 } })
+
+  test('Escape still closes after clicking empty space in the dialog', async ({ page }) => {
+    await page.goto('/')
+    const before = await page.evaluate(() => getComputedStyle(document.documentElement).overflow)
+    await openOverlay(page)
+    // Empty area below the link list (the <ul> is flex-1, its rows end well above).
+    const list = (await dialog(page).locator('ul').boundingBox())!
+    const lastRow = (await dialog(page).locator('ul > li').last().boundingBox())!
+    const y = Math.round((lastRow.y + lastRow.height + list.y + list.height) / 2)
+    expect(y).toBeGreaterThan(lastRow.y + lastRow.height)
+    await page.mouse.click(375 / 2, y)
+    expect(await page.evaluate(() => document.activeElement?.getAttribute('role'))).toBe('dialog')
+    await page.keyboard.press('Escape')
+    await expect(dialog(page)).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Open menu' })).toBeFocused()
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe(before)
+    expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe('')
+  })
+})
+
 test.describe('mobile overlay with reduced motion', () => {
   test.use({ viewport: { width: 375, height: 700 } })
 

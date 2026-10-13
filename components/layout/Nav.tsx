@@ -294,11 +294,15 @@ export function Nav() {
             aria-modal="true"
             aria-label="Site menu"
             onKeyDown={onDialogKeyDown}
+            // Focusable (not tabbable) so a click on blank space lands focus on
+            // the dialog rather than <body>; keydown then still reaches the
+            // Escape / focus-trap handler.
+            tabIndex={-1}
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={reduceMotion ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0 }}
             transition={{ duration: 0.18 }}
-            className="lg:hidden fixed inset-0 z-[60] flex flex-col h-dvh bg-white overflow-y-auto overscroll-contain"
+            className="lg:hidden fixed inset-0 z-[60] flex flex-col h-dvh bg-white overflow-y-auto overscroll-contain outline-none"
           >
             <div className="shrink-0 border-b border-line">
               <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">

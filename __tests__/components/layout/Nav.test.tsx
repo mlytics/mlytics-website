@@ -257,7 +257,7 @@ describe('Nav mobile overlay', () => {
     expect(logo).toHaveFocus()
   })
 
-  it('Shift+Tab from the first focusable wraps to the last, and focus outside goes to the first', async () => {
+  it('Shift+Tab from the first focusable wraps to the last', async () => {
     render(<Nav />)
     const dialog = await openMenu()
     const items = Array.from(dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'))
@@ -267,9 +267,36 @@ describe('Nav mobile overlay', () => {
     items[0].focus()
     fireEvent.keyDown(items[0], { key: 'Tab', shiftKey: true })
     expect(items.at(-1)).toHaveFocus()
-    ;(document.activeElement as HTMLElement).blur()
-    fireEvent.keyDown(dialog, { key: 'Tab' })
-    expect(items[0]).toHaveFocus()
+  })
+
+  it('is focusable but not tabbable, without a visible ring on the container', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    expect(dialog).toHaveAttribute('tabindex', '-1')
+    expect(dialog).toHaveClass('outline-none')
+    // Initial focus still goes to Close, not the container.
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Close menu' })).toHaveFocus())
+  })
+
+  it('a click on blank space focuses the dialog; Tab from there goes to the first focusable', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Close menu' })).toHaveFocus())
+    await userEvent.click(dialog)
+    expect(document.activeElement).toBe(dialog)
+    await userEvent.tab()
+    expect(within(dialog).getByRole('link', { name: 'Mlytics' })).toHaveFocus()
+  })
+
+  it('a click on blank space keeps Escape working: closes and returns focus to the hamburger', async () => {
+    render(<Nav />)
+    const dialog = await openMenu()
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Close menu' })).toHaveFocus())
+    await userEvent.click(within(dialog).getByRole('list'))
+    expect(document.activeElement).toBe(dialog)
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(hamburger()).toHaveFocus()
   })
 
   it('Escape closes and returns focus to the hamburger', async () => {
