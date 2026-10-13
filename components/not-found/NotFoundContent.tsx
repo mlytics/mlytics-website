@@ -7,9 +7,6 @@ import Link from 'next/link'
  */
 const BOOK_A_DEMO = '/book-a-demo'
 
-/** Destination for the CDN variant's primary CTA (DATAI-553). */
-const DECISIVE_ENGINE = '/decisive-engine'
-
 /**
  * Both variants are rendered into the single prerendered 404.html; the inline
  * script in app/not-found.tsx stamps `data-nf` on <html> before first paint and
@@ -52,25 +49,12 @@ function CdnNotFound() {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-        {/* Primary now leads to the product page: visitors arriving from legacy
-            Multi-CDN URLs want the capability, not the sales form. Contact Us
-            stays one step away, and repeats at the bottom of that page.
-            The extra context is visually hidden text appended after the visible
-            label, not an aria-label: WCAG 2.5.3 (Label in Name) requires the
-            accessible name to contain the visible label, and an aria-label
-            replaces the accessible name outright rather than extending it — do
-            not "simplify" this back to aria-label. The space before the hidden
-            span is a real separating character (invisible to sighted users,
-            since nothing renders after it): without it the accessible-name
-            computation joins the two text nodes with no separator at all,
-            producing "Explore MoreMulti-CDN" instead of the intended
-            "Explore More Multi-CDN". */}
         <Link
-          href={DECISIVE_ENGINE}
+          href={BOOK_A_DEMO}
           className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
           style={{ background: 'var(--color-primary)' }}
         >
-          Explore More <span className="sr-only">Multi-CDN</span>
+          Contact Us
         </Link>
         {/* Secondary uses the design system's .pill-btn--dark. Two overrides,
             both inline because a class would lose to .pill-btn's later cascade
@@ -78,14 +62,14 @@ function CdnNotFound() {
             (2) its 1.5px border would otherwise make this button 3px taller
             than the borderless primary, so the vertical padding absorbs it. */}
         <Link
-          href={BOOK_A_DEMO}
+          href="/"
           className="pill-btn pill-btn--dark justify-center"
           style={{
             padding: 'calc(0.75rem - 1.5px) calc(1.5rem - 1.5px)',
             fontWeight: 600,
           }}
         >
-          Contact Us
+          Back to Home
         </Link>
       </div>
     </div>
