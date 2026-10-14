@@ -10,6 +10,7 @@
 - [媒體方案](https://www.mlytics.com/content-owners)：媒體 AI 流量變現 — 單一整合提供三層獨立收益，在不流失任何讀者至 AI 搜尋的前提下，將既有受眾轉化為新收益來源
 - [媒體夥伴計畫](https://www.mlytics.com/partnership)：加入 Media Partner Program — Starter 方案 US$1,000 一次性，獲得最多 10,000 個 AEO Answer 頁面啟用、最高 25% 品牌互動收益分潤，以及品牌合作獎勵；Enterprise 方案提供客製規模
 - [開發者方案](https://www.mlytics.com/developers)：媒體 AI Agent API — 單一 API 涵蓋內容路由、租戶知識庫管理，以及文字、圖片、語音、影片的全球規模化交付
+- [Mlytics AI Mode 互動示範](https://www.mlytics.com/ai-mode-playground/)：以範例情境體驗 Chat、Quote、Listen 三種互動，並看同一次互動產生的訊號如何引導 Media & Content Owners 與 Brands 做出不同決策
 
 ## 媒體 AEO 運作方式（品牌）
 
@@ -36,6 +37,17 @@ Mlytics 執行 AI 答案中的品牌置入，屬於 AEO 執行工具，而非 AE
 - 第五層 — Lead Pilot（按成果績效計費）：CRM 就緒、績效計費的潛在客戶直接交付品牌，是整個鏈條中價值密度最高的環節。（受眾：品牌）
 
 注意：/content-owners 頁面展示的是簡化版三層媒體產品套件，取自第二至第四層，並依媒體受眾的價值感知重新排序：AI Q&A Widget（第三層）→ Full Conversation CPL（第四層）→ Decisive Engine（第二層）。第一層與第五層未在該頁面呈現。
+
+## Mlytics AI Mode 互動示範
+
+AI Mode 互動示範頁以 iPhone 18 Pro 為主題的範例情境（範例問題、金句與一段語音摘要），示範使用者如何與 Mlytics AI Mode 互動，以及這些互動如何變成商業決策的依據。頁面使用示範內容，並非即時的實際營運資料。
+
+- 三種互動體驗：Chat（從三個 iPhone 18 Pro 範例問題中選一個，查看這次提問產生的訊號）、Quote（選一句有共鳴的話、留下感受並點選分享鍵）、Listen（播放一段範例語音摘要）
+- 從互動到訊號：頁面會顯示每次互動產生的原始資料，例如使用者問了什麼問題、選了哪句話與哪種感受、按了哪個分享鍵、語音播放了多久
+- 同一組訊號，兩種客戶類型，各有兩條商業路徑：
+  - Media & Content Owners：Content Experience（哪些主題值得延伸成內容）與 Brand Partnerships（哪一種體驗、在什麼內容時刻，值得包裝成品牌合作方案）
+  - Brands：Audience & Messaging（下一步要測試哪種訊息、哪些市場或客群值得優先投入轉換資源）與 Product Understanding（使用者實際上怎麼理解產品，應優先調整教育內容、產品定位還是行銷溝通）
+- 頁面呈現的分工：AI Mode 自動彙整訊號，客戶的團隊負責決定下一步
 
 ## 公司
 
@@ -180,6 +192,7 @@ This file is structured for large language models. It uses factual, marketing-ne
 - [For Publishers](https://www.mlytics.com/content-owners): AI publisher monetization — three independent revenue layers from one integration, without losing a single reader to AI search
 - [Media Partner Program](https://www.mlytics.com/partnership): Join as a media partner — Starter membership US$1,000 one-time, up to 10,000 activated Answer pages, up to 25% brand interaction revenue share, and brand cooperation rewards; Enterprise available for custom scale
 - [For Developers](https://www.mlytics.com/developers): Publisher AI agent API — one API for content routing, per-tenant knowledge base management, and managed delivery at scale across text, image, voice, and video
+- [Mlytics AI Mode interactive demo](https://www.mlytics.com/ai-mode-playground/): Try Chat, Quote, and Listen in a sample scenario, and follow how the signals from the same interaction lead Media & Content Owners and Brands to different decisions
 
 ## How Media AEO Works (For Brands)
 
@@ -206,6 +219,17 @@ Raw traffic enters at the top. Each layer adds intelligence and intent — and e
 - Layer 05 — Lead Pilot (performance per outcome): CRM-ready, performance-billed leads handed directly to brands — the highest value density in the chain. (Audience: Brands)
 
 Note: The /content-owners page presents a simplified three-layer publisher product suite drawn from Layers 02–04, ordered by publisher value rather than refinery sequence: AI Q&A Widget (Layer 03) → Full Conversation CPL (Layer 04) → Decisive Engine (Layer 02). Layer 01 and Layer 05 are not surfaced on that page.
+
+## Mlytics AI Mode Interactive Demo
+
+The AI Mode demo page uses a sample iPhone 18 Pro scenario (sample questions, quotable lines, and a short audio overview) to show how users interact with Mlytics AI Mode and how those interactions inform business decisions. The page uses demonstration content, not live production data.
+
+- Three experiences: Chat (pick one of three sample iPhone 18 Pro questions and see the signal it produces), Quote (pick a line that resonates, leave feedback, and click a share button), and Listen (play a short audio overview)
+- From interaction to signal: the page shows the raw data each interaction produces, such as which question the user asked, which line and feedback they picked, which share button they clicked, and how much of the audio played
+- The same signals, two customer types, two business paths each:
+  - Media & Content Owners: Content Experience (which topics are worth expanding) and Brand Partnerships (which experience, at which content moment, is worth shaping into a brand partnership)
+  - Brands: Audience & Messaging (which message to test next, and which markets or segments deserve conversion resources first) and Product Understanding (how people actually understand the product, and whether that should shape education content, product positioning, or marketing messages first)
+- The division of work shown on the page: AI Mode pulls the signals together automatically; the customer's team decides the next step
 
 ## Company
 
