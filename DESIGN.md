@@ -396,7 +396,7 @@
 - 不是按鈕：/content-owners/ 的「Talk to us」大卡片屬於**卡片家族**（§4.1），不套按鈕規則；導覽列與頁尾的文字連結屬於各自的 Organism（§5.1、§5.2）。
 - 全站行動按鈕只有藥丸一種形狀（`rounded-full`），一律 14／600（`text-sm font-semibold`）。
 - 圖示按鈕：全站只有頁尾 LinkedIn 一顆，規則見 §5.2。
-- 本章未收錄、**未定案**的元件：內容區的資訊小膠囊（非 Hero 小膠囊）、內文連結樣式。遇到時依 §0 第 2 點詢問。<!-- src: 文件未定案清單 #11, #13 -->
+- 內容區的資訊小膠囊見 §3.14；內文連結見 §3.15（都不是按鈕）。<!-- src: #33 -->
 <!-- src: atom-btn-primary, atom-btn-inline-submit, atom-btn-block, atom-btn-secondary-outline, atom-btn-dark-secondary, atom-btn-font, buttons.json A1–A9／B1–B6, #29-9 -->
 
 ### 3.2 實心藥丸（行動）
@@ -497,7 +497,7 @@
   - 淺底：預設（主色）——`<Eyebrow>`
   - 深底：`dark`（on-dark）——`<Eyebrow dark>`
   - 痛點段落：`color="var(--color-warn-deep)"`（例：`components/pages/brands/BrandPainSection.tsx:58`；該行的 `className="mb-3"` 不要抄）
-  - 頁尾欄標題：現況用 `color="rgba(168,197,195,0.85)"`（`components/layout/Footer.tsx:30`）；`dark` 參數給的是不透明 on-dark，改用會讓畫面變亮，頁尾欄標題的寫法**未定案**。<!-- src: 文件未定案清單 #17 -->
+  - 頁尾欄標題：`<Eyebrow color="rgba(168,197,195,0.85)">`（`components/layout/Footer.tsx:30`、`:39`、`:46`）。on-dark .85 在階梯上、符合深底文字 ≥.85，而且是用元件參數換色，合規；只用於頁尾欄標題。<!-- src: #33（controller 裁定 #17） -->
   - 與 h2 的距離「緊」：小標籤維持行內元素，**不加 `block`、不加 `mb-*`**（畫面上字到字約 16px）。行內元素上的 `mb-*` 本來就不會生效（§0 第 6 點）。
   - `.label-eyebrow-md`（14px）：現況只用於 /brands/ 深色區塊「Your audience didn't disappear.」這行較大的標示文字（`components/pages/brands/BrandGEOSection.tsx:102`）。
 - 禁止：用 className 覆寫顏色（例如 `className="text-on-dark/55"`，靠 tailwind-merge 剃掉預設色才生效，元件一改就失效）；加 `block mb-3` 拉開距離；深底小標籤 α 低於 .85。
@@ -556,6 +556,29 @@
 - JS 動畫要處理減少動態（第 8 章）。
 <!-- src: mol-stat-cell, 附錄 A §3 -->
 
+### 3.14 資訊小膠囊（內容區）
+
+**規則：區塊內容裡的分類、方案類型、適用對象等圓角小標籤，統一為高 24、無框的藥丸。**
+- 用在哪：內容區（卡片內、方案卡角落、Hero 底部的功能列等）的資訊標籤。不是按鈕、不可點；Hero h1 上方那顆是 §3.9 的 Hero 小膠囊，不在此列。
+- 寫法：字 12／600、內距上下 4・左右 12、高 24：
+  - 淺底：`px-3 py-1 rounded-full text-xs font-semibold bg-primary/8 text-primary`
+  - 深底：`px-3 py-1 rounded-full text-xs font-semibold bg-on-dark/8 text-on-dark`
+- 禁止：加框線；其他高度或內距；小於 12px 的字；白色透明底；inline `style` 上色。
+- 現況偏離：見 §10 DATAI-625（尺寸與框線統一）：/decisive-engine/ Hero 底部 5 個（`components/pages/decisive-engine/DecisiveEngineHero.tsx:56`，有框、高 30）、/partnership/ 方案卡 2 個（`components/pages/partnership/PartnershipMembership.tsx:55`、`:117`，有框、高 30）、首頁流程 5 個（`components/home/IntentPipeline.tsx:185`，10px、高 19）、/decisive-engine/ 決策迴圈卡片 12 個（`components/pages/decisive-engine/DecisionLoop.tsx:85`，高 24 但左右內距 10）；DATAI-556（`IntentPipeline.tsx:185` 的 10px 字）；DATAI-623（`IntentPipeline.tsx:185` 的白色 .08 底）；DATAI-621（上列 5 行的半級內距）
+<!-- src: #33（An 2026-10-15 決策頁 3 q11 選 a）, decisions-2026-10-15c/questions.json -->
+
+### 3.15 內文連結
+
+**規則：段落或清單裡的文字連結依位置分兩種；深底連結目前沒有標準。**
+- 用在哪與寫法：
+  - **一行一個的清單連結**：`text-primary underline-offset-4 hover:underline`（平常無底線、滑過出現；現有例子 `components/pages/decisive-engine/EngineFAQ.tsx:149`）。
+  - **句子中間的連結**：`text-primary underline underline-offset-4 hover:no-underline`（平常就畫底線、滑過消失）。原因：主色字與旁邊灰色內文的對比只有 1.42:1，只靠顏色無法分辨（WCAG 要求 ≥3:1）。
+  - **深底上的內文連結**：目前沒有；需要時依 §0 第 2 點詢問 An。
+  - 字級與字重跟所在內文，不另設；另加 §3.7 焦點外框。
+- 禁止：句中連結不畫底線；把內文連結做成按鈕或膠囊的樣子；自訂其他連結顏色。
+- 現況偏離：無。
+<!-- src: #33（An 2026-10-15 決策頁 3 q13 選 c）, decisions-2026-10-15c/questions.json -->
+
 ---
 
 ## 4. Molecules
@@ -603,9 +626,11 @@
   - 深底：小標籤 `<Eyebrow dark>`、h2 `section-heading text-white mb-4`、說明改 `text-on-dark`。
   - 靠左：旁邊是圖表或流程的雙欄版面（例：`components/home/IntentRefinerySection.tsx:20-26`）；容器不加 `text-center`，說明不加 `mx-auto`。
   - 小標籤 → h2「緊」（§3.8）；h2 → 說明 16（`mb-4`，含頁尾 CTA）；說明寬 576（`max-w-xl`）。
-  - 標題組與下方內容的距離：**未定案**（現況 `mb-10`／`mb-12`／`mb-14` 混用），依 §0 第 2 點詢問。<!-- src: 文件未定案清單 #12 -->
+  - 標題組與下方內容（卡片、表格、列表等）的距離 **48**：標題組容器加 `mb-12`（例：`components/pages/brands/BrandFAQ.tsx:54` 的 `text-center mb-12`）。量法：說明文字底部（沒有說明時是 h2 底部）到下方第一個內容元素頂部，手機與桌機相同。
+  - 不適用：標題組下方直接接按鈕或 email 欄（32，`mb-8`，§5.4 頁尾 CTA 與 §5.6 AI Mode 入口）；首頁靠左雙欄的 Intent Refinery（`components/home/IntentRefinerySection.tsx`，桌機旁邊是圖表）；法律頁條文小標（§6.5）。<!-- src: #33 -->
 - 禁止：h2 不用 `.section-heading` 而自訂字級；h2 下方用 `mb-3`／`mb-2`／`mb-5`；說明用 `max-w-3xl` 或不限寬；小標籤加 `block mb-*`。
 - 現況偏離：見 §10 DATAI-620（6 個頁尾 CTA 與一處 h2 → 說明不是 16；16 處說明寬不是 576；7 處小標籤「鬆」；首頁 Flywheel h2 沒用 `.section-heading`）
+- 現況偏離：見 §10 DATAI-620（標題組 → 內容距離不是 48 的 11 處：44（`mb-11`）`components/pages/decisive-engine/DecisionLoop.tsx:40`、`DecisiveEnginePageCTA.tsx:22`、`EngineAdvantages.tsx:23`、`EngineComparison.tsx:24`、`EngineUseCases.tsx:23`；40（`mb-10`）`components/pages/developers/DeveloperSpecs.tsx:25`、`components/home/FlywheelSection.tsx:61`、`components/pages/publishers/KnowledgeBaseSection.tsx:103`、`components/pages/publishers/ZeroClickSection.tsx:24`；56（`mb-14`）`components/pages/publishers/LayerOverview.tsx:98`、`components/pages/partnership/PartnershipEarnings.tsx:109`）<!-- src: #33 -->
 <!-- src: mol-heading-group, mol-heading-group-left, mol-heading-group-desc-width, mol-heading-group-h2-gap, mol-heading-group-eyebrow-gap, mol-heading-flywheel, #29-3, #30-2 -->
 
 ### 4.4 FAQ 單題
@@ -679,7 +704,7 @@
 ### 5.2 頁尾
 
 - 標準版：`components/layout/Footer.tsx`。
-- 規格：深色（`.section-dark`）；品牌區＋ Solutions／Resources／Legal 三欄；欄標題用 `Eyebrow`（現況 on-dark .85，寫法未定案，見 §3.8）；連結 14px on-dark、滑過白色；目前頁白色 600；**AI Mode 連結固定在 Partnership 與 Contact 之間**；寬度跟各頁內容（首頁 1152、內頁 1024，§2.12）。
+- 規格：深色（`.section-dark`）；品牌區＋ Solutions／Resources／Legal 三欄；欄標題用 `<Eyebrow color="rgba(168,197,195,0.85)">`（合規，見 §3.8）；連結 14px on-dark、滑過白色；目前頁白色 600；**AI Mode 連結固定在 Partnership 與 Contact 之間**；寬度跟各頁內容（首頁 1152、內頁 1024，§2.12）。
 - 禁止：放任何按鈕（包括 Try AI Mode 與外框次要按鈕）；寫死白色。
 - 現況偏離：見 §10 DATAI-619（寬度固定 1152）、DATAI-623（目前頁連結寫死 `#fff`；分隔線白 .08；LinkedIn 滑過白 .1）、DATAI-621（LinkedIn 圖示鈕 `p-1.5`）
 <!-- src: org-footer, tpl-container-footer, #7, #26 -->
