@@ -324,12 +324,13 @@
 **規則：過場短、只動實際變化的屬性；JS 動畫必須處理減少動態。**
 - 用在哪：滑過、展開等狀態過場，以及區塊進場動畫。
 - 寫法：
-  - CSS 過場時間 `duration-200`／`duration-300`；只過場實際會變的屬性（例如 `transition-colors`、`transition-opacity`、`transition-transform`）。
+  - 只過場實際會變的屬性（例如 `transition-colors`、`transition-opacity`、`transition-transform`）。
+  - 過場時間：**要指定時間時**只用 `duration-200`／`duration-300`；沒有指定時沿用 Tailwind 預設時間。按鈕與表單欄位照第 3 章的標準字串寫，不另加 `duration-*`。
   - 進場動畫：framer-motion 0.5 秒、`easeOut`、淡入上移；卡片依序延遲 0.1 秒。
   - 減少動態：CSS 由 `app/site-base.css` 的 `prefers-reduced-motion` 規則全站處理；JS 動畫要自行處理（規則見 §8）。
 - 禁止：`transition-all`。
 - 現況偏離：見 §10 DATAI-624（13 處 `transition-all`）、DATAI-627（JS 動畫未處理減少動態）
-<!-- src: tok-duration, tok-transition-all, tok-motion, cross-reduced-motion-js -->
+<!-- src: tok-duration, tok-transition-all, tok-motion, cross-reduced-motion-js, Task 4 review I1 -->
 
 ### 2.17 圖示
 
@@ -394,6 +395,7 @@
 
 - 不是按鈕：/content-owners/ 的「Talk to us」大卡片屬於**卡片家族**（§4.1），不套按鈕規則；導覽列與頁尾的文字連結屬於各自的 Organism（§5.1、§5.2）。
 - 全站行動按鈕只有藥丸一種形狀（`rounded-full`），一律 14／600（`text-sm font-semibold`）。
+- 圖示按鈕：全站只有頁尾 LinkedIn 一顆，規則見 §5.2。
 - 本章未收錄、**未定案**的元件：內容區的資訊小膠囊（非 Hero 小膠囊）、內文連結樣式。遇到時依 §0 第 2 點詢問。<!-- src: 文件未定案清單 #11, #13 -->
 <!-- src: atom-btn-primary, atom-btn-inline-submit, atom-btn-block, atom-btn-secondary-outline, atom-btn-dark-secondary, atom-btn-font, buttons.json A1–A9／B1–B6, #29-9 -->
 
@@ -409,11 +411,11 @@
 | 高度 | 標準寫法（新程式照抄） | 取自 |
 |---|---|---|
 | 44 | `inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90` | `components/ui/PlaygroundCTASection.tsx:72` |
-| 40 | `shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap` | `components/ui/InlineEmailCTA.tsx:116`（原始碼逐字） |
+| 40 | `shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-[opacity,transform] hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap` | `components/ui/InlineEmailCTA.tsx:116` |
 | 36 | `px-4 py-2 rounded-full text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-primary` | `components/layout/Nav.tsx:32` 的 `PRIMARY_BTN` |
 
-  - 44 與 36 的標準寫法和原始碼只差一處：原始碼的 `transition-all` 依 §2.16 改成只過場實際變化的屬性（滑過只變透明度 → `transition-opacity`）。原始碼現況：44 為 `inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-all hover:opacity-90`；36 為 `px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 bg-primary`。
-  - **40 未定案**：它的滑過（透明度）與按下（`active:scale-[0.98]` 縮放）會變兩個屬性，`transition-all` 要換成什麼、`active:scale-[0.98]` 是否列入標準都還沒裁決；在那之前照上表原始碼逐字寫法，不要自行改寫（依 §0 第 2 點詢問）。<!-- src: 文件未定案清單 #10 -->
+  - 三種高度的標準寫法和原始碼都只差一處：原始碼的 `transition-all` 依 §2.16 改成只過場實際變化的屬性。44 與 36 滑過只變透明度 → `transition-opacity`；40 滑過變透明度、按下（`active:scale-[0.98]`）變縮放 → `transition-[opacity,transform]`。過場時間都沿用預設，畫面不變。原始碼現況：44 為 `inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-all hover:opacity-90`；40 為 `shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap`；36 為 `px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 bg-primary`。
+  - `active:scale-[0.98]`（按下微縮）**只屬於 40 送出鈕**的現況寫法，保留在這顆上；不是通則，不加到 44、36 或其他按鈕。<!-- src: Task 4 review #10 -->
   - 40 的 `py-2.5` 是 §2.10 的按鈕例外，保留。
   - 送出中的狀態用 `disabled:opacity-60`（§2.4）。
   - 導覽型按鈕要呼叫 `trackCTA`（第 7 章）。
@@ -443,7 +445,8 @@
 | 44 | `inline-flex items-center justify-center px-[calc(1.5rem-1px)] py-[calc(0.75rem-1px)] rounded-full text-sm font-semibold border border-primary bg-white text-primary transition-colors hover:bg-primary hover:text-white` | 由 §3.2 標準 44 的內距各扣 1px 框線推得（DATAI-624 把手機選單外框那顆改成此寫法） |
 
   - `app/site-base.css` 的 `.pill-btn` 由 DATAI-624 對齊上表（1px 框、600 字重、同高、不用 `transition: all`），之後只留一份定義。
-- 禁止：1.5px 框線；字重 500；與旁邊實心按鈕不同高；在 DATAI-624 完成前單獨使用 `.pill-btn`（目前它的框線、字重與內距都不符標準）；用在深底（改用 §3.5）。
+- 禁止：1.5px 框線；字重 500；與旁邊實心按鈕不同高；用在深底（改用 §3.5）。
+- 注意：DATAI-624 完成前，現行 `.pill-btn` 是現況偏離，不可當範本（§0 第 4 點）；新寫淺底外框一律用上表字串。
 - 現況偏離：見 §10 DATAI-624（`.pill-btn` 與導覽列外框按鈕兩份定義；手機選單外框鈕用 `h-11` 定高；`transition-all`）
 <!-- src: atom-btn-secondary-outline, buttons.json A4／A5, #29-9(4), #30-4 -->
 
@@ -452,7 +455,7 @@
 **規則：深底的次要行動用 `.pill-btn--dark`；只作次要按鈕，與旁邊主要按鈕同高。**
 - 用在哪：深色區塊內、與實心按鈕並排的次要行動（例：404 CDN 版「Contact Us」）。
 - 寫法：`pill-btn pill-btn--dark`（`.pill-btn--dark` 疊在 `.pill-btn` 上）。顏色由類別提供：透明底、on-dark 字、on-dark .4 框；滑過為主色 .6 底、白字、`--color-primary-light` 框。字級 14／600、框線 1px、高度與旁邊主要按鈕相同——這三點要等 DATAI-624 統一 `.pill-btn` 定義後由類別提供。
-- **未定案**：DATAI-624 完成前，現行類別無法與 44 實心同高（只能 inline 覆寫內距與字重，屬偏離）；需要新增深底外框時依 §0 第 2 點詢問。<!-- src: 文件未定案清單 #14 -->
+- 注意：DATAI-624 完成前，現行類別無法與 44 實心同高（404 CDN 版用 inline 覆寫，屬現況偏離，不可當範本，§0 第 4 點）；這段期間需要新增深底外框時，依 §0 第 2 點先詢問。<!-- src: Task 4 review #14 -->
 - 禁止：當主要按鈕；用在淺底；用 inline `style` 覆寫內距或字重。
 - 頁尾不放任何按鈕（§5.2）。
 - 現況偏離：見 §10 DATAI-624（404 CDN 版用 inline 覆寫內距與字重；`.pill-btn` 的 1.5px 框線與 `transition: all`）
@@ -493,7 +496,8 @@
 - 寫法：`<Eyebrow>`（`components/ui/Eyebrow.tsx`，渲染 `.label-eyebrow`：12／600／大寫／字距 0.1em）。顏色依底色選參數：
   - 淺底：預設（主色）——`<Eyebrow>`
   - 深底：`dark`（on-dark）——`<Eyebrow dark>`
-  - 痛點段落：`color="var(--color-warn-deep)"`（例：`components/pages/brands/BrandPainSection.tsx:58`）
+  - 痛點段落：`color="var(--color-warn-deep)"`（例：`components/pages/brands/BrandPainSection.tsx:58`；該行的 `className="mb-3"` 不要抄）
+  - 頁尾欄標題：現況用 `color="rgba(168,197,195,0.85)"`（`components/layout/Footer.tsx:30`）；`dark` 參數給的是不透明 on-dark，改用會讓畫面變亮，頁尾欄標題的寫法**未定案**。<!-- src: 文件未定案清單 #17 -->
   - 與 h2 的距離「緊」：小標籤維持行內元素，**不加 `block`、不加 `mb-*`**（畫面上字到字約 16px）。行內元素上的 `mb-*` 本來就不會生效（§0 第 6 點）。
   - `.label-eyebrow-md`（14px）：現況只用於 /brands/ 深色區塊「Your audience didn't disappear.」這行較大的標示文字（`components/pages/brands/BrandGEOSection.tsx:102`）。
 - 禁止：用 className 覆寫顏色（例如 `className="text-on-dark/55"`，靠 tailwind-merge 剃掉預設色才生效，元件一改就失效）；加 `block mb-3` 拉開距離；深底小標籤 α 低於 .85。
@@ -529,8 +533,7 @@
 - 用在哪：區塊內或同色相鄰區塊之間的細線、列表列線、Hero 底線。
 - 寫法：淺底 `border-line`（例：`border-t border-line`）；深底 on-dark .12，用 class 寫法（例：`border-t border-on-dark/12`，§2.3）。
 - 禁止：黑色或白色透明的線（例如 `rgba(0,0,0,0.08)`、`border-white/8`）；1px 以外的粗細。
-- 現況偏離：見 §10 DATAI-623（淺底分隔線與三頁 FAQ 列線用黑色透明；頁尾用白 .08）
-- 注意：多處深底細線目前是 inline `rgba(168,197,195,0.12)` 寫法，改成 class 寫法是否列入修正票**未定案**。<!-- src: 文件未定案清單 #16 -->
+- 現況偏離：見 §10 DATAI-623（淺底分隔線與三頁 FAQ 列線用黑色透明；頁尾用白 .08；各頁 Hero 底線與深底細線用 inline `rgba(168,197,195,0.12)` 寫法）<!-- src: Task 4 review I2 -->
 <!-- src: atom-divider, tok-border-width -->
 
 ### 3.12 圖示底座
@@ -549,7 +552,7 @@
 - 用在哪：卡片數字的計數動畫（例：/content-owners/ 痛點數據 `components/pages/publishers/ZeroClickSection.tsx:51`）。
 - 寫法：`<NumberTicker value={…} suffix="…" duration={…} />`（`components/ui/NumberTicker.tsx`；`duration` 預設 1200ms）；字級與顏色由外層決定（§4.5）。
 - 禁止：在元件內寫死字級或顏色。
-- 注意：首頁 Flywheel 另有自己的 `CountUp`（`components/home/FlywheelSection.tsx:7`），是否改用 `NumberTicker` **未定案**。<!-- src: 文件未定案清單 #15 -->
+- **例外（核准）**：首頁 Flywheel 的展示大數字用元件內自己的 `CountUp`（`components/home/FlywheelSection.tsx:7`），保留，不改用 `NumberTicker`；只限這一處，不可照抄到其他地方。<!-- src: An 2026-10-15 裁決（Task 4 review #15） -->
 - JS 動畫要處理減少動態（第 8 章）。
 <!-- src: mol-stat-cell, 附錄 A §3 -->
 
@@ -628,8 +631,8 @@
 |---|---|---|
 | 展示大數字 | 整個區塊的主角（深色區塊） | `font-black tabular-nums leading-none text-white`＋`letterSpacing: '-0.04em'`；字級用 clamp：首頁 `clamp(2.5rem, 7vw, 4.5rem)`（`components/home/FlywheelSection.tsx:98-100`）、/brands/ `clamp(2rem, 11vw, 9rem)`（`components/pages/brands/BrandGEOSection.tsx:116-118`） |
 | 卡片數字・主角 | 數字是卡片的主角（例：/content-owners/ 痛點數據） | 48／700：`text-4xl md:text-5xl font-bold`（`components/pages/publishers/ZeroClickSection.tsx:49`）；痛點段落用 `text-warn` |
-| 卡片數字・規格之一 | 數字只是規格之一（例：/developers/ 規格卡） | 20／700：`text-xl font-bold text-primary`（`components/pages/developers/DeveloperSpecs.tsx:50`） |
-| 方案價格 | 方案卡價格 | 36／900：`text-4xl font-black text-primary`（`components/pages/partnership/PartnershipMembership.tsx:51`） |
+| 卡片數字・規格之一 | 數字只是規格之一（例：/developers/ 規格卡） | 20／700：`text-xl font-bold text-primary`（`components/pages/developers/DeveloperSpecs.tsx:50`，省略原始碼排版用的 `mb-1`） |
+| 方案價格 | 方案卡價格 | 36／900：`text-4xl font-black text-primary`（`components/pages/partnership/PartnershipMembership.tsx:50`） |
 
 - 計數動畫用 `NumberTicker`（§3.13）。
 - 禁止：上表以外的數字字級；用 inline `style` 上色。
@@ -676,14 +679,14 @@
 ### 5.2 頁尾
 
 - 標準版：`components/layout/Footer.tsx`。
-- 規格：深色（`.section-dark`）；品牌區＋ Solutions／Resources／Legal 三欄；欄標題用 `Eyebrow`（on-dark .85）；連結 14px on-dark、滑過白色；目前頁白色 600；**AI Mode 連結固定在 Partnership 與 Contact 之間**；寬度跟各頁內容（首頁 1152、內頁 1024，§2.12）。
+- 規格：深色（`.section-dark`）；品牌區＋ Solutions／Resources／Legal 三欄；欄標題用 `Eyebrow`（現況 on-dark .85，寫法未定案，見 §3.8）；連結 14px on-dark、滑過白色；目前頁白色 600；**AI Mode 連結固定在 Partnership 與 Contact 之間**；寬度跟各頁內容（首頁 1152、內頁 1024，§2.12）。
 - 禁止：放任何按鈕（包括 Try AI Mode 與外框次要按鈕）；寫死白色。
 - 現況偏離：見 §10 DATAI-619（寬度固定 1152）、DATAI-623（目前頁連結寫死 `#fff`；分隔線白 .08；LinkedIn 滑過白 .1）、DATAI-621（LinkedIn 圖示鈕 `p-1.5`）
 <!-- src: org-footer, tpl-container-footer, #7, #26 -->
 
 ### 5.3 Hero
 
-- 標準版：/brands/（`app/brands/page.tsx:28-41`）、/content-owners/、/book-a-demo/ 三頁一致的版本。Hero 沒有共用元件，各頁自己寫，照標準版的結構。
+- 標準版：以 /brands/（`app/brands/page.tsx:28-41`）為準；/content-owners/、/book-a-demo/ 結構相同（/book-a-demo/ 的 h1 少 `text-balance`，屬現況偏離）。Hero 沒有共用元件，各頁自己寫，照標準版的結構。
 - 規格：深色、上 128／下 48、底部 1px on-dark .12 細線、768 容器、小膠囊＋h1＋說明，置中：
   ```
   <div className="section-dark pt-32 pb-12 text-center border-b border-on-dark/12">
@@ -698,9 +701,8 @@
   - /book-a-demo/ 的 Hero 容器為 672（`max-w-2xl`，§2.12）。
   - **例外（核准）**：/decisive-engine/ Hero 文字區 768，底部膠囊列維持 1024（`max-w-5xl`）。
   - **首頁 Hero 是首頁專屬**（`components/home/HeroSection.tsx`：白底、標準淺底光暈、h1 另加 ≤420px 27px 與 `tracking-tight`），不可照抄到其他頁。
-  - 法律頁與 /book-a-demo/ 的 h1 沒有 `text-balance`；各頁 Hero 底線目前是 inline `rgba` 寫法。兩者是否列為偏離**未定案**。<!-- src: 文件未定案清單 #16 -->
 - 禁止：其他上下距；省略底部細線；h1 用其他字級；Hero 內放 Try AI Mode。
-- 現況偏離：見 §10 DATAI-626（/developers/、/partnership/、/decisive-engine/ 的下距、細線與 h1；404／錯誤頁標題）、DATAI-625（小膠囊手寫）、DATAI-623（inline `style` 上色）
+- 現況偏離：見 §10 DATAI-626（/developers/、/partnership/、/decisive-engine/ 的下距、細線與 h1；/privacy-policy/、/terms-of-service/、/book-a-demo/ 的 h1 少 `text-balance`；404／錯誤頁標題）、DATAI-625（小膠囊手寫）、DATAI-623（inline `style` 上色；底線用 inline `rgba` 寫法）<!-- src: Task 4 review I2, I3 -->
 <!-- src: org-hero-structure, org-hero-h1-standard, org-hero-home, org-hero-h1-h2-clash, page-book-a-demo, #26, #29-2, #31-9 -->
 
 ### 5.4 頁尾 CTA
@@ -727,6 +729,7 @@
 - 標準版：`components/pages/brands/BrandFAQ.tsx`（與 `ContentOwnerFAQ.tsx`、`EngineFAQ.tsx` 三份一致）。
 - 規格：白底 `section-white pt-8 pb-16 lg:pb-20`（§2.11；**接在深色區塊之後時，上方改用一般區塊距離**）；1024 容器；置中標題組「FAQ」＋「Common questions.」（`.section-heading`）；每題照 §4.4。
 - **必帶 FAQPage JSON-LD**（`components/pages/brands/BrandFAQ.tsx:35-49`）。
+- 照抄標準版時注意：`BrandFAQ.tsx:60` 的 `<Eyebrow className="mb-3">` 不要抄（§3.8，小標籤不加 `mb-*`）。
 - 禁止：沒有 JSON-LD 的 FAQ；自訂題目樣式。
 - 現況偏離：見 §10 DATAI-619（/decisive-engine/ FAQ 緊接深色區塊、上方只有 32）、DATAI-623（列線）、DATAI-627（aria）、DATAI-625（焦點外框）
 <!-- src: org-faq-group, org-faq-top-after-dark, cross-faq-jsonld -->
@@ -784,6 +787,7 @@
 - 標準版：`app/brands/page.tsx`。
 - 區塊順序：深 Hero（§5.3）→ 白 痛點 → 深 方案（含 AI Mode 入口 `variant="embedded"`）→ 白 比較＋細線＋FAQ（§5.5）→ 深 頁尾 CTA（§5.4）。
 - /content-owners/、/developers/、/partnership/ 屬同一類；/content-owners/ 的連續同色區塊已接受（同色相鄰可細線或不區隔）。
+- 禁止：深色 Hero 以外的開頭；淺灰區塊；省略頁尾 CTA；有 FAQ 卻不帶 JSON-LD。
 - 現況偏離：見 §10 DATAI-619（區塊上下距）、DATAI-626（/developers/、/partnership/ Hero）
 <!-- src: tpl-order-alternation, tpl-order-content-owners, page-brands -->
 
@@ -792,6 +796,7 @@
 - 標準版：`app/decisive-engine/page.tsx`（DATAI-619 把淺灰區塊改白之後）。
 - 區塊順序：深 Hero（膠囊列 1024 例外）→ 白 決策迴圈 → 白 優勢 → 白 比較 → 白 使用案例 → 深 結果區 → 白 FAQ（上方用一般區塊距離）→ 深 頁尾 CTA（產品頁變體「Contact Us」，§5.4）。
 - 連續白底之間可用細線區隔或不區隔（§6.1）。
+- 禁止：淺灰交替；FAQ 緊貼深色區塊（上方只留 32）；頁尾 CTA 改回 email 欄（產品頁用「Contact Us」變體）。
 - 現況偏離：見 §10 DATAI-619（淺灰交替、FAQ 上方距離、區塊上下距）、DATAI-626（Hero）、DATAI-628（頁尾按鈕追蹤）
 <!-- src: tpl-order-de-surface, page-decisive-engine, org-faq-top-after-dark, org-de-cta-form -->
 
@@ -800,6 +805,7 @@
 - 標準版：`app/page.tsx`。
 - 區塊順序：白 Hero（`HeroSection`）→ 白 身分卡 → 深 Flywheel → 白 Intent Refinery → 深 頁尾 CTA（白／白／深／白／深）。
 - 首頁專屬項目：白底全螢幕 Hero 與其 h1 寫法（≤420px 27px、`tracking-tight`）、內容與頁尾 1152（`max-w-6xl`）、標準淺底光暈的首頁 Hero 用法。這些只限首頁，其他頁不可用。
+- 禁止：把首頁的 1152 容器、白底全螢幕 Hero 或白／白開頭用在其他頁。
 - 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）、DATAI-620（Flywheel h2）、DATAI-625（身分卡圖示底座）、DATAI-624（身分卡按鈕）、DATAI-628（身分卡按鈕追蹤）、DATAI-556（身分卡標題 18 → 24）
 <!-- src: tpl-order-home, tpl-container-home-6xl, org-hero-home, page-home -->
 
@@ -816,6 +822,7 @@
 
 - 標準版：`app/book-a-demo/page.tsx`。
 - 結構：深 Hero（容器 672 `max-w-2xl`）→ 白 表單區（一般區塊上下距；容器 512 `max-w-lg`）。表單欄位 §3.10、送出用滿版藥丸 §3.3。
+- 禁止：表單區用其他容器寬；方角送出鈕；自做另一套欄位樣式。
 - 現況偏離：見 §10 DATAI-619（表單區上下距）、DATAI-624（送出鈕）、DATAI-623、DATAI-625
 <!-- src: page-book-a-demo, tpl-container-widths -->
 
@@ -828,6 +835,7 @@
   - 說明：`text-base mb-8 text-on-dark`。
   - 按鈕：§3.2 標準 44 實心；CDN 版另有 §3.5 深底外框。
   - 兩個 404 版本以 `.nf-cdn`／`.nf-default` 切換（只用於 404）。
+- 禁止：大字用主色；標題用 36；按鈕 inline 上色。
 - 現況偏離：見 §10 DATAI-626（標題目前 36）、DATAI-622（大字目前主色）、DATAI-624（按鈕寫法、深底外框 inline 覆寫）、DATAI-628（404 按鈕追蹤）
 <!-- src: page-404, page-error, #31-1 -->
 
