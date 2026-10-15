@@ -23,8 +23,8 @@
    <!-- src: #30 -->
 6. **量間距、量字級以瀏覽器實測為準**，不要用 class 推算（例：行內小標籤上的 `mb-*` 不會產生間距）。
    <!-- src: #29 方法學, mol-heading-group-eyebrow-gap -->
-7. 第 7–10 章撰寫中；在那之前，行為契約、無障礙與新增頁面 SOP 一律視為「文件沒寫到」，依第 2 點處理。第 3–6 章引用的 §10 待修清單也在撰寫中，票號以各規則「現況偏離」行為準。
-   <!-- src: #28 -->
+7. **畫面以外的約定**（追蹤、結構化資料、sitemap、導覽列、CSS 入口檔）在第 7 章，無障礙在第 8 章，新增頁面照第 9 章 SOP；核准例外與待修清單在第 10 章。照抄任何現有程式前，先查 §10.2 待修清單。
+   <!-- src: #28, 附錄 A §7–§10 -->
 
 ---
 
@@ -869,18 +869,243 @@
 - `/ai-mode-playground/` 是例外，版型、字級與間距不可照抄、不計入任何慣例（§0 第 3 點）；對齊另由 DATAI-630 處理。
 <!-- src: tpl-ai-mode, #20, #28 -->
 
+---
+
 ## 7. 行為契約與技術約束
 
-（Task 5 撰寫）
+本章寫的是畫面以外、改程式時一定要守的約定。違反時畫面可能看起來正常，但追蹤、搜尋收錄或樣式會無聲失效。
+
+### 7.1 CTA 點擊追蹤（`trackCTA`）
+
+**規則：每個導覽型 CTA（點了會換頁或前往預約頁的按鈕與卡片）都要呼叫 `trackCTA(label, position)`。**
+- 用在哪：行動按鈕（§3.2、§3.3）、外框按鈕（§3.4、§3.5）、「Talk to us」這類可點的大卡片。
+- 寫法：在 `onClick` 呼叫 `trackCTA`（`lib/analytics.ts:28`，送出 GA4 `click_cta` 事件，參數 `cta_label`／`cta_position`／`page_audience`）。
+  - `label`＝**畫面上的按鈕文字**（例：`trackCTA('Book a Demo', 'nav')`，`components/layout/Nav.tsx:267`）。
+  - `position`＝按鈕位置，沿用既有命名（例：導覽列 `nav`、手機導覽列 `nav_mobile_header`、滿版選單 `nav_mobile`、/content-owners/ 區塊 `content_owners_section`）；共用元件由參數傳入（例：`PlaygroundCTASection` 的 `trackingPosition`、`InlineEmailCTA` 的 `ctaLabel`）。
+- 不適用（維持現狀）：`InlineEmailCTA` 只在送出成功後記錄（`components/ui/InlineEmailCTA.tsx:48`）；/book-a-demo/ 表單送出記錄 `contact_form_submit` 事件；錯誤頁「Try again」是重試，不是 CTA。
+- 禁止：導覽型 CTA 不呼叫 `trackCTA`；`label` 與畫面文字不同。
+- 現況偏離：見 §10 DATAI-628（首頁身分卡 3 顆、/decisive-engine/ 頁尾「Contact Us」、404 三顆沒有 `trackCTA`；「Talk to us」卡片記錄成「Get Started」）
+<!-- src: cross-trackcta, lib/analytics.ts:27, #26, #31-11 -->
+
+### 7.2 FAQ 結構化資料
+
+**規則：每個 FAQ 區塊都要輸出 FAQPage JSON-LD。**
+- 用在哪：所有 FAQ 區塊（§5.5）。
+- 寫法：照 `components/pages/brands/BrandFAQ.tsx:35-49`，在區塊內放 `<script type="application/ld+json">`，`@type: 'FAQPage'`，`mainEntity` 由畫面渲染用的**同一個題目陣列**產生（每題 `Question`＋`acceptedAnswer`），確保結構化資料與畫面文字一致。
+- 禁止：沒有 JSON-LD 的 FAQ；JSON-LD 另寫一份與畫面不同的題目或答案。
+- 現況：三個 FAQ（/brands/、/content-owners/、/decisive-engine/）都已符合。
+<!-- src: cross-faq-jsonld, org-faq-group -->
+
+### 7.3 新頁面進 sitemap 與 llms.txt
+
+**規則：新增頁面時，同時加進 `public/sitemap.xml` 與 `public/llms.txt`。**
+- 寫法：
+  - `public/sitemap.xml`：加一個 `<url>`，`<loc>` 用 `https://www.mlytics.com/<路徑>/`（結尾斜線，與既有項目一致）。
+  - `public/llms.txt`：加一行 Markdown 連結 `- [名稱](https://www.mlytics.com/<路徑>)：一句說明`，放在對應段落。
+- CI 把關：`__tests__/public/llms-sitemap.test.ts` 檢查 sitemap 裡的每一頁（首頁除外）都在 llms.txt 有連結，漏加會讓 CI 失敗。
+- 注意：**頁面有沒有加進 sitemap 本身沒有自動檢查**，要人工確認（§9 檢查表）。
+- 未定案：現有 /book-a-demo/、/privacy-policy/、/terms-of-service/ 都不在 sitemap；哪些類型的新頁面可以不列入 sitemap 尚未決定，遇到時依 §0 第 2 點詢問。<!-- src: 文件未定案清單 #18 -->
+<!-- src: 附錄 A §7, __tests__/public/llms-sitemap.test.ts, #2, #8 -->
+
+### 7.4 導覽列的技術約束
+
+**規則：改 `components/layout/Nav.tsx` 前必讀；以下每一條違反都會讓導覽列或 AI Mode 頁壞掉。**
+- 滿版選單必須是 `<nav>` 的**兄弟元素**：`<nav>` 帶 transform／`backdrop-blur`，會成為 fixed 子元素的定位容器，選單會被困在 65px 導覽列內。
+- 選單內不可含 `<nav>`／`<header>`：AI Mode 頁的 `useNavOffset` 以 `header, nav` 找導覽列。
+- 導覽列高度維持 65px。
+- 桌機斷點一律用 `matchMedia('(min-width: 64rem)')`（`Nav.tsx:27` 的 `DESKTOP_QUERY`），與 Tailwind `lg:` 一致。
+- 選單的行為：dialog／`aria-modal`、開啟時焦點到關閉鈕、關閉回漢堡鈕、Tab 焦點陷阱、Esc 關閉、背景捲動鎖＋`inert`、換頁與放大到桌機寬度自動關閉、減少動態時不淡入淡出、淡出期間不可點、關閉後 250ms 內忽略重開。改動後這些行為都要保留。
+- 入口排法與追蹤位置見 §5.1。
+- 禁止：把選單移進 `<nav>`；在選單內加 `<nav>`／`<header>`；改導覽列高度；另寫一套斷點判斷。
+<!-- src: #26, org-nav, org-nav-entry -->
+
+### 7.5 Tailwind v4 與樣式的無聲失效陷阱
+
+**規則：以下寫法不會報錯，但樣式會被靜默丟棄或被蓋掉；寫完一律在瀏覽器確認 computed style。**
+1. **自訂 token 撞 Tailwind 內建色名**：例如自訂 `--color-amber` 會無聲失效，所以痛點色叫 `warn`（`app/site-base.css:25-28` 註解）。新 token 不可用 Tailwind 內建色系名稱。
+2. **字級 token 必須叫 `--text-*`**：`--font-size-*` 不會產生 class（§2.8，DATAI-556 處理）。
+3. **自訂 class 內的 `text-wrap` 要用 `@apply`**：例如 `.section-heading` 寫 `@apply text-balance;`（`app/site-base.css:121`），不要手寫 `text-wrap` 屬性。
+4. **`Eyebrow` 靠 `cn()`（tailwind-merge）合併 class**（`lib/utils.ts`）：用 className 覆寫顏色會靠 tailwind-merge 剃掉預設色才生效，元件一改就失效。換色一律用元件參數（§3.8）。
+5. **未分層的自訂 class 會蓋過 Tailwind utilities**：`app/site-base.css` 的 `.pill-btn` 等類別不在 `@layer` 內，同一元素上的 Tailwind 內距 class 會被它蓋掉（`components/layout/Nav.tsx:34-40` 註解）。不要在 `.pill-btn` 上疊內距 utilities 調高度（§3.4、§3.5）。
+- 現況偏離：見 §10 DATAI-556（字級 token 失效）、DATAI-625（4 處小標籤用 className 覆寫顏色）、DATAI-624（`.pill-btn` 定義）
+<!-- src: 附錄 A §7, tok-font-size-token-broken, atom-eyebrow-override-risk, atom-btn-secondary-outline -->
+
+### 7.6 量測以瀏覽器為準
+
+**規則：間距、字級、顏色、對比一律在瀏覽器量 computed style 與畫面，不用 class 推算。**
+- 用在哪：寫新區塊、驗收修正票、回報偏離。
+- 寫法：在 375／768／1280 三種寬度量；間距量「字到字」或「元素邊到元素邊」的實際距離。
+- 典型陷阱：行內小標籤（`<Eyebrow>` 是 `<span>`）上的 `mb-*` 不會產生間距；`block mb-3` 才會（所以標題組的「鬆」來自 `block`，§3.8）。
+- 禁止：只看原始碼的 class 就判定符合標準。
+<!-- src: #29 方法學, mol-heading-group-eyebrow-gap -->
+
+### 7.7 CSS 入口檔與掃描範圍
+
+**規則：token 與共用類別只寫在 `app/site-base.css`；`app/globals.css` 只放 import 與掃描設定。**
+- 三個檔案的分工：
+  - `app/site-base.css`：所有 token（`@theme`、`:root`）、共用類別（§2.18）、`body`、捲軸、減少動態規則。
+  - `app/globals.css`：網站的 CSS 入口，只做 `@import "tailwindcss"`、`@import "./site-base.css"`，以及用 `@source not` 排除 `DESIGN.md`、`stories/`、`.storybook/`、`*.stories.tsx`、`*.mdx`。
+  - `.storybook/storybook.css`：Storybook 的入口，同樣 import `app/site-base.css`，另外用 `@source` 掃描 story 檔與 `DESIGN.md`。
+- 為什麼排除：Tailwind v4 會掃描所有未被 gitignore 的檔案，文件與 story 裡的範例 class 會流進網站 CSS，讓網站外觀在沒改任何頁面的情況下改變。所以文件與 Storybook 的 class 只進 Storybook 的 CSS，不進網站 CSS。
+- 寫法：
+  - 新增或修改 token、共用類別：改 `app/site-base.css`。
+  - 新增一種文件或 story 檔案類型：同時在 `app/globals.css` 加 `@source not` 排除，並在 `.storybook/storybook.css` 加 `@source`。
+  - `storybook-static/`（Storybook 建置輸出）必須留在 `.gitignore`，否則會被網站 CSS 掃到。
+- 注意：有 5 處程式註解仍寫「globals.css」（`components/not-found/NotFoundContent.tsx:16`、`components/not-found/variantScript.ts:19`、`components/layout/Nav.tsx:34`、`components/pages/ai-mode-playground/AiModePlayground.tsx:87`、`components/pages/ai-mode-playground/ExperiencePanel.module.css:339`），規則實際都已在 `app/site-base.css`，讀到時以 `site-base.css` 為準。
+- 禁止：在 `app/globals.css` 寫任何樣式規則；在文件或 story 用網站沒有的 class 卻不排除掃描。
+<!-- src: #32, app/globals.css, .storybook/storybook.css, assumption-check 第 2 輪 #3（storybook-static 實測） -->
+
+### 7.8 Storybook
+
+**規則：Storybook 只在本機看元件的樣子；新增共用元件要同時處理 Storybook。**
+- Storybook **不經過 `app/layout.tsx`**：沒有導覽列、頁尾、GA 與 HubSpot 追蹤、全站 JSON-LD。依賴這些的元件，在 story 裡要自己提供需要的外層。好處是在 Storybook 點按鈕不會送出追蹤。
+- 新增共用元件時：
+  - 沒有待修項目 → 同時加 story。
+  - 有待修項目 → 列入 Storybook 的待修元件清單（`stories/_data/registry.ts`），寫上修正票號；修正票完成後再換成 story。
+- CI 會渲染每一個 story 並跑無障礙檢查（`__tests__/design-system/stories-render.test.tsx`），任一 story 出錯會讓 CI 失敗。
+- 規則以本文件為準（§0 第 5 點）。
+<!-- src: #30, 附錄 A §7 -->
+
+---
 
 ## 8. 無障礙
 
-（Task 5 撰寫）
+### 8.1 文字對比
+
+**規則：文字對比達 WCAG AA。**
+- 用在哪：所有文字，包括提示文字（placeholder）與 SVG 圖表文字。
+- 寫法：
+  - 一般文字 ≥4.5:1；大字（24px 以上，或 18.66px 以上粗體）≥3:1。
+  - 深底（`--bg-dark`）上的淡綠字透明度 ≥.85（§2.3）。
+  - `text-ink-subtle` 不可用於文字（§2.1），淡一階的文字用 `text-ink-muted`。
+  - 主色底上的文字一律白色（§2.3）。
+  - 疊在半透明卡片上的文字，用實際合成後的背景色計算對比。
+- 禁止：只靠目測判斷對比；用透明度把文字調淡到低於上述門檻。
+- 現況偏離：見 §10 DATAI-622
+<!-- src: cross-contrast-list, cross-contrast-ink-subtle, tok-on-dark-085, cross-contrast-card-number -->
+
+### 8.2 鍵盤焦點
+
+**規則：所有互動元素用全站同一個焦點外框，表單欄位也要有。**
+- 寫法與禁止：見 §3.7。深底上的外框對比要實測，不足時回報。
+- 現況偏離：見 §10 DATAI-625
+<!-- src: atom-focus, atom-focus-form -->
+
+### 8.3 語意與鍵盤操作
+
+**規則：可點的元素一定是 `<button>`（頁內操作）或 `<a>`（換頁），並讓讀屏軟體知道狀態。**
+- 用在哪與寫法：
+  - 可展開的題目（FAQ）：題目列是 `<button>`，加 `aria-expanded`（展開狀態）＋`aria-controls`（指向答案區塊的 id）。
+  - 步驟清單（分頁式）：用 tab 語意（`role="tab"`、`aria-selected` 標記目前選中項），可用方向鍵切換。
+  - 輪播點：要有可讀的標籤（例：第幾張）。
+  - 滿版選單：dialog 語意與焦點管理（§7.4）。
+  - 句中連結要畫底線，不可只靠顏色分辨（§3.15）。
+- 禁止：`onClick` 加在 `<div>`／`<span>` 上；可展開或可切換的元件沒有狀態屬性。
+- 現況偏離：見 §10 DATAI-627（FAQ 與步驟清單缺狀態屬性與鍵盤操作；首頁流程列是可點的 `<div>`；輪播點缺標籤）
+<!-- src: cross-aria-disclosure, #29-9(7), #26, #33 -->
+
+### 8.4 減少動態
+
+**規則：使用者開啟「減少動態效果」時，動畫要停。**
+- CSS：`app/site-base.css` 的 `prefers-reduced-motion` 規則已把全站 CSS 動畫與過場壓到 0.01ms，不需另寫。
+- JS 動畫要自行處理，分三類：
+  1. **位移**（上移、縮放等）：要停。
+  2. **淡入**：framer-motion 的全站設定只停位移、不停淡入，淡入要另外處理。
+  3. **`setInterval` 自動輪播**（Hero 標題輪播、流程與步驟輪播、地圖光點）：停止自動切換。
+  - 現有範例：導覽列滿版選單用 framer-motion 的 `useReducedMotion`（`components/layout/Nav.tsx:64`），減少動態時不淡入淡出。
+- 禁止：新增 JS 動畫卻不處理減少動態。
+- 現況偏離：見 §10 DATAI-627（34 個使用 framer-motion 的檔案只有導覽列處理；4 個 `setInterval` 輪播未處理）
+<!-- src: cross-reduced-motion-js, tok-motion -->
+
+### 8.5 點擊範圍
+
+**規則：可點元素的點擊範圍至少 24×24。**
+- 寫法：小圖示按鈕用內距補足點擊範圍（例：手機選單開關 `p-[11px]`＋22px 圖示＝44×44，§2.10 例外 1）。
+- 例外（已明確接受）：輪播點維持 5×5（可能不符 WCAG 2.5.8，§3.6）。
+- 禁止：新增小於 24×24 的可點元素。
+<!-- src: 附錄 A §8, #29 明確接受的取捨 -->
+
+### 8.6 已接受的取捨
+
+以下兩點已知不理想，An 已明確接受，不需回報、也不要自行修正：
+- 深底上主色按鈕的形狀對比約 1.55:1（§3.2）。
+- 桌機 h1 與 h2 同為 48（§2.7）。
+<!-- src: cross-dark-primary-shape, #29 明確接受的取捨, #26 -->
+
+---
 
 ## 9. 新增頁面 SOP
 
-（Task 5 撰寫）
+**規則：新頁面照第 6 章的骨架組，用第 3–5 章既有的元件，上線前逐項跑完檢查表。**
+
+1. **選骨架**（第 6 章）：受眾頁照 /brands/（§6.2）、產品頁照 /decisive-engine/（§6.3）、法律頁（§6.5）、表單頁（§6.6）。首頁（§6.4）與 AI Mode 頁（§6.8）**不可當骨架**。
+2. **組區塊**：Hero（§5.3）、標題組（§4.3）、卡片（§4.1、§4.2）、FAQ（§5.5）、頁尾 CTA（§5.4）都用既有寫法或共用元件；照抄標準版前先看 §10 有沒有待修項目。
+3. **文件沒寫到的**：停下，依 §0 第 2 點詢問，確認後才做，做完把新規則補進本文件。
+4. **上線前檢查表**：
+   - [ ] metadata：頁面 export `metadata`，含 `title`、`description`、`openGraph`（`title`／`description`／`url`）、`twitter`、`alternates.canonical`（照 `app/brands/page.tsx:9-22`；`title` 會自動加上 `| Mlytics Cortex`）。
+   - [ ] sitemap：`public/sitemap.xml` 已加入（§7.3；沒有自動檢查）。
+   - [ ] llms.txt：`public/llms.txt` 已加入連結（§7.3；CI 會擋）。
+   - [ ] FAQ JSON-LD：有 FAQ 就有 FAQPage JSON-LD（§7.2）。
+   - [ ] `trackCTA`：每個導覽型 CTA 都有，`label` 與畫面文字一致（§7.1）。
+   - [ ] 375／768／1280 三種寬度都沒有水平捲動。
+   - [ ] 對比：文字對比達 AA（§8.1），在瀏覽器實測。
+   - [ ] 焦點：用 Tab 鍵走過所有互動元素，每一個都看得到焦點外框（§8.2）；可展開／可切換元件有狀態屬性（§8.3）。
+   - [ ] 減少動態：開啟系統「減少動態效果」後，JS 動畫與輪播都停（§8.4）。
+   - [ ] 測試：`npx vitest run --dir ./__tests__` 全部通過，`npm run build` 成功。
+<!-- src: 附錄 A §9, app/brands/page.tsx, app/layout.tsx -->
+
+---
 
 ## 10. 例外與待修清單
 
-（Task 5 撰寫：例外清單與每張修正票一列）
+### 10.1 核准例外
+
+以下是 An 核准、**只限列出的位置**的例外。不可延伸到其他地方；需要類似的例外時依 §0 第 2 點詢問。
+
+| 例外 | 範圍與寫法 | 依據 |
+|---|---|---|
+| AI Mode 頁（`/ai-mode-playground/`） | 字級與間距沿用原型，不計入任何全站慣例、不可照抄（顏色合規）；內文與分頁字級用網站 14px；對齊另由 DATAI-630 處理（§0 第 3 點、§6.8） | #20、#28 |
+| AI Mode 分享卡 | 極簡深色卡（`--bg-dark` 底、右上薄荷柔光、小金色引號、底部細分隔線＋10px 贊助標籤＋白色單色 logo）；分享區外框 14px 為核准值；贊助標籤 10px 為 12px 下限的核准例外 | #24、#29-7 |
+| AI Mode 播放器與分享按鈕 | Listen 播放器（不可拖曳的進度條、手機播放鍵 36px、逐字稿與逐句高亮）；LINE／FB 圖示用網站主色單色 | #25 |
+| 首頁專屬項目 | 白底全螢幕 Hero；Hero h1 的 `max-[420px]:text-[27px]` 與 `tracking-tight`；內容與頁尾 1152（`max-w-6xl`）（§2.7、§2.12、§6.4） | #29-2、tpl-container-home-6xl、org-hero-home |
+| 首頁 Flywheel 計數動畫 | 首頁 Flywheel 展示大數字用元件內自己的 `CountUp`（`components/home/FlywheelSection.tsx:7`），不改用 `NumberTicker`（§3.13） | #33 |
+| 間距：手機選單開關 | `p-[11px]`／`-mr-[11px]`，讓 22px 圖示湊成 44×44（§2.10） | #29-4 |
+| 間距：/partnership/ 勾勾 | 2px 下移置中（§2.10） | #29-4 |
+| 間距：按鈕以整顆高度為準 | 按鈕高度 44／40／36 符合規格即可，內距不往下取（例：`py-2.5`）；外框按鈕可用扣 1px 框線的 `calc()` 內距（§2.10） | #30-4 |
+| 導覽列半透明白底 | `bg-white/80` 加 `backdrop-blur-sm`，只限導覽列（§2.3、§2.4） | #31-4 |
+| 標準淺底光暈配方 | 首頁 Hero 與 /content-owners/ AI Mode 入口的薄荷→白漸層，淺底只能逐字照抄這一個配方（§2.4） | #31-5 |
+| /brands/ 痛點段落琥珀色 | 琥珀光暈與琥珀短線（`components/pages/brands/BrandPainSection.tsx:180`、`:186`），只限痛點段落（§2.4） | #31-5 |
+| 深底卡片 hover 發光 | `0 0 0 1px rgba(168,197,195,0.28), 0 6px 28px rgba(34,93,89,0.24)`，含階梯外的 .28、.24，只限深色區塊卡片、逐字照抄（§2.14） | #32-4 |
+| 錯誤色 | 新增兩個錯誤色（淺底 `#B91C1C`、深底 `#FCA5A5`），是「只用既有 token」的唯一核准新增（§2.2） | #29-8、#31-2 |
+| /decisive-engine/ Hero 膠囊列 | 文字區 768，底部膠囊列維持 1024（§2.12、§5.3） | #31-9 |
+| 流程圖專用小底座 | 首頁流程圖 32px 圓形小底座、內放 15px 圖示，只限流程圖（§2.17、§3.12） | #32-6 |
+| /developers/ 規格卡圖示 | 不加底座（§2.17） | #29-5 |
+| /partnership/ 標題孤字 | Hero 標題「channel.」孤字換行維持現狀，不改文案或字級 | #1 |
+| 輪播點點擊範圍 | 維持 5×5（可能不符 WCAG 2.5.8）（§3.6、§8.5） | #29 |
+| 桌機 h1／h2 同 48 | 維持（§2.7、§8.6） | #29、第二個 #12 |
+| 深底主色按鈕形狀對比 | 約 1.55:1，不處理（§3.2、§8.6） | cross-dark-primary-shape、#26 |
+<!-- src: #1, #20, #24, #25, #26, #28, #29, #30, #31, #32, #33, 附錄 A §10 -->
+
+### 10.2 待修清單
+
+每張修正票一列。本文件各規則的「現況偏離」行只會引用這張表裡的票號（`__tests__/design-system/design-md-coverage.test.ts` 會檢查）。
+
+- 用法：照抄任何現有程式前，先查這張表；元件或頁面有待修時，照本文件的標準寫，不照原始碼現況。
+- 修正票完成時：刪除該票這一列、刪除各章引用該票的「現況偏離」行（或其中該票的部分）、把 Storybook 待修元件清單裡的對應元件改成有 story。
+
+| 票號 | 類別 | 內容 | 盤點 id |
+|---|---|---|---|
+| DATAI-556 | 字級 token | `--font-size-*` 改名 `--text-*`（display／h1／h2 的值改成與實際標題角色一致，與 DATAI-630 協調）；6 張卡片標題 16→24、首頁身分卡標題 18→24；`text-[10px]`、SVG 小字對齊 12px 下限 | tok-font-size-token-broken、tok-caption-12-floor、tok-text-size-scale |
+| DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白 | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
+| DATAI-620 | 區塊標題組 | h2→說明 16（含頁尾 CTA）；說明寬 576；7 處小標籤改「緊」；首頁 Flywheel h2 改 `.section-heading`；標題組到下方內容 48（11 處） | mol-heading-group-h2-gap、mol-heading-group-desc-width、mol-heading-group-eyebrow-gap、mol-heading-flywheel |
+| DATAI-621 | 4px 間距刻度 | 非按鈕的半級與任意值往下取（例外見 §10.1）；`.label-eyebrow-pill` 內距 6→4；內容區資訊小膠囊 5 行不在本票（歸 DATAI-625） | tok-spacing |
+| DATAI-622 | 對比修正 | `text-ink-subtle` 文字改 `text-ink-muted`；深底淡綠字低於 .85 改 ≥.85；主色字在深底改 on-dark；404「404」與錯誤頁「!」改白；白面板上的淡綠字改主色；比較卡編號改白；.75 文字改 .85 | cross-contrast-ink-subtle、tok-on-dark-085、cross-contrast-primary-on-dark、cross-contrast-ondark-on-white、cross-contrast-card-number |
+| DATAI-623 | 色彩寫法與 token | 寫死白色 14 處；Tailwind 灰／紅改 token；新增兩個錯誤色 token；inline `var()` 與 inline `rgba(…0.12)` 改 class；移除多疊的 `bg-primary-dark`；非基色透明與階梯外透明度就近對齊；淺底分隔線改 `border-line`；金／琥珀裝飾（痛點段落以外）改兩基色；`app/site-base.css` 階梯註解加 .6；移除 Geist 字型；/content-owners/ 陰影改標準級 | tok-color-hex-residue、tok-color-tailwind-gray、tok-color-error-red、tok-color-error-red-token、tok-color-two-syntaxes、tok-color-primary-dark-alias、tok-alpha-nonbase、tok-alpha-off-ladder、tok-alpha-pill-border-06、atom-divider、tok-font-family、tok-shadow |
+| DATAI-624 | 按鈕 | 4 顆方角滿版按鈕改藥丸；`.pill-btn` 單一定義（1px 框、600、同高、不用 `transition: all`）；外框與旁邊實心同高；`transition-all` 改具體屬性；主要按鈕上色統一為 `bg-primary`；手機選單底部按鈕不用 `h-11` 定高 | atom-btn-block、atom-btn-secondary-outline、atom-btn-primary、atom-btn-dark-secondary、tok-transition-all |
+| DATAI-625 | Atom 樣式 | Hero 小膠囊 9 處統一 `.label-eyebrow-pill` 並補框線；小標籤換色改參數；首頁身分卡圖示底座改大號 48；全站焦點外框（含表單欄位）；28px 卡片內距 3 處改 24；放大鏡 13→12；流程圖小底座框線 2→1px；內容區資訊小膠囊統一高 24、無框 | atom-eyebrow-pill、atom-eyebrow-override-risk、atom-icon-badge、atom-focus、atom-focus-form、mol-card-padding |
+| DATAI-626 | Hero 對齊 | /developers/、/partnership/、/decisive-engine/ 對齊標準 Hero（下距 48、底部細線、h1 48）；/privacy-policy/、/terms-of-service/、/book-a-demo/ 的 h1 補 `text-balance`；404／錯誤頁標題 48 | org-hero-structure、org-hero-h1-standard、page-404、page-error |
+| DATAI-627 | 無障礙行為 | FAQ 加 `aria-expanded`／`aria-controls`；步驟清單 tab 語意與鍵盤；首頁流程列改 `<button>`；輪播點標籤；JS 動畫減少動態（位移、淡入、`setInterval` 輪播三類） | cross-aria-disclosure、cross-reduced-motion-js |
+| DATAI-628 | CTA 追蹤 | 7 顆導覽型按鈕補 `trackCTA`；「Talk to us」記錄名稱改為畫面文字（改名前先查 GA 報表） | cross-trackcta |
+| DATAI-629 | /content-owners/ 步驟面板 | 說明最後一行被固定高度切掉；輪播改為點擊後永久停止、捲出畫面不輪播，與首頁流程一致 | page-content-owners、org-home-pipeline-carousel |
+| DATAI-630 | AI Mode 頁對齊 | 14／9／7px 間距改 4px 刻度（分享區核准的 14px 除外）；legacy 變數改 `@theme` token；AI Mode 頁仍是例外 | tok-ai-mode-spacing、tok-ai-mode-legacy-vars |
+<!-- src: 附錄 B（F1–F13 對應 DATAI-556、DATAI-619–630）, #30-5, #31, #32, #33 -->

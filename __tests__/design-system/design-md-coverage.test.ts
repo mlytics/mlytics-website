@@ -69,4 +69,30 @@ describe('DESIGN.md', () => {
     const missing = componentClasses(css).filter((c) => !designMd.includes(`\`.${c}\``))
     expect(missing, `Classes missing from DESIGN.md: ${missing.join(', ')}`).toEqual([])
   })
+
+  // §10 fix list: one row per open fix ticket, `| DATAI-123 | 類別 | 內容 | 盤點 id |`.
+  const fixListSection = () => designMd.slice(designMd.indexOf('## 10. 例外與待修清單'))
+  const fixListKeys = () =>
+    new Set([...fixListSection().matchAll(/^\|\s*(DATAI-\d+)\s*\|/gm)].map((m) => m[1]))
+
+  it('lists only real Jira keys in the fix list', () => {
+    const section = designMd.slice(designMd.indexOf('## 10. 例外與待修清單'))
+    const rows = section.split('\n').filter((l) => /^\|\s*DATAI-/.test(l))
+    expect(rows.length).toBeGreaterThanOrEqual(13)
+    expect(rows.every((r) => /^\|\s*DATAI-\d+\s*\|/.test(r))).toBe(true)
+  })
+
+  it('has a fix-list row for every ticket chapters 0–9 cite', () => {
+    // Every DATAI key before §10 (現況偏離 lines, 待修 columns, notes) must be
+    // a row in §10, so a rule can never point at a ticket the list lacks.
+    const body = designMd.slice(0, designMd.indexOf('## 10. 例外與待修清單'))
+    const cited = new Set([...body.matchAll(/DATAI-\d+/g)].map((m) => m[0]))
+    const deviationLines = body.split('\n').filter((l) => l.includes('現況偏離') && /DATAI-\d+/.test(l))
+    // Guard the parser: chapters 2–6 cite many tickets on 現況偏離 lines.
+    expect(deviationLines.length).toBeGreaterThan(20)
+    expect(cited.size).toBeGreaterThan(5)
+    const listed = fixListKeys()
+    const missing = [...cited].filter((k) => !listed.has(k))
+    expect(missing, `Cited in chapters 0–9 but missing from §10: ${missing.join(', ')}`).toEqual([])
+  })
 })
