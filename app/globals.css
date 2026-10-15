@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Docs and Storybook files are not site code: keep their class names out of
+   the site CSS. .storybook/storybook.css scans them for Storybook only. */
+@source not "../DESIGN.md";
+@source not "../stories";
+@source not "../.storybook";
+@source not "../**/*.stories.tsx";
+@source not "../**/*.mdx";
+
 /* ============================================================
    DESIGN SYSTEM — Single source of truth
    ============================================================
