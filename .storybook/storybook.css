@@ -1,9 +1,8 @@
-/* Storybook's CSS entry: the site CSS plus the story and doc files that
-   app/globals.css excludes, so story-only classes exist here but never ship
-   in the site CSS. The import below is inlined by a plugin in main.ts with
-   globals.css's `@source not` lines removed (Tailwind would otherwise apply
-   them to this file too); keep the line exactly as written. */
-@import "../app/globals.css";
+/* Storybook's CSS entry: the same tokens and shared classes as the site
+   (app/site-base.css), plus the story and doc files that app/globals.css
+   excludes, so story-only classes exist here but never ship in the site CSS. */
+@import "tailwindcss";
+@import "../app/site-base.css";
 
 @source "../stories";
 @source "../components/**/*.stories.tsx";

@@ -5,23 +5,26 @@
 - 每條規則寫三件事：**用在哪**、**寫法**（逐字的 class／token）、**禁止什麼**。
 - 現況與標準不同時，規則下方會有一行「現況偏離：見 §10 DATAI-xxx」。偏離的寫法**不可當範本照抄**，以本文件為準；修正票完成後該行會刪除。
 - 每條規則後有隱藏的來源註記（`<!-- src: ... -->`），指向盤點項目 id 與專案決策編號，供維護者追溯，閱讀時可忽略。
-- token 與 class 一律寫在反引號內；`__tests__/design-system/design-md-coverage.test.ts` 會檢查 `app/globals.css` 的每個 token 與元件類別都出現在本文件，避免文件過期。
+- token 與 class 一律寫在反引號內；`__tests__/design-system/design-md-coverage.test.ts` 會檢查 `app/site-base.css` 的每個 token 與元件類別都出現在本文件，避免文件過期。
 
 ---
 
 ## 0. 給 AI 的使用說明
 
 1. **動工前完整讀完本文件**，不可只讀部分章節。
+   <!-- src: #28, 附錄 A §0 -->
 2. **文件沒寫到的情況，先停下告知**：說明「哪件事沒涵蓋、打算參照哪一頁、會用哪些數值」，經確認後才動工；做完把新規則補進本文件（附來源註記）。不可自行找「最像的頁面」照做。
    <!-- src: #28 -->
 3. **AI Mode 頁（`/ai-mode-playground/`）是例外，不可照抄**：它的字級與間距沿用原型，不計入任何全站慣例。
    <!-- src: tok-ai-mode, page-ai-mode, #20, #28 -->
 4. **「現況偏離」不可當範本**：標有「現況偏離」的規則，網站上看到的寫法是待修的，照本文件的標準寫。
+   <!-- src: #28, 附錄 A §0 -->
 5. **展示**：`npm run storybook` 只在本機開啟，用來看元件的樣子；**規則以本文件為準**，Storybook 與本文件不一致時以本文件為準並回報。
    <!-- src: #30 -->
 6. **量間距、量字級以瀏覽器實測為準**，不要用 class 推算（例：行內小標籤上的 `mb-*` 不會產生間距）。
    <!-- src: #29 方法學, mol-heading-group-eyebrow-gap -->
 7. 第 3–10 章撰寫中；在那之前，元件、版型、行為與無障礙規則一律視為「文件沒寫到」，依第 2 點處理。
+   <!-- src: #28 -->
 
 ---
 
@@ -41,11 +44,11 @@
 
 ## 2. Tokens
 
-所有 token 定義在 `app/globals.css`：`@theme` 區塊（會產生 Tailwind class）與 `:root` 區塊（legacy 變數）。
+所有 token 與共用類別定義在 `app/site-base.css`：`@theme` 區塊（會產生 Tailwind class）與 `:root` 區塊（legacy 變數）。CSS 有兩個入口檔，都 import 這份檔案：`app/globals.css` 是網站入口（排除 DESIGN.md 與 Storybook 檔案，避免文件裡的 class 進到網站 CSS），`.storybook/storybook.css` 是 Storybook 入口（額外掃描 story 與 DESIGN.md）。新增或修改 token 一律改 `app/site-base.css`。
 
 ### 2.1 顏色 token
 
-**規則：只用 `app/globals.css` 的顏色 token，不新增顏色、不寫死色碼。**
+**規則：只用 `app/site-base.css` 的顏色 token，不新增顏色、不寫死色碼。**
 - 用在哪：所有文字、底色、框線、圖示。
 - 寫法：一律 Tailwind class，例如 `text-ink-muted`、`bg-primary`、`border-line`。白色用 Tailwind 的 `text-white`／`bg-white`。SVG 屬性（`fill`、`stroke`）可寫 `var(--color-*)`。
 - 禁止：`style={{ color: 'var(--…)' }}` 這類 inline 寫法（同一顏色兩種寫法容易改漏）；寫死 hex（包含 `#fff`／`#FFFFFF`）；Tailwind 內建灰色與紅色（`text-gray-*`、`border-gray-*`、`text-red-*` 等）。
@@ -71,11 +74,11 @@
 <!-- src: tok-color-accents, tok-color-primary-dark-alias, cross-contrast-ink-subtle, cross-contrast-primary-on-dark, cross-contrast-ondark-on-white, #29-8 -->
 - 現況偏離：見 §10 DATAI-622（`text-ink-subtle` 當文字、主色字放在深底、淡綠字放在白面板）、DATAI-623（`/developers/` 頁尾 CTA 在 `.section-dark` 上多疊 `bg-primary-dark`）
 
-### 2.2 錯誤色（核准新增，尚未加入 globals.css）
+### 2.2 錯誤色（核准新增，尚未加入 site-base.css）
 
 **規則：錯誤提示用兩個專用錯誤色 token，依底色選用。** 這是「只用既有 token」的核准例外。
 - 用在哪：表單與 email 欄的錯誤訊息、錯誤狀態框線。
-- 寫法：淺底用 `#B91C1C`（白底對比 6.47:1）、深底用 `#FCA5A5`（深底對比 6.24:1）。建議名稱 `--color-error`／`--color-error-on-dark`，由修正票加入 `app/globals.css` 後改用對應 class。
+- 寫法：淺底用 `#B91C1C`（白底對比 6.47:1）、深底用 `#FCA5A5`（深底對比 6.24:1）。建議名稱 `--color-error`／`--color-error-on-dark`，由修正票加入 `app/site-base.css` 後改用對應 class。
 - 禁止：用 `warn`（琥珀，語意是痛點段落）或 Tailwind 內建紅表示錯誤；在深底用淺底那一個紅（反之亦然）。
 - 現況偏離：見 §10 DATAI-623（`InlineEmailCTA` 目前用 `text-red-500`、`border-red-400`）
 <!-- src: tok-color-error-red-token, tok-color-error-red, #29-8, #31-2 -->
@@ -89,14 +92,18 @@
   - 主色底上的文字一律用白色。
   - 淺底分隔線用 `border-line`；深底分隔線用 on-dark .12。
 - 禁止：黑色透明、白色透明、金色／琥珀／灰色等其他顏色的透明（淺底分隔線不可用黑色透明）。
-- **例外（核准）**：導覽列捲動後的 `bg-white/80` 加 `backdrop-blur-sm`。
-- 現況偏離：見 §10 DATAI-622（深底文字 α 低於 .85、比較卡編號、.75 文字）、DATAI-623（非基色透明、階梯外的值、淺底分隔線用黑色透明、`app/globals.css` 階梯註解尚未列入 .6）
+- **例外（核准）**：
+  1. 導覽列捲動後的 `bg-white/80` 加 `backdrop-blur-sm`。
+  2. §2.4 的**標準淺底光暈配方**（薄荷 `rgba(240,248,247,0.97)`→白 `rgba(255,255,255,0.65)`），只限逐字照抄該配方，不可拿其中的薄荷或白色透明用在別處。
+  3. /brands/ 痛點段落的琥珀光暈與琥珀短線（§2.4），只限痛點段落。
+- 現況偏離：見 §10 DATAI-622（深底文字 α 低於 .85、比較卡編號、.75 文字）、DATAI-623（非基色透明、階梯外的值、淺底分隔線用黑色透明、`app/site-base.css` 階梯註解尚未列入 .6）
 <!-- src: tok-alpha-nonbase, tok-alpha-off-ladder, tok-alpha-pill-border-06, tok-on-dark-085, atom-divider, cross-contrast-card-number, #31-3, #31-4 -->
 
 ### 2.4 光暈、漸層、模糊與透明效果
 
 **規則：光暈以深色區塊為主；淺底只能用唯一標準配方。**
-- 用在哪與寫法：
+- 用在哪：區塊背景的裝飾（光暈）、遮罩與流程線、導覽列背景、按鈕狀態。
+- 寫法：
   - **深色區塊光暈**：可用，只用 primary 與 on-dark 兩個基色。
   - **淺底區塊光暈**：只能用首頁 Hero（`components/home/HeroSection.tsx:36-37`）與 /content-owners/ AI Mode 入口（`components/ui/PlaygroundCTASection.tsx:88-89`）現有的薄荷→白漸層，**逐字照抄**：
     ```
@@ -113,7 +120,7 @@
 
 ### 2.5 legacy 變數（`:root`）
 
-**規則：`:root` 的 legacy 變數只供 `app/globals.css` 自己的 `.section-*`、捲軸與 `body` 規則使用。**
+**規則：`:root` 的 legacy 變數只供 `app/site-base.css` 自己的 `.section-*`、捲軸與 `body` 規則使用。**
 
 | 變數 | 值 | 目前用在 |
 |---|---|---|
@@ -124,6 +131,7 @@
 | `--text-primary` | `#1A1A1A` | `body` 文字色 |
 | `--text-dark-primary` | `#FAFAFA` | `.section-dark` 文字色 |
 
+- 用在哪：只在 `app/site-base.css` 內部。
 - 寫法：新程式一律用 §2.1 的 `@theme` token。
 - 禁止：在元件或頁面的程式裡引用這些變數。
 - 現況偏離：AI Mode 頁（例外頁）的 CSS 檔引用 legacy 變數，見 §10 DATAI-630
@@ -132,6 +140,7 @@
 ### 2.6 字型
 
 **規則：只用系統字型 stack。**
+- 用在哪：全站所有文字。
 - 寫法：`body` 已設定 `-apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif`，元件不需另設字型。
 - 禁止：載入其他字型（Google Fonts 等）、在元件上另設 `font-family`。
 - 現況偏離：見 §10 DATAI-623（`app/layout.tsx` 載入未使用的 Geist 字型）
@@ -141,6 +150,9 @@
 
 **規則：字級依文字角色決定，一個角色一種字級；最小 12px。**
 
+- 用在哪：所有文字，依下表角色選字級。
+- 寫法：照下表「寫法」欄逐字使用。
+
 | 角色 | 字級 | 寫法 |
 |---|---|---|
 | h1（Hero 標題） | 手機 36、≥768 為 48 | `text-4xl md:text-5xl font-bold` |
@@ -149,7 +161,7 @@
 | 404 的「404」與錯誤頁的「!」大字 | — | `text-7xl`，**白色** |
 | h2（區塊標題） | 30／36（≥768）／48（≥1024） | `.section-heading` |
 | 展示大字句（區塊中段重點句） | 手機 36、≥768 為 60 | `text-4xl md:text-6xl` |
-| 卡片標題 | 24 | `text-h3`（DATAI-556 修好前不產生樣式，見 §2.8）；首頁身分卡標題也是 24 |
+| 卡片標題 | 24 | `text-h3`（DATAI-556 修好前不產生樣式，見 §2.8）；首頁身分卡標題也是 24。**未定案**：DATAI-556 完成前新寫的 24px 卡片標題用什麼寫法，依 §0 第 2 點詢問 |
 | 法律頁條文小標 | 20 | `text-xl font-bold` |
 | 內文 | 16 | `text-base` |
 | 輔助文字 | 14 | `text-sm` |
@@ -164,7 +176,7 @@
 
 ### 2.8 字級 token（目前失效）
 
-`app/globals.css` 的 `@theme` 定義了六個字級 token，但**目前全部失效**：Tailwind v4 的字級命名空間是 `--text-*`，`--font-size-*` 不會產生 `text-display`、`text-h1`……等 class，寫了也沒有效果。
+`app/site-base.css` 的 `@theme` 定義了六個字級 token，但**目前全部失效**：Tailwind v4 的字級命名空間是 `--text-*`，`--font-size-*` 不會產生 `text-display`、`text-h1`……等 class，寫了也沒有效果。
 
 | token | 值 |
 |---|---|
@@ -175,13 +187,17 @@
 | `--font-size-small` | `0.875rem` |
 | `--font-size-caption` | `0.75rem` |
 
+- 用在哪：目前不可用於任何地方。
 - 寫法：DATAI-556 修正後改名為 `--text-*`，屆時 `text-h3` 才會是 24px。
-- 禁止：在 DATAI-556 完成前新增任何 `text-display`／`text-h1`／`text-h2`／`text-h3`／`text-small`／`text-caption` 用法；也不要自行在 `app/globals.css` 補 `--text-*`。
+- 禁止：在 DATAI-556 完成前新增任何 `text-display`／`text-h1`／`text-h2`／`text-h3`／`text-small`／`text-caption` 用法；也不要自行在 `app/site-base.css` 補 `--text-*`。
 - 未定案：改名為 `--text-*` 後，`display`／`h1`／`h2` 三個 token 的值與 §2.7 角色字級不一致（只有 `h3`、`small`、`caption` 一致），改名後是否保留、改值或刪除，待確認。
 - 現況偏離：見 §10 DATAI-556
 <!-- src: tok-font-size-token-broken, #29-6, #30-5 -->
 
 ### 2.9 字重、行高、字距
+
+- 用在哪：所有文字，依下表角色選字重、行高、字距。
+- 寫法：照下表「寫法」欄逐字使用。
 
 | 項目 | 標準 | 寫法 |
 |---|---|---|
@@ -214,6 +230,9 @@
 
 **規則：區塊依角色用固定的上下距。**
 
+- 用在哪：每個頁面區塊（`<section>`）的上下內距。
+- 寫法：照下表「寫法」欄逐字使用。
+
 | 區塊角色 | 上下距 | 寫法 |
 |---|---|---|
 | 一般內容區塊 | 平板與手機 64、桌機（≥1024）112 | `py-16 lg:py-28` |
@@ -230,6 +249,9 @@
 ### 2.12 容器寬
 
 **規則：容器寬依內容角色決定。**
+
+- 用在哪：區塊內的內容容器。
+- 寫法：照下表「寫法」欄逐字使用。
 
 | 角色 | 寬度 | 寫法 |
 |---|---|---|
@@ -249,6 +271,9 @@
 
 ### 2.13 圓角與框線
 
+- 用在哪：按鈕、膠囊、卡片、表單欄位等所有有圓角或框線的元素。
+- 寫法：照下表「寫法」欄逐字使用。
+
 | 角色 | 寫法 |
 |---|---|
 | 藥丸（按鈕、膠囊） | `rounded-full` |
@@ -264,6 +289,7 @@
 ### 2.14 陰影
 
 **規則：卡片預設扁平（只有框線）；需要陰影時只用三級。**
+- 用在哪：卡片、浮出的面板與下拉選單。
 - 寫法：`shadow-sm`／`shadow-lg`／`shadow-xl`。
 - 禁止：自訂 `boxShadow`。
 - 現況偏離：見 §10 DATAI-623（/content-owners/ 比較卡改 `shadow-sm`、步驟面板改 `shadow-lg`）
@@ -272,23 +298,26 @@
 
 ### 2.15 圖層與斷點
 
+- 用在哪：疊層元素（導覽列、選單、背景裝飾）與響應式排版。
+
 | 項目 | 標準 |
 |---|---|
 | 圖層 | `z-0`／`z-10`／`z-20`／`z-50`（導覽列）／`z-[60]`（滿版選單，必須在導覽列之上） |
 | 斷點 | `sm` 480（`--breakpoint-sm: 30rem`，不是 Tailwind 預設的 640）、`md` 768、`lg` 1024 |
 | 首頁專屬斷點 | `max-[420px]` 只限首頁 Hero |
 
-- 寫法：`--breakpoint-sm` 已在 `app/globals.css` 改為 480px，`sm:` 即 480px 起。
+- 寫法：`--breakpoint-sm` 已在 `app/site-base.css` 改為 480px，`sm:` 即 480px 起。
 - 禁止：上表以外的圖層值與斷點。
 <!-- src: tok-z, tok-breakpoint-sm-480, tok-breakpoint-420 -->
 
 ### 2.16 動態
 
 **規則：過場短、只動實際變化的屬性；JS 動畫必須處理減少動態。**
+- 用在哪：滑過、展開等狀態過場，以及區塊進場動畫。
 - 寫法：
   - CSS 過場時間 `duration-200`／`duration-300`；只過場實際會變的屬性（例如 `transition-colors`、`transition-opacity`、`transition-transform`）。
   - 進場動畫：framer-motion 0.5 秒、`easeOut`、淡入上移；卡片依序延遲 0.1 秒。
-  - 減少動態：CSS 由 `app/globals.css` 的 `prefers-reduced-motion` 規則全站處理；JS 動畫要自行處理（規則見 §8）。
+  - 減少動態：CSS 由 `app/site-base.css` 的 `prefers-reduced-motion` 規則全站處理；JS 動畫要自行處理（規則見 §8）。
 - 禁止：`transition-all`。
 - 現況偏離：見 §10 DATAI-624（13 處 `transition-all`）、DATAI-627（JS 動畫未處理減少動態）
 <!-- src: tok-duration, tok-transition-all, tok-motion, cross-reduced-motion-js -->
@@ -296,6 +325,7 @@
 ### 2.17 圖示
 
 **規則：圖示用 lucide（`lucide-react`）；功能圖示 22px。**
+- 用在哪：所有功能圖示。
 - 寫法：`size={22}`。需要底座時用大號底座：48px、`rounded-2xl`、`bg-primary`、白色圖示，底座內圖示同為 22（標準寫法見 `components/pages/decisive-engine/EngineUseCases.tsx:45`：`w-12 h-12 rounded-2xl bg-primary text-white`）。
 - 例外（核准）：/developers/ 規格卡的圖示不加底座。
 - 禁止：其他圖示庫。
@@ -303,9 +333,9 @@
 - 現況偏離：見 §10 DATAI-625（首頁身分卡改用大號 48 實心底座）
 <!-- src: tok-icon-size, atom-icon-badge, atom-icon-badge-none, #29-5 -->
 
-### 2.18 `app/globals.css` 元件類別索引
+### 2.18 `app/site-base.css` 元件類別索引
 
-`app/globals.css` 定義的共用類別。完整的元件規則寫在第 3–6 章（撰寫中）；此處先列出每個類別的角色。
+`app/site-base.css` 定義的共用類別。完整的元件規則寫在第 3–6 章（撰寫中）；此處先列出每個類別的角色。
 
 | 類別 | 角色 | 注意 |
 |---|---|---|

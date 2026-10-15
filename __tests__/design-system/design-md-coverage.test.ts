@@ -8,7 +8,9 @@ import { describe, expect, it } from 'vitest'
 const root = resolve(__dirname, '../..')
 const read = (p: string) => readFileSync(resolve(root, p), 'utf8')
 const designMd = existsSync(resolve(root, 'DESIGN.md')) ? read('DESIGN.md') : ''
-const css = read('app/globals.css')
+// Tokens and shared classes live in app/site-base.css; app/globals.css is the
+// site entry that only imports it and sets Tailwind sources.
+const css = read('app/site-base.css')
 
 function block(source: string, opener: RegExp): string {
   const start = source.search(opener)
@@ -29,7 +31,7 @@ function declaredTokens(body: string): string[] {
   return [...stripComments(body).matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1])
 }
 
-/** Top-level component classes defined in globals.css (e.g. .pill-btn). */
+/** Top-level component classes defined in site-base.css (e.g. .pill-btn). */
 function componentClasses(source: string): string[] {
   const names = [...stripComments(source).matchAll(/^\.([a-z][a-z0-9-]*(?:--[a-z0-9-]+)?)\s*[{,:]/gm)].map((m) => m[1])
   return [...new Set(names)]
@@ -44,12 +46,14 @@ const CHAPTERS = [
 
 describe('DESIGN.md', () => {
   it('exists and has every chapter in order', () => {
-    const positions = CHAPTERS.map((h) => designMd.indexOf(h))
+    // Match whole heading lines only, so '### 1. …' or a mention in prose does not count.
+    const escape = (h: string) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const positions = CHAPTERS.map((h) => designMd.search(new RegExp(`^${escape(h)}$`, 'm')))
     expect(positions.every((p) => p >= 0), `missing: ${CHAPTERS.filter((_, i) => positions[i] < 0)}`).toBe(true)
     expect([...positions].sort((a, b) => a - b)).toEqual(positions)
   })
 
-  it('parses a non-trivial token and class set from globals.css (guards the parser)', () => {
+  it('parses a non-trivial token and class set from site-base.css (guards the parser)', () => {
     expect(declaredTokens(block(css, /@theme\s*\{/))).toContain('--color-primary')
     expect(declaredTokens(block(css, /:root\s*\{/))).toContain('--bg-dark')
     expect(componentClasses(css)).toEqual(expect.arrayContaining(['section-heading', 'pill-btn', 'label-eyebrow']))
@@ -61,7 +65,7 @@ describe('DESIGN.md', () => {
     expect(missing, `Tokens missing from DESIGN.md: ${missing.join(', ')}`).toEqual([])
   })
 
-  it('documents every component class defined in globals.css', () => {
+  it('documents every component class defined in site-base.css', () => {
     const missing = componentClasses(css).filter((c) => !designMd.includes(`\`.${c}\``))
     expect(missing, `Classes missing from DESIGN.md: ${missing.join(', ')}`).toEqual([])
   })
