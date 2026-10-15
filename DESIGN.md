@@ -898,14 +898,16 @@
 
 ### 7.3 新頁面進 sitemap 與 llms.txt
 
-**規則：新增頁面時，同時加進 `public/sitemap.xml` 與 `public/llms.txt`。**
+**規則：所有公開頁面都要同時列在 `public/sitemap.xml` 與 `public/llms.txt`，包括轉換頁（例：/book-a-demo/）與法律頁。**
+- 用在哪：每個新增的公開頁面。
 - 寫法：
   - `public/sitemap.xml`：加一個 `<url>`，`<loc>` 用 `https://www.mlytics.com/<路徑>/`（結尾斜線），並帶 `<changefreq>weekly</changefreq>` 與 `<priority>0.8</priority>`（與既有內頁一致）。
   - `public/llms.txt`：檔案有中文與英文兩段，**兩段各加一行** Markdown 連結，放在對應段落：中文段 `- [名稱](https://www.mlytics.com/<路徑>)：一句說明`（全形冒號），英文段 `- [Name](https://www.mlytics.com/<路徑>): one-line summary`（半形冒號加空格）。
 - CI 把關：`__tests__/public/llms-sitemap.test.ts` 檢查 sitemap 裡的每一頁（首頁除外）都在 llms.txt 有連結，漏加會讓 CI 失敗。
 - 注意：**頁面有沒有加進 sitemap 本身沒有自動檢查**，要人工確認（§9 檢查表）。
-- 未定案：現有 /book-a-demo/、/privacy-policy/、/terms-of-service/ 都不在 sitemap；哪些類型的新頁面可以不列入 sitemap 尚未決定，遇到時依 §0 第 2 點詢問。<!-- src: 文件未定案清單 #18 -->
-<!-- src: 附錄 A §7, __tests__/public/llms-sitemap.test.ts, #2, #8 -->
+- 禁止：以「轉換頁」或「法律頁」為由不列入。
+- 現況偏離：見 §10 DATAI-632（/book-a-demo/ 不在 sitemap 也不在 llms.txt；/privacy-policy/、/terms-of-service/ 不在 sitemap，llms.txt 只在英文段的 Optional 有連結）<!-- src: #34（關閉文件未定案清單 #18） -->
+<!-- src: 附錄 A §7, __tests__/public/llms-sitemap.test.ts, #2, #8, #34 -->
 
 ### 7.4 導覽列的技術約束
 
@@ -1109,4 +1111,5 @@
 | DATAI-628 | CTA 追蹤 | 7 顆導覽型按鈕補 `trackCTA`；「Talk to us」記錄名稱改為畫面文字（改名前先查 GA 報表） | cross-trackcta |
 | DATAI-629 | /content-owners/ 步驟面板 | 說明最後一行被固定高度切掉；輪播改為點擊後永久停止、捲出畫面不輪播，與首頁流程一致 | page-content-owners、org-home-pipeline-carousel |
 | DATAI-630 | AI Mode 頁對齊 | 14／9／7px 間距改 4px 刻度（分享區核准的 14px 除外）；legacy 變數改 `@theme` token；AI Mode 頁仍是例外 | tok-ai-mode-spacing、tok-ai-mode-legacy-vars |
+| DATAI-632 | SEO／可發現性 | /book-a-demo/、/privacy-policy/、/terms-of-service/ 補進 `public/sitemap.xml` 與 `public/llms.txt`（中英兩段），讓所有公開頁面兩邊都有 | —（2026-10-15 決策 #34） |
 <!-- src: 附錄 B（F1–F13 對應 DATAI-556、DATAI-619–630）, #30-5, #31, #32, #33 -->
