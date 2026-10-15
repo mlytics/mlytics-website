@@ -70,29 +70,55 @@ describe('DESIGN.md', () => {
     expect(missing, `Classes missing from DESIGN.md: ${missing.join(', ')}`).toEqual([])
   })
 
-  // §10 fix list: one row per open fix ticket, `| DATAI-123 | 類別 | 內容 | 盤點 id |`.
-  const fixListSection = () => designMd.slice(designMd.indexOf('## 10. 例外與待修清單'))
-  const fixListKeys = () =>
-    new Set([...fixListSection().matchAll(/^\|\s*(DATAI-\d+)\s*\|/gm)].map((m) => m[1]))
+  // §10.2 fix list: one row per OPEN fix ticket. Rows are deleted as tickets
+  // close, so no check here may depend on how many tickets are still open.
+  const FIX_LIST_HEADING = '## 10. 例外與待修清單'
+  const FIX_LIST_HEADER = '| 票號 | 類別 | 內容 | 盤點 id |'
+  const FIX_ROW = /^\|\s*DATAI-\d+\s*\|[^|\n]+\|[^|\n]+\|[^|\n]+\|$/
+  const TICKET_KEY = /DATAI-\d+/g
+  const stripHtmlComments = (s: string) => s.replace(/<!--[\s\S]*?-->/g, '')
 
-  it('lists only real Jira keys in the fix list', () => {
-    const section = designMd.slice(designMd.indexOf('## 10. 例外與待修清單'))
-    const rows = section.split('\n').filter((l) => /^\|\s*DATAI-/.test(l))
-    expect(rows.length).toBeGreaterThanOrEqual(13)
-    expect(rows.every((r) => /^\|\s*DATAI-\d+\s*\|/.test(r))).toBe(true)
+  /** Lines of the §10.2 table body (after header and separator, up to the first non-table line). */
+  function fixListRows(md: string): string[] | null {
+    const section = md.indexOf(FIX_LIST_HEADING)
+    if (section < 0) return null
+    const lines = md.slice(section).split('\n')
+    const header = lines.findIndex((l) => l.trim() === FIX_LIST_HEADER)
+    if (header < 0) return null
+    const rows: string[] = []
+    for (const line of lines.slice(header + 2)) {
+      if (!line.startsWith('|')) break
+      rows.push(line)
+    }
+    return rows
+  }
+
+  it('keeps the §10.2 fix list parseable and every row a real Jira key', () => {
+    expect(designMd).toMatch(new RegExp(`^${FIX_LIST_HEADING}$`, 'm'))
+    const rows = fixListRows(designMd)
+    expect(rows, `§10.2 table header not found: ${FIX_LIST_HEADER}`).not.toBeNull()
+    const bad = rows!.filter((r) => !FIX_ROW.test(r))
+    expect(bad, `Rows not shaped "| DATAI-123 | 類別 | 內容 | 盤點 id |":\n${bad.join('\n')}`).toEqual([])
+    const keys = rows!.map((r) => r.match(TICKET_KEY)![0])
+    expect(new Set(keys).size, 'duplicate ticket rows').toBe(keys.length)
   })
 
-  it('has a fix-list row for every ticket chapters 0–9 cite', () => {
-    // Every DATAI key before §10 (現況偏離 lines, 待修 columns, notes) must be
-    // a row in §10, so a rule can never point at a ticket the list lacks.
-    const body = designMd.slice(0, designMd.indexOf('## 10. 例外與待修清單'))
-    const cited = new Set([...body.matchAll(/DATAI-\d+/g)].map((m) => m[0]))
-    const deviationLines = body.split('\n').filter((l) => l.includes('現況偏離') && /DATAI-\d+/.test(l))
-    // Guard the parser: chapters 2–6 cite many tickets on 現況偏離 lines.
-    expect(deviationLines.length).toBeGreaterThan(20)
-    expect(cited.size).toBeGreaterThan(5)
-    const listed = fixListKeys()
+  it('cites in body text only tickets that have a fix-list row', () => {
+    // Guard the pattern on a fixed sample, not on today's ticket count.
+    expect('見 §10 DATAI-12、DATAI-345'.match(TICKET_KEY)).toEqual(['DATAI-12', 'DATAI-345'])
+    // Source comments (<!-- src: … -->) may cite any ticket; visible text may
+    // only cite open fix tickets, so closing a ticket forces every mention of
+    // it (現況偏離 lines, notes, 待修 columns) to be cleaned up with its row.
+    const rows = fixListRows(designMd) ?? []
+    const listed = new Set(rows.map((r) => r.match(TICKET_KEY)![0]))
+    // A row's own key cell does not count as a citation; the rest of the row does.
+    const rowSet = new Set(rows)
+    const body = stripHtmlComments(designMd)
+      .split('\n')
+      .map((l) => (rowSet.has(l) ? l.replace(/^\|\s*DATAI-\d+\s*\|/, '|') : l))
+      .join('\n')
+    const cited = new Set(body.match(TICKET_KEY) ?? [])
     const missing = [...cited].filter((k) => !listed.has(k))
-    expect(missing, `Cited in chapters 0–9 but missing from §10: ${missing.join(', ')}`).toEqual([])
+    expect(missing, `Cited in DESIGN.md text but missing from §10.2: ${missing.join(', ')}`).toEqual([])
   })
 })

@@ -420,7 +420,7 @@
   - 送出中的狀態用 `disabled:opacity-60`（§2.4）。
   - 導覽型按鈕要呼叫 `trackCTA`（第 7 章）。
 - 禁止：方角或 12px 圓角（`rounded-xl`）；用 `h-*` 定高；inline 上色（`style={{ background: 'var(--color-primary)' }}`）；把 36 或 40 用在獨立 CTA、把 44 塞進導覽列；在深底另做一顆不同顏色的主要按鈕。
-- 已接受取捨：深底上主色按鈕的形狀對比約 1.55:1，不處理。
+- 已接受取捨：深底上主色按鈕的形狀對比約 1.57:1，不處理。<!-- src: dark-primary-contrast（rulings.json，WORKLOG 2026-09-11） -->
 - 現況偏離：見 §10 DATAI-624（13 行 `transition-all`；404、錯誤頁與 /book-a-demo/ 送出鈕的 inline 上色；手機滿版選單底部兩顆用 `h-11` 定高）、DATAI-628（部分導覽型按鈕沒有 `trackCTA`）
 <!-- src: atom-btn-primary, atom-btn-inline-submit, atom-btn-font, cross-dark-primary-shape, tok-transition-all, buttons.json A1／A2／A3, #29-9(1), #30-4 -->
 
@@ -829,8 +829,8 @@
 
 - 標準版：`app/page.tsx`。
 - 區塊順序：白 Hero（`HeroSection`）→ 白 身分卡 → 深 Flywheel → 白 Intent Refinery → 深 頁尾 CTA（白／白／深／白／深）。
-- 首頁專屬項目：白底全螢幕 Hero 與其 h1 寫法（≤420px 27px、`tracking-tight`）、內容與頁尾 1152（`max-w-6xl`）、標準淺底光暈的首頁 Hero 用法。這些只限首頁，其他頁不可用。
-- 禁止：把首頁的 1152 容器、白底全螢幕 Hero 或白／白開頭用在其他頁。
+- 首頁專屬項目：白／白開頭的區塊順序（白底 Hero）、h1 寫法（≤420px 27px、`tracking-tight`）、內容與頁尾 1152（`max-w-6xl`）、標準淺底光暈的首頁 Hero 用法。這些只限首頁，其他頁不可用。（Hero 的全螢幕高與標題輪播是現況，未列為標準。）<!-- src: tpl-order-home, home-hero-h1-narrow-27, org-hero-home -->
+- 禁止：把首頁的 1152 容器、白底 Hero 或白／白開頭用在其他頁。
 - 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）、DATAI-620（Flywheel h2）、DATAI-625（身分卡圖示底座）、DATAI-624（身分卡按鈕）、DATAI-628（身分卡按鈕追蹤）、DATAI-556（身分卡標題 18 → 24）
 <!-- src: tpl-order-home, tpl-container-home-6xl, org-hero-home, page-home -->
 
@@ -900,8 +900,8 @@
 
 **規則：新增頁面時，同時加進 `public/sitemap.xml` 與 `public/llms.txt`。**
 - 寫法：
-  - `public/sitemap.xml`：加一個 `<url>`，`<loc>` 用 `https://www.mlytics.com/<路徑>/`（結尾斜線，與既有項目一致）。
-  - `public/llms.txt`：加一行 Markdown 連結 `- [名稱](https://www.mlytics.com/<路徑>)：一句說明`，放在對應段落。
+  - `public/sitemap.xml`：加一個 `<url>`，`<loc>` 用 `https://www.mlytics.com/<路徑>/`（結尾斜線），並帶 `<changefreq>weekly</changefreq>` 與 `<priority>0.8</priority>`（與既有內頁一致）。
+  - `public/llms.txt`：檔案有中文與英文兩段，**兩段各加一行** Markdown 連結，放在對應段落：中文段 `- [名稱](https://www.mlytics.com/<路徑>)：一句說明`（全形冒號），英文段 `- [Name](https://www.mlytics.com/<路徑>): one-line summary`（半形冒號加空格）。
 - CI 把關：`__tests__/public/llms-sitemap.test.ts` 檢查 sitemap 裡的每一頁（首頁除外）都在 llms.txt 有連結，漏加會讓 CI 失敗。
 - 注意：**頁面有沒有加進 sitemap 本身沒有自動檢查**，要人工確認（§9 檢查表）。
 - 未定案：現有 /book-a-demo/、/privacy-policy/、/terms-of-service/ 都不在 sitemap；哪些類型的新頁面可以不列入 sitemap 尚未決定，遇到時依 §0 第 2 點詢問。<!-- src: 文件未定案清單 #18 -->
@@ -1028,9 +1028,9 @@
 ### 8.6 已接受的取捨
 
 以下兩點已知不理想，An 已明確接受，不需回報、也不要自行修正：
-- 深底上主色按鈕的形狀對比約 1.55:1（§3.2）。
+- 深底上主色按鈕的形狀對比約 1.57:1（§3.2）。
 - 桌機 h1 與 h2 同為 48（§2.7）。
-<!-- src: cross-dark-primary-shape, #29 明確接受的取捨, #26 -->
+<!-- src: dark-primary-contrast（rulings.json，WORKLOG 2026-09-11）, cross-dark-primary-shape, #29 明確接受的取捨（h1／h2 同 48） -->
 
 ---
 
@@ -1067,7 +1067,8 @@
 | AI Mode 頁（`/ai-mode-playground/`） | 字級與間距沿用原型，不計入任何全站慣例、不可照抄（顏色合規）；內文與分頁字級用網站 14px；對齊另由 DATAI-630 處理（§0 第 3 點、§6.8） | #20、#28 |
 | AI Mode 分享卡 | 極簡深色卡（`--bg-dark` 底、右上薄荷柔光、小金色引號、底部細分隔線＋10px 贊助標籤＋白色單色 logo）；分享區外框 14px 為核准值；贊助標籤 10px 為 12px 下限的核准例外 | #24、#29-7 |
 | AI Mode 播放器與分享按鈕 | Listen 播放器（不可拖曳的進度條、手機播放鍵 36px、逐字稿與逐句高亮）；LINE／FB 圖示用網站主色單色 | #25 |
-| 首頁專屬項目 | 白底全螢幕 Hero；Hero h1 的 `max-[420px]:text-[27px]` 與 `tracking-tight`；內容與頁尾 1152（`max-w-6xl`）（§2.7、§2.12、§6.4） | #29-2、tpl-container-home-6xl、org-hero-home |
+| 首頁專屬項目 | 白／白／深／白／深區塊順序（白底 Hero 開頭）；Hero h1 的 `max-[420px]:text-[27px]` 與 `tracking-tight`；內容與頁尾 1152（`max-w-6xl`）（§2.7、§2.9、§2.12、§6.4） | tpl-order-home（home-section-rhythm）、home-hero-h1-narrow-27、tok-tracking、tpl-container-home-6xl (a)、#29-2 |
+| /decisive-engine/ 產品頁頁尾 CTA 變體 | 頁尾 CTA 不用 `InlineEmailCTA`，改用連到 /book-a-demo 的 §3.2 標準 44「Contact Us」，必須呼叫 `trackCTA`（範圍：§4.7、§5.4） | org-de-cta-form (a) |
 | 首頁 Flywheel 計數動畫 | 首頁 Flywheel 展示大數字用元件內自己的 `CountUp`（`components/home/FlywheelSection.tsx:7`），不改用 `NumberTicker`（§3.13） | #33 |
 | 間距：手機選單開關 | `p-[11px]`／`-mr-[11px]`，讓 22px 圖示湊成 44×44（§2.10） | #29-4 |
 | 間距：/partnership/ 勾勾 | 2px 下移置中（§2.10） | #29-4 |
@@ -1083,12 +1084,12 @@
 | /partnership/ 標題孤字 | Hero 標題「channel.」孤字換行維持現狀，不改文案或字級 | #1 |
 | 輪播點點擊範圍 | 維持 5×5（可能不符 WCAG 2.5.8）（§3.6、§8.5） | #29 |
 | 桌機 h1／h2 同 48 | 維持（§2.7、§8.6） | #29、第二個 #12 |
-| 深底主色按鈕形狀對比 | 約 1.55:1，不處理（§3.2、§8.6） | cross-dark-primary-shape、#26 |
+| 深底主色按鈕形狀對比 | 約 1.57:1，不處理（§3.2、§8.6） | dark-primary-contrast（WORKLOG 2026-09-11） |
 <!-- src: #1, #20, #24, #25, #26, #28, #29, #30, #31, #32, #33, 附錄 A §10 -->
 
 ### 10.2 待修清單
 
-每張修正票一列。本文件各規則的「現況偏離」行只會引用這張表裡的票號（`__tests__/design-system/design-md-coverage.test.ts` 會檢查）。
+每張**仍未完成**的修正票一列。本文件正文（「現況偏離」行、說明、待修欄）只會引用這張表裡的票號；隱藏的來源註記可以引用任何票（`__tests__/design-system/design-md-coverage.test.ts` 會檢查）。
 
 - 用法：照抄任何現有程式前，先查這張表；元件或頁面有待修時，照本文件的標準寫，不照原始碼現況。
 - 修正票完成時：刪除該票這一列、刪除各章引用該票的「現況偏離」行（或其中該票的部分）、把 Storybook 待修元件清單裡的對應元件改成有 story。
@@ -1101,7 +1102,7 @@
 | DATAI-621 | 4px 間距刻度 | 非按鈕的半級與任意值往下取（例外見 §10.1）；`.label-eyebrow-pill` 內距 6→4；內容區資訊小膠囊 5 行不在本票（歸 DATAI-625） | tok-spacing |
 | DATAI-622 | 對比修正 | `text-ink-subtle` 文字改 `text-ink-muted`；深底淡綠字低於 .85 改 ≥.85；主色字在深底改 on-dark；404「404」與錯誤頁「!」改白；白面板上的淡綠字改主色；比較卡編號改白；.75 文字改 .85 | cross-contrast-ink-subtle、tok-on-dark-085、cross-contrast-primary-on-dark、cross-contrast-ondark-on-white、cross-contrast-card-number |
 | DATAI-623 | 色彩寫法與 token | 寫死白色 14 處；Tailwind 灰／紅改 token；新增兩個錯誤色 token；inline `var()` 與 inline `rgba(…0.12)` 改 class；移除多疊的 `bg-primary-dark`；非基色透明與階梯外透明度就近對齊；淺底分隔線改 `border-line`；金／琥珀裝飾（痛點段落以外）改兩基色；`app/site-base.css` 階梯註解加 .6；移除 Geist 字型；/content-owners/ 陰影改標準級 | tok-color-hex-residue、tok-color-tailwind-gray、tok-color-error-red、tok-color-error-red-token、tok-color-two-syntaxes、tok-color-primary-dark-alias、tok-alpha-nonbase、tok-alpha-off-ladder、tok-alpha-pill-border-06、atom-divider、tok-font-family、tok-shadow |
-| DATAI-624 | 按鈕 | 4 顆方角滿版按鈕改藥丸；`.pill-btn` 單一定義（1px 框、600、同高、不用 `transition: all`）；外框與旁邊實心同高；`transition-all` 改具體屬性；主要按鈕上色統一為 `bg-primary`；手機選單底部按鈕不用 `h-11` 定高 | atom-btn-block、atom-btn-secondary-outline、atom-btn-primary、atom-btn-dark-secondary、tok-transition-all |
+| DATAI-624 | 按鈕 | 4 顆方角滿版按鈕改藥丸；`.pill-btn` 單一定義（1px 框、600、同高、不用 `transition: all`）；外框與旁邊實心同高；`transition-all` 改具體屬性；主要按鈕上色統一為 `bg-primary`；手機選單底部按鈕不用 `h-11` 定高 | atom-btn-block、atom-btn-secondary-outline、atom-btn-primary、atom-btn-dark-secondary、tok-transition-all、page-book-a-demo（按鈕部分） |
 | DATAI-625 | Atom 樣式 | Hero 小膠囊 9 處統一 `.label-eyebrow-pill` 並補框線；小標籤換色改參數；首頁身分卡圖示底座改大號 48；全站焦點外框（含表單欄位）；28px 卡片內距 3 處改 24；放大鏡 13→12；流程圖小底座框線 2→1px；內容區資訊小膠囊統一高 24、無框 | atom-eyebrow-pill、atom-eyebrow-override-risk、atom-icon-badge、atom-focus、atom-focus-form、mol-card-padding |
 | DATAI-626 | Hero 對齊 | /developers/、/partnership/、/decisive-engine/ 對齊標準 Hero（下距 48、底部細線、h1 48）；/privacy-policy/、/terms-of-service/、/book-a-demo/ 的 h1 補 `text-balance`；404／錯誤頁標題 48 | org-hero-structure、org-hero-h1-standard、page-404、page-error |
 | DATAI-627 | 無障礙行為 | FAQ 加 `aria-expanded`／`aria-controls`；步驟清單 tab 語意與鍵盤；首頁流程列改 `<button>`；輪播點標籤；JS 動畫減少動態（位移、淡入、`setInterval` 輪播三類） | cross-aria-disclosure、cross-reduced-motion-js |
