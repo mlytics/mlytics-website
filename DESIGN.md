@@ -59,7 +59,7 @@
 |---|---|---|---|
 | `--color-primary` | `#225D59` | 主色：行動按鈕底色、淺底上的強調文字、主色小標籤 | 不可當深底上的文字色（對比不足） |
 | `--color-primary-dark` | `#1A3D3A` | 與 `--bg-dark` **同值兩名**。深色區塊一律用 `.section-dark`；`bg-primary-dark` 只用於元件內的小面積深底 | 不可把整個區塊寫成 `bg-primary-dark`，也不可在 `.section-dark` 上再疊 `bg-primary-dark` |
-| `--color-primary-light` | `#2d7a74` | 現況用於首頁世界地圖點陣的訊號點與 `.pill-btn--dark` 滑過時的框線；一般用途未定案 | 新用途先依 §0 第 2 點詢問 |
+| `--color-primary-light` | `#2d7a74` | **只限現有兩處**：首頁世界地圖點陣的訊號點（`components/home/WorldMapDots.tsx`）與 `.pill-btn--dark` 滑過時的框線 | 不可用在其他地方；需要新用途先問 An <!-- src: #32-1 --> |
 | `--color-gold` | `#F59E0B` | 數字亮點、強調標籤 | 不當一般文字色 |
 | `--color-gold-light` | `#FCD34D` | 目前零使用 | 新用途先詢問 |
 | `--color-warn` | `#D97706` | 痛點／問題段落 | 只用於痛點段落；不當錯誤提示色 |
@@ -96,6 +96,7 @@
   1. 導覽列捲動後的 `bg-white/80` 加 `backdrop-blur-sm`。
   2. §2.4 的**標準淺底光暈配方**（薄荷 `rgba(240,248,247,0.97)`→白 `rgba(255,255,255,0.65)`），只限逐字照抄該配方，不可拿其中的薄荷或白色透明用在別處。
   3. /brands/ 痛點段落的琥珀光暈與琥珀短線（§2.4），只限痛點段落。
+  4. §2.14 的深底卡片 hover 發光配方（含階梯外的 .28、.24），只限逐字照抄。
 - 現況偏離：見 §10 DATAI-622（深底文字 α 低於 .85、比較卡編號、.75 文字）、DATAI-623（非基色透明、階梯外的值、淺底分隔線用黑色透明、`app/site-base.css` 階梯註解尚未列入 .6）
 <!-- src: tok-alpha-nonbase, tok-alpha-off-ladder, tok-alpha-pill-border-06, tok-on-dark-085, atom-divider, cross-contrast-card-number, #31-3, #31-4 -->
 
@@ -161,7 +162,7 @@
 | 404 的「404」與錯誤頁的「!」大字 | — | `text-7xl`，**白色** |
 | h2（區塊標題） | 30／36（≥768）／48（≥1024） | `.section-heading` |
 | 展示大字句（區塊中段重點句） | 手機 36、≥768 為 60 | `text-4xl md:text-6xl` |
-| 卡片標題 | 24 | `text-h3`（DATAI-556 修好前不產生樣式，見 §2.8）；首頁身分卡標題也是 24。**未定案**：DATAI-556 完成前新寫的 24px 卡片標題用什麼寫法，依 §0 第 2 點詢問 |
+| 卡片標題 | 24 | `text-h3`（DATAI-556 修好前不產生樣式，見 §2.8）；首頁身分卡標題也是 24。**DATAI-556 完成前不得新增卡片標題**；需要時先問 An <!-- src: #32-3 --> |
 | 法律頁條文小標 | 20 | `text-xl font-bold` |
 | 內文 | 16 | `text-base` |
 | 輔助文字 | 14 | `text-sm` |
@@ -190,7 +191,9 @@
 - 用在哪：目前不可用於任何地方。
 - 寫法：DATAI-556 修正後改名為 `--text-*`，屆時 `text-h3` 才會是 24px。
 - 禁止：在 DATAI-556 完成前新增任何 `text-display`／`text-h1`／`text-h2`／`text-h3`／`text-small`／`text-caption` 用法；也不要自行在 `app/site-base.css` 補 `--text-*`。
-- 未定案：改名為 `--text-*` 後，`display`／`h1`／`h2` 三個 token 的值與 §2.7 角色字級不一致（只有 `h3`、`small`、`caption` 一致），改名後是否保留、改值或刪除，待確認。
+- DATAI-556 改名為 `--text-*` 時，`display`／`h1`／`h2` 三個 token 的**值改成與 §2.7 的實際標題角色一致**（角色字級是響應式：h1 36／48、h2 30／36／48；實作值由 DATAI-556 提案、截圖交 An 確認）。`h3`、`small`、`caption` 的值不變。
+- 目前除了 AI Mode 頁（例外頁，`DecisionFlow.module.css` 以 `var(--font-size-h2)` 引用）以外，沒有任何地方用到這幾個 token。改值會讓 AI Mode 頁的標題大小跟著變，所以 DATAI-556 必須和 DATAI-630（AI Mode 頁對齊）協調。
+<!-- src: #32-2 -->
 - 現況偏離：見 §10 DATAI-556
 <!-- src: tok-font-size-token-broken, #29-6, #30-5 -->
 
@@ -293,7 +296,12 @@
 - 寫法：`shadow-sm`／`shadow-lg`／`shadow-xl`。
 - 禁止：自訂 `boxShadow`。
 - 現況偏離：見 §10 DATAI-623（/content-owners/ 比較卡改 `shadow-sm`、步驟面板改 `shadow-lg`）
-- 未定案：首頁流程圖金色小圓點的發光、/partnership/ 與 /content-owners/ 深色區塊選中卡片的自訂光暈陰影，是否屬本規則的違規，待確認。
+- **例外（核准）：深底卡片 hover 發光**。用在哪：深色區塊內的卡片，滑鼠移上時。寫法：逐字照抄 /partnership/（`components/pages/partnership/PartnershipEarnings.tsx:65`）與 /content-owners/（`components/pages/publishers/LayerOverview.tsx:41`）現有配方：
+  ```
+  boxShadow: '0 0 0 1px rgba(168,197,195,0.28), 0 6px 28px rgba(34,93,89,0.24)'
+  ```
+  未 hover 時為 `'0 0 0 1px transparent'`。禁止：用在淺底卡片，或改動配方的透明度與尺寸。<!-- src: #32-4 -->
+- 未定案：首頁流程圖金色小圓點的發光（`components/home/IntentPipeline.tsx:154`），依 §0 第 2 點詢問。
 <!-- src: tok-shadow, #31-7 -->
 
 ### 2.15 圖層與斷點
@@ -329,9 +337,19 @@
 - 寫法：`size={22}`。需要底座時用大號底座：48px、`rounded-2xl`、`bg-primary`、白色圖示，底座內圖示同為 22（標準寫法見 `components/pages/decisive-engine/EngineUseCases.tsx:45`：`w-12 h-12 rounded-2xl bg-primary text-white`）。
 - 例外（核准）：/developers/ 規格卡的圖示不加底座。
 - 禁止：其他圖示庫。
-- 未定案：22 以外的圖示尺寸（下拉選單、勾勾、送出成功圖示等）與首頁流程圖的 32px 圓形小底座，依 §0 第 2 點詢問。
-- 現況偏離：見 §10 DATAI-625（首頁身分卡改用大號 48 實心底座）
-<!-- src: tok-icon-size, atom-icon-badge, atom-icon-badge-none, #29-5 -->
+- 圖示尺寸依角色：
+
+| 角色 | 尺寸 | 例 |
+|---|---|---|
+| 小控制（例：下拉箭頭、國碼選單的放大鏡） | 12 | `size={12}` |
+| 行內勾勾 | 14 | `size={14}` |
+| 功能圖示 | 22 | `size={22}` |
+| 狀態大圖示（例：表單送出成功） | 32 | `size={32}` |
+
+- 例外（核准）：首頁流程圖的 32px 圓形小底座，保留為**流程圖專用小底座**（不可用在其他地方），框線 1px。完整元件規則寫在第 3 章。
+- 未定案：流程圖專用小底座內的圖示目前是 15px，不在上表角色內，依 §0 第 2 點詢問。
+- 現況偏離：見 §10 DATAI-625（首頁身分卡改用大號 48 實心底座；/book-a-demo/ 國碼選單的放大鏡 13 → 12；流程圖小底座框線 2px → 1px）
+<!-- src: tok-icon-size, atom-icon-badge, atom-icon-badge-none, #29-5, #32-5, #32-6 -->
 
 ### 2.18 `app/site-base.css` 元件類別索引
 
