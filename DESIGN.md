@@ -564,7 +564,7 @@
   - 淺底：`px-3 py-1 rounded-full text-xs font-semibold bg-primary/8 text-primary`
   - 深底：`px-3 py-1 rounded-full text-xs font-semibold bg-on-dark/8 text-on-dark`
 - 禁止：加框線；其他高度或內距；小於 12px 的字；白色透明底；inline `style` 上色。
-- 現況偏離：見 §10 DATAI-625（尺寸與框線統一）：/decisive-engine/ Hero 底部 5 個（`components/pages/decisive-engine/DecisiveEngineHero.tsx:56`，有框、高 30）、/partnership/ 方案卡 2 個（`components/pages/partnership/PartnershipMembership.tsx:55`、`:117`，有框、高 30）、首頁流程 5 個（`components/home/IntentPipeline.tsx:185`，10px、高 19）、/decisive-engine/ 決策迴圈卡片 12 個（`components/pages/decisive-engine/DecisionLoop.tsx:85`，高 24 但左右內距 10）；DATAI-556（`IntentPipeline.tsx:185` 的 10px 字）；DATAI-623（`IntentPipeline.tsx:185` 的白色 .08 底）；DATAI-621（上列 5 行的半級內距）
+- 現況偏離：見 §10 DATAI-625（尺寸與框線統一）：/decisive-engine/ Hero 底部 5 個（`components/pages/decisive-engine/DecisiveEngineHero.tsx:56`，有框、高 30）、/partnership/ 方案卡 2 個（`components/pages/partnership/PartnershipMembership.tsx:55`、`:117`，有框、高 30）、首頁流程 5 個（`components/home/IntentPipeline.tsx:185`，10px、高 19）、/decisive-engine/ 決策迴圈卡片 12 個（`components/pages/decisive-engine/DecisionLoop.tsx:85`，高 24 但左右內距 10）。這 5 行（`DecisiveEngineHero.tsx:56`、`PartnershipMembership.tsx:55`、`:117`、`IntentPipeline.tsx:185`、`DecisionLoop.tsx:85`）的內距**不由 DATAI-621 往下取**，一律照本節 `px-3 py-1`，由 DATAI-625 處理。`IntentPipeline.tsx:185` 另有：白色 .08 底改 `bg-on-dark/8`（DATAI-623）、10px 字改 12（DATAI-556），三張票的施工順序由 DATAI-625 協調
 <!-- src: #33（An 2026-10-15 決策頁 3 q11 選 a）, decisions-2026-10-15c/questions.json -->
 
 ### 3.15 內文連結
