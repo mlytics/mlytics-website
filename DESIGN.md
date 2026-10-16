@@ -554,6 +554,7 @@
 - 禁止：在元件內寫死字級或顏色。
 - **例外（核准）**：首頁 Flywheel 的展示大數字用元件內自己的 `CountUp`（`components/home/FlywheelSection.tsx:7`），保留，不改用 `NumberTicker`；只限這一處，不可照抄到其他地方。<!-- src: An 2026-10-15 裁決（Task 4 review #15） -->
 - JS 動畫要處理減少動態（第 8 章）。
+- 現況偏離：見 §10 DATAI-627（`NumberTicker` 未處理減少動態）<!-- src: 2026-10-16 An Task 7 #22 -->
 <!-- src: mol-stat-cell, 附錄 A §3 -->
 
 ### 3.14 資訊小膠囊（內容區）

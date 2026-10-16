@@ -1,8 +1,9 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { COLOR_TOKENS } from '@/stories/_data/tokens'
 import { SPECIMENS } from '@/stories/_data/specimens'
+import { REGISTRY } from '@/stories/_data/registry'
 
 // DESIGN.md is the single source of truth for UI rules. These checks keep it
 // from silently drifting away from the code it documents.
@@ -168,5 +169,42 @@ describe('storybook data matches the source of truth', () => {
       s.className.split(/\s+/).some((c) => FORBIDDEN.includes(c.split(':').pop()!)),
     ).map((s) => `${s.id}: ${s.className}`)
     expect(forbidden, `Specimens using a class DESIGN.md forbids:\n${forbidden.join('\n')}`).toEqual([])
+  })
+})
+
+// DESIGN.md §7.8: a shared component either has a story next to it (no open
+// fix ticket) or is listed as pending with the §10.2 tickets that block it.
+describe('storybook registry', () => {
+  it('lists every shared and layout component', () => {
+    const names = ['components/ui', 'components/layout'].flatMap((dir) =>
+      readdirSync(resolve(root, dir))
+        .filter((f) => f.endsWith('.tsx') && !f.endsWith('.stories.tsx'))
+        .map((f) => f.replace(/\.tsx$/, '')),
+    )
+    const listed = new Set(REGISTRY.map((e) => e.component))
+    expect(names.filter((c) => !listed.has(c))).toEqual([])
+  })
+
+  it('rendered entries have a story file next to the component', () => {
+    for (const e of REGISTRY.filter((x) => x.status === 'rendered')) {
+      expect(existsSync(resolve(root, e.file.replace(/\.tsx$/, '.stories.tsx'))), e.id).toBe(true)
+    }
+  })
+
+  it('every pending entry names a ticket that DESIGN.md §10 lists', () => {
+    const fixList = designMd.slice(designMd.indexOf('## 10. 例外與待修清單'))
+    for (const e of REGISTRY.filter((x) => x.status === 'pending')) {
+      expect(e.tickets.length, e.id).toBeGreaterThan(0)
+      for (const t of e.tickets) expect(fixList, `${e.id} → ${t}`).toContain(t)
+    }
+  })
+
+  it('has unique ids, existing files, and no tickets on rendered entries', () => {
+    const ids = REGISTRY.map((e) => e.id)
+    expect(new Set(ids).size, 'duplicate registry ids').toBe(ids.length)
+    for (const e of REGISTRY) {
+      expect(existsSync(resolve(root, e.file)), `${e.id}: ${e.file}`).toBe(true)
+      if (e.status === 'rendered') expect(e.tickets, e.id).toEqual([])
+    }
   })
 })

@@ -1,0 +1,103 @@
+{/* stories/templates/PageTemplates.mdx — page skeletons from DESIGN.md §6.
+    Storybook's MDX has no GFM, so tables are JSX, not pipe syntax. */}
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Templates/頁型骨架" />
+
+export const Order = ({ rows }) => (
+  <table>
+    <thead>
+      <tr>
+        <th>順序</th>
+        <th>底色</th>
+        <th>區塊</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map(([tone, block], i) => (
+        <tr key={i}>
+          <td>{i + 1}</td>
+          <td>{tone}</td>
+          <td>{block}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)
+
+# 頁型骨架
+
+每種頁型的區塊順序（深＝`.section-dark`，白＝`.section-white`）與「照哪一頁做」。內容摘自 `DESIGN.md` 第 6 章；兩者不一致時以 `DESIGN.md` 為準。
+
+**共同規則（§6.1）**：深色 Hero 開頭、深白交替、深色頁尾 CTA 收尾；FAQ 白底。同色區塊相鄰時可用細線區隔（淺底 `border-line`、深底 on-dark .12），也可不區隔。不用 `.section-light`（淺灰）做區塊交替。上下距見 §2.11、容器見 §2.12；導覽列與頁尾由 `app/layout.tsx` 提供。照抄標準版前先查 §10.2 待修清單。
+
+## 受眾頁（§6.2）
+
+照哪一頁做：`app/brands/page.tsx`（/brands/）。/content-owners/、/developers/、/partnership/ 屬同一類。
+
+<Order rows={[
+  ['深', 'Hero（§5.3）'],
+  ['白', '痛點'],
+  ['深', <>方案（含 AI Mode 入口 <code>variant="embedded"</code>）</>],
+  ['白', '比較＋細線＋FAQ（§5.5）'],
+  ['深', '頁尾 CTA（§5.4）'],
+]} />
+
+## 產品頁（§6.3）
+
+照哪一頁做：`app/decisive-engine/page.tsx`（/decisive-engine/，DATAI-619 把淺灰區塊改白之後）。
+
+<Order rows={[
+  ['深', 'Hero（膠囊列 1024 例外）'],
+  ['白', '決策迴圈'],
+  ['白', '優勢'],
+  ['白', '比較'],
+  ['白', '使用案例'],
+  ['深', '結果區'],
+  ['白', 'FAQ（上方用一般區塊距離）'],
+  ['深', '頁尾 CTA（產品頁變體「Contact Us」，§5.4）'],
+]} />
+
+## 首頁（§6.4）——首頁專屬，不可照抄
+
+照哪一頁做：不可當骨架（§9）。標準版 `app/page.tsx` 只供首頁本身維護。
+
+<Order rows={[
+  ['白', <>Hero（<code>HeroSection</code>）</>],
+  ['白', '身分卡'],
+  ['深', 'Flywheel'],
+  ['白', 'Intent Refinery'],
+  ['深', '頁尾 CTA'],
+]} />
+
+白／白開頭（白底 Hero）、h1 的 ≤420px 寫法、1152 容器（`max-w-6xl`）都只限首頁，其他頁不可用。
+
+## 法律頁（§6.5）
+
+照哪一頁做：`app/privacy-policy/page.tsx`、`app/terms-of-service/page.tsx`。
+
+<Order rows={[
+  ['深', 'Hero（§5.3）'],
+  ['白', <>條文區（一般區塊上下距；容器 768 <code>max-w-3xl</code>）</>],
+]} />
+
+## 表單頁（§6.6）
+
+照哪一頁做：`app/book-a-demo/page.tsx`。
+
+<Order rows={[
+  ['深', <>Hero（容器 672 <code>max-w-2xl</code>）</>],
+  ['白', <>表單區（一般區塊上下距；容器 512 <code>max-w-lg</code>；欄位 §3.10、送出用滿版藥丸 §3.3）</>],
+]} />
+
+## 404／錯誤頁（§6.7）
+
+照哪一頁做：`app/not-found.tsx`＋`components/not-found/NotFoundContent.tsx`、`app/error.tsx`。
+
+<Order rows={[
+  ['深', <>單一深色區塊置中（容器 512 <code>max-w-lg</code>；404 CDN 版 576 <code>max-w-xl</code>）</>],
+]} />
+
+## AI Mode 頁（§6.8）——例外，不是骨架
+
+`/ai-mode-playground/` 是例外，版型、字級與間距不可照抄、不計入任何慣例（§0 第 3 點）；對齊另由 DATAI-630 處理。

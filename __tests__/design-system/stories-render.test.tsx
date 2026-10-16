@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { composeStories, setProjectAnnotations } from '@storybook/nextjs-vite'
 import type { ComposedStoryFn } from 'storybook/internal/types'
 import * as a11yAddonAnnotations from '@storybook/addon-a11y/preview'
@@ -19,8 +19,19 @@ const modules = import.meta.glob(
 ) as Record<string, Parameters<typeof composeStories>[0]>
 
 describe('stories render', () => {
-  it('collects every Task 6 story module', () => {
-    expect(Object.keys(modules)).toHaveLength(14)
+  // jsdom has no window.scrollTo; the ScrollToTop story calls it on mount.
+  // Stub it here (test-only) so the run stays quiet; the story is unchanged.
+  beforeEach(() => {
+    vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+  })
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('collects every story module', () => {
+    // 14 under stories/ (Task 6) + 2 next to real components (Eyebrow,
+    // ScrollToTop). MDX docs pages are not *.stories.tsx, so they don't count.
+    expect(Object.keys(modules)).toHaveLength(16)
   })
 
   for (const [file, mod] of Object.entries(modules)) {
