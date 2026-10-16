@@ -505,7 +505,8 @@ describe('storybook registry', () => {
   /**
    * Repo files a module loads at runtime, resolved to repo-relative paths
    * ('@/' = repo root). Covers `import … from`, side-effect `import '…'`,
-   * dynamic `import('…')` and re-exports (`export … from`, `export * from`).
+   * dynamic `import('…')` (also with a backtick literal that has no `${`, i.e.
+   * a fixed path) and re-exports (`export … from`, `export * from`).
    * Type-only forms (`import type`, `export type`, or braces holding only
    * `type X` specifiers) render nothing and are skipped. Comments are dropped
    * first; in MDX, so are code fences and inline code, which are shown, not run.
@@ -523,6 +524,7 @@ describe('storybook registry', () => {
     const STATIC = /\b(?:import|export)\s+(type\s+)?((?:[\w$]+\s*,\s*)?(?:\*(?:\s+as\s+[\w$]+)?|\{[^}]*\}|[\w$]+))\s*from\s*['"]([^'"]+)['"]/g
     for (const m of code.matchAll(STATIC)) if (!m[1] && !typeOnly(m[2].trim())) specs.push(m[3])
     for (const m of code.matchAll(/(?<![@\w$.])import\s*(?:\(\s*)?['"]([^'"]+)['"]/g)) specs.push(m[1])
+    for (const m of code.matchAll(/(?<![@\w$.])import\s*\(\s*`([^`]+)`/g)) if (!m[1].includes('${')) specs.push(m[1])
     return specs.flatMap((spec) => {
       const base = spec.startsWith('@/') ? spec.slice(2)
         : spec.startsWith('.') ? relative(root, resolve(root, dirname(fromFile), spec)) : null
@@ -533,9 +535,10 @@ describe('storybook registry', () => {
   }
 
   // Imports are followed only through repo-internal script modules under
-  // components/ and stories/ (lib/ holds helpers such as cn() and is not
-  // followed); anything else is still checked as an import target.
-  const FOLLOWED = /^(components|stories)\/.*\.(tsx?|mdx)$/
+  // app/, components/ and stories/ (app/ sections can embed shared components;
+  // lib/ holds helpers such as cn() and is not followed); anything else is
+  // still checked as an import target.
+  const FOLLOWED = /^(app|components|stories)\/.*\.(tsx?|mdx)$/
 
   /** Every repo file `entry` reaches through runtime imports, each with the shortest import chain to it. */
   function reachableFiles(entry: string, fs: RepoFs = repoFs): Map<string, string[]> {
@@ -568,6 +571,10 @@ describe('storybook registry', () => {
       'components/ui/Hidden.tsx': ``,
       'stories/b.mdx': "import { Meta } from '@storybook/addon-docs/blocks'\nimport * as R from './_data/registry'\n\n```tsx\nimport { Pending } from '@/components/ui/Pending'\n```\n\nUse `import { Pending } from '@/components/ui/Pending'` in pages.",
       'stories/_data/registry.ts': ``,
+      // Fixed-path backtick dynamic import counts; one with ${} cannot be resolved statically.
+      'stories/c.stories.tsx': "const a = import(`@/components/ui/Pending`)\nconst b = import(`@/components/ui/${name}`)\nimport { S } from '@/app/brands/Section'",
+      // app/ is followed: a page section that embeds a component is a path to it.
+      'app/brands/Section.tsx': `import { Hidden } from '@/components/ui/Hidden'`,
     }
     const fs: RepoFs = { isFile: (f) => f in tree, read: (f) => tree[f] }
     const deps = (entry: string) => Object.fromEntries([...reachableFiles(entry, fs)].map(([f, c]) => [f, c.join(' → ')]))
@@ -581,17 +588,26 @@ describe('storybook registry', () => {
     })
     // MDX: ESM imports count; code fences and inline code are examples, not imports.
     expect(Object.keys(deps('stories/b.mdx'))).toEqual(['stories/_data/registry.ts'])
+    expect(deps('stories/c.stories.tsx')).toEqual({
+      'components/ui/Pending.tsx': 'stories/c.stories.tsx → components/ui/Pending.tsx',
+      'app/brands/Section.tsx': 'stories/c.stories.tsx → app/brands/Section.tsx',
+      'components/ui/Hidden.tsx': 'stories/c.stories.tsx → app/brands/Section.tsx → components/ui/Hidden.tsx',
+    })
   })
 
-  it('no story or MDX page reaches a pending component, directly or through other imports (§7.8)', () => {
+  it('no story, MDX page or preview decorator reaches a pending component, directly or through other imports (§7.8)', () => {
     // .storybook/main.ts loads stories/**/*.mdx as well as *.stories.ts(x), and
-    // MDX can import and render components, so both are entry points.
+    // MDX can import and render components, so both are entry points. So is
+    // .storybook/preview.ts(x): its decorators wrap every story. (main.ts is
+    // Node-side config and is never loaded into the preview.)
     const entries = ['stories', 'components'].flatMap((dir) =>
       (readdirSync(resolve(root, dir), { recursive: true }) as string[])
         .filter((f) => /\.stories\.tsx?$|\.mdx$/.test(f))
         .map((f) => join(dir, f)))
+      .concat(['.storybook/preview.ts', '.storybook/preview.tsx'].filter((f) => repoFs.isFile(f)))
     expect(entries.length).toBeGreaterThan(5)
     expect(entries).toContain('stories/PendingComponents.mdx')
+    expect(entries).toContain('.storybook/preview.ts')
     const byFile = new Map(REGISTRY.map((e) => [e.file, e]))
     // A registered file on the way is labelled: a `rendered` entry that embeds a
     // pending one must inherit its tickets and become pending itself (registry rule).
