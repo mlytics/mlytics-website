@@ -19,8 +19,8 @@ const modules = import.meta.glob(
 ) as Record<string, Parameters<typeof composeStories>[0]>
 
 describe('stories render', () => {
-  it('collects story modules (0 until Task 6 lands)', () => {
-    expect(Object.keys(modules).length).toBeGreaterThanOrEqual(0)
+  it('collects every Task 6 story module', () => {
+    expect(Object.keys(modules)).toHaveLength(14)
   })
 
   for (const [file, mod] of Object.entries(modules)) {
@@ -31,9 +31,10 @@ describe('stories render', () => {
       it(`${file} › ${name}`, async () => {
         // render(<Story />) throws SB_FRAMEWORK_NEXTJS_0002 here; run() mounts
         // through the framework. It does not throw on a11y violations, so read
-        // the reports explicitly.
+        // the reports explicitly. The addon default `test: 'todo'` reports
+        // violations as 'warning', so anything not 'passed' must fail.
         await Story.run()
-        const failed = Story.reporting.reports.filter((r) => r.status === 'failed')
+        const failed = Story.reporting.reports.filter((r) => r.status !== 'passed')
         expect(failed, JSON.stringify(failed.map((r) => r.result), null, 2)).toEqual([])
       })
     }

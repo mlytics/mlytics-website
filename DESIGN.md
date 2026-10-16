@@ -336,7 +336,7 @@
 
 **規則：圖示用 lucide（`lucide-react`）；功能圖示 22px。**
 - 用在哪：所有功能圖示。
-- 寫法：`size={22}`。需要底座時用大號底座：48px、`rounded-2xl`、`bg-primary`、白色圖示，底座內圖示同為 22（標準寫法見 `components/pages/decisive-engine/EngineUseCases.tsx:45`：`w-12 h-12 rounded-2xl bg-primary text-white`）。
+- 寫法：`size={22}`。需要底座時用大號底座：48px、`rounded-2xl`、`bg-primary`、白色圖示，底座內圖示同為 22（標準寫法見 `components/pages/decisive-engine/EngineUseCases.tsx:45`：`grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white`，含置中，與原始碼逐字相同）。<!-- src: 2026-10-16 An Task 6 #21 -->
 - 例外（核准）：/developers/ 規格卡的圖示不加底座。
 - 禁止：其他圖示庫。
 - 圖示尺寸依角色：
@@ -518,13 +518,13 @@
 **規則：多欄位表單用方角欄位；單欄 email 用 `InlineEmailCTA` 的藥丸欄。**
 - 用在哪：表單欄位用於 /book-a-demo/ 這類多欄位表單；email 欄只透過 `InlineEmailCTA`（§4.7）使用。
 - 寫法：
-  - 表單欄位：`w-full px-3 py-2 text-sm border border-line rounded-lg focus:border-primary transition-colors`，再加 §3.7 焦點外框（取自 `app/book-a-demo/BookADemoForm.tsx:20`，拿掉原始碼的 `focus:outline-none`）。8px 圓角、1px line 框、14px、聚焦框線變主色。
+  - 表單欄位：`w-full px-3 py-2 text-sm border border-line rounded-lg focus:border-primary transition-colors placeholder:text-ink-muted`，再加 §3.7 焦點外框（取自 `app/book-a-demo/BookADemoForm.tsx:20`，拿掉原始碼的 `focus:outline-none`，並加上原始碼沒有的 `placeholder:text-ink-muted`）。8px 圓角、1px line 框、14px、聚焦框線變主色。
   - 表單標籤：`block text-xs font-medium text-ink-muted mb-1`（取自 `app/book-a-demo/BookADemoForm.tsx:21`，Tailwind 灰改 `text-ink-muted`）。
   - email 欄：藥丸外框（`rounded-full border border-line bg-white`）、聚焦時 `focus-within:border-primary`、內嵌 §3.2 的 40 送出鈕（`components/ui/InlineEmailCTA.tsx:101-117`）。
   - 錯誤狀態：用 §2.2 錯誤色，依輸入框所在底色選淺底或深底那一個。
-  - 提示文字（placeholder）也是文字，不可用 `text-ink-subtle`（§2.1）。
+  - 提示文字（placeholder）一律用 `placeholder:text-ink-muted`（白底對比約 5.3:1；§2.1 淡一階文字一律 `text-ink-muted`，§8.1 提示文字也要 AA）；不可用 `text-ink-subtle`、Tailwind 灰或瀏覽器預設提示文字色。email 欄（`InlineEmailCTA`）同此規則。<!-- src: 2026-10-16 An Task 6 #20 -->
 - 禁止：其他圓角或框色；Tailwind 內建灰／紅；拿掉焦點外框；自己再做一個 email 欄。
-- 現況偏離：見 §10 DATAI-625（欄位拿掉焦點外框）、DATAI-623（表單標籤與國碼選單用 Tailwind 灰；email 錯誤用 Tailwind 紅）、DATAI-622（email 欄提示文字用 ink-subtle）
+- 現況偏離：見 §10 DATAI-625（欄位拿掉焦點外框）、DATAI-623（表單標籤與國碼選單用 Tailwind 灰；email 錯誤用 Tailwind 紅）、DATAI-622（email 欄提示文字用 ink-subtle；/book-a-demo/ 表單欄位提示文字未指定顏色，瀏覽器預設灰，白底約 3.4:1）
 <!-- src: atom-input, atom-focus-form, tok-color-tailwind-gray, tok-color-error-red-token, cross-contrast-ink-subtle -->
 
 ### 3.11 分隔線
@@ -540,7 +540,7 @@
 
 **規則：圖示底座只有兩種：大號底座（一般卡片）與流程圖專用小底座。**
 - 用在哪與寫法：
-  - **大號底座**：卡片內的功能圖示。`w-12 h-12 rounded-2xl bg-primary text-white`，內放 22px 圖示（`components/pages/decisive-engine/EngineUseCases.tsx:45`）。/developers/ 規格卡的圖示不加底座（核准例外）。
+  - **大號底座**：卡片內的功能圖示。`grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white`，內放 22px 圖示（`components/pages/decisive-engine/EngineUseCases.tsx:45`，逐字相同）。/developers/ 規格卡的圖示不加底座（核准例外）。<!-- src: 2026-10-16 An Task 6 #21 -->
   - **流程圖專用小底座**：只用於首頁流程圖（`components/home/IntentPipeline.tsx`）每一層的節點。32px 圓形：`w-8 h-8 rounded-full flex items-center justify-center bg-primary-dark`，框線 1px（顏色跟各層，依 §2.3 只用兩基色），內放 `size={15}` 的 `text-on-dark` 圖示。
 - 禁止：其他尺寸或形狀的底座（例如 32px 淡底方塊）；把流程圖小底座用在流程圖以外；2px 框線。
 - 現況偏離：見 §10 DATAI-625（首頁身分卡用 32px 淡底小方塊，改大號 48；流程圖小底座框線 2px → 1px）、DATAI-623（流程圖各層的金色底與框改兩基色）
@@ -965,8 +965,9 @@
   - 沒有待修項目 → 同時加 story。
   - 有待修項目 → 列入 Storybook 的待修元件清單（`stories/_data/registry.ts`），寫上修正票號；修正票完成後再換成 story。
 - CI 會渲染每一個 story 並跑無障礙檢查（`__tests__/design-system/stories-render.test.tsx`），任一 story 出錯會讓 CI 失敗。
+- DATAI-556、DATAI-624、DATAI-621／DATAI-625 完成前，卡片標題、深底外框按鈕、Hero 小膠囊的 story 只列目標規格與待修票號，不渲染現況偏離的樣本，也不加 Storybook 私有樣式補丁；修正票完成後再補實際樣本。
 - 規則以本文件為準（§0 第 5 點）。
-<!-- src: #30, 附錄 A §7 -->
+<!-- src: #30, 附錄 A §7, 2026-10-15 Task 6 #19 -->
 
 ---
 
@@ -1102,7 +1103,7 @@
 | DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白 | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
 | DATAI-620 | 區塊標題組 | h2→說明 16（含頁尾 CTA）；說明寬 576；7 處小標籤改「緊」；首頁 Flywheel h2 改 `.section-heading`；標題組到下方內容 48（11 處） | mol-heading-group-h2-gap、mol-heading-group-desc-width、mol-heading-group-eyebrow-gap、mol-heading-flywheel |
 | DATAI-621 | 4px 間距刻度 | 非按鈕的半級與任意值往下取（例外見 §10.1）；`.label-eyebrow-pill` 內距 6→4；內容區資訊小膠囊 5 行不在本票（歸 DATAI-625） | tok-spacing |
-| DATAI-622 | 對比修正 | `text-ink-subtle` 文字改 `text-ink-muted`；深底淡綠字低於 .85 改 ≥.85；主色字在深底改 on-dark；404「404」與錯誤頁「!」改白；白面板上的淡綠字改主色；比較卡編號改白；.75 文字改 .85 | cross-contrast-ink-subtle、tok-on-dark-085、cross-contrast-primary-on-dark、cross-contrast-ondark-on-white、cross-contrast-card-number |
+| DATAI-622 | 對比修正 | `text-ink-subtle` 文字改 `text-ink-muted`；email 欄與 /book-a-demo/ 表單欄位提示文字改 `placeholder:text-ink-muted`；深底淡綠字低於 .85 改 ≥.85；主色字在深底改 on-dark；404「404」與錯誤頁「!」改白；白面板上的淡綠字改主色；比較卡編號改白；.75 文字改 .85 | cross-contrast-ink-subtle、tok-on-dark-085、cross-contrast-primary-on-dark、cross-contrast-ondark-on-white、cross-contrast-card-number |
 | DATAI-623 | 色彩寫法與 token | 寫死白色 14 處；Tailwind 灰／紅改 token；新增兩個錯誤色 token；inline `var()` 與 inline `rgba(…0.12)` 改 class；移除多疊的 `bg-primary-dark`；非基色透明與階梯外透明度就近對齊；淺底分隔線改 `border-line`；金／琥珀裝飾（痛點段落以外）改兩基色；`app/site-base.css` 階梯註解加 .6；移除 Geist 字型；/content-owners/ 陰影改標準級 | tok-color-hex-residue、tok-color-tailwind-gray、tok-color-error-red、tok-color-error-red-token、tok-color-two-syntaxes、tok-color-primary-dark-alias、tok-alpha-nonbase、tok-alpha-off-ladder、tok-alpha-pill-border-06、atom-divider、tok-font-family、tok-shadow |
 | DATAI-624 | 按鈕 | 4 顆方角滿版按鈕改藥丸；`.pill-btn` 單一定義（1px 框、600、同高、不用 `transition: all`）；外框與旁邊實心同高；`transition-all` 改具體屬性；主要按鈕上色統一為 `bg-primary`；手機選單底部按鈕不用 `h-11` 定高 | atom-btn-block、atom-btn-secondary-outline、atom-btn-primary、atom-btn-dark-secondary、tok-transition-all、page-book-a-demo（按鈕部分） |
 | DATAI-625 | Atom 樣式 | Hero 小膠囊 9 處統一 `.label-eyebrow-pill` 並補框線；小標籤換色改參數；首頁身分卡圖示底座改大號 48；全站焦點外框（含表單欄位）；28px 卡片內距 3 處改 24；放大鏡 13→12；流程圖小底座框線 2→1px；內容區資訊小膠囊統一高 24、無框 | atom-eyebrow-pill、atom-eyebrow-override-risk、atom-icon-badge、atom-focus、atom-focus-form、mol-card-padding |

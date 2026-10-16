@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { COLOR_TOKENS } from '@/stories/_data/tokens'
+import { SPECIMENS } from '@/stories/_data/specimens'
 
 // DESIGN.md is the single source of truth for UI rules. These checks keep it
 // from silently drifting away from the code it documents.
@@ -120,5 +122,51 @@ describe('DESIGN.md', () => {
     const cited = new Set(body.match(TICKET_KEY) ?? [])
     const missing = [...cited].filter((k) => !listed.has(k))
     expect(missing, `Cited in DESIGN.md text but missing from §10.2: ${missing.join(', ')}`).toEqual([])
+  })
+})
+
+describe('storybook data matches the source of truth', () => {
+  it('shows every color token with the value site-base.css declares', () => {
+    const theme = stripComments(block(css, /@theme\s*\{/))
+    const declared = Object.fromEntries(
+      [...theme.matchAll(/(--color-[a-z0-9-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim().toLowerCase()]),
+    )
+    expect(COLOR_TOKENS.map((c) => c.token).sort()).toEqual(Object.keys(declared).sort())
+    for (const c of COLOR_TOKENS) expect(c.hex.toLowerCase(), c.token).toBe(declared[c.token])
+  })
+
+  // DESIGN.md also quotes deviations, forbidden forms and pre-fix source code
+  // verbatim, so a className found only on such a line is not a standard.
+  const NON_STANDARD_LINE = /現況偏離|禁止|原始碼現況/
+  const standardLines = designMd.split('\n').filter((l) => !NON_STANDARD_LINE.test(l))
+
+  /**
+   * The whole className, delimited, in one of the three ways DESIGN.md quotes a
+   * standard: `classes`, `.class` (a single class in selector form, e.g.
+   * `.label-eyebrow`), or className="classes" (a JSX attribute inside a quoted
+   * element or a fenced code block). A substring of a longer string never counts.
+   */
+  function quotedAsStandard(className: string): boolean {
+    const forms = [`\`${className}\``, `className="${className}"`]
+    if (!/\s/.test(className)) forms.push(`\`.${className}\``)
+    return standardLines.some((line) => forms.some((f) => line.includes(f)))
+  }
+
+  it('every specimen className is quoted in full as a standard in DESIGN.md, and none is forbidden', () => {
+    // Guard the matcher on fixed samples, not on today's DESIGN.md wording.
+    expect(NON_STANDARD_LINE.test('- 禁止：`p-7`（28）或其他內距。')).toBe(true)
+    expect(NON_STANDARD_LINE.test('原始碼現況：44 為 `… transition-all …`')).toBe(true)
+    expect(NON_STANDARD_LINE.test('- 現況偏離：見 §10 DATAI-625')).toBe(true)
+    expect(quotedAsStandard('rounded-full text-sm'), 'a substring of a longer quoted string must not count').toBe(false)
+
+    const missing = SPECIMENS.filter((s) => !quotedAsStandard(s.className)).map((s) => `${s.id}: ${s.className}`)
+    expect(missing, `Specimens not quoted as a standard in DESIGN.md:\n${missing.join('\n')}`).toEqual([])
+
+    // §2.16 forbids transition-all; §4.2 forbids p-7. Variant prefixes (md:, hover:) count too.
+    const FORBIDDEN = ['transition-all', 'p-7']
+    const forbidden = SPECIMENS.filter((s) =>
+      s.className.split(/\s+/).some((c) => FORBIDDEN.includes(c.split(':').pop()!)),
+    ).map((s) => `${s.id}: ${s.className}`)
+    expect(forbidden, `Specimens using a class DESIGN.md forbids:\n${forbidden.join('\n')}`).toEqual([])
   })
 })
