@@ -1,0 +1,9 @@
+/* Storybook's CSS entry: the same tokens and shared classes as the site
+   (app/site-base.css), plus the story and doc files that app/globals.css
+   excludes, so story-only classes exist here but never ship in the site CSS. */
+@import "tailwindcss";
+@import "../app/site-base.css";
+
+@source "../stories";
+@source "../components/**/*.stories.tsx";
+@source "../DESIGN.md";
