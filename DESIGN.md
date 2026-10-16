@@ -326,7 +326,12 @@
 - 寫法：
   - 只過場實際會變的屬性（例如 `transition-colors`、`transition-opacity`、`transition-transform`）。
   - 過場時間：**要指定時間時**只用 `duration-200`／`duration-300`；沒有指定時沿用 Tailwind 預設時間。按鈕與表單欄位照第 3 章的標準字串寫，不另加 `duration-*`。
-  - 進場動畫：framer-motion 0.5 秒、`easeOut`、淡入上移；卡片依序延遲 0.1 秒。
+  - 進場動畫：**新增的內容區塊預設要有進場動畫**，用 framer-motion，捲動進入畫面時播放一次（`viewport={{ once: true }}`）：
+    - 標題組：0.5 秒淡入、上移 20px（`initial={{ opacity: 0, y: 20 }}`、`transition={{ duration: 0.5 }}`）。
+    - 卡片：0.4 秒淡入、上移 24px、`easeOut`（`initial={{ opacity: 0, y: 24 }}`、`transition={{ duration: 0.4, ease: 'easeOut' }}`）。一排三卡時每張依序多延遲 0.1 秒（0／0.1／0.2）；超過一排的多卡網格怎麼延遲不在本規則範圍，需要時依 §0 第 2 點詢問。
+    - 各區塊現有的其他數值（例如 0.45 秒、0.08 秒延遲、`viewport` 的 `margin`）是現況差異，不可當新程式的範本。
+    - JS 動畫必須處理減少動態（§8.4）。
+    <!-- src: An 2026-10-16 缺口裁決 q4（AI 接手測試） -->
   - 減少動態：CSS 由 `app/site-base.css` 的 `prefers-reduced-motion` 規則全站處理；JS 動畫要自行處理（規則見 §8）。
 - 禁止：`transition-all`。
 - 現況偏離：見 §10 DATAI-624（13 處 `transition-all`）、DATAI-627（JS 動畫未處理減少動態）
@@ -336,7 +341,7 @@
 
 **規則：圖示用 lucide（`lucide-react`）；功能圖示 22px。**
 - 用在哪：所有功能圖示。
-- 寫法：`size={22}`。需要底座時用大號底座：48px、`rounded-2xl`、`bg-primary`、白色圖示，底座內圖示同為 22（標準寫法見 `components/pages/decisive-engine/EngineUseCases.tsx:45`：`grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white`，含置中，與原始碼逐字相同）。<!-- src: An 2026-10-16 裁決（大號底座補回置中寫法） -->
+- 寫法：`size={22}`。需要底座時用大號底座：48px、`rounded-2xl`、`bg-primary`、白色圖示，底座內圖示同為 22（標準寫法見 `components/pages/decisive-engine/EngineUseCases.tsx:45`：`grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white`，含置中，與原始碼逐字相同；底座在文字上方時的距離見 §3.12）。<!-- src: An 2026-10-16 裁決（大號底座補回置中寫法） -->
 - 例外（核准）：/developers/ 規格卡的圖示不加底座。
 - 禁止：其他圖示庫。
 - 圖示尺寸依角色：
@@ -541,9 +546,11 @@
 **規則：圖示底座只有兩種：大號底座（一般卡片）與流程圖專用小底座。**
 - 用在哪與寫法：
   - **大號底座**：卡片內的功能圖示。`grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white`，內放 22px 圖示（`components/pages/decisive-engine/EngineUseCases.tsx:45`，逐字相同）。/developers/ 規格卡的圖示不加底座（核准例外）。<!-- src: An 2026-10-16 裁決（大號底座補回置中寫法） -->
+    - **大號底座在文字上方時**：底座到下一個文字元素（例如卡片標題）的距離 **28**，在底座上加 `mb-7`（現有例子 `components/pages/decisive-engine/DecisionLoop.tsx:74`；該處底座寫成 `inline-grid`，瀏覽器實測為 28px。改用上方標準寫法 `grid` 的底座加 `mb-7` 時，28 由 DATAI-625 施工時在瀏覽器確認）。首頁身分卡由 DATAI-625 改用大號 48 底座時，同樣用 28。底座在文字左側時不適用（例：`EngineUseCases.tsx` 用雙欄 `gap-4`）。
+    <!-- src: An 2026-10-16 缺口裁決 q2（AI 接手測試） -->
   - **流程圖專用小底座**：只用於首頁流程圖（`components/home/IntentPipeline.tsx`）每一層的節點。32px 圓形：`w-8 h-8 rounded-full flex items-center justify-center bg-primary-dark`，框線 1px（顏色跟各層，依 §2.3 只用兩基色），內放 `size={15}` 的 `text-on-dark` 圖示。
 - 禁止：其他尺寸或形狀的底座（例如 32px 淡底方塊）；把流程圖小底座用在流程圖以外；2px 框線。
-- 現況偏離：見 §10 DATAI-625（首頁身分卡用 32px 淡底小方塊，改大號 48；流程圖小底座框線 2px → 1px）、DATAI-623（流程圖各層的金色底與框改兩基色）
+- 現況偏離：見 §10 DATAI-625（首頁身分卡用 32px 淡底小方塊、底座到標題 8（`mb-2`），改大號 48、距離 28（`mb-7`）；流程圖小底座框線 2px → 1px）、DATAI-623（流程圖各層的金色底與框改兩基色）
 <!-- src: atom-icon-badge, atom-icon-badge-none, tok-icon-size, #29-5, #32-6 -->
 
 ### 3.13 NumberTicker
@@ -591,7 +598,7 @@
 - 寫法：
   - **淺底卡片**：`rounded-2xl border border-line`，底色 `bg-surface` 或 `bg-white`（例：`components/pages/partnership/PartnershipMembership.tsx:37` 的 `rounded-2xl p-8 bg-surface border border-line`）。
   - **深色區塊內的卡片**：`rounded-2xl`、primary .25 底、on-dark .12 框，用 class 寫法（例：`rounded-2xl border border-on-dark/12 bg-primary/25`）；滑過時用 §2.14 的深底卡片 hover 發光。
-  - 卡片內層元件 `rounded-xl`、小元件 `rounded-lg`（§2.13）；卡片標題 24（§2.7，DATAI-556 完成前不新增卡片標題）；圖示底座見 §3.12；內距見 §4.2。
+  - 卡片內層元件 `rounded-xl`、小元件 `rounded-lg`（§2.13）；卡片標題 24（§2.7，DATAI-556 完成前不新增卡片標題）；圖示底座見 §3.12；內距見 §4.2；多張卡片排成網格時的間距見 §4.8。
 - 禁止：其他圓角；自訂 `boxShadow`（§2.14）；深色區塊卡片用 inline `rgba` 寫法或階梯外的透明度。
 - 現況偏離：見 §10 DATAI-623（/partnership/、/content-owners/ 深色卡片目前 inline primary .22 底、on-dark .1 框）、DATAI-628（「Talk to us」記錄名稱與畫面文字不同）
 <!-- src: mol-card, tok-alpha-off-ladder, 按鈕盤點 A8, #29-9(3), #32-4 -->
@@ -681,6 +688,23 @@
 - 禁止：自己另做 email 欄或送出鈕；改送出鈕高度。
 - 現況偏離：見 §10 DATAI-623（錯誤提示用 Tailwind 紅）、DATAI-625（email 欄拿掉焦點外框）、DATAI-622（提示文字用 ink-subtle）、DATAI-624（送出鈕 `transition-all`）
 <!-- src: org-page-cta, atom-input, atom-btn-inline-submit -->
+
+### 4.8 卡片網格
+
+**規則：卡片排成一排或網格時，間距依卡片數與性質只用兩級：大卡 2–3 張 `gap-5`（20），4 張以上或小卡 `gap-4`（16）。**
+- 用在哪：同一層 2 張以上卡片的排列（卡片外框見 §4.1、內距見 §4.2）。
+- 寫法：
+
+| 情況 | 間距 | 現有例子 |
+|---|---|---|
+| 一排 2–3 張大卡 | `gap-5`（20） | 兩張：`components/pages/partnership/PartnershipResponsibilities.tsx:42`、`components/pages/partnership/PartnershipMembership.tsx:34`；三張：`components/pages/publishers/LayerOverview.tsx:114`、`components/pages/partnership/PartnershipEarnings.tsx:123`、`components/pages/decisive-engine/DecisionLoop.tsx:55` |
+| 4 張以上，或統計／分類／清單型小卡 | `gap-4`（16） | 統計卡 `components/pages/publishers/ZeroClickSection.tsx:40`、分類卡 `components/pages/publishers/ContentOwnerVerticals.tsx:130`、規格卡 `components/pages/developers/DeveloperSpecs.tsx:38`、`components/pages/decisive-engine/EngineAdvantages.tsx:39`、`components/pages/decisive-engine/EngineUseCases.tsx:35` |
+
+- 一排三張：`grid md:grid-cols-3 gap-5`（手機單欄、≥768 三欄；例：`components/pages/publishers/LayerOverview.tsx:114`）。
+- 選級時對照上表的同類排列；拿不準時依 §0 第 2 點詢問。
+- 禁止：卡片網格用上表以外的間距（例如 `gap-6`、`gap-3`、`gap-8`）。
+- 現況偏離：見 §10 DATAI-619（`gap-6` 兩處改 `gap-5`：/brands/ 痛點兩卡 `components/pages/brands/BrandPainSection.tsx:67`、首頁身分卡 `components/home/IdentityCards.tsx:82`）
+<!-- src: An 2026-10-16 缺口裁決 q1（AI 接手測試） -->
 
 ---
 
@@ -811,7 +835,11 @@
 ### 6.2 受眾頁（照 /brands/）
 
 - 標準版：`app/brands/page.tsx`。
-- 區塊順序：深 Hero（§5.3）→ 白 痛點 → 深 方案（含 AI Mode 入口 `variant="embedded"`）→ 白 比較＋細線＋FAQ（§5.5）→ 深 頁尾 CTA（§5.4）。
+- 區塊順序（基本骨架，可依下一點加白色區塊）：深 Hero（§5.3）→ 白 痛點 → 深 方案（含 AI Mode 入口 `variant="embedded"`）→ 白 比較 →（可加的白色內容區塊）→ 細線＋白 FAQ（§5.5）→ 深 頁尾 CTA（§5.4）。
+- 加白色內容區塊：方案區塊與 FAQ 之間可再加白色內容區塊，一律放在 FAQ 上方那條細線**之前**，讓 FAQ 的入口固定是「細線＋FAQ」（細線緊接在 FAQ 上方，同 /brands/）。
+  - 新區塊用一般內容區塊上下距（§2.11 `py-16 lg:py-28`）。
+  - 新區塊與相鄰白色區塊之間照 §6.1（可用細線區隔，也可不區隔）；FAQ 上方那條細線固定保留。
+  <!-- src: An 2026-10-16 缺口裁決 q3（AI 接手測試） -->
 - /content-owners/、/developers/、/partnership/ 屬同一類；/content-owners/ 的連續同色區塊已接受（同色相鄰可細線或不區隔）。
 - 禁止：深色 Hero 以外的開頭；淺灰區塊；省略頁尾 CTA；有 FAQ 卻不帶 JSON-LD。
 - 現況偏離：見 §10 DATAI-619（區塊上下距）、DATAI-626（/developers/、/partnership/ Hero）
@@ -1043,7 +1071,7 @@
 **規則：新頁面照第 6 章的骨架組，用第 3–5 章既有的元件，上線前逐項跑完檢查表。**
 
 1. **選骨架**（第 6 章）：受眾頁照 /brands/（§6.2）、產品頁照 /decisive-engine/（§6.3）、法律頁（§6.5）、表單頁（§6.6）。首頁（§6.4）與 AI Mode 頁（§6.8）**不可當骨架**。
-2. **組區塊**：Hero（§5.3）、標題組（§4.3）、卡片（§4.1、§4.2）、FAQ（§5.5）、頁尾 CTA（§5.4）都用既有寫法或共用元件；照抄標準版前先看 §10 有沒有待修項目。
+2. **組區塊**：Hero（§5.3）、標題組（§4.3）、卡片（§4.1、§4.2、§4.8）、FAQ（§5.5）、頁尾 CTA（§5.4）都用既有寫法或共用元件；照抄標準版前先看 §10 有沒有待修項目。
 3. **文件沒寫到的**：停下，依 §0 第 2 點詢問，確認後才做，做完把新規則補進本文件。
 4. **上線前檢查表**：
    - [ ] metadata：頁面 export `metadata`，含 `title`、`description`、`openGraph`（`title`／`description`／`url`）、`twitter`、`alternates.canonical`（照 `app/brands/page.tsx:9-22`；`title` 會自動加上 `| Mlytics Cortex`）。
@@ -1101,13 +1129,13 @@
 | 票號 | 類別 | 內容 | 盤點 id |
 |---|---|---|---|
 | DATAI-556 | 字級 token | `--font-size-*` 改名 `--text-*`（display／h1／h2 的值改成與實際標題角色一致，與 DATAI-630 協調）；6 張卡片標題 16→24、首頁身分卡標題 18→24；`text-[10px]`、SVG 小字對齊 12px 下限 | tok-font-size-token-broken、tok-caption-12-floor、tok-text-size-scale |
-| DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白 | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
+| DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白；卡片網格 `gap-6` 兩處改 `gap-5`（/brands/ 痛點兩卡、首頁身分卡） | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
 | DATAI-620 | 區塊標題組 | h2→說明 16（含頁尾 CTA）；說明寬 576；7 處小標籤改「緊」；首頁 Flywheel h2 改 `.section-heading`；標題組到下方內容 48（11 處） | mol-heading-group-h2-gap、mol-heading-group-desc-width、mol-heading-group-eyebrow-gap、mol-heading-flywheel |
 | DATAI-621 | 4px 間距刻度 | 非按鈕的半級與任意值往下取（例外見 §10.1）；`.label-eyebrow-pill` 內距 6→4；內容區資訊小膠囊 5 行不在本票（歸 DATAI-625） | tok-spacing |
 | DATAI-622 | 對比修正 | `text-ink-subtle` 文字改 `text-ink-muted`；email 欄與 /book-a-demo/ 表單欄位提示文字改 `placeholder:text-ink-muted`；深底淡綠字低於 .85 改 ≥.85；主色字在深底改 on-dark；404「404」與錯誤頁「!」改白；白面板上的淡綠字改主色；比較卡編號改白；.75 文字改 .85 | cross-contrast-ink-subtle、tok-on-dark-085、cross-contrast-primary-on-dark、cross-contrast-ondark-on-white、cross-contrast-card-number |
 | DATAI-623 | 色彩寫法與 token | 寫死白色 14 處；Tailwind 灰／紅改 token；新增兩個錯誤色 token；inline `var()` 與 inline `rgba(…0.12)` 改 class；移除多疊的 `bg-primary-dark`；非基色透明與階梯外透明度就近對齊；淺底分隔線改 `border-line`；金／琥珀裝飾（痛點段落以外）改兩基色；`app/site-base.css` 階梯註解加 .6；移除 Geist 字型；/content-owners/ 陰影改標準級 | tok-color-hex-residue、tok-color-tailwind-gray、tok-color-error-red、tok-color-error-red-token、tok-color-two-syntaxes、tok-color-primary-dark-alias、tok-alpha-nonbase、tok-alpha-off-ladder、tok-alpha-pill-border-06、atom-divider、tok-font-family、tok-shadow |
 | DATAI-624 | 按鈕 | 4 顆方角滿版按鈕改藥丸；`.pill-btn` 單一定義（1px 框、600、同高、不用 `transition: all`）；外框與旁邊實心同高；`transition-all` 改具體屬性；主要按鈕上色統一為 `bg-primary`；手機選單底部按鈕不用 `h-11` 定高 | atom-btn-block、atom-btn-secondary-outline、atom-btn-primary、atom-btn-dark-secondary、tok-transition-all、page-book-a-demo（按鈕部分） |
-| DATAI-625 | Atom 樣式 | Hero 小膠囊 9 處統一 `.label-eyebrow-pill` 並補框線；小標籤換色改參數；首頁身分卡圖示底座改大號 48；全站焦點外框（含表單欄位）；28px 卡片內距 3 處改 24；放大鏡 13→12；流程圖小底座框線 2→1px；內容區資訊小膠囊統一高 24、無框 | atom-eyebrow-pill、atom-eyebrow-override-risk、atom-icon-badge、atom-focus、atom-focus-form、mol-card-padding |
+| DATAI-625 | Atom 樣式 | Hero 小膠囊 9 處統一 `.label-eyebrow-pill` 並補框線；小標籤換色改參數；首頁身分卡圖示底座改大號 48（底座到標題 28，`mb-7`）；全站焦點外框（含表單欄位）；28px 卡片內距 3 處改 24；放大鏡 13→12；流程圖小底座框線 2→1px；內容區資訊小膠囊統一高 24、無框 | atom-eyebrow-pill、atom-eyebrow-override-risk、atom-icon-badge、atom-focus、atom-focus-form、mol-card-padding |
 | DATAI-626 | Hero 對齊 | /developers/、/partnership/、/decisive-engine/ 對齊標準 Hero（下距 48、底部細線、h1 48）；/privacy-policy/、/terms-of-service/、/book-a-demo/ 的 h1 補 `text-balance`；404／錯誤頁標題 48 | org-hero-structure、org-hero-h1-standard、page-404、page-error |
 | DATAI-627 | 無障礙行為 | FAQ 加 `aria-expanded`／`aria-controls`；步驟清單 tab 語意與鍵盤；首頁流程列改 `<button>`；輪播點標籤；JS 動畫減少動態（位移、淡入、`setInterval` 輪播三類） | cross-aria-disclosure、cross-reduced-motion-js |
 | DATAI-628 | CTA 追蹤 | 7 顆導覽型按鈕補 `trackCTA`；「Talk to us」記錄名稱改為畫面文字（改名前先查 GA 報表） | cross-trackcta |
