@@ -29,6 +29,8 @@ export default defineConfig({
         plugins: [storybookNextjs({ dir: __dirname })],
         test: {
           name: 'stories',
+          // Cold start of Storybook + axe has exceeded the 5s default.
+          testTimeout: 30_000,
           include: ['__tests__/design-system/**/*.test.{ts,tsx}'],
           server: { deps: { inline: ['vite-plugin-storybook-nextjs', '@storybook/nextjs-vite', '@storybook/react'] } },
         },

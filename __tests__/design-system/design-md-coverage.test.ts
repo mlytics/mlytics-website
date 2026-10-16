@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import postcss from 'postcss'
 import { COLOR_TOKENS } from '@/stories/_data/tokens'
 import { SPECIMENS } from '@/stories/_data/specimens'
 import { REGISTRY } from '@/stories/_data/registry'
@@ -15,30 +16,71 @@ const designMd = existsSync(resolve(root, 'DESIGN.md')) ? read('DESIGN.md') : ''
 // site entry that only imports it and sets Tailwind sources.
 const css = read('app/site-base.css')
 
-function block(source: string, opener: RegExp): string {
-  const start = source.search(opener)
-  if (start < 0) return ''
-  const open = source.indexOf('{', start)
-  let depth = 0
-  for (let i = open; i < source.length; i++) {
-    if (source[i] === '{') depth++
-    if (source[i] === '}' && --depth === 0) return source.slice(open + 1, i)
-  }
-  return ''
+/**
+ * Custom properties declared directly in a block, in source order, with their
+ * values. postcss already drops comments, so `--x: …` inside one never counts.
+ */
+function declarations(source: string, selector: '@theme' | ':root'): Map<string, string> {
+  const out = new Map<string, string>()
+  postcss.parse(source).each((node) => {
+    const match = selector === '@theme'
+      ? node.type === 'atrule' && node.name === 'theme'
+      : node.type === 'rule' && node.selector === ':root'
+    if (!match || !('each' in node)) return
+    node.each((child: postcss.ChildNode) => {
+      if (child.type === 'decl' && child.prop.startsWith('--')) out.set(child.prop, child.value)
+    })
+  })
+  return out
 }
 
-const stripComments = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, '')
+/** Custom properties declared in @theme or :root. */
+const declaredTokens = (source: string, selector: '@theme' | ':root') => [...declarations(source, selector).keys()]
 
-/** Custom properties declared in a block, ignoring ones inside comments. */
-function declaredTokens(body: string): string[] {
-  return [...stripComments(body).matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1])
-}
-
-/** Top-level component classes defined in site-base.css (e.g. .pill-btn). */
+/**
+ * Every class used in a selector anywhere in the file, including inside
+ * @media / @layer blocks and compound selectors such as
+ * `[data-nf="cdn"] .nf-default`. Keyframe steps (`from`, `50%`) are not
+ * selectors and are skipped.
+ */
 function componentClasses(source: string): string[] {
-  const names = [...stripComments(source).matchAll(/^\.([a-z][a-z0-9-]*(?:--[a-z0-9-]+)?)\s*[{,:]/gm)].map((m) => m[1])
-  return [...new Set(names)]
+  const names = new Set<string>()
+  postcss.parse(source).walkRules((rule) => {
+    if (rule.parent?.type === 'atrule' && /keyframes$/.test((rule.parent as postcss.AtRule).name)) return
+    // Drop attribute selectors and strings first so `[href$=".pdf"]` is not read as a class.
+    const selector = rule.selector.replace(/\[[^\]]*\]/g, '').replace(/(["'])[^"']*\1/g, '')
+    for (const m of selector.matchAll(/\.(-?[_a-zA-Z][\w-]*)/g)) names.add(m[1])
+  })
+  return [...names]
 }
+
+/** Normalises a CSS value for comparison: case and whitespace do not matter. */
+const normValue = (v: string) => v.trim().replace(/\s+/g, ' ').toLowerCase()
+
+/**
+ * The first Markdown table under a heading line (e.g. '### 2.1 顏色 token'),
+ * stopping at the next heading. Returns the header cells and the body rows.
+ */
+function tableUnder(md: string, heading: string): { header: string[]; rows: string[][] } | null {
+  const lines = md.split('\n')
+  const start = lines.findIndex((l) => l.trim() === heading)
+  if (start < 0) return null
+  const cells = (l: string) => l.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim())
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^#{2,3} /.test(lines[i])) return null
+    if (!lines[i].startsWith('|')) continue
+    const rows: string[][] = []
+    for (const line of lines.slice(i + 2)) {
+      if (!line.startsWith('|')) break
+      rows.push(cells(line))
+    }
+    return { header: cells(lines[i]), rows }
+  }
+  return null
+}
+
+/** The single backtick-quoted string a table cell holds, or null. */
+const codeCell = (cell: string) => cell.match(/^`([^`]+)`$/)?.[1] ?? null
 
 const CHAPTERS = [
   '## 0. 給 AI 的使用說明', '## 1. 設計原則', '## 2. Tokens', '## 3. Atoms',
@@ -80,20 +122,137 @@ describe('DESIGN.md', () => {
   })
 
   it('parses a non-trivial token and class set from site-base.css (guards the parser)', () => {
-    expect(declaredTokens(block(css, /@theme\s*\{/))).toContain('--color-primary')
-    expect(declaredTokens(block(css, /:root\s*\{/))).toContain('--bg-dark')
+    expect(declaredTokens(css, '@theme')).toContain('--color-primary')
+    expect(declaredTokens(css, ':root')).toContain('--bg-dark')
+    expect(declarations(css, '@theme').get('--font-size-h3')).toBe('1.5rem')
     expect(componentClasses(css)).toEqual(expect.arrayContaining(['section-heading', 'pill-btn', 'label-eyebrow']))
+    // Fixed samples: classes inside @media / @layer and in compound selectors
+    // count; keyframe steps, attribute values and comments do not.
+    const sample = `
+      @layer components { .in-layer { color: red } }
+      @media (min-width: 768px) { .in-media:hover { color: red } }
+      [data-nf="cdn"] .compound, .a.b > .c { color: red }
+      a[href$=".pdf"] { color: red }
+      /* .commented { color: red } */
+      @keyframes k { from { opacity: 0 } 50.5% { opacity: 1 } }`
+    expect(componentClasses(sample).sort()).toEqual(['a', 'b', 'c', 'compound', 'in-layer', 'in-media'])
   })
 
-  it('documents every @theme and :root token', () => {
-    const tokens = [...declaredTokens(block(css, /@theme\s*\{/)), ...declaredTokens(block(css, /:root\s*\{/))]
-    const missing = tokens.filter((t) => !designMd.includes(`\`${t}\``))
-    expect(missing, `Tokens missing from DESIGN.md: ${missing.join(', ')}`).toEqual([])
+  // A name quoted only on a 禁止 (forbidden) line, or only inside a hidden
+  // <!-- src --> comment, is not documented: it says what not to do, not what
+  // the token or class is.
+  const documentedLines = stripHtmlComments(designMd).split('\n').filter((l) => !/禁止/.test(l))
+  const documented = (quoted: string) => documentedLines.some((l) => l.includes(quoted))
+
+  it('documents every @theme and :root token outside 禁止 lines', () => {
+    const tokens = [...declaredTokens(css, '@theme'), ...declaredTokens(css, ':root')]
+    const missing = tokens.filter((t) => !documented(`\`${t}\``))
+    expect(missing, `Tokens missing from DESIGN.md (or only on a 禁止 line): ${missing.join(', ')}`).toEqual([])
   })
 
-  it('documents every component class defined in site-base.css', () => {
-    const missing = componentClasses(css).filter((c) => !designMd.includes(`\`.${c}\``))
-    expect(missing, `Classes missing from DESIGN.md: ${missing.join(', ')}`).toEqual([])
+  it('documents every class used in site-base.css outside 禁止 lines', () => {
+    const missing = componentClasses(css).filter((c) => !documented(`\`.${c}\``))
+    expect(missing, `Classes missing from DESIGN.md (or only on a 禁止 line): ${missing.join(', ')}`).toEqual([])
+  })
+
+  // Tables that state the value a token has in site-base.css TODAY. §2.8 says
+  // DATAI-556 will rename and re-value some of these; its table still lists the
+  // current values (the target is in prose), so it is checked too. When a
+  // ticket changes a value, the table and the CSS must change together.
+  const VALUE_TABLES: { heading: string; tokens: (name: string) => boolean; from: '@theme' | ':root' }[] = [
+    { heading: '### 2.1 顏色 token', tokens: (t) => t.startsWith('--color-'), from: '@theme' },
+    { heading: '### 2.5 legacy 變數（`:root`）', tokens: () => true, from: ':root' },
+    { heading: '### 2.8 字級 token（目前失效）', tokens: (t) => t.startsWith('--font-size-'), from: '@theme' },
+  ]
+
+  /** token → value from a DESIGN.md table, read from its first column and its 值 column. */
+  function documentedValues(heading: string): Map<string, string> | null {
+    const table = tableUnder(designMd, heading)
+    if (!table) return null
+    const col = table.header.indexOf('值')
+    if (col < 0) return null
+    const out = new Map<string, string>()
+    for (const row of table.rows) {
+      const token = codeCell(row[0])
+      const value = codeCell(row[col] ?? '')
+      if (token && value) out.set(token, value)
+    }
+    return out
+  }
+
+  it('reads token values from DESIGN.md tables (guards the parser)', () => {
+    const sample = '### X\n\ntext\n\n| token | 值 | 用途 |\n|---|---|---|\n| `--a` | `#ABC` | x |\n| `--b` | `1px` | y |\n\nafter\n| `--c` | `2px` | z |'
+    const t = tableUnder(sample, '### X')!
+    expect(t.header).toEqual(['token', '值', '用途'])
+    expect(t.rows.map((r) => [codeCell(r[0]), codeCell(r[1])])).toEqual([['--a', '#ABC'], ['--b', '1px']])
+    expect(tableUnder('### X\ntext\n### Y\n| a |\n|---|\n| b |', '### X'), 'must stop at the next heading').toBeNull()
+  })
+
+  it.each(VALUE_TABLES)('$heading lists every token with the value site-base.css declares', ({ heading, tokens, from }) => {
+    const doc = documentedValues(heading)
+    expect(doc, `table with a 值 column not found under "${heading}"`).not.toBeNull()
+    const declared = [...declarations(css, from)].filter(([t]) => tokens(t))
+    expect(declared.length).toBeGreaterThan(0)
+    const actual = new Map(declared.map(([t, v]) => [t, normValue(v)]))
+    const stated = new Map([...doc!].map(([t, v]) => [t, normValue(v)]))
+    // Same token set, and the same value for each.
+    expect([...stated.keys()].sort(), 'tokens in the table vs. site-base.css').toEqual([...actual.keys()].sort())
+    for (const [t, v] of stated) expect(v, `${heading}: ${t}`).toBe(actual.get(t))
+  })
+
+  // Names DESIGN.md already uses for something a §10.2 fix ticket will add to
+  // site-base.css. Keyed by ticket so closing the ticket forces a cleanup: each
+  // key must still have a §10.2 row, and each name must still be missing from
+  // the CSS (once the ticket adds it, drop it here).
+  const PLANNED_BY_TICKET: Record<string, string[]> = {
+    'DATAI-623': ['--color-error', '--color-error-on-dark'], // §2.2 錯誤色，建議名稱
+  }
+  const planned = new Set(Object.values(PLANNED_BY_TICKET).flat())
+
+  it('keeps the planned-name allowlist tied to open tickets and still unbuilt', () => {
+    const rows = fixListRows(designMd) ?? []
+    const open = new Set(rows.map((r) => r.match(TICKET_KEY)![0]))
+    const existing = new Set([
+      ...declaredTokens(css, '@theme'), ...declaredTokens(css, ':root'),
+      ...componentClasses(css).map((c) => `.${c}`),
+    ])
+    for (const [ticket, names] of Object.entries(PLANNED_BY_TICKET)) {
+      expect(open.has(ticket), `${ticket} has no §10.2 row; remove it from PLANNED_BY_TICKET`).toBe(true)
+      for (const n of names) expect(existing.has(n), `${n} now exists in site-base.css; remove it from PLANNED_BY_TICKET`).toBe(false)
+    }
+  })
+
+  // A real token name inside a code span: not a wildcard prefix such as
+  // `--text-*` and not a BEM modifier such as `.pill-btn--dark`.
+  const TOKEN_IN_CODE = /(?<![\w-])--[a-z0-9]+(?:-[a-z0-9]+)*(?![\w*-])/g
+  const codeSpans = (md: string) => [...md.matchAll(/`([^`\n]+)`/g)].map((m) => m[1])
+
+  it('every token named in §2 Tokens exists in site-base.css', () => {
+    expect(codeSpans('`--a-b` `--text-*` `.pill-btn--dark` `var(--c)`').flatMap((c) => c.match(TOKEN_IN_CODE) ?? [])).toEqual(['--a-b', '--c'])
+    // Scoped to §2: other chapters quote non-existent names on purpose
+    // (§7.5 uses --color-amber as an example of a token that silently fails).
+    const start = designMd.indexOf('\n## 2. Tokens')
+    const end = designMd.indexOf('\n## 3. Atoms')
+    expect(start).toBeGreaterThan(0)
+    const chapter = stripHtmlComments(designMd.slice(start, end))
+    const named = new Set(codeSpans(chapter).flatMap((c) => c.match(TOKEN_IN_CODE) ?? []))
+    expect(named.size).toBeGreaterThan(10)
+    const existing = new Set([...declaredTokens(css, '@theme'), ...declaredTokens(css, ':root')])
+    const missing = [...named].filter((t) => !existing.has(t) && !planned.has(t))
+    expect(missing, `Named in DESIGN.md §2 but not declared in site-base.css: ${missing.join(', ')}`).toEqual([])
+  })
+
+  it('every class in the §2.18 index exists in site-base.css', () => {
+    const table = tableUnder(designMd, '### 2.18 `app/site-base.css` 元件類別索引')
+    expect(table, '§2.18 table not found').not.toBeNull()
+    const listed = table!.rows.flatMap((r) => [...r[0].matchAll(/`\.([a-z][\w-]*)`/g)].map((m) => m[1]))
+    expect(listed).toEqual(expect.arrayContaining(['label-eyebrow', 'nf-cdn', 'nf-default']))
+    const existing = new Set(componentClasses(css))
+    const missing = listed.filter((c) => !existing.has(c) && !planned.has(`.${c}`))
+    expect(missing, `Listed in DESIGN.md §2.18 but not in site-base.css: ${missing.join(', ')}`).toEqual([])
+    // And the index is complete: every class in the CSS has a §2.18 row.
+    const unlisted = [...existing].filter((c) => !listed.includes(c))
+    expect(unlisted, `Classes in site-base.css with no §2.18 row: ${unlisted.join(', ')}`).toEqual([])
   })
 
   it('keeps the §10.2 fix list parseable and every row a real Jira key', () => {
@@ -128,9 +287,8 @@ describe('DESIGN.md', () => {
 
 describe('storybook data matches the source of truth', () => {
   it('shows every color token with the value site-base.css declares', () => {
-    const theme = stripComments(block(css, /@theme\s*\{/))
     const declared = Object.fromEntries(
-      [...theme.matchAll(/(--color-[a-z0-9-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim().toLowerCase()]),
+      [...declarations(css, '@theme')].filter(([t]) => t.startsWith('--color-')).map(([t, v]) => [t, v.trim().toLowerCase()]),
     )
     expect(COLOR_TOKENS.map((c) => c.token).sort()).toEqual(Object.keys(declared).sort())
     for (const c of COLOR_TOKENS) expect(c.hex.toLowerCase(), c.token).toBe(declared[c.token])
@@ -185,9 +343,15 @@ describe('storybook registry', () => {
     expect(names.filter((c) => !listed.has(c))).toEqual([])
   })
 
-  it('rendered entries have a story file next to the component', () => {
+  it('rendered entries have a story file next to the component, pending entries do not', () => {
+    const storyOf = (file: string) => resolve(root, file.replace(/\.tsx$/, '.stories.tsx'))
     for (const e of REGISTRY.filter((x) => x.status === 'rendered')) {
-      expect(existsSync(resolve(root, e.file.replace(/\.tsx$/, '.stories.tsx'))), e.id).toBe(true)
+      expect(existsSync(storyOf(e.file)), `${e.id}: rendered but has no story`).toBe(true)
+    }
+    // §7.8: a component with open fix tickets must not render its current
+    // (deviating) state as a story; it is listed in PendingComponents instead.
+    for (const e of REGISTRY.filter((x) => x.status === 'pending')) {
+      expect(existsSync(storyOf(e.file)), `${e.id}: pending but has a story next to it`).toBe(false)
     }
   })
 

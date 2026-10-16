@@ -5,7 +5,7 @@
 - 每條規則寫三件事：**用在哪**、**寫法**（逐字的 class／token）、**禁止什麼**。
 - 現況與標準不同時，規則下方會有一行「現況偏離：見 §10 DATAI-xxx」。偏離的寫法**不可當範本照抄**，以本文件為準；修正票完成後該行會刪除。
 - 每條規則後有隱藏的來源註記（`<!-- src: ... -->`），指向盤點項目 id 與專案決策編號，供維護者追溯，閱讀時可忽略。來源註記與 §10.1「依據」欄裡的 `#nn` 決策編號和盤點 id 是內部追溯用的參照；對外共用的正式紀錄以 Jira 票為準。
-- token 與 class 一律寫在反引號內；`__tests__/design-system/design-md-coverage.test.ts` 會檢查 `app/site-base.css` 的每個 token 與元件類別都出現在本文件，避免文件過期。
+- token 與 class 一律寫在反引號內；`__tests__/design-system/design-md-coverage.test.ts` 會檢查 `app/site-base.css` 的每個 token 與元件類別都出現在本文件、本文件 token 表的值與 CSS 一致、本文件列出的 token 與 class 在 CSS 中確實存在，避免文件過期。
 
 ---
 
@@ -79,6 +79,7 @@
 **規則：錯誤提示用兩個專用錯誤色 token，依底色選用。** 這是「只用既有 token」的核准例外。
 - 用在哪：表單與 email 欄的錯誤訊息、錯誤狀態框線。
 - 寫法：淺底用 `#B91C1C`（白底對比 6.47:1）、深底用 `#FCA5A5`（深底對比 6.24:1）。建議名稱 `--color-error`／`--color-error-on-dark`，由修正票加入 `app/site-base.css` 後改用對應 class。
+- 過渡期：DATAI-623 把這兩個 token 加入 `app/site-base.css` 之前，若需要新增錯誤提示，先依 §0 第 2 點停下詢問，不可自行寫死色碼或自行新增 token。<!-- src: An 2026-10-16 裁決（DATAI-614 出貨審查 #6） -->
 - 禁止：用 `warn`（琥珀，語意是痛點段落）或 Tailwind 內建紅表示錯誤；在深底用淺底那一個紅（反之亦然）。
 - 現況偏離：見 §10 DATAI-623（`InlineEmailCTA` 目前用 `text-red-500`、`border-red-400`）
 <!-- src: tok-color-error-red-token, tok-color-error-red, #29-8, #31-2 -->
@@ -995,7 +996,7 @@
 - 新增共用元件時：
   - 沒有待修項目 → 同時加 story。
   - 有待修項目 → 列入 Storybook 的待修元件清單（`stories/_data/registry.ts`），寫上修正票號；修正票完成後再換成 story。
-- CI 會渲染每一個 story 並跑無障礙檢查（`__tests__/design-system/stories-render.test.tsx`），任一 story 出錯會讓 CI 失敗。
+- CI 會渲染每一個 story 並跑無障礙檢查（`__tests__/design-system/stories-render.test.tsx`），任一 story 出錯會讓 CI 失敗；但 CI 的測試環境（jsdom）無法檢查顏色對比，對比一律在瀏覽器實測（§8.1）。
 - DATAI-556、DATAI-624、DATAI-621／DATAI-625 完成前，卡片標題、深底外框按鈕、Hero 小膠囊的 story 只列目標規格與待修票號，不渲染現況偏離的樣本，也不加 Storybook 私有樣式補丁；修正票完成後再補實際樣本。
 - 規則以本文件為準（§0 第 5 點）。
 <!-- src: #30, An 2026-10-15 裁決（待修共用樣式在 Storybook 只列標準與票號） -->

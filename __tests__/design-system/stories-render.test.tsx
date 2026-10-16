@@ -58,7 +58,11 @@ describe('stories render', () => {
         // the reports explicitly. The addon default `test: 'todo'` reports
         // violations as 'warning', so anything not 'passed' must fail.
         await Story.run()
-        const failed = Story.reporting.reports.filter((r) => r.status !== 'passed')
+        // No a11y report means the addon annotations did not run (e.g. a broken
+        // setProjectAnnotations), which would otherwise pass silently.
+        const { reports } = Story.reporting
+        expect(reports.some((r) => r.type === 'a11y'), 'no a11y report: the a11y check did not run').toBe(true)
+        const failed = reports.filter((r) => r.status !== 'passed')
         expect(failed, JSON.stringify(failed.map((r) => r.result), null, 2)).toEqual([])
       })
     }
