@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import postcss from 'postcss'
@@ -17,24 +17,45 @@ const designMd = existsSync(resolve(root, 'DESIGN.md')) ? read('DESIGN.md') : ''
 const css = read('app/site-base.css')
 
 /**
- * Custom properties declared directly in a block, in source order, with their
- * values. postcss already drops comments, so `--x: …` inside one never counts.
- * Blocks are found at any depth (inside @layer / @media too), and a :root rule
- * counts when :root is one entry of a selector list such as `:root, :host`.
+ * Custom properties declared directly in a @theme or :root block. Blocks are
+ * found at any depth (inside @layer / @media too), and a :root rule counts when
+ * :root is one entry of a selector list such as `:root, :host`. postcss already
+ * drops comments, so `--x: …` inside one never counts.
+ *
+ * `names` lists every token declared anywhere. `values` holds only what an
+ * unconditional block declares (the block sits at the top level or is wrapped
+ * only by @layer / @theme): an override inside @media / @supports or a
+ * container query applies only sometimes, so it must not replace the base
+ * value the DESIGN.md tables are compared against.
  */
-function declarations(source: string, selector: '@theme' | ':root'): Map<string, string> {
-  const out = new Map<string, string>()
-  const collect = (node: postcss.Container) => node.each((child: postcss.ChildNode) => {
-    if (child.type === 'decl' && child.prop.startsWith('--')) out.set(child.prop, child.value)
-  })
+function tokenBlocks(source: string, selector: '@theme' | ':root'): { names: string[]; values: Map<string, string> } {
+  const names = new Set<string>()
+  const values = new Map<string, string>()
+  const unconditional = (node: postcss.Node) => {
+    for (let p = node.parent; p && p.type !== 'root'; p = p.parent) {
+      if (p.type !== 'atrule' || !['layer', 'theme'].includes((p as postcss.AtRule).name)) return false
+    }
+    return true
+  }
+  const collect = (node: postcss.Container) => {
+    const base = unconditional(node)
+    node.each((child: postcss.ChildNode) => {
+      if (child.type !== 'decl' || !child.prop.startsWith('--')) return
+      names.add(child.prop)
+      if (base) values.set(child.prop, child.value)
+    })
+  }
   const parsed = postcss.parse(source)
   if (selector === '@theme') parsed.walkAtRules('theme', collect)
   else parsed.walkRules((rule) => { if (rule.selectors.some((s) => s.trim() === ':root')) collect(rule) })
-  return out
+  return { names: [...names], values }
 }
 
-/** Custom properties declared in @theme or :root. */
-const declaredTokens = (source: string, selector: '@theme' | ':root') => [...declarations(source, selector).keys()]
+/** Unconditional token values of a @theme or :root block, in source order (last write wins). */
+const declarations = (source: string, selector: '@theme' | ':root') => tokenBlocks(source, selector).values
+
+/** Every custom property declared in @theme or :root, conditional overrides included. */
+const declaredTokens = (source: string, selector: '@theme' | ':root') => tokenBlocks(source, selector).names
 
 /**
  * Every class used in a selector anywhere in the file, including inside
@@ -155,8 +176,26 @@ describe('DESIGN.md', () => {
       .x { --not-root-either: 5px; }
       @layer theme { @theme { --nested-theme: 6px; } }
       @theme inline { --theme-inline: 7px; }`
-    expect([...declarations(tokenSample, ':root')]).toEqual([['--top', '1px'], ['--in-layer', '2px'], ['--in-media', '3px']])
+    expect(declaredTokens(tokenSample, ':root')).toEqual(['--top', '--in-layer', '--in-media'])
+    expect(declaredTokens(tokenSample, '@theme')).toEqual(['--nested-theme', '--theme-inline'])
+    // Values come only from unconditional blocks: an override inside @media /
+    // @supports / container query keeps its name but never replaces the base value.
+    expect([...declarations(tokenSample, ':root')]).toEqual([['--top', '1px'], ['--in-layer', '2px']])
     expect([...declarations(tokenSample, '@theme')]).toEqual([['--nested-theme', '6px'], ['--theme-inline', '7px']])
+    // Tailwind scans this file for class names: spelled whole, the container
+    // at-rule would add a utility to the site CSS.
+    const CQ = ['@', 'container'].join('')
+    const overrides = `
+      :root { --bg: #fff; }
+      @media (prefers-color-scheme: dark) { :root { --bg: #000; --dark-only: 1px; } }
+      @supports (color: lab(0 0 0)) { @layer base { :root { --bg: lab(0 0 0); } } }
+      ${CQ} (min-width: 1px) { :root { --bg: red; } }
+      @theme { --t: 1px; }
+      @media print { @theme { --t: 2px; } }`
+    expect(declaredTokens(overrides, ':root')).toEqual(['--bg', '--dark-only'])
+    expect([...declarations(overrides, ':root')]).toEqual([['--bg', '#fff']])
+    expect(declaredTokens(overrides, '@theme')).toEqual(['--t'])
+    expect([...declarations(overrides, '@theme')]).toEqual([['--t', '1px']])
   })
 
   // A name quoted only on a 禁止 (forbidden) line, or only inside a hidden
@@ -243,30 +282,49 @@ describe('DESIGN.md', () => {
     for (const t of [...NAME_ONLY, ...PROSE_VALUES.map((p) => p.token)]) expect([...theme, ...declaredTokens(css, ':root')], t).toContain(t)
   })
 
-  it.each(PROSE_VALUES)('$section states the value site-base.css declares for $token', ({ section, token }) => {
-    const lines = designMd.split('\n')
+  /**
+   * Values a section states in `--token: value` code spans, or null when the
+   * section is missing. Like `documentedLines`, <!-- src --> comments and 禁止
+   * lines do not count: a forbidden example may quote a wrong value on purpose.
+   */
+  function proseValues(md: string, section: string, token: string): string[] | null {
+    const lines = md.split('\n')
     const start = lines.findIndex((l) => l.startsWith(section))
-    expect(start, `section "${section}" not found`).toBeGreaterThanOrEqual(0)
+    if (start < 0) return null
     const end = lines.findIndex((l, i) => i > start && /^#{2,3} /.test(l))
     const body = stripHtmlComments(lines.slice(start + 1, end < 0 ? undefined : end).join('\n'))
+      .split('\n').filter((l) => !/禁止/.test(l)).join('\n')
     const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    const stated = [...body.matchAll(new RegExp(`\`${escaped}:\\s*([^\`;]+);?\``, 'g'))].map((m) => normValue(m[1]))
-    expect(stated.length, `no \`${token}: <value>\` code span in ${section}`).toBeGreaterThan(0)
+    return [...body.matchAll(new RegExp(`\`${escaped}:\\s*([^\`;]+);?\``, 'g'))].map((m) => normValue(m[1]))
+  }
+
+  it('reads prose token values outside 禁止 lines and comments (guards the parser)', () => {
+    const sample = '### 2.15 x\n- `--bp: 30rem`\n- 禁止改成 `--bp: 40rem`\n<!-- src: `--bp: 50rem` -->\n### 2.16 y\n`--bp: 60rem`'
+    expect(proseValues(sample, '### 2.15 ', '--bp')).toEqual(['30rem'])
+    expect(proseValues(sample, '### 9.9 ', '--bp')).toBeNull()
+  })
+
+  it.each(PROSE_VALUES)('$section states the value site-base.css declares for $token', ({ section, token }) => {
+    const stated = proseValues(designMd, section, token)
+    expect(stated, `section "${section}" not found`).not.toBeNull()
+    expect(stated!.length, `no \`${token}: <value>\` code span in ${section}`).toBeGreaterThan(0)
     const actual = declarations(css, '@theme').get(token)
     expect(actual, `${token} not in @theme`).toBeDefined()
-    for (const v of stated) expect(v, `${section}: ${token}`).toBe(normValue(actual!))
+    for (const v of stated!) expect(v, `${section}: ${token}`).toBe(normValue(actual!))
   })
 
   it.each(VALUE_TABLES)('$heading lists every token with the value site-base.css declares', ({ heading, tokens, from }) => {
     const doc = documentedValues(heading)
     expect(doc, `table with a 值 column not found under "${heading}"`).not.toBeNull()
-    const declared = [...declarations(css, from)].filter(([t]) => tokens(t))
-    expect(declared.length).toBeGreaterThan(0)
-    const actual = new Map(declared.map(([t, v]) => [t, normValue(v)]))
+    const names = declaredTokens(css, from).filter(tokens)
+    expect(names.length).toBeGreaterThan(0)
+    const actual = new Map([...declarations(css, from)].filter(([t]) => tokens(t)).map(([t, v]) => [t, normValue(v)]))
     const stated = new Map([...doc!].map(([t, v]) => [t, normValue(v)]))
-    // Same token set, and the same value for each.
-    expect([...stated.keys()].sort(), 'tokens in the table vs. site-base.css').toEqual([...actual.keys()].sort())
-    for (const [t, v] of stated) expect(v, `${heading}: ${t}`).toBe(actual.get(t))
+    // Same token set, and the same value as the unconditional (base) declaration.
+    // A token declared only inside @media / @supports / a container query has no base
+    // value to compare, so only its name is checked.
+    expect([...stated.keys()].sort(), 'tokens in the table vs. site-base.css').toEqual([...names].sort())
+    for (const [t, v] of stated) if (actual.has(t)) expect(v, `${heading}: ${t}`).toBe(actual.get(t))
   })
 
   // Names DESIGN.md already uses for something a §10.2 fix ticket will add to
@@ -323,7 +381,11 @@ describe('DESIGN.md', () => {
   it('every class in the §2.18 index exists in site-base.css', () => {
     const table = tableUnder(designMd, '### 2.18 `app/site-base.css` 元件類別索引')
     expect(table, '§2.18 table not found').not.toBeNull()
-    const listed = table!.rows.flatMap((r) => [...r[0].matchAll(/`\.([a-z][\w-]*)`/g)].map((m) => m[1]))
+    // A functional @utility such as `tab-*` is collected as `tab-*`, so the
+    // index may list it as `.tab-*`.
+    const classesIn = (cell: string) => [...cell.matchAll(/`\.([a-z][\w-]*\*?)`/g)].map((m) => m[1])
+    expect(classesIn('`.a-b` `.tab-*` and `.c--d`, not `.*x`')).toEqual(['a-b', 'tab-*', 'c--d'])
+    const listed = table!.rows.flatMap((r) => classesIn(r[0]))
     expect(listed).toEqual(expect.arrayContaining(['label-eyebrow', 'nf-cdn', 'nf-default']))
     const existing = new Set(componentClasses(css))
     const missing = listed.filter((c) => !existing.has(c) && !planned.has(`.${c}`))
@@ -433,32 +495,112 @@ describe('storybook registry', () => {
     }
   })
 
-  /** Files a story module imports, resolved to repo-relative paths ('@/' = repo root). */
-  function importedFiles(source: string, fromFile: string): string[] {
-    const specs = [...source.matchAll(/(?:\bfrom\s*|\bimport\s*\(?\s*)['"]([^'"]+)['"]/g)].map((m) => m[1])
+  /** How the import scan reads the repo; replaced by an in-memory tree in the parser guard. */
+  type RepoFs = { isFile: (rel: string) => boolean; read: (rel: string) => string }
+  const repoFs: RepoFs = {
+    isFile: (rel) => { try { return statSync(resolve(root, rel)).isFile() } catch { return false } },
+    read: (rel) => read(rel),
+  }
+
+  /**
+   * Repo files a module loads at runtime, resolved to repo-relative paths
+   * ('@/' = repo root). Covers `import … from`, side-effect `import '…'`,
+   * dynamic `import('…')` and re-exports (`export … from`, `export * from`).
+   * Type-only forms (`import type`, `export type`, or braces holding only
+   * `type X` specifiers) render nothing and are skipped. Comments are dropped
+   * first; in MDX, so are code fences and inline code, which are shown, not run.
+   * A directory resolves to its index.ts(x); a package import is not a repo file.
+   */
+  function importedFiles(source: string, fromFile: string, fs: RepoFs = repoFs): string[] {
+    let code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(?<![:'"\w])\/\/[^\n]*/g, '')
+    if (fromFile.endsWith('.mdx')) code = code.replace(/^```[\s\S]*?^```/gm, '').replace(/`[^`\n]*`/g, '')
+    const typeOnly = (clause: string) => {
+      const braces = clause.match(/^\{([^}]*)\}$/)?.[1]
+      const items = braces?.split(',').map((x) => x.trim()).filter(Boolean)
+      return !!items?.length && items.every((x) => /^type\s/.test(x))
+    }
+    const specs: string[] = []
+    const STATIC = /\b(?:import|export)\s+(type\s+)?((?:[\w$]+\s*,\s*)?(?:\*(?:\s+as\s+[\w$]+)?|\{[^}]*\}|[\w$]+))\s*from\s*['"]([^'"]+)['"]/g
+    for (const m of code.matchAll(STATIC)) if (!m[1] && !typeOnly(m[2].trim())) specs.push(m[3])
+    for (const m of code.matchAll(/(?<![@\w$.])import\s*(?:\(\s*)?['"]([^'"]+)['"]/g)) specs.push(m[1])
     return specs.flatMap((spec) => {
-      const base = spec.startsWith('@/') ? resolve(root, spec.slice(2))
-        : spec.startsWith('.') ? resolve(root, dirname(fromFile), spec) : null
-      if (!base) return [] // a package, not a repo file
-      const hit = ['', '.tsx', '.ts', '/index.tsx', '/index.ts'].map((ext) => base + ext).find((f) => existsSync(f) && !f.endsWith('/'))
-      return [relative(root, hit ?? base)]
+      const base = spec.startsWith('@/') ? spec.slice(2)
+        : spec.startsWith('.') ? relative(root, resolve(root, dirname(fromFile), spec)) : null
+      if (base === null) return [] // a package, not a repo file
+      const hit = ['', '.tsx', '.ts', '/index.tsx', '/index.ts'].map((ext) => base + ext).find((f) => fs.isFile(f))
+      return [hit ?? base]
     })
   }
 
-  it('no story anywhere imports a pending component (§7.8)', () => {
-    // Guard the resolver on a fixed sample.
+  // Imports are followed only through repo-internal script modules under
+  // components/ and stories/ (lib/ holds helpers such as cn() and is not
+  // followed); anything else is still checked as an import target.
+  const FOLLOWED = /^(components|stories)\/.*\.(tsx?|mdx)$/
+
+  /** Every repo file `entry` reaches through runtime imports, each with the shortest import chain to it. */
+  function reachableFiles(entry: string, fs: RepoFs = repoFs): Map<string, string[]> {
+    const chains = new Map<string, string[]>([[entry, [entry]]])
+    const queue = [entry]
+    while (queue.length) {
+      const file = queue.shift()!
+      for (const dep of importedFiles(fs.read(file), file, fs)) {
+        if (chains.has(dep)) continue // visited: also stops import cycles
+        chains.set(dep, [...chains.get(file)!, dep])
+        if (FOLLOWED.test(dep) && fs.isFile(dep)) queue.push(dep)
+      }
+    }
+    chains.delete(entry)
+    return chains
+  }
+
+  it('resolves imports transitively, skipping type-only ones (guards the parser)', () => {
+    // Real files: aliases, relative paths, packages, dynamic imports.
     expect(importedFiles(`import { A } from '@/components/ui/Eyebrow'\nimport x from './ScrollToTop'\nimport 'react'\nconst y = import("../ui/Eyebrow")`, 'components/layout/X.stories.tsx'))
       .toEqual(['components/ui/Eyebrow.tsx', 'components/layout/ScrollToTop.tsx', 'components/ui/Eyebrow.tsx'])
-    // Only story modules: an MDX page that mentions a pending component by name is fine.
-    const stories = ['stories', 'components'].flatMap((dir) =>
+    // An in-memory tree for barrels, re-exports, type-only imports, MDX and cycles.
+    const tree: Record<string, string> = {
+      'stories/a.stories.tsx': `import type { P } from '@/components/ui/Pending'\nimport { type Q } from '@/components/ui/Pending'\nimport { H } from '../stories/helper'\n// import { X } from '@/components/ui/Pending'`,
+      'stories/helper.tsx': `export { Pending as H } from '@/components/ui'\nexport type { T } from '@/components/ui/Pending'\nimport { Back } from './cycle'`,
+      'stories/cycle.ts': `export * from './helper'`,
+      'components/ui/index.ts': `export * from './Pending'\nexport * as L from '@/lib/thing'`,
+      'components/ui/Pending.tsx': `export const Pending = 1`,
+      'lib/thing.ts': `export * from '@/components/ui/Hidden'`,
+      'components/ui/Hidden.tsx': ``,
+      'stories/b.mdx': "import { Meta } from '@storybook/addon-docs/blocks'\nimport * as R from './_data/registry'\n\n```tsx\nimport { Pending } from '@/components/ui/Pending'\n```\n\nUse `import { Pending } from '@/components/ui/Pending'` in pages.",
+      'stories/_data/registry.ts': ``,
+    }
+    const fs: RepoFs = { isFile: (f) => f in tree, read: (f) => tree[f] }
+    const deps = (entry: string) => Object.fromEntries([...reachableFiles(entry, fs)].map(([f, c]) => [f, c.join(' → ')]))
+    expect(deps('stories/a.stories.tsx')).toEqual({
+      'stories/helper.tsx': 'stories/a.stories.tsx → stories/helper.tsx',
+      'components/ui/index.ts': 'stories/a.stories.tsx → stories/helper.tsx → components/ui/index.ts',
+      'stories/cycle.ts': 'stories/a.stories.tsx → stories/helper.tsx → stories/cycle.ts',
+      'components/ui/Pending.tsx': 'stories/a.stories.tsx → stories/helper.tsx → components/ui/index.ts → components/ui/Pending.tsx',
+      // lib/ is checked as a target but not followed, so Hidden is not reached.
+      'lib/thing.ts': 'stories/a.stories.tsx → stories/helper.tsx → components/ui/index.ts → lib/thing.ts',
+    })
+    // MDX: ESM imports count; code fences and inline code are examples, not imports.
+    expect(Object.keys(deps('stories/b.mdx'))).toEqual(['stories/_data/registry.ts'])
+  })
+
+  it('no story or MDX page reaches a pending component, directly or through other imports (§7.8)', () => {
+    // .storybook/main.ts loads stories/**/*.mdx as well as *.stories.ts(x), and
+    // MDX can import and render components, so both are entry points.
+    const entries = ['stories', 'components'].flatMap((dir) =>
       (readdirSync(resolve(root, dir), { recursive: true }) as string[])
-        .filter((f) => /\.stories\.tsx?$/.test(f))
+        .filter((f) => /\.stories\.tsx?$|\.mdx$/.test(f))
         .map((f) => join(dir, f)))
-    expect(stories.length).toBeGreaterThan(5)
-    const pending = new Map(REGISTRY.filter((e) => e.status === 'pending').map((e) => [e.file, e.id]))
-    const offending = stories.flatMap((story) =>
-      importedFiles(read(story), story).filter((f) => pending.has(f)).map((f) => `${story} → ${f} (${pending.get(f)})`))
-    expect(offending, `Stories importing a pending component:\n${offending.join('\n')}`).toEqual([])
+    expect(entries.length).toBeGreaterThan(5)
+    expect(entries).toContain('stories/PendingComponents.mdx')
+    const byFile = new Map(REGISTRY.map((e) => [e.file, e]))
+    // A registered file on the way is labelled: a `rendered` entry that embeds a
+    // pending one must inherit its tickets and become pending itself (registry rule).
+    const label = (f: string) => { const e = byFile.get(f); return e ? `${f} [${e.status} ${e.id}]` : f }
+    const offending = entries.flatMap((entry) =>
+      [...reachableFiles(entry)]
+        .filter(([f]) => byFile.get(f)?.status === 'pending')
+        .map(([, chain]) => chain.map(label).join(' → ')))
+    expect(offending, `Storybook entries reaching a pending component:\n${offending.join('\n')}`).toEqual([])
   })
 
   it('every pending entry names only tickets that have a DESIGN.md §10.2 row', () => {

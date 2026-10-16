@@ -2,10 +2,11 @@
 @import "./site-base.css";
 
 /* Site CSS entry. Tokens and shared classes live in ./site-base.css, which
-   Storybook also imports (.storybook/storybook.css). Docs and Storybook files
-   are not site code: keep their class names out of the site CSS. */
+   Storybook also imports (.storybook/storybook.css). Docs, Storybook and design-system
+   test files are not site code: keep their class names out of the site CSS. */
 @source not "../DESIGN.md";
 @source not "../stories";
 @source not "../.storybook";
 @source not "../**/*.stories.tsx";
 @source not "../**/*.mdx";
+@source not "../__tests__/design-system";
