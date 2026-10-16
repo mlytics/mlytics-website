@@ -47,6 +47,29 @@ const CHAPTERS = [
   '## 10. 例外與待修清單',
 ]
 
+// §10.2 fix list: one row per OPEN fix ticket. Rows are deleted as tickets
+// close, so no check here may depend on how many tickets are still open.
+const FIX_LIST_HEADING = '## 10. 例外與待修清單'
+const FIX_LIST_HEADER = '| 票號 | 類別 | 內容 | 盤點 id |'
+const FIX_ROW = /^\|\s*DATAI-\d+\s*\|[^|\n]+\|[^|\n]+\|[^|\n]+\|$/
+const TICKET_KEY = /DATAI-\d+/g
+const stripHtmlComments = (s: string) => s.replace(/<!--[\s\S]*?-->/g, '')
+
+/** Lines of the §10.2 table body (after header and separator, up to the first non-table line). */
+function fixListRows(md: string): string[] | null {
+  const section = md.indexOf(FIX_LIST_HEADING)
+  if (section < 0) return null
+  const lines = md.slice(section).split('\n')
+  const header = lines.findIndex((l) => l.trim() === FIX_LIST_HEADER)
+  if (header < 0) return null
+  const rows: string[] = []
+  for (const line of lines.slice(header + 2)) {
+    if (!line.startsWith('|')) break
+    rows.push(line)
+  }
+  return rows
+}
+
 describe('DESIGN.md', () => {
   it('exists and has every chapter in order', () => {
     // Match whole heading lines only, so '### 1. …' or a mention in prose does not count.
@@ -72,29 +95,6 @@ describe('DESIGN.md', () => {
     const missing = componentClasses(css).filter((c) => !designMd.includes(`\`.${c}\``))
     expect(missing, `Classes missing from DESIGN.md: ${missing.join(', ')}`).toEqual([])
   })
-
-  // §10.2 fix list: one row per OPEN fix ticket. Rows are deleted as tickets
-  // close, so no check here may depend on how many tickets are still open.
-  const FIX_LIST_HEADING = '## 10. 例外與待修清單'
-  const FIX_LIST_HEADER = '| 票號 | 類別 | 內容 | 盤點 id |'
-  const FIX_ROW = /^\|\s*DATAI-\d+\s*\|[^|\n]+\|[^|\n]+\|[^|\n]+\|$/
-  const TICKET_KEY = /DATAI-\d+/g
-  const stripHtmlComments = (s: string) => s.replace(/<!--[\s\S]*?-->/g, '')
-
-  /** Lines of the §10.2 table body (after header and separator, up to the first non-table line). */
-  function fixListRows(md: string): string[] | null {
-    const section = md.indexOf(FIX_LIST_HEADING)
-    if (section < 0) return null
-    const lines = md.slice(section).split('\n')
-    const header = lines.findIndex((l) => l.trim() === FIX_LIST_HEADER)
-    if (header < 0) return null
-    const rows: string[] = []
-    for (const line of lines.slice(header + 2)) {
-      if (!line.startsWith('|')) break
-      rows.push(line)
-    }
-    return rows
-  }
 
   it('keeps the §10.2 fix list parseable and every row a real Jira key', () => {
     expect(designMd).toMatch(new RegExp(`^${FIX_LIST_HEADING}$`, 'm'))
@@ -191,11 +191,15 @@ describe('storybook registry', () => {
     }
   })
 
-  it('every pending entry names a ticket that DESIGN.md §10 lists', () => {
-    const fixList = designMd.slice(designMd.indexOf('## 10. 例外與待修清單'))
+  it('every pending entry names only tickets that have a DESIGN.md §10.2 row', () => {
+    // Exact keys from the §10.2 rows only: §10.1, prose and source comments
+    // also mention tickets, and a substring match would accept "DATAI-62".
+    const rows = fixListRows(designMd)
+    expect(rows, '§10.2 table not found').not.toBeNull()
+    const listed = new Set(rows!.map((r) => r.match(/^\|\s*(DATAI-\d+)\s*\|/)?.[1]))
     for (const e of REGISTRY.filter((x) => x.status === 'pending')) {
       expect(e.tickets.length, e.id).toBeGreaterThan(0)
-      for (const t of e.tickets) expect(fixList, `${e.id} → ${t}`).toContain(t)
+      for (const t of e.tickets) expect(listed.has(t), `${e.id} → ${t} has no §10.2 row`).toBe(true)
     }
   })
 

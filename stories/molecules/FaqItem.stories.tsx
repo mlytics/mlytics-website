@@ -25,11 +25,10 @@ function FaqSpecimen() {
         <span className={specimen('faq-question').className}>How does this pattern support clear navigation?</span>
         <span className={`${specimen('faq-icon').className} ${open ? 'rotate-45' : ''}`} aria-hidden="true">+</span>
       </button>
-      {open && (
-        <div id={answerId} className={specimen('faq-answer').className}>
-          The question exposes its state and controls a matching answer region for keyboard and assistive technology users.
-        </div>
-      )}
+      {/* Kept in the DOM while collapsed (hidden) so aria-controls always points at an existing id (§8.3). */}
+      <div id={answerId} className={specimen('faq-answer').className} hidden={!open}>
+        The question exposes its state and controls a matching answer region for keyboard and assistive technology users.
+      </div>
     </div>
   )
 }
