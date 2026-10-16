@@ -32,5 +32,10 @@ jobs:
       - name: Build static export
         run: npm run build
 
+      # Storybook is local-only (not deployed). Building it here makes a broken
+      # story fail the PR instead of the next person who opens Storybook.
+      - name: Build Storybook
+        run: npm run build-storybook
+
       - name: Playwright E2E tests
         run: npm run test:e2e
