@@ -239,12 +239,14 @@
 | 區塊角色 | 上下距 | 寫法 |
 |---|---|---|
 | 一般內容區塊 | 平板與手機 64、桌機（≥1024）112 | `py-16 lg:py-28` |
+| 受眾頁緊接 FAQ 細線前的白色內容區塊 | 上 64、桌機（≥1024）112；下固定 32（含桌機） | `pt-16 lg:pt-28 pb-8` |
 | Hero | 上 128、下 48 | `pt-32 pb-12` |
 | 頁尾 CTA | 上下 64 | `py-16` |
 | FAQ 區塊 | 上 32、下 64（桌機 80） | `pt-8 pb-16 lg:pb-20` |
 | FAQ 接在深色區塊之後 | 上方改用一般區塊距離 | — |
 
-- 禁止：一般內容區塊用其他上下距（例如 `py-16 lg:py-20`、`py-20 lg:py-28`）。
+- 禁止：除上表受眾頁 FAQ 細線前的白色內容區塊例外，一般內容區塊用其他上下距（例如 `py-16 lg:py-20`、`py-20 lg:py-28`）。
+- 受眾頁 FAQ 細線上下各留 32：緊接細線前的白色區塊用 `pb-8`，FAQ 維持 `pt-8`；只限該白色區塊，其他一般區塊與 FAQ 直接接深底時的規則不變。<!-- src: An 2026-10-16 裁決 open question #27（細線上下對稱） -->
 - 注意：首頁等目前手機為 80 的區塊，修正後會變 64。
 - 現況偏離：見 §10 DATAI-619
 <!-- src: tpl-section-rhythm, tpl-section-rhythm-112, tpl-section-rhythm-infra, org-faq-top-after-dark, #29-1, #30-1 -->
@@ -837,7 +839,7 @@
 - 標準版：`app/brands/page.tsx`。
 - 區塊順序（基本骨架，可依下一點加白色區塊）：深 Hero（§5.3）→ 白 痛點 → 深 方案（含 AI Mode 入口 `variant="embedded"`）→ 白 比較 →（可加的白色內容區塊）→ 細線＋白 FAQ（§5.5）→ 深 頁尾 CTA（§5.4）。
 - 加白色內容區塊：方案區塊與 FAQ 之間可再加白色內容區塊，一律放在 FAQ 上方那條細線**之前**，讓 FAQ 的入口固定是「細線＋FAQ」（細線緊接在 FAQ 上方，同 /brands/）。
-  - 新區塊用一般內容區塊上下距（§2.11 `py-16 lg:py-28`）。
+  - 緊接 FAQ 細線前的白色內容區塊（未新增時為比較區塊）下距固定 32（含桌機），上距仍為 64／112，寫 `pt-16 lg:pt-28 pb-8`（§2.11）；FAQ 維持 `pt-8`，細線上下各 32。其他新區塊仍用一般上下距 `py-16 lg:py-28`。<!-- src: An 2026-10-16 裁決 open question #27（細線上下對稱） -->
   - 新區塊與相鄰白色區塊之間照 §6.1（可用細線區隔，也可不區隔）；FAQ 上方那條細線固定保留。
   <!-- src: An 2026-10-16 缺口裁決 q3（AI 接手測試） -->
 - /content-owners/、/developers/、/partnership/ 屬同一類；/content-owners/ 的連續同色區塊已接受（同色相鄰可細線或不區隔）。
@@ -1102,6 +1104,7 @@
 | 首頁專屬項目 | 白／白／深／白／深區塊順序（白底 Hero 開頭）；Hero h1 的 `max-[420px]:text-[27px]` 與 `tracking-tight`；內容與頁尾 1152（`max-w-6xl`）（§2.7、§2.9、§2.12、§6.4） | tpl-order-home（home-section-rhythm）、home-hero-h1-narrow-27、tok-tracking、tpl-container-home-6xl (a)、#29-2 |
 | /decisive-engine/ 產品頁頁尾 CTA 變體 | 頁尾 CTA 不用 `InlineEmailCTA`，改用連到 /book-a-demo 的 §3.2 標準 44「Contact Us」，必須呼叫 `trackCTA`（範圍：§4.7、§5.4） | org-de-cta-form (a) |
 | 首頁 Flywheel 計數動畫 | 首頁 Flywheel 展示大數字用元件內自己的 `CountUp`（`components/home/FlywheelSection.tsx:7`），不改用 `NumberTicker`（§3.13） | #33 |
+| 間距：受眾頁 FAQ 細線前白色區塊 | 僅緊接 FAQ 細線前的白色內容區塊：上 64／112、下固定 32（含桌機），`pt-16 lg:pt-28 pb-8`；搭配 FAQ `pt-8`，細線上下各 32（§2.11、§6.2） | #38（An 2026-10-16 細線上下對稱裁決） |
 | 間距：手機選單開關 | `p-[11px]`／`-mr-[11px]`，讓 22px 圖示湊成 44×44（§2.10） | #29-4 |
 | 間距：/partnership/ 勾勾 | 2px 下移置中（§2.10） | #29-4 |
 | 間距：按鈕以整顆高度為準 | 按鈕高度 44／40／36 符合規格即可，內距不往下取（例：`py-2.5`）；外框按鈕可用扣 1px 框線的 `calc()` 內距（§2.10） | #30-4 |
@@ -1129,7 +1132,7 @@
 | 票號 | 類別 | 內容 | 盤點 id |
 |---|---|---|---|
 | DATAI-556 | 字級 token | `--font-size-*` 改名 `--text-*`（display／h1／h2 的值改成與實際標題角色一致，與 DATAI-630 協調）；6 張卡片標題 16→24、首頁身分卡標題 18→24；`text-[10px]`、SVG 小字對齊 12px 下限 | tok-font-size-token-broken、tok-caption-12-floor、tok-text-size-scale |
-| DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白；卡片網格 `gap-6` 兩處改 `gap-5`（/brands/ 痛點兩卡、首頁身分卡） | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
+| DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`（受眾頁緊接 FAQ 細線前白色區塊依 §2.11／§6.2 例外，下距固定 32）；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白；卡片網格 `gap-6` 兩處改 `gap-5`（/brands/ 痛點兩卡、首頁身分卡） | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
 | DATAI-620 | 區塊標題組 | h2→說明 16（含頁尾 CTA）；說明寬 576；7 處小標籤改「緊」；首頁 Flywheel h2 改 `.section-heading`；標題組到下方內容 48（11 處） | mol-heading-group-h2-gap、mol-heading-group-desc-width、mol-heading-group-eyebrow-gap、mol-heading-flywheel |
 | DATAI-621 | 4px 間距刻度 | 非按鈕的半級與任意值往下取（例外見 §10.1）；`.label-eyebrow-pill` 內距 6→4；內容區資訊小膠囊 5 行不在本票（歸 DATAI-625） | tok-spacing |
 | DATAI-622 | 對比修正 | `text-ink-subtle` 文字改 `text-ink-muted`；email 欄與 /book-a-demo/ 表單欄位提示文字改 `placeholder:text-ink-muted`；深底淡綠字低於 .85 改 ≥.85；主色字在深底改 on-dark；404「404」與錯誤頁「!」改白；白面板上的淡綠字改主色；比較卡編號改白；.75 文字改 .85 | cross-contrast-ink-subtle、tok-on-dark-085、cross-contrast-primary-on-dark、cross-contrast-ondark-on-white、cross-contrast-card-number |
