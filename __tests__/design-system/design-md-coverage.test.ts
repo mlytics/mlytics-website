@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import postcss from 'postcss'
 import { COLOR_TOKENS } from '@/stories/_data/tokens'
@@ -19,18 +19,17 @@ const css = read('app/site-base.css')
 /**
  * Custom properties declared directly in a block, in source order, with their
  * values. postcss already drops comments, so `--x: …` inside one never counts.
+ * Blocks are found at any depth (inside @layer / @media too), and a :root rule
+ * counts when :root is one entry of a selector list such as `:root, :host`.
  */
 function declarations(source: string, selector: '@theme' | ':root'): Map<string, string> {
   const out = new Map<string, string>()
-  postcss.parse(source).each((node) => {
-    const match = selector === '@theme'
-      ? node.type === 'atrule' && node.name === 'theme'
-      : node.type === 'rule' && node.selector === ':root'
-    if (!match || !('each' in node)) return
-    node.each((child: postcss.ChildNode) => {
-      if (child.type === 'decl' && child.prop.startsWith('--')) out.set(child.prop, child.value)
-    })
+  const collect = (node: postcss.Container) => node.each((child: postcss.ChildNode) => {
+    if (child.type === 'decl' && child.prop.startsWith('--')) out.set(child.prop, child.value)
   })
+  const parsed = postcss.parse(source)
+  if (selector === '@theme') parsed.walkAtRules('theme', collect)
+  else parsed.walkRules((rule) => { if (rule.selectors.some((s) => s.trim() === ':root')) collect(rule) })
   return out
 }
 
@@ -40,12 +39,15 @@ const declaredTokens = (source: string, selector: '@theme' | ':root') => [...dec
 /**
  * Every class used in a selector anywhere in the file, including inside
  * @media / @layer blocks and compound selectors such as
- * `[data-nf="cdn"] .nf-default`. Keyframe steps (`from`, `50%`) are not
- * selectors and are skipped.
+ * `[data-nf="cdn"] .nf-default`, plus every Tailwind v4 `@utility name { }`
+ * (it becomes a class just like a selector does). Keyframe steps (`from`,
+ * `50%`) are not selectors and are skipped.
  */
 function componentClasses(source: string): string[] {
   const names = new Set<string>()
-  postcss.parse(source).walkRules((rule) => {
+  const parsed = postcss.parse(source)
+  parsed.walkAtRules('utility', (at) => { names.add(at.params.trim()) })
+  parsed.walkRules((rule) => {
     if (rule.parent?.type === 'atrule' && /keyframes$/.test((rule.parent as postcss.AtRule).name)) return
     // Drop attribute selectors and strings first so `[href$=".pdf"]` is not read as a class.
     const selector = rule.selector.replace(/\[[^\]]*\]/g, '').replace(/(["'])[^"']*\1/g, '')
@@ -60,10 +62,12 @@ const normValue = (v: string) => v.trim().replace(/\s+/g, ' ').toLowerCase()
 /**
  * The first Markdown table under a heading line (e.g. '### 2.1 顏色 token'),
  * stopping at the next heading. Returns the header cells and the body rows.
+ * A heading ending in a space (e.g. '### 2.8 ') matches by prefix, so a
+ * section can be found by number when its title wording may change.
  */
 function tableUnder(md: string, heading: string): { header: string[]; rows: string[][] } | null {
   const lines = md.split('\n')
-  const start = lines.findIndex((l) => l.trim() === heading)
+  const start = lines.findIndex((l) => (heading.endsWith(' ') ? l.startsWith(heading) : l.trim() === heading))
   if (start < 0) return null
   const cells = (l: string) => l.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim())
   for (let i = start + 1; i < lines.length; i++) {
@@ -136,6 +140,23 @@ describe('DESIGN.md', () => {
       /* .commented { color: red } */
       @keyframes k { from { opacity: 0 } 50.5% { opacity: 1 } }`
     expect(componentClasses(sample).sort()).toEqual(['a', 'b', 'c', 'compound', 'in-layer', 'in-media'])
+    // Tailwind v4 @utility at-rules define classes too, at any depth.
+    const utilities = `
+      @utility scrollbar-none { scrollbar-width: none }
+      @layer x { @utility tab-* { tab-size: --value(integer) } }`
+    expect(componentClasses(utilities).sort()).toEqual(['scrollbar-none', 'tab-*'])
+    // :root and @theme blocks count wherever they are, and :root inside a
+    // selector list counts; a selector that merely contains ":root" does not.
+    const tokenSample = `
+      :root, :host { --top: 1px; }
+      @layer base { :root { --in-layer: 2px; } }
+      @media (prefers-color-scheme: dark) { :root { --in-media: 3px; } }
+      :root.dark { --not-root: 4px; }
+      .x { --not-root-either: 5px; }
+      @layer theme { @theme { --nested-theme: 6px; } }
+      @theme inline { --theme-inline: 7px; }`
+    expect([...declarations(tokenSample, ':root')]).toEqual([['--top', '1px'], ['--in-layer', '2px'], ['--in-media', '3px']])
+    expect([...declarations(tokenSample, '@theme')]).toEqual([['--nested-theme', '6px'], ['--theme-inline', '7px']])
   })
 
   // A name quoted only on a 禁止 (forbidden) line, or only inside a hidden
@@ -162,8 +183,22 @@ describe('DESIGN.md', () => {
   const VALUE_TABLES: { heading: string; tokens: (name: string) => boolean; from: '@theme' | ':root' }[] = [
     { heading: '### 2.1 顏色 token', tokens: (t) => t.startsWith('--color-'), from: '@theme' },
     { heading: '### 2.5 legacy 變數（`:root`）', tokens: () => true, from: ':root' },
-    { heading: '### 2.8 字級 token（目前失效）', tokens: (t) => t.startsWith('--font-size-'), from: '@theme' },
+    // Matched by number: the title says 目前失效 and will change with DATAI-556.
+    // DATAI-556 renames --font-size-* to --text-*: it must update this prefix
+    // (and the §2.8 table) in the same PR, or every --text-* token falls
+    // through to the classification check below.
+    { heading: '### 2.8 ', tokens: (t) => t.startsWith('--font-size-'), from: '@theme' },
   ]
+
+  // @theme tokens whose value DESIGN.md states in prose rather than in a
+  // table: the exact `--token: value` code span must appear in that section.
+  const PROSE_VALUES: { section: string; token: string }[] = [
+    { section: '### 2.15 ', token: '--breakpoint-sm' }, // 「`--breakpoint-sm: 30rem`」
+  ]
+
+  // @theme / :root tokens that are documented by name only, with no value
+  // check. Empty today. Adding a name here is a conscious decision: say why.
+  const NAME_ONLY: string[] = []
 
   /** token → value from a DESIGN.md table, read from its first column and its 值 column. */
   function documentedValues(heading: string): Map<string, string> | null {
@@ -186,6 +221,40 @@ describe('DESIGN.md', () => {
     expect(t.header).toEqual(['token', '值', '用途'])
     expect(t.rows.map((r) => [codeCell(r[0]), codeCell(r[1])])).toEqual([['--a', '#ABC'], ['--b', '1px']])
     expect(tableUnder('### X\ntext\n### Y\n| a |\n|---|\n| b |', '### X'), 'must stop at the next heading').toBeNull()
+    expect(tableUnder('### 2.8 any title\n| a |\n|---|\n| b |', '### 2.8 ')?.rows, 'trailing space matches by prefix').toEqual([['b']])
+    expect(tableUnder('### 2.8 any title\n| a |\n|---|\n| b |', '### 2.8'), 'no trailing space matches the whole line').toBeNull()
+  })
+
+  /** Which value check covers a token, or null when none does. */
+  const valueCheckFor = (token: string, from: '@theme' | ':root') =>
+    VALUE_TABLES.find((v) => v.from === from && v.tokens(token))?.heading
+    ?? (from === '@theme' ? PROSE_VALUES.find((p) => p.token === token)?.section : undefined)
+    ?? (NAME_ONLY.includes(token) ? 'NAME_ONLY' : null)
+
+  it('classifies every @theme and :root token into a value check or NAME_ONLY', () => {
+    // A new token family (e.g. --radius-*, --text-*) must be consciously given a
+    // value table, a PROSE_VALUES entry, or a NAME_ONLY entry; never skipped.
+    expect(valueCheckFor('--radius-sm', '@theme'), 'an unknown family must be unclassified').toBeNull()
+    const unclassified = (['@theme', ':root'] as const).flatMap((from) =>
+      declaredTokens(css, from).filter((t) => valueCheckFor(t, from) === null).map((t) => `${from} ${t}`))
+    expect(unclassified, `Add a VALUE_TABLES prefix, a PROSE_VALUES entry or a commented NAME_ONLY entry for: ${unclassified.join(', ')}`).toEqual([])
+    // NAME_ONLY / PROSE_VALUES must not go stale either.
+    const theme = declaredTokens(css, '@theme')
+    for (const t of [...NAME_ONLY, ...PROSE_VALUES.map((p) => p.token)]) expect([...theme, ...declaredTokens(css, ':root')], t).toContain(t)
+  })
+
+  it.each(PROSE_VALUES)('$section states the value site-base.css declares for $token', ({ section, token }) => {
+    const lines = designMd.split('\n')
+    const start = lines.findIndex((l) => l.startsWith(section))
+    expect(start, `section "${section}" not found`).toBeGreaterThanOrEqual(0)
+    const end = lines.findIndex((l, i) => i > start && /^#{2,3} /.test(l))
+    const body = stripHtmlComments(lines.slice(start + 1, end < 0 ? undefined : end).join('\n'))
+    const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const stated = [...body.matchAll(new RegExp(`\`${escaped}:\\s*([^\`;]+);?\``, 'g'))].map((m) => normValue(m[1]))
+    expect(stated.length, `no \`${token}: <value>\` code span in ${section}`).toBeGreaterThan(0)
+    const actual = declarations(css, '@theme').get(token)
+    expect(actual, `${token} not in @theme`).toBeDefined()
+    for (const v of stated) expect(v, `${section}: ${token}`).toBe(normValue(actual!))
   })
 
   it.each(VALUE_TABLES)('$heading lists every token with the value site-base.css declares', ({ heading, tokens, from }) => {
@@ -226,16 +295,25 @@ describe('DESIGN.md', () => {
   // `--text-*` and not a BEM modifier such as `.pill-btn--dark`.
   const TOKEN_IN_CODE = /(?<![\w-])--[a-z0-9]+(?:-[a-z0-9]+)*(?![\w*-])/g
   const codeSpans = (md: string) => [...md.matchAll(/`([^`\n]+)`/g)].map((m) => m[1])
+  /**
+   * Token names quoted in code spans, skipping <!-- src --> comments and 禁止
+   * lines (same rule as `documentedLines`): a forbidden example may name a
+   * token that intentionally does not exist.
+   */
+  const namedTokens = (md: string) => new Set(
+    stripHtmlComments(md).split('\n').filter((l) => !/禁止/.test(l))
+      .flatMap((l) => codeSpans(l).flatMap((c) => c.match(TOKEN_IN_CODE) ?? [])),
+  )
 
   it('every token named in §2 Tokens exists in site-base.css', () => {
     expect(codeSpans('`--a-b` `--text-*` `.pill-btn--dark` `var(--c)`').flatMap((c) => c.match(TOKEN_IN_CODE) ?? [])).toEqual(['--a-b', '--c'])
+    expect([...namedTokens('`--kept`\n- 禁止：`--forbidden-example`\n<!-- src: `--in-comment` -->')]).toEqual(['--kept'])
     // Scoped to §2: other chapters quote non-existent names on purpose
     // (§7.5 uses --color-amber as an example of a token that silently fails).
     const start = designMd.indexOf('\n## 2. Tokens')
     const end = designMd.indexOf('\n## 3. Atoms')
     expect(start).toBeGreaterThan(0)
-    const chapter = stripHtmlComments(designMd.slice(start, end))
-    const named = new Set(codeSpans(chapter).flatMap((c) => c.match(TOKEN_IN_CODE) ?? []))
+    const named = namedTokens(designMd.slice(start, end))
     expect(named.size).toBeGreaterThan(10)
     const existing = new Set([...declaredTokens(css, '@theme'), ...declaredTokens(css, ':root')])
     const missing = [...named].filter((t) => !existing.has(t) && !planned.has(t))
@@ -353,6 +431,34 @@ describe('storybook registry', () => {
     for (const e of REGISTRY.filter((x) => x.status === 'pending')) {
       expect(existsSync(storyOf(e.file)), `${e.id}: pending but has a story next to it`).toBe(false)
     }
+  })
+
+  /** Files a story module imports, resolved to repo-relative paths ('@/' = repo root). */
+  function importedFiles(source: string, fromFile: string): string[] {
+    const specs = [...source.matchAll(/(?:\bfrom\s*|\bimport\s*\(?\s*)['"]([^'"]+)['"]/g)].map((m) => m[1])
+    return specs.flatMap((spec) => {
+      const base = spec.startsWith('@/') ? resolve(root, spec.slice(2))
+        : spec.startsWith('.') ? resolve(root, dirname(fromFile), spec) : null
+      if (!base) return [] // a package, not a repo file
+      const hit = ['', '.tsx', '.ts', '/index.tsx', '/index.ts'].map((ext) => base + ext).find((f) => existsSync(f) && !f.endsWith('/'))
+      return [relative(root, hit ?? base)]
+    })
+  }
+
+  it('no story anywhere imports a pending component (§7.8)', () => {
+    // Guard the resolver on a fixed sample.
+    expect(importedFiles(`import { A } from '@/components/ui/Eyebrow'\nimport x from './ScrollToTop'\nimport 'react'\nconst y = import("../ui/Eyebrow")`, 'components/layout/X.stories.tsx'))
+      .toEqual(['components/ui/Eyebrow.tsx', 'components/layout/ScrollToTop.tsx', 'components/ui/Eyebrow.tsx'])
+    // Only story modules: an MDX page that mentions a pending component by name is fine.
+    const stories = ['stories', 'components'].flatMap((dir) =>
+      (readdirSync(resolve(root, dir), { recursive: true }) as string[])
+        .filter((f) => /\.stories\.tsx?$/.test(f))
+        .map((f) => join(dir, f)))
+    expect(stories.length).toBeGreaterThan(5)
+    const pending = new Map(REGISTRY.filter((e) => e.status === 'pending').map((e) => [e.file, e.id]))
+    const offending = stories.flatMap((story) =>
+      importedFiles(read(story), story).filter((f) => pending.has(f)).map((f) => `${story} → ${f} (${pending.get(f)})`))
+    expect(offending, `Stories importing a pending component:\n${offending.join('\n')}`).toEqual([])
   })
 
   it('every pending entry names only tickets that have a DESIGN.md §10.2 row', () => {
