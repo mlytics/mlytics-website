@@ -198,4 +198,17 @@ describe('Tailwind opacity-modifier colours (DESIGN.md §2.3)', () => {
     expect(hintOf('className="bg-primary/0"')).toContain('全透明')
     expect(hintOf('className="bg-primary/0"')).toContain('bg-transparent')
   })
+
+  it('keeps the longer utility names winning for base colours', () => {
+    for (const c of ['ring-offset-primary/8', 'inset-shadow-primary/8', 'drop-shadow-primary/8', 'border-s-primary/8', 'inset-ring-on-dark/85']) {
+      expect(found('a.tsx', `className="${c}"`)).toEqual([])
+    }
+    expect(found('a.tsx', 'className="ring-offset-primary/10"')).toEqual(['opacity ring-offset-primary/10'])
+    expect(hintOf('className="ring-offset-primary/10"')).toContain('0.12')
+  })
+
+  it('rounds alpha in the hint to at most 4 decimals', () => {
+    expect(hintOf('className="text-on-dark/84.9"')).toContain('α 0.849 ')
+    expect(hintOf('className="text-on-dark/84.9"')).not.toContain('0.8490000')
+  })
 })

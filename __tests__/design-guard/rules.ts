@@ -129,7 +129,7 @@ function opacityHint(utility: string, colour: string, rawAlpha: string): string 
   if (alpha <= 0) return `DESIGN.md §2.3：α 0 是全透明，改用 ${utility}-transparent 或移除`
   if (!ALPHA_LADDER.includes(alpha)) {
     const near = nearestStep(alpha)
-    return `DESIGN.md §2.3：α ${alpha} 不在階梯，就近改為 ${near}（例：${utility}-${colour}/${Math.round(near * 100)}）`
+    return `DESIGN.md §2.3：α ${Number(alpha.toFixed(4))} 不在階梯，就近改為 ${near}（例：${utility}-${colour}/${Math.round(near * 100)}）`
   }
   return null
 }
