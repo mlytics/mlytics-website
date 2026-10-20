@@ -83,13 +83,7 @@ export const SPECIMENS: Specimen[] = [
   { id: 'card-small', layer: 'molecule', label: '小卡內距', className: 'p-5' },
   { id: 'card-regular', layer: 'molecule', label: '一般卡內距', className: 'p-6' },
   { id: 'card-large', layer: 'molecule', label: '大卡內距', className: 'p-8' },
-  {
-    id: 'card-title-pending',
-    layer: 'molecule',
-    label: '卡片標題 24',
-    className: 'text-h3',
-    note: 'DATAI-556 完成前只列規格，不渲染樣本。',
-  },
+  { id: 'card-title', layer: 'molecule', label: '卡片標題 24', className: 'text-h3 font-bold leading-snug' },
   { id: 'heading-title', layer: 'molecule', label: '區塊標題', className: 'section-heading mb-4 text-ink' },
   {
     id: 'heading-description',

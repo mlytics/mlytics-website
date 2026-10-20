@@ -55,15 +55,35 @@
       4.5:1 on --bg-dark; use it instead of .7 for text)   */
 
   /* --- Typography scale ---
-     Usage: text-display / text-h1 / text-h2 / text-h3
-            text-small / text-caption
+     Usage: card titles use text-h3 (DESIGN.md §2.8). h1 / h2 / display
+            statements always use their current DESIGN.md §2.7 classes.
+            text-h1 / text-h2 / text-display set font-size only (no
+            line-height) and are not used on pages today; revisit when
+            AI Mode is aligned in DATAI-630.
+     Tailwind v4 only generates text-* classes from --text-* tokens.
+     display / h1 / h2 are in the @theme static block below.
      (text-base = 1rem already exists in Tailwind)       */
-  --font-size-display:    clamp(2.5rem, 6vw, 4rem);  /* 40–64px — hero, responsive */
-  --font-size-h1:         clamp(2rem, 5vw, 3rem);    /* 32–48px                    */
-  --font-size-h2:         2.25rem;  /* 36px — section title  */
-  --font-size-h3:         1.5rem;   /* 24px — card title (was 1.25rem/20px) */
-  --font-size-small:      0.875rem; /* 14px                  */
-  --font-size-caption:    0.75rem;  /* 12px — minimum size   */
+  --text-h3:         1.5rem;   /* 24px — card title */
+  --text-small:      0.875rem; /* 14px */
+  --text-caption:    0.75rem;  /* 12px — minimum size */
+}
+
+/* display / h1 / h2 hold the mobile value here; the md / lg values are set
+   by the :root overrides below, so one class follows the heading role at
+   every breakpoint (DESIGN.md §2.7, §2.8). `static` makes Tailwind always
+   emit these variables: without it an unused one is dropped and the mobile
+   value would be missing under the md / lg overrides. */
+@theme static {
+  --text-display:    2.25rem;  /* 36px; 60px ≥768 */
+  --text-h1:         2.25rem;  /* 36px; 48px ≥768 */
+  --text-h2:         1.875rem; /* 30px; 36px ≥768; 48px ≥1024 */
+}
+
+@media (min-width: 48rem) {
+  :root { --text-display: 3.75rem; --text-h1: 3rem; --text-h2: 2.25rem; }
+}
+@media (min-width: 64rem) {
+  :root { --text-h2: 3rem; }
 }
 
 /* --- Legacy CSS variables ---
@@ -76,6 +96,13 @@
   --bg-dark:            #1A3D3A;
   --text-primary:       #1A1A1A;
   --text-dark-primary:  #FAFAFA;
+
+  /* AI Mode only (/ai-mode-playground/ CSS modules): old names with their
+     old fixed values, so that page keeps its type sizes. Remove in DATAI-630. */
+  --font-size-h2:       2.25rem;
+  --font-size-h3:       1.5rem;
+  --font-size-small:    0.875rem;
+  --font-size-caption:  0.75rem;
 }
 
 /* ============================================================

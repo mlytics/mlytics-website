@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Eyebrow } from '@/components/ui/Eyebrow'
+import { useSvgTextFloor } from '@/lib/useSvgTextFloor'
 
 // CPM ROAS decline — normalised (100 = peak performance, declining right)
 const CPM_POINTS = [
@@ -37,6 +38,8 @@ export function BrandPainSection() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const pathRef = useRef<SVGPathElement>(null)
+  const chartRef = useRef<SVGSVGElement>(null)
+  useSvgTextFloor(chartRef)
   const [pathLen, setPathLen] = useState(0)
   useEffect(() => {
     if (pathRef.current) setPathLen(pathRef.current.getTotalLength())
@@ -80,7 +83,7 @@ export function BrandPainSection() {
               You're paying for 1,000 impressions to reach maybe 3 people who care. ROAS is declining quarter over quarter — and you already know it.
             </p>
             {/* Declining line chart */}
-            <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="w-full" style={{ overflow: 'visible' }}>
+            <svg ref={chartRef} viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="w-full" style={{ overflow: 'visible' }}>
               <defs>
                 <linearGradient id="cpm-fill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" style={{ stopColor: 'var(--color-warn-deep)' }} stopOpacity="0.12" />

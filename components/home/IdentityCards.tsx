@@ -95,7 +95,7 @@ export function IdentityCards() {
                   <div className="mb-2 w-8 h-8 rounded-lg flex items-center justify-center bg-primary/8">
                     <card.Icon size={17} strokeWidth={1.8} className="text-primary" />
                   </div>
-                  <h3 className="text-lg font-bold text-ink">{card.persona}</h3>
+                  <h3 className="text-h3 font-bold leading-snug text-ink">{card.persona}</h3>
                   <p className="text-sm mt-0.5 text-ink-subtle">{card.products}</p>
                 </div>
               </div>

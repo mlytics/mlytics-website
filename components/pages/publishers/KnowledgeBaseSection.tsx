@@ -136,7 +136,7 @@ export function KnowledgeBaseSection() {
                     }}
                   >
                     <span
-                      className="block text-[10px] font-bold tabular-nums mb-1"
+                      className="block text-xs font-bold tabular-nums mb-1"
                       style={{ color: isActive ? 'rgba(168,197,195,0.7)' : 'rgba(168,197,195,0.45)', letterSpacing: '0.05em' }}
                     >
                       0{i + 1}

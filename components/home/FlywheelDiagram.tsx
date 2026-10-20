@@ -1,6 +1,8 @@
 'use client'
 
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
+import { useSvgTextFloor } from '@/lib/useSvgTextFloor'
 
 const NODES = [
   { label: '15M+ MAU',    sub: 'Installed Base',      angle: -90 },
@@ -25,9 +27,13 @@ const ringPath = `
 `
 
 export function FlywheelDiagram() {
+  const chartRef = useRef<SVGSVGElement>(null)
+  // <768: approved exception, authored sizes stay (DESIGN.md §10.1).
+  useSvgTextFloor(chartRef, { media: '(min-width: 48rem)' })
   return (
     <div className="flex items-center justify-center py-2">
       <svg
+        ref={chartRef}
         viewBox="-40 0 480 420"
         className="w-full max-w-md lg:max-w-none"
         style={{ overflow: 'visible' }}
@@ -76,7 +82,8 @@ export function FlywheelDiagram() {
           <text x={CX} y={CY + 2} textAnchor="middle" fill="var(--color-surface)" fontSize="11" fontWeight="700" letterSpacing="0.8">
             ENGINE
           </text>
-          <text x={CX} y={CY + 20} textAnchor="middle" fill="var(--color-gold)" fontSize="9.5" fontWeight="500">
+          {/* Authored size at every width: approved exception, DESIGN.md §10.1. */}
+          <text x={CX} y={CY + 20} textAnchor="middle" fill="var(--color-gold)" fontSize="9.5" fontWeight="500" data-text-floor="off">
             intent · route · earn
           </text>
         </motion.g>

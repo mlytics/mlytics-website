@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { Eyebrow } from '@/components/ui/Eyebrow'
-import { PendingNotice, SpecimenBlock, StoryFrame, specimen } from '../_components/StoryPrimitives'
+import { SpecimenBlock, StoryFrame, specimen } from '../_components/StoryPrimitives'
 
 const meta = { title: 'Foundations/Typography', parameters: { layout: 'fullscreen' } } satisfies Meta
 export default meta
@@ -22,18 +22,9 @@ export const 字級角色: Story = {
         <SpecimenBlock title="區塊標題" className="section-heading">
           <p className="section-heading">A system for consistent decisions.</p>
         </SpecimenBlock>
-        <PendingNotice
-          title="卡片標題 24px"
-          ticket="DATAI-556"
-          className={specimen('card-title-pending').className}
-          spec={[
-            '字級：24px（§2.7 卡片標題；首頁身分卡標題也是 24）。',
-            '寫法：text-h3。DATAI-556 把字級 token 改名為 --text-* 後，text-h3 才會是 24px（§2.8）。',
-            'DATAI-556 完成前不得新增卡片標題；需要時先問 An。',
-          ]}
-        >
-          依 §7.8，DATAI-556 完成前只列目標規格與票號，不渲染樣本。
-        </PendingNotice>
+        <SpecimenBlock title="卡片標題" className={specimen('card-title').className}>
+          <p className={specimen('card-title').className}>A clear card title.</p>
+        </SpecimenBlock>
         <SpecimenBlock title="展示大字句" className={DISPLAY}>
           <p className={DISPLAY}>Make every signal useful.</p>
         </SpecimenBlock>
