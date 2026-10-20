@@ -37,6 +37,21 @@ describe('compareWithPending', () => {
     const result = compareWithPending([v('a.tsx', '#fff'), v('a.tsx', '#fff'), arb, hex], pending)
     expect(result.unexpected).toEqual([hex])
   })
+
+  it('detects stale entries when two tickets list the same file+match', () => {
+    const pending2 = [
+      { ticket: 'DATAI-622', entries: [{ file: 'a.tsx', match: 'rgba(168,197,195,0.5)', count: 1 }] },
+      { ticket: 'DATAI-623', entries: [{ file: 'a.tsx', match: 'rgba(168,197,195,0.5)', count: 1 }] },
+    ]
+    const one = compareWithPending([v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn')], pending2)
+    expect(one.stale).toEqual([
+      { ticket: 'DATAI-622', file: 'a.tsx', match: 'rgba(168,197,195,0.5)', listed: 1, found: 1 },
+      { ticket: 'DATAI-623', file: 'a.tsx', match: 'rgba(168,197,195,0.5)', listed: 1, found: 1 },
+    ])
+    const two = compareWithPending([v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn')], pending2)
+    expect(two.stale).toEqual([])
+    expect(two.unexpected).toEqual([])
+  })
 })
 
 describe('ticketFor', () => {
@@ -52,6 +67,11 @@ describe('ticketFor', () => {
     expect(ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), "style={{ color: 'rgba(168,197,195,0.5)' }}")).toBe('DATAI-622')
     expect(ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), "style={{ borderColor: 'rgba(168,197,195,0.5)' }}")).toBe('DATAI-623')
     expect(ticketFor(v('a.tsx', '#fff'), "{ color: '#fff' }")).toBe('DATAI-623')
+  })
+
+  it('distinguishes color from background-color and border-color in CSS', () => {
+    expect(ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), '.x { background-color: rgba(168,197,195,0.5); }')).toBe('DATAI-623')
+    expect(ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), '.x { color: rgba(168,197,195,0.5); }')).toBe('DATAI-622')
   })
 
   it('refuses to guess for an arbitrary value with no fix ticket', () => {

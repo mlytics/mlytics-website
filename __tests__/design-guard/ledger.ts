@@ -23,7 +23,12 @@ export function compareWithPending(violations: Violation[], pending: PendingTick
   }
 
   const listed = new Map<string, number>()
-  for (const t of pending) for (const e of t.entries) listed.set(key(e.file, e.match), (listed.get(key(e.file, e.match)) ?? 0) + e.count)
+  for (const t of pending) {
+    for (const e of t.entries) {
+      const k = key(e.file, e.match)
+      listed.set(k, (listed.get(k) ?? 0) + e.count)
+    }
+  }
 
   const unexpected: Violation[] = []
   for (const [k, vs] of found) unexpected.push(...vs.slice(listed.get(k) ?? 0))
@@ -31,8 +36,10 @@ export function compareWithPending(violations: Violation[], pending: PendingTick
   const stale: StaleEntry[] = []
   for (const t of pending) {
     for (const e of t.entries) {
-      const n = found.get(key(e.file, e.match))?.length ?? 0
-      if (n < e.count) stale.push({ ticket: t.ticket, file: e.file, match: e.match, listed: e.count, found: n })
+      const k = key(e.file, e.match)
+      const n = found.get(k)?.length ?? 0
+      const totalListed = listed.get(k) ?? 0
+      if (n < totalListed) stale.push({ ticket: t.ticket, file: e.file, match: e.match, listed: e.count, found: n })
     }
   }
   return { unexpected, stale }
@@ -49,7 +56,7 @@ export function ticketFor(v: Violation, lineText: string): string {
     throw new Error(`${v.file}:${v.line} ${v.match} 沒有對應的修正票，先問 An`)
   }
   const rgba = parseRgba(v.match)
-  if (rgba?.base === 'on-dark' && rgba.alpha !== null && rgba.alpha < 0.85 && /\bcolor\s*[:=]/.test(lineText)) return 'DATAI-622'
+  if (rgba?.base === 'on-dark' && rgba.alpha !== null && rgba.alpha < 0.85 && /(?<![\w-])color\s*[:=]/.test(lineText)) return 'DATAI-622'
   return 'DATAI-623'
 }
 
