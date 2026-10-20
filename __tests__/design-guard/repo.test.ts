@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { APPROVED } from './approved'
 import { compareWithPending, type PendingTicket } from './ledger'
-import { OUTLINE_CALC_DESIGN_REF } from './rules'
+import { OUTLINE_CALC_DESIGN_REF, findViolations } from './rules'
 import { ROOT, listFiles, readSource, scanRepo } from './scan-repo'
 
 // The design guard (DESIGN.md §0). New UI code may not hard-code colours, use
@@ -75,6 +75,7 @@ describe('design guard', () => {
 
   it('actually scans the site (guards against an empty file list)', () => {
     expect(listFiles().length).toBeGreaterThan(50)
-    expect(violations.length).toBeGreaterThan(0)
+    // Canary: the scanner still sees violations (the repo itself may one day have none).
+    expect(findViolations('canary.tsx', "className=\"mt-[7px]\" style={{ color: '#123456' }}")).toHaveLength(2)
   })
 })

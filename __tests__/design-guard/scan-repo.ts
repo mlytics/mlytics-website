@@ -1,13 +1,16 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative, resolve, sep } from 'node:path'
 import type { ApprovedException } from './approved'
-import { blankText, findViolations, type Violation } from './rules'
+import { blank, blankText, findViolations, type Violation } from './rules'
 
 export const ROOT = resolve(__dirname, '../..')
 const SCAN_DIRS = ['app', 'components']
-const SKIP = new Set(['app/site-base.css']) // token definitions live here
+// app/site-base.css is scanned too: only its token definitions (custom-property
+// declarations `--x: …;`) are exempt, the shared classes below them are not.
+const TOKEN_FILE = 'app/site-base.css'
+const TOKEN_DECLARATION = /--[\w-]+\s*:[^;{}]*;/g
 
-const scanned = (rel: string) => /\.(tsx?|css)$/.test(rel) && !/\.(stories|test)\.tsx?$/.test(rel) && !SKIP.has(rel)
+const scanned = (rel: string) => /\.(tsx?|css)$/.test(rel) && !/\.(stories|test)\.tsx?$/.test(rel)
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -28,6 +31,7 @@ export const readSource = (rel: string) => readFileSync(resolve(ROOT, rel), 'utf
 export function scanRepo(approved: ApprovedException[]): Violation[] {
   return listFiles().flatMap((file) => {
     let source = readSource(file)
+    if (file === TOKEN_FILE) source = source.replace(TOKEN_DECLARATION, blank)
     for (const a of approved) if (a.files.includes(file)) source = blankText(source, a.text)
     return findViolations(file, source)
   })

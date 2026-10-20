@@ -36,10 +36,11 @@ export const blankText = (source: string, text: string) => source.split(text).jo
 
 const lineOf = (source: string, index: number) => source.slice(0, index).split('\n').length
 
-// Colour-length hex (3/4/6/8 digits) not preceded by a word char or `&` (HTML entity)
+// Colour-length hex (3/4/6/8 digits) not preceded by a letter, digit or `&` (HTML entity;
+// `_` is allowed so `shadow-[0_0_0_1px_#fff]` is seen)
 // and not followed by a word char or hyphen (so `#section-2` and `#faq` are not colours).
-const HEX = /(?<![&\w])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})(?![\w-])/g
-const COLOR_FN = /\b(?:rgba?|hsla?)\([^)]*\)/g
+const HEX = /(?<![&0-9A-Za-z])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})(?![\w-])/g
+const COLOR_FN = /(?<![A-Za-z0-9-])(?:rgba?|hsla?)\([^)]*\)/g
 const RGBA = /^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d*\.?\d+)\s*)?\)$/
 
 export function parseRgba(match: string): { base: 'primary' | 'on-dark' | null; alpha: number | null } | null {
@@ -61,9 +62,9 @@ function colorFnHint(match: string): string | null {
 }
 
 // A class token with an arbitrary value: optional variant chain (variants may
-// themselves be arbitrary, e.g. `max-[420px]:`), optional leading minus,
+// themselves be arbitrary, e.g. `max-[420px]:`, `[&>svg]:`, `*:`, `group-hover/item:`), optional leading minus,
 // utility name, `-[value]`. The lookbehind stops matches starting mid-token.
-const ARBITRARY = /(?<![\w\-[\]:])((?:[\w-]+(?:-\[[^\]\s]+\])?:)*)(-?)([a-z][a-z0-9]*(?:-[a-z0-9]+)*)-\[([^\]\s'"`]+)\]/g
+const ARBITRARY = /(?<![\w\-[\]:/*])((?:(?:[\w/-]+(?:-\[[^\]\s]+\])?|\[[^\]\s]+\]|\*):)*)(-?)([a-z][a-z0-9]*(?:-[a-z0-9]+)*)-\[([^\]\s'"`]+)\]/g
 
 const SPACING = /^(?:p|px|py|pt|pr|pb|pl|ps|pe|m|mx|my|mt|mr|mb|ml|ms|me|gap|gap-x|gap-y|space-x|space-y)$/
 const COLOR_UTILITY = /^(?:text|bg|border(?:-[trblxy])?|fill|stroke|ring|outline|from|via|to|decoration|divide|caret|accent|shadow)$/

@@ -39,6 +39,10 @@ describe('hex colours', () => {
     expect(found('a.tsx', "'&#123;' /* #fff */ href=\"#faq\" href=\"#section-2\"")).toEqual([])
   })
 
+  it('finds hex inside underscore-separated arbitrary values', () => {
+    expect(found('a.tsx', 'className="shadow-[0_0_0_1px_#fff]"')).toEqual(['hex #fff'])
+  })
+
   it('reports the 1-based line', () => {
     expect(findViolations('a.tsx', "\n\n'#fff'")[0].line).toBe(3)
   })
@@ -113,6 +117,18 @@ describe('Tailwind arbitrary values', () => {
 
   it('keeps the variant chain in the match', () => {
     expect(found('a.tsx', 'className="max-[420px]:text-[27px]"')).toEqual(['arbitrary max-[420px]:text-[27px]'])
+  })
+
+  it('finds colour functions inside underscore-separated arbitrary values', () => {
+    expect(found('a.tsx', 'className="shadow-[0_0_0_1px_rgba(0,0,0,0.1)]"')).toEqual(['color-fn rgba(0,0,0,0.1)'])
+    expect(found('a.tsx', 'className="shadow-[0_4px_20px_rgba(0,0,0,0.08)]"')).toEqual(['color-fn rgba(0,0,0,0.08)'])
+  })
+
+  it('catches arbitrary variants, child selectors and named groups as prefixes', () => {
+    expect(found('a.tsx', 'className="[&>svg]:p-[3px]"')).toEqual(['arbitrary [&>svg]:p-[3px]'])
+    expect(found('a.tsx', 'className="[&_svg]:text-[10px]"')).toEqual(['arbitrary [&_svg]:text-[10px]'])
+    expect(found('a.tsx', 'className="*:mt-[7px]"')).toEqual(['arbitrary *:mt-[7px]'])
+    expect(found('a.tsx', 'className="group-hover/item:mt-[7px]"')).toEqual(['arbitrary group-hover/item:mt-[7px]'])
   })
 
   it('does not look for class names in CSS files', () => {
