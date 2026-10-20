@@ -1,0 +1,57 @@
+{/* stories/PendingComponents.mdx — generated from stories/_data/registry.ts, so it cannot drift from it. */}
+import { Meta } from '@storybook/addon-docs/blocks'
+import { PENDING, REGISTRY } from './_data/registry'
+
+<Meta title="待修元件" />
+
+# 待修元件
+
+下列共用元件還有未完成的修正票（`DESIGN.md` §10.2），依 §7.8 **不渲染現況樣本**：網站上看到的寫法是待修的，不可照抄，一律照 `DESIGN.md` 的標準寫。修正票全部完成後，該元件才補上 story。
+
+本表直接由 `stories/_data/registry.ts` 產生，共 {PENDING.length} 個待修；已有 story 的元件：{REGISTRY.filter((e) => e.status === 'rendered').map((e) => e.component).join('、')}。
+
+{/* Below 1024px the same rows render as a stacked list, so the page never scrolls sideways at 375px.
+    Names and paths are plain text here: Storybook docs force inline <code> to nowrap, so long paths could not wrap.
+    From 1024px up (where it fits) the table is shown, inside its own keyboard-reachable scroll region as a fallback. */}
+<div className="lg:hidden">
+  {PENDING.map((e) => (
+    <div key={e.id} className="border-t border-line py-4">
+      <p><strong>{e.name}</strong></p>
+      <p className="break-all">{e.component} · {e.file}</p>
+      <p>{e.standard}</p>
+      <p>修正票：{e.tickets.join('、')}</p>
+      <p>現況頁面：<code>{e.livePage}</code></p>
+    </div>
+  ))}
+</div>
+
+<div className="hidden lg:block overflow-x-auto" role="region" aria-label="待修元件清單" tabIndex={0}>
+<table>
+  <thead>
+    <tr>
+      <th>元件</th>
+      <th>標準（一句話）</th>
+      <th>修正票</th>
+      <th>現況頁面</th>
+    </tr>
+  </thead>
+  <tbody>
+    {PENDING.map((e) => (
+      <tr key={e.id}>
+        <td>
+          {e.name}
+          <br />
+          <code>{e.component}</code>
+          <br />
+          <code>{e.file}</code>
+        </td>
+        <td>{e.standard}</td>
+        <td>{e.tickets.join('、')}</td>
+        <td><code>{e.livePage}</code></td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+</div>
+
+規則以 `DESIGN.md` 為準；本表與 `DESIGN.md` 不一致時，以 `DESIGN.md` 為準並回報。
