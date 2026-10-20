@@ -135,3 +135,42 @@ describe('Tailwind arbitrary values', () => {
     expect(found('a.module.css', '.x { padding: 14px; color: #fff; }')).toEqual(['hex #fff'])
   })
 })
+
+describe('Tailwind opacity-modifier colours (DESIGN.md §2.3)', () => {
+  it('allows the two bases on the ladder, with variants and bracket alpha', () => {
+    expect(found('a.tsx', 'className="bg-primary/8 text-on-dark/85 hover:bg-primary/12 bg-primary/[0.25] text-on-dark/[.4] bg-primary/[40%]"')).toEqual([])
+  })
+
+  it('flags off-ladder alpha, other colours and keeps the variant chain in the match', () => {
+    expect(found('a.tsx', 'className="bg-primary/30 bg-primary/[0.3] text-white/50 bg-black/20 shadow-black/10 md:text-on-dark/65 border-gray-100/50"')).toEqual([
+      'opacity bg-primary/30',
+      'opacity bg-primary/[0.3]',
+      'opacity text-white/50',
+      'opacity bg-black/20',
+      'opacity shadow-black/10',
+      'opacity md:text-on-dark/65',
+      'opacity border-gray-100/50',
+    ])
+  })
+
+  it('flags hover variants on white', () => {
+    expect(found('a.tsx', 'className="hover:bg-white/10 border-t-white/8"')).toEqual(['opacity hover:bg-white/10', 'opacity border-t-white/8'])
+  })
+
+  it('names the nearest ladder step for an off-ladder alpha', () => {
+    expect(hintOf('className="text-on-dark/65"')).toContain('0.7')
+    expect(hintOf('className="bg-primary/[30%]"')).toContain('0.25')
+  })
+
+  it('says only the two bases are allowed for any other colour', () => {
+    expect(hintOf('className="text-white/50"')).toContain('primary 與 on-dark')
+  })
+
+  it('does not flag fractions, plain opacity, aspect ratios, text-size/line-height or paths', () => {
+    expect(found('a.tsx', `className="w-1/2 translate-x-1/2 opacity-50 aspect-16/9 grid-cols-[1fr_40px_1fr] text-sm/6 text-lg/7" href='/brands/' src="/img/bg-x/y.png"`)).toEqual([])
+  })
+
+  it('does not look for class names in CSS files', () => {
+    expect(found('a.module.css', '.x { content: "bg-white/10"; }')).toEqual([])
+  })
+})

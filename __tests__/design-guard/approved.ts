@@ -20,6 +20,7 @@ export const APPROVED: ApprovedException[] = [
     files: ['components/pages/partnership/PartnershipEarnings.tsx', 'components/pages/publishers/LayerOverview.tsx'],
     designRef: "boxShadow: '0 0 0 1px rgba(168,197,195,0.28), 0 6px 28px rgba(34,93,89,0.24)'",
   },
+  { text: 'bg-white/80', files: [NAV], designRef: '導覽列捲動後的 `bg-white/80` 加 `backdrop-blur-sm`' },
   { text: 'rgba(180,83,9,0.07)', files: ['components/pages/brands/BrandPainSection.tsx'], designRef: '/brands/ 痛點段落的琥珀光暈與琥珀短線' },
   { text: 'rgba(180,83,9,0.3)', files: ['components/pages/brands/BrandPainSection.tsx'], designRef: '/brands/ 痛點段落的琥珀光暈與琥珀短線' },
 ]

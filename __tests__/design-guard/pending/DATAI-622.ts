@@ -6,8 +6,10 @@ const pending: PendingTicket = {
   ticket: 'DATAI-622',
   entries: [
     { file: "components/home/FlywheelDiagram.tsx", match: "rgba(168,197,195,0.75)", count: 1 },
+    { file: "components/home/FlywheelSection.tsx", match: "text-on-dark/65", count: 2 },
     { file: "components/pages/brands/BrandGEOSection.tsx", match: "rgba(168,197,195,0.35)", count: 1 },
     { file: "components/pages/brands/BrandGEOSection.tsx", match: "rgba(168,197,195,0.45)", count: 1 },
+    { file: "components/pages/developers/AILayerSection.tsx", match: "text-on-dark/50", count: 1 },
     { file: "components/pages/publishers/KnowledgeBaseSection.tsx", match: "rgba(168,197,195,0.45)", count: 1 },
     { file: "components/pages/publishers/LayerOverview.tsx", match: "rgba(168,197,195,0.5)", count: 1 },
   ],

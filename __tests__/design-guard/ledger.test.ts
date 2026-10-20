@@ -69,6 +69,14 @@ describe('ticketFor', () => {
     expect(ticketFor(v('a.tsx', '#fff'), "{ color: '#fff' }")).toBe('DATAI-623')
   })
 
+  it('sends off-ladder on-dark text classes to DATAI-622 and white/grey opacity classes to DATAI-623', () => {
+    expect(ticketFor(v('a.tsx', 'text-on-dark/65', 'opacity'), '')).toBe('DATAI-622')
+    expect(ticketFor(v('a.tsx', 'md:text-on-dark/[0.5]', 'opacity'), '')).toBe('DATAI-622')
+    expect(ticketFor(v('a.tsx', 'border-on-dark/50', 'opacity'), '')).toBe('DATAI-623')
+    expect(ticketFor(v('a.tsx', 'hover:bg-white/10', 'opacity'), '')).toBe('DATAI-623')
+    expect(ticketFor(v('a.tsx', 'border-gray-100/50', 'opacity'), '')).toBe('DATAI-623')
+  })
+
   it('distinguishes color from background-color and border-color in CSS', () => {
     expect(ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), '.x { background-color: rgba(168,197,195,0.5); }')).toBe('DATAI-623')
     expect(ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), '.x { color: rgba(168,197,195,0.5); }')).toBe('DATAI-622')

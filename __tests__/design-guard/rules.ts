@@ -3,7 +3,7 @@
 // §2.7／§2.9 type, §2.10 spacing scale. These functions only look at one
 // file's text; repo-wide bookkeeping lives in ledger.ts.
 
-export type Kind = 'hex' | 'color-fn' | 'arbitrary'
+export type Kind = 'hex' | 'color-fn' | 'arbitrary' | 'opacity'
 
 export interface Violation {
   file: string
@@ -99,6 +99,36 @@ function arbitraryHint(minus: string, utility: string, value: string): string | 
   return null
 }
 
+// A colour utility with an opacity modifier: `<variants>?<utility>-<colour>/<alpha>`, alpha an
+// integer percent (`/30`) or a bracket value (`/[0.3]`, `/[.3]`, `/[30%]`). Same prefix handling as ARBITRARY.
+const OPACITY_UTILITY = '(?:text|bg|border(?:-[trblxy])?|fill|stroke|ring|outline|from|via|to|decoration|divide|caret|accent|shadow)'
+const OPACITY = new RegExp(
+  String.raw`(?<![\w\-[\]:/*])((?:(?:[\w/-]+(?:-\[[^\]\s]+\])?|\[[^\]\s]+\]|\*):)*)(-?)(${OPACITY_UTILITY})-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)/(\d+|\[[^\]\s'"\x60]+\])(?![\w/\-[])`,
+  'g',
+)
+const TEXT_SIZE = /^(?:xs|sm|base|lg|[2-9]?xl)$/ // `text-sm/6` is font-size/line-height, not a colour
+const OPACITY_BASES = ['primary', 'on-dark']
+
+function opacityAlpha(raw: string): number | null {
+  if (/^\d+$/.test(raw)) return Number(raw) / 100
+  const pct = raw.match(/^\[(\d*\.?\d+)%\]$/)
+  if (pct) return Number(pct[1]) / 100
+  const num = raw.match(/^\[(\d*\.?\d+)\]$/)
+  return num ? Number(num[1]) : null
+}
+
+function opacityHint(utility: string, colour: string, rawAlpha: string): string | null {
+  if (utility === 'text' && TEXT_SIZE.test(colour)) return null
+  const alpha = opacityAlpha(rawAlpha)
+  if (alpha === null) return null
+  if (!OPACITY_BASES.includes(colour)) return 'DESIGN.md §2.3：透明色只准 primary 與 on-dark 兩個基色（例：bg-primary/8、text-on-dark/85）'
+  if (!ALPHA_LADDER.includes(alpha)) {
+    const near = nearestStep(alpha)
+    return `DESIGN.md §2.3：α ${alpha} 不在階梯，就近改為 ${near}（例：${utility}-${colour}/${Math.round(near * 100)}）`
+  }
+  return null
+}
+
 export function findViolations(file: string, source: string): Violation[] {
   const code = stripComments(source)
   const out: Violation[] = []
@@ -116,6 +146,10 @@ export function findViolations(file: string, source: string): Violation[] {
     for (const m of code.matchAll(ARBITRARY)) {
       const hint = arbitraryHint(m[2], m[3], m[4])
       if (hint) push(m.index!, 'arbitrary', m[0], hint)
+    }
+    for (const m of code.matchAll(OPACITY)) {
+      const hint = opacityHint(m[3], m[4], m[5])
+      if (hint) push(m.index!, 'opacity', m[0], hint)
     }
   }
   return out
