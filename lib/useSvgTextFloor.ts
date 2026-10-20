@@ -17,6 +17,9 @@ type Options = {
 // floor applies only while that query matches (approved exceptions, §10.1).
 // A <text> with data-text-floor="off" is never enlarged and keeps its
 // authored size at every width; use it only for a §10.1 approved exception.
+// Input: each <text> must carry its size in its own font-size attribute.
+// Sizes inherited from a parent or set through style are not handled, and
+// the hook overwrites style.fontSize on the <text> it adjusts.
 export function useSvgTextFloor(ref: RefObject<SVGSVGElement | null>, options: Options = {}) {
   const { minPx = 12, media } = options
 

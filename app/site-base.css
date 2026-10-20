@@ -56,8 +56,10 @@
 
   /* --- Typography scale ---
      Usage: card titles use text-h3 (DESIGN.md §2.8). h1 / h2 / display
-            statements keep their current §2.7 classes; text-h1 / text-h2 /
-            text-display are for new code and give the same sizes.
+            statements always use their current DESIGN.md §2.7 classes.
+            text-h1 / text-h2 / text-display set font-size only (no
+            line-height) and are not used on pages today; revisit when
+            AI Mode is aligned in DATAI-630.
      Tailwind v4 only generates text-* classes from --text-* tokens.
      display / h1 / h2 are in the @theme static block below.
      (text-base = 1rem already exists in Tailwind)       */

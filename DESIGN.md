@@ -195,7 +195,8 @@
 | `--text-caption` | `0.75rem` |
 
 - 表中 `display`／`h1`／`h2` 是手機值；≥768（display `3.75rem`、h1 `3rem`、h2 `2.25rem`）與 ≥1024（h2 `3rem`）由 `app/site-base.css` 的 media query 覆寫 `:root` 變數，所以一個 class 就跟著斷點變化：`text-h1` 為 36／48、`text-h2` 為 30／36／48、`text-display` 為 36／60，與 §2.7 的角色字級一致。這三個 token 寫在 `@theme static` 區塊，確保變數一定輸出。
-- 用在哪：卡片標題用 `text-h3`（§2.7）。h1、h2、展示大字句維持 §2.7 的現有寫法，不改用新 token。
+- 用在哪：卡片標題用 `text-h3`（§2.7）。h1、h2、展示大字句一律照 §2.7 的現有寫法，不改用新 token。
+- `text-display`、`text-h1`、`text-h2` 只設字級、不帶行高，目前不用於頁面（DATAI-630 對齊 AI Mode 時再評估）；要新增這三個 class 的用法，先依 §0 第 2 點詢問。
 - 寫法：Tailwind class（例：`text-h3`）；新增或修改值一律改 `app/site-base.css`，並同步本表。
 - 禁止：用 `--font-size-*` 命名新的字級 token（不會產生 class，§7.5）；為單一區塊另定字級 token。
 - AI Mode 頁（例外頁）的兩個 CSS module 仍以舊名 `var()` 引用，共 26 處：`components/pages/ai-mode-playground/DecisionFlow.module.css` 12 處、`components/pages/ai-mode-playground/ExperiencePanel.module.css` 14 處；依 token 分為 `--font-size-caption` 15、`--font-size-small` 7、`--font-size-h3` 3、`--font-size-h2` 1。這 26 處由 §2.5 的 4 個相容變數接住、值不變，AI Mode 頁字級不受本節影響；DATAI-630 改用新 token 並刪除相容變數。
