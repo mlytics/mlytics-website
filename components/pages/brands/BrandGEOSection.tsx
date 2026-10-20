@@ -244,16 +244,16 @@ export function BrandGEOSection() {
                 const textAnchor = i === 0 ? 'start' : i === DATA_POINTS.length - 1 ? 'end' : 'middle'
                 // <768 shows the short date so the enlarged labels fit; ≥768 the full one.
                 return (
-                  <g key={i}>
+                  <g key={i} fill="rgba(168,197,195,0.35)">
                     <text className="md:hidden" x={x} y={SVG_H - 6}
                       textAnchor={textAnchor}
-                      fill="rgba(168,197,195,0.35)" fontSize="11" fontWeight="500"
+                      fontSize="11" fontWeight="500"
                     >
                       {p.short}
                     </text>
                     <text className="hidden md:inline" x={x} y={SVG_H - 6}
                       textAnchor={textAnchor}
-                      fill="rgba(168,197,195,0.35)" fontSize="11" fontWeight="500"
+                      fontSize="11" fontWeight="500"
                     >
                       {p.label}
                     </text>
