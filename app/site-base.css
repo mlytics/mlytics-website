@@ -55,8 +55,9 @@
       4.5:1 on --bg-dark; use it instead of .7 for text)   */
 
   /* --- Typography scale ---
-     Usage: text-display / text-h1 / text-h2 / text-h3
-            text-small / text-caption
+     Usage: card titles use text-h3 (DESIGN.md §2.8). h1 / h2 / display
+            statements keep their current §2.7 classes; text-h1 / text-h2 /
+            text-display are for new code and give the same sizes.
      Tailwind v4 only generates text-* classes from --text-* tokens.
      display / h1 / h2 are in the @theme static block below.
      (text-base = 1rem already exists in Tailwind)       */

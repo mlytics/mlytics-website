@@ -175,8 +175,8 @@
 | 按鈕 | 14／600 | `text-sm font-semibold` |
 | FAQ 題目 | 16／600 | `text-base font-semibold` |
 
-- 禁止：小於 12px 的字（包括 `text-[10px]` 與 SVG `fontSize="10"`）；為單一區塊自訂字級。
-- SVG 圖表文字以畫面實際大小計；隨版面縮放的圖用 `useSvgTextFloor`（`lib/useSvgTextFloor.ts`）維持 ≥12：畫面上小於 12 的文字放大到剛好 12，已 ≥12 的維持原本字級；例外見 §10.1（首頁飛輪圖手機字級）。<!-- src: DATAI-556 -->
+- 禁止：畫面上小於 12px 的字（包括 `text-[10px]`；SVG 圖表文字以畫面實際大小計，隨版面縮放的圖用 `useSvgTextFloor`，例外見 §10.1）；為單一區塊自訂字級。
+- `useSvgTextFloor`（`lib/useSvgTextFloor.ts`）的做法：只把畫面上小於 12 的 SVG 文字放大到剛好 12，已 ≥12 的維持原本字級；首頁飛輪圖在 <768 寬不放大（§10.1 首頁飛輪圖手機字級）。<!-- src: DATAI-556 -->
 - 已接受取捨：桌機 h1 與 h2 同為 48。
 - 現況偏離：見 §10 DATAI-626（/developers/ h1、404／錯誤頁標題目前 `text-3xl md:text-4xl`）、DATAI-622（「404」與「!」目前是主色）、DATAI-620（首頁 Flywheel h2 未用 `.section-heading`）
 <!-- src: tok-text-size-scale, tok-caption-12-floor, mol-display-statement, page-legal, page-404, org-hero-h1-standard, org-hero-home, tok-breakpoint-420, #29-6, #29-7, #31-1, #31-10 -->
