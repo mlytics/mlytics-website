@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import { PendingNotice, SpecimenBlock, StoryFrame, specimen } from '../_components/StoryPrimitives'
+import { SpecimenBlock, StoryFrame, specimen } from '../_components/StoryPrimitives'
 
 const meta = { title: 'Molecules/Card', parameters: { layout: 'fullscreen' } } satisfies Meta
 export default meta
@@ -21,24 +21,13 @@ export const 卡片外框與內距: Story = {
           return (
             <SpecimenBlock key={id} title={label} className={className}>
               <div className={className}>
-                <p className="text-base leading-relaxed text-ink-muted">Supporting content demonstrates the available space without introducing a pending card title.</p>
+                <h3 className={specimen('card-title').className}>Card title</h3>
+                <p className="text-base leading-relaxed text-ink-muted">Supporting content demonstrates the available space.</p>
               </div>
             </SpecimenBlock>
           )
         })}
       </div>
-      <PendingNotice
-        title="卡片標題 24px"
-        ticket="DATAI-556"
-        className={specimen('card-title-pending').className}
-        spec={[
-          '字級：24px（§2.7 卡片標題；首頁身分卡標題也是 24）。',
-          '寫法：text-h3。DATAI-556 把字級 token 改名為 --text-* 後，text-h3 才會是 24px（§2.8）。',
-          'DATAI-556 完成前不得新增卡片標題；需要時先問 An。',
-        ]}
-      >
-        依 §7.8，DATAI-556 完成前只列目標規格與票號，不渲染樣本。
-      </PendingNotice>
     </StoryFrame>
   ),
   parameters: { docs: { description: { story: '選擇內容卡片外框與 20／24／32px 內距時使用。' } } },

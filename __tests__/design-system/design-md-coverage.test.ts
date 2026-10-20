@@ -149,7 +149,7 @@ describe('DESIGN.md', () => {
   it('parses a non-trivial token and class set from site-base.css (guards the parser)', () => {
     expect(declaredTokens(css, '@theme')).toContain('--color-primary')
     expect(declaredTokens(css, ':root')).toContain('--bg-dark')
-    expect(declarations(css, '@theme').get('--font-size-h3')).toBe('1.5rem')
+    expect(declarations(css, '@theme').get('--text-h3')).toBe('1.5rem')
     expect(componentClasses(css)).toEqual(expect.arrayContaining(['section-heading', 'pill-btn', 'label-eyebrow']))
     // Fixed samples: classes inside @media / @layer and in compound selectors
     // count; keyframe steps, attribute values and comments do not.
@@ -215,18 +215,18 @@ describe('DESIGN.md', () => {
     expect(missing, `Classes missing from DESIGN.md (or only on a 禁止 line): ${missing.join(', ')}`).toEqual([])
   })
 
-  // Tables that state the value a token has in site-base.css TODAY. §2.8 says
-  // DATAI-556 will rename and re-value some of these; its table still lists the
-  // current values (the target is in prose), so it is checked too. When a
+  // Tables that state the value a token has in site-base.css TODAY. When a
   // ticket changes a value, the table and the CSS must change together.
+  // A :root rule that overrides an @theme token of the same name (e.g. the
+  // md / lg heading sizes inside @media) is not a legacy variable: §2.8
+  // states those overrides in prose, so §2.5 leaves them out.
+  const themeNames = declaredTokens(css, '@theme')
   const VALUE_TABLES: { heading: string; tokens: (name: string) => boolean; from: '@theme' | ':root' }[] = [
     { heading: '### 2.1 顏色 token', tokens: (t) => t.startsWith('--color-'), from: '@theme' },
-    { heading: '### 2.5 legacy 變數（`:root`）', tokens: () => true, from: ':root' },
-    // Matched by number: the title says 目前失效 and will change with DATAI-556.
-    // DATAI-556 renames --font-size-* to --text-*: it must update this prefix
-    // (and the §2.8 table) in the same PR, or every --text-* token falls
-    // through to the classification check below.
-    { heading: '### 2.8 ', tokens: (t) => t.startsWith('--font-size-'), from: '@theme' },
+    { heading: '### 2.5 legacy 變數（`:root`）', tokens: (t) => !themeNames.includes(t), from: ':root' },
+    // Matched by number. §2.8 lists base (mobile) values; md／lg overrides
+    // live in @media and are stated in prose.
+    { heading: '### 2.8 ', tokens: (t) => t.startsWith('--text-'), from: '@theme' },
   ]
 
   // @theme tokens whose value DESIGN.md states in prose rather than in a
@@ -236,8 +236,11 @@ describe('DESIGN.md', () => {
   ]
 
   // @theme / :root tokens that are documented by name only, with no value
-  // check. Empty today. Adding a name here is a conscious decision: say why.
-  const NAME_ONLY: string[] = []
+  // check. Adding a name here is a conscious decision: say why.
+  // --text-display / --text-h1 / --text-h2: the md／lg overrides of the §2.8
+  // tokens inside @media :root. Their base values are checked against the
+  // §2.8 table; the override values are stated in the §2.8 prose.
+  const NAME_ONLY: string[] = ['--text-display', '--text-h1', '--text-h2']
 
   /** token → value from a DESIGN.md table, read from its first column and its 值 column. */
   function documentedValues(heading: string): Map<string, string> | null {

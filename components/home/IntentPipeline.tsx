@@ -182,7 +182,7 @@ export function IntentPipeline() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center flex-wrap gap-2">
                     <span className="text-sm font-semibold text-white">{layer.name}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/8 text-on-dark">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-white/8 text-on-dark">
                       {layer.audience}
                     </span>
                   </div>

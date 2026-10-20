@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { PlaygroundCTASection } from '@/components/ui/PlaygroundCTASection'
+import { useSvgTextFloor } from '@/lib/useSvgTextFloor'
 
 const STEPS = [
   {
@@ -35,11 +36,11 @@ const STEPS = [
 
 // ── MAU chart helpers ─────────────────────────────────────────────────────────
 const DATA_POINTS = [
-  { label: 'May 2025', v: 18 },
-  { label: 'Jul 2025',  v: 38 },
-  { label: 'Oct 2025',  v: 62 },
-  { label: 'Jan 2026',  v: 82 },
-  { label: 'Today',     v: 100 },
+  { label: 'May 2025', short: 'May ’25', v: 18 },
+  { label: 'Jul 2025', short: 'Jul ’25', v: 38 },
+  { label: 'Oct 2025', short: 'Oct ’25', v: 62 },
+  { label: 'Jan 2026', short: 'Jan ’26', v: 82 },
+  { label: 'Today',    short: 'Today',  v: 100 },
 ]
 
 const SVG_W = 800
@@ -76,6 +77,8 @@ export function BrandGEOSection() {
   const count = useCountUp(15_000_000, 2200, inView)
 
   const pathRef = useRef<SVGPathElement>(null)
+  const chartRef = useRef<SVGSVGElement>(null)
+  useSvgTextFloor(chartRef)
   const [pathLen, setPathLen] = useState(0)
   useEffect(() => {
     if (pathRef.current) setPathLen(pathRef.current.getTotalLength())
@@ -175,7 +178,7 @@ export function BrandGEOSection() {
         >
           {/* Left — chart */}
           <div className="pt-8 pb-4 lg:border-r" style={{ borderColor: 'rgba(168,197,195,0.12)' }}>
-            <svg viewBox={`0 0 ${SVG_W / 2} ${SVG_H}`} className="w-full" style={{ overflow: 'visible' }}>
+            <svg ref={chartRef} viewBox={`0 0 ${SVG_W / 2} ${SVG_H}`} className="w-full" style={{ overflow: 'visible' }}>
               <defs>
                 <linearGradient id="geo-mau-fill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="var(--color-gold)" stopOpacity="0.2" />
@@ -238,13 +241,23 @@ export function BrandGEOSection() {
 
               {DATA_POINTS.map((p, i) => {
                 const x = PAD_L + (i / (DATA_POINTS.length - 1)) * (SVG_W / 2 - PAD_L - PAD_R)
+                const textAnchor = i === 0 ? 'start' : i === DATA_POINTS.length - 1 ? 'end' : 'middle'
+                // <768 shows the short date so the enlarged labels fit; ≥768 the full one.
                 return (
-                  <text key={i} x={x} y={SVG_H - 6}
-                    textAnchor={i === 0 ? 'start' : i === DATA_POINTS.length - 1 ? 'end' : 'middle'}
-                    fill="rgba(168,197,195,0.35)" fontSize="11" fontWeight="500"
-                  >
-                    {p.label}
-                  </text>
+                  <g key={i}>
+                    <text className="md:hidden" x={x} y={SVG_H - 6}
+                      textAnchor={textAnchor}
+                      fill="rgba(168,197,195,0.35)" fontSize="11" fontWeight="500"
+                    >
+                      {p.short}
+                    </text>
+                    <text className="hidden md:inline" x={x} y={SVG_H - 6}
+                      textAnchor={textAnchor}
+                      fill="rgba(168,197,195,0.35)" fontSize="11" fontWeight="500"
+                    >
+                      {p.label}
+                    </text>
+                  </g>
                 )
               })}
             </svg>

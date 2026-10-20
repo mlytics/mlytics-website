@@ -132,12 +132,16 @@
 | `--bg-dark` | `#1A3D3A` | `.section-dark`（與 `--color-primary-dark` 同值） |
 | `--text-primary` | `#1A1A1A` | `body` 文字色 |
 | `--text-dark-primary` | `#FAFAFA` | `.section-dark` 文字色 |
+| `--font-size-h2` | `2.25rem` | AI Mode 頁 CSS module 的相容舊名（DATAI-630 刪除） |
+| `--font-size-h3` | `1.5rem` | AI Mode 頁 CSS module 的相容舊名（DATAI-630 刪除） |
+| `--font-size-small` | `0.875rem` | AI Mode 頁 CSS module 的相容舊名（DATAI-630 刪除） |
+| `--font-size-caption` | `0.75rem` | AI Mode 頁 CSS module 的相容舊名（DATAI-630 刪除） |
 
 - 用在哪：只在 `app/site-base.css` 內部。
 - 寫法：新程式一律用 §2.1 的 `@theme` token。
 - 禁止：在元件或頁面的程式裡引用這些變數。
-- 現況偏離：AI Mode 頁（例外頁）的 CSS 檔引用 legacy 變數，見 §10 DATAI-630
-<!-- src: tok-legacy-root-vars-site, tok-ai-mode-legacy-vars -->
+- 現況偏離：AI Mode 頁（例外頁）的 CSS 檔引用 legacy 變數；AI Mode CSS module 以舊名 `--font-size-*` 引用相容變數（§2.8），見 §10 DATAI-630
+<!-- src: tok-legacy-root-vars-site, tok-ai-mode-legacy-vars, DATAI-556 -->
 
 ### 2.6 字型
 
@@ -163,7 +167,7 @@
 | 404 的「404」與錯誤頁的「!」大字 | — | `text-7xl`，**白色** |
 | h2（區塊標題） | 30／36（≥768）／48（≥1024） | `.section-heading` |
 | 展示大字句（區塊中段重點句） | 手機 36、≥768 為 60 | `text-4xl md:text-6xl` |
-| 卡片標題 | 24 | `text-h3`（DATAI-556 修好前不產生樣式，見 §2.8）；首頁身分卡標題也是 24。**DATAI-556 完成前不得新增卡片標題**；需要時先問 An <!-- src: #32-3 --> |
+| 卡片標題 | 24 | `text-h3 font-bold leading-snug`（字級 token 見 §2.8）；首頁身分卡標題也是 24 <!-- src: #32-3, DATAI-556 --> |
 | 法律頁條文小標 | 20 | `text-xl font-bold` |
 | 內文 | 16 | `text-base` |
 | 輔助文字 | 14 | `text-sm` |
@@ -172,31 +176,31 @@
 | FAQ 題目 | 16／600 | `text-base font-semibold` |
 
 - 禁止：小於 12px 的字（包括 `text-[10px]` 與 SVG `fontSize="10"`）；為單一區塊自訂字級。
+- SVG 圖表文字以畫面實際大小計；隨版面縮放的圖用 `useSvgTextFloor`（`lib/useSvgTextFloor.ts`）維持 ≥12：畫面上小於 12 的文字放大到剛好 12，已 ≥12 的維持原本字級；例外見 §10.1（首頁飛輪圖手機字級）。<!-- src: DATAI-556 -->
 - 已接受取捨：桌機 h1 與 h2 同為 48。
-- 現況偏離：見 §10 DATAI-556（6 張卡片標題與首頁身分卡標題不是 24、10px 字）、DATAI-626（/developers/ h1、404／錯誤頁標題目前 `text-3xl md:text-4xl`）、DATAI-622（「404」與「!」目前是主色）、DATAI-620（首頁 Flywheel h2 未用 `.section-heading`）
+- 現況偏離：見 §10 DATAI-626（/developers/ h1、404／錯誤頁標題目前 `text-3xl md:text-4xl`）、DATAI-622（「404」與「!」目前是主色）、DATAI-620（首頁 Flywheel h2 未用 `.section-heading`）
 <!-- src: tok-text-size-scale, tok-caption-12-floor, mol-display-statement, page-legal, page-404, org-hero-h1-standard, org-hero-home, tok-breakpoint-420, #29-6, #29-7, #31-1, #31-10 -->
 
-### 2.8 字級 token（目前失效）
+### 2.8 字級 token
 
-`app/site-base.css` 的 `@theme` 定義了六個字級 token，但**目前全部失效**：Tailwind v4 的字級命名空間是 `--text-*`，`--font-size-*` 不會產生 `text-display`、`text-h1`……等 class，寫了也沒有效果。
+`app/site-base.css` 定義六個字級 token（`display`／`h1`／`h2` 三個在 `@theme static` 區塊，`h3`／`small`／`caption` 三個在 `@theme` 區塊），產生 `text-display`、`text-h1`、`text-h2`、`text-h3`、`text-small`、`text-caption` 六個 class（Tailwind v4 只從 `--text-*` 產生字級 class，§7.5）。
 
 | token | 值 |
 |---|---|
-| `--font-size-display` | `clamp(2.5rem, 6vw, 4rem)` |
-| `--font-size-h1` | `clamp(2rem, 5vw, 3rem)` |
-| `--font-size-h2` | `2.25rem` |
-| `--font-size-h3` | `1.5rem` |
-| `--font-size-small` | `0.875rem` |
-| `--font-size-caption` | `0.75rem` |
+| `--text-display` | `2.25rem` |
+| `--text-h1` | `2.25rem` |
+| `--text-h2` | `1.875rem` |
+| `--text-h3` | `1.5rem` |
+| `--text-small` | `0.875rem` |
+| `--text-caption` | `0.75rem` |
 
-- 用在哪：目前不可用於任何地方。
-- 寫法：DATAI-556 修正後改名為 `--text-*`，屆時 `text-h3` 才會是 24px。
-- 禁止：在 DATAI-556 完成前新增任何 `text-display`／`text-h1`／`text-h2`／`text-h3`／`text-small`／`text-caption` 用法；也不要自行在 `app/site-base.css` 補 `--text-*`。
-- DATAI-556 改名為 `--text-*` 時，`display`／`h1`／`h2` 三個 token 的**值改成與 §2.7 的實際標題角色一致**（角色字級是響應式：h1 36／48、h2 30／36／48；實作值由 DATAI-556 提案、截圖交 An 確認）。`h3`、`small`、`caption` 的值不變。
-- 目前只有 AI Mode 頁（例外頁）的兩個 CSS module 以 `var()` 引用這幾個 token，共 26 處：`components/pages/ai-mode-playground/DecisionFlow.module.css` 12 處、`components/pages/ai-mode-playground/ExperiencePanel.module.css` 14 處；依 token 分為 `--font-size-caption` 15、`--font-size-small` 7、`--font-size-h3` 3、`--font-size-h2` 1。其他地方都沒有用到。改名為 `--text-*` 會讓這 26 處引用全部解析不到，AI Mode 頁的字級無聲失效（不只是改值的問題）；改值也會讓 AI Mode 頁的字級跟著變。所以 DATAI-556 必須同步處理這 26 處引用，並和 DATAI-630（AI Mode 頁對齊）協調。
-<!-- src: #32-2 -->
-- 現況偏離：見 §10 DATAI-556
-<!-- src: tok-font-size-token-broken, #29-6, #30-5 -->
+- 表中 `display`／`h1`／`h2` 是手機值；≥768（display `3.75rem`、h1 `3rem`、h2 `2.25rem`）與 ≥1024（h2 `3rem`）由 `app/site-base.css` 的 media query 覆寫 `:root` 變數，所以一個 class 就跟著斷點變化：`text-h1` 為 36／48、`text-h2` 為 30／36／48、`text-display` 為 36／60，與 §2.7 的角色字級一致。這三個 token 寫在 `@theme static` 區塊，確保變數一定輸出。
+- 用在哪：卡片標題用 `text-h3`（§2.7）。h1、h2、展示大字句維持 §2.7 的現有寫法，不改用新 token。
+- 寫法：Tailwind class（例：`text-h3`）；新增或修改值一律改 `app/site-base.css`，並同步本表。
+- 禁止：用 `--font-size-*` 命名新的字級 token（不會產生 class，§7.5）；為單一區塊另定字級 token。
+- AI Mode 頁（例外頁）的兩個 CSS module 仍以舊名 `var()` 引用，共 26 處：`components/pages/ai-mode-playground/DecisionFlow.module.css` 12 處、`components/pages/ai-mode-playground/ExperiencePanel.module.css` 14 處；依 token 分為 `--font-size-caption` 15、`--font-size-small` 7、`--font-size-h3` 3、`--font-size-h2` 1。這 26 處由 §2.5 的 4 個相容變數接住、值不變，AI Mode 頁字級不受本節影響；DATAI-630 改用新 token 並刪除相容變數。
+<!-- src: #32-2, DATAI-556 -->
+<!-- src: tok-font-size-token-broken, #29-6, #30-5, DATAI-556 -->
 
 ### 2.9 字重、行高、字距
 
@@ -575,7 +579,7 @@
   - 淺底：`px-3 py-1 rounded-full text-xs font-semibold bg-primary/8 text-primary`
   - 深底：`px-3 py-1 rounded-full text-xs font-semibold bg-on-dark/8 text-on-dark`
 - 禁止：加框線；其他高度或內距；小於 12px 的字；白色透明底；inline `style` 上色。
-- 現況偏離：見 §10 DATAI-625（尺寸與框線統一）：/decisive-engine/ Hero 底部 5 個（`components/pages/decisive-engine/DecisiveEngineHero.tsx:56`，有框、高 30）、/partnership/ 方案卡 2 個（`components/pages/partnership/PartnershipMembership.tsx:55`、`:117`，有框、高 30）、首頁流程 5 個（`components/home/IntentPipeline.tsx:185`，10px、高 19）、/decisive-engine/ 決策迴圈卡片 12 個（`components/pages/decisive-engine/DecisionLoop.tsx:85`，高 24 但左右內距 10）。這 5 行（`DecisiveEngineHero.tsx:56`、`PartnershipMembership.tsx:55`、`:117`、`IntentPipeline.tsx:185`、`DecisionLoop.tsx:85`）的內距**不由 DATAI-621 往下取**，一律照本節 `px-3 py-1`，由 DATAI-625 處理。`IntentPipeline.tsx:185` 另有：白色 .08 底改 `bg-on-dark/8`（DATAI-623）、10px 字改 12（DATAI-556），三張票的施工順序由 DATAI-625 協調
+- 現況偏離：見 §10 DATAI-625（尺寸與框線統一）：/decisive-engine/ Hero 底部 5 個（`components/pages/decisive-engine/DecisiveEngineHero.tsx:56`，有框、高 30）、/partnership/ 方案卡 2 個（`components/pages/partnership/PartnershipMembership.tsx:55`、`:117`，有框、高 30）、首頁流程 5 個（`components/home/IntentPipeline.tsx:185`，12px、高 20）、/decisive-engine/ 決策迴圈卡片 12 個（`components/pages/decisive-engine/DecisionLoop.tsx:85`，高 24 但左右內距 10）。這 5 行（`DecisiveEngineHero.tsx:56`、`PartnershipMembership.tsx:55`、`:117`、`IntentPipeline.tsx:185`、`DecisionLoop.tsx:85`）的內距**不由 DATAI-621 往下取**，一律照本節 `px-3 py-1`，由 DATAI-625 處理。`IntentPipeline.tsx:185` 另有：白色 .08 底改 `bg-on-dark/8`（DATAI-623），兩張票的施工順序由 DATAI-625 協調
 <!-- src: #33（An 2026-10-15 決策頁 3 q11 選 a） -->
 
 ### 3.15 內文連結
@@ -601,7 +605,7 @@
 - 寫法：
   - **淺底卡片**：`rounded-2xl border border-line`，底色 `bg-surface` 或 `bg-white`（例：`components/pages/partnership/PartnershipMembership.tsx:37` 的 `rounded-2xl p-8 bg-surface border border-line`）。
   - **深色區塊內的卡片**：`rounded-2xl`、primary .25 底、on-dark .12 框，用 class 寫法（例：`rounded-2xl border border-on-dark/12 bg-primary/25`）；滑過時用 §2.14 的深底卡片 hover 發光。
-  - 卡片內層元件 `rounded-xl`、小元件 `rounded-lg`（§2.13）；卡片標題 24（§2.7，DATAI-556 完成前不新增卡片標題）；圖示底座見 §3.12；內距見 §4.2；多張卡片排成網格時的間距見 §4.8。
+  - 卡片內層元件 `rounded-xl`、小元件 `rounded-lg`（§2.13）；卡片標題 24（§2.7）；圖示底座見 §3.12；內距見 §4.2；多張卡片排成網格時的間距見 §4.8。
 - 禁止：其他圓角；自訂 `boxShadow`（§2.14）；深色區塊卡片用 inline `rgba` 寫法或階梯外的透明度。
 - 現況偏離：見 §10 DATAI-623（/partnership/、/content-owners/ 深色卡片目前 inline primary .22 底、on-dark .1 框）、DATAI-628（「Talk to us」記錄名稱與畫面文字不同）
 <!-- src: mol-card, tok-alpha-off-ladder, 按鈕盤點 A8, #29-9(3), #32-4 -->
@@ -863,7 +867,7 @@
 - 區塊順序：白 Hero（`HeroSection`）→ 白 身分卡 → 深 Flywheel → 白 Intent Refinery → 深 頁尾 CTA（白／白／深／白／深）。
 - 首頁專屬項目：白／白開頭的區塊順序（白底 Hero）、h1 寫法（≤420px 27px、`tracking-tight`）、內容與頁尾 1152（`max-w-6xl`）、標準淺底光暈的首頁 Hero 用法。這些只限首頁，其他頁不可用。（Hero 的全螢幕高與標題輪播是現況，未列為標準。）<!-- src: tpl-order-home, home-hero-h1-narrow-27, org-hero-home -->
 - 禁止：把首頁的 1152 容器、白底 Hero 或白／白開頭用在其他頁。
-- 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）、DATAI-620（Flywheel h2）、DATAI-625（身分卡圖示底座）、DATAI-624（身分卡按鈕）、DATAI-628（身分卡按鈕追蹤）、DATAI-556（身分卡標題 18 → 24）
+- 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）、DATAI-620（Flywheel h2）、DATAI-625（身分卡圖示底座）、DATAI-624（身分卡按鈕）、DATAI-628（身分卡按鈕追蹤）
 <!-- src: tpl-order-home, tpl-container-home-6xl, org-hero-home, page-home -->
 
 ### 6.5 法律頁
@@ -957,12 +961,12 @@
 
 **規則：以下寫法不會報錯，但樣式會被靜默丟棄或被蓋掉；寫完一律在瀏覽器確認 computed style。**
 1. **自訂 token 撞 Tailwind 內建色名**：例如自訂 `--color-amber` 會無聲失效，所以痛點色叫 `warn`（`app/site-base.css:25-28` 註解）。新 token 不可用 Tailwind 內建色系名稱。
-2. **字級 token 必須叫 `--text-*`**：`--font-size-*` 不會產生 class（§2.8，DATAI-556 處理）。
+2. **字級 token 必須叫 `--text-*`**：`--font-size-*` 不會產生 class；字級 token 一律用 `--text-*`（§2.8）。
 3. **自訂 class 內的 `text-wrap` 要用 `@apply`**：例如 `.section-heading` 寫 `@apply text-balance;`（`app/site-base.css:121`），不要手寫 `text-wrap` 屬性。
 4. **`Eyebrow` 靠 `cn()`（tailwind-merge）合併 class**（`lib/utils.ts`）：用 className 覆寫顏色會靠 tailwind-merge 剃掉預設色才生效，元件一改就失效。換色一律用元件參數（§3.8）。
 5. **未分層的自訂 class 會蓋過 Tailwind utilities**：`app/site-base.css` 的 `.pill-btn` 等類別不在 `@layer` 內，同一元素上的 Tailwind 內距 class 會被它蓋掉（`components/layout/Nav.tsx:34-40` 註解）。不要在 `.pill-btn` 上疊內距 utilities 調高度（§3.4、§3.5）。
-- 現況偏離：見 §10 DATAI-556（字級 token 失效）、DATAI-625（4 處小標籤用 className 覆寫顏色）、DATAI-624（`.pill-btn` 定義）
-<!-- src: tok-font-size-token-broken, atom-eyebrow-override-risk, atom-btn-secondary-outline -->
+- 現況偏離：見 §10 DATAI-625（4 處小標籤用 className 覆寫顏色）、DATAI-624（`.pill-btn` 定義）
+<!-- src: tok-font-size-token-broken, atom-eyebrow-override-risk, atom-btn-secondary-outline, DATAI-556 -->
 
 ### 7.6 量測以瀏覽器為準
 
@@ -997,7 +1001,7 @@
   - 沒有待修項目 → 同時加 story。
   - 有待修項目 → 列入 Storybook 的待修元件清單（`stories/_data/registry.ts`），寫上修正票號；修正票完成後再換成 story。
 - CI 會渲染每一個 story 並跑無障礙檢查（`__tests__/design-system/stories-render.test.tsx`），任一 story 出錯會讓 CI 失敗；但 CI 的測試環境（jsdom）無法檢查顏色對比，對比一律在瀏覽器實測（§8.1）。
-- DATAI-556、DATAI-624、DATAI-621／DATAI-625 完成前，卡片標題、深底外框按鈕、Hero 小膠囊的 story 只列目標規格與待修票號，不渲染現況偏離的樣本，也不加 Storybook 私有樣式補丁；修正票完成後再補實際樣本。
+- DATAI-624、DATAI-621／DATAI-625 完成前，深底外框按鈕、Hero 小膠囊的 story 只列目標規格與待修票號，不渲染現況偏離的樣本，也不加 Storybook 私有樣式補丁；修正票完成後再補實際樣本。
 - 規則以本文件為準（§0 第 5 點）。
 <!-- src: #30, An 2026-10-15 裁決（待修共用樣式在 Storybook 只列標準與票號） -->
 
@@ -1099,13 +1103,14 @@
 
 | 例外 | 範圍與寫法 | 依據 |
 |---|---|---|
-| AI Mode 頁（`/ai-mode-playground/`） | 字級與間距沿用原型，不計入任何全站慣例、不可照抄（顏色合規）；內文與分頁字級用網站 14px；對齊另由 DATAI-630 處理（§0 第 3 點、§6.8） | #20、#28 |
+| AI Mode 頁（`/ai-mode-playground/`） | 字級與間距沿用原型，不計入任何全站慣例、不可照抄（顏色合規）；內文與分頁字級用網站 14px；字級 token 舊名由 §2.5 相容變數接住；對齊另由 DATAI-630 處理（§0 第 3 點、§6.8） | #20、#28 |
 | AI Mode 分享卡 | 極簡深色卡（`--bg-dark` 底、右上薄荷柔光、小金色引號、底部細分隔線＋10px 贊助標籤＋白色單色 logo）；分享區外框 14px 為核准值；贊助標籤 10px 為 12px 下限的核准例外 | #24、#29-7 |
 | AI Mode 播放器與分享按鈕 | Listen 播放器（不可拖曳的進度條、手機播放鍵 36px、逐字稿與逐句高亮）；LINE／FB 圖示用網站主色單色 | #25 |
 | 首頁專屬項目 | 白／白／深／白／深區塊順序（白底 Hero 開頭）；Hero h1 的 `max-[420px]:text-[27px]` 與 `tracking-tight`；內容與頁尾 1152（`max-w-6xl`）（§2.7、§2.9、§2.12、§6.4） | tpl-order-home（home-section-rhythm）、home-hero-h1-narrow-27、tok-tracking、tpl-container-home-6xl (a)、#29-2 |
 | /decisive-engine/ 產品頁頁尾 CTA 變體 | 頁尾 CTA 不用 `InlineEmailCTA`，改用連到 /book-a-demo 的 §3.2 標準 44「Contact Us」，必須呼叫 `trackCTA`（範圍：§4.7、§5.4） | org-de-cta-form (a) |
 | 首頁 Flywheel 計數動畫 | 首頁 Flywheel 展示大數字用元件內自己的 `CountUp`（`components/home/FlywheelSection.tsx:7`），不改用 `NumberTicker`（§3.13） | #33 |
 | 間距：受眾頁 FAQ 細線前白色區塊 | 僅緊接 FAQ 細線前的白色內容區塊：上 64／112、下固定 32（含桌機），`pt-16 lg:pt-28 pb-8`；搭配 FAQ `pt-8`，細線上下各 32（§2.11、§6.2） | #38（An 2026-10-16 細線上下對稱裁決） |
+| 首頁飛輪圖手機字級 | `components/home/FlywheelDiagram.tsx` 的 SVG 文字在 <768 寬維持原屬性大小（375 寬約 6.5–8.9px），≥768 照 12px 下限補償（`useSvgTextFloor` 帶 `media: '(min-width: 48rem)'`，§2.7） | #40 |
 | 間距：手機選單開關 | `p-[11px]`／`-mr-[11px]`，讓 22px 圖示湊成 44×44（§2.10） | #29-4 |
 | 間距：/partnership/ 勾勾 | 2px 下移置中（§2.10） | #29-4 |
 | 間距：按鈕以整顆高度為準 | 按鈕高度 44／40／36 符合規格即可，內距不往下取（例：`py-2.5`）；外框按鈕可用扣 1px 框線的 `calc()` 內距（§2.10） | #30-4 |
@@ -1132,7 +1137,6 @@
 
 | 票號 | 類別 | 內容 | 盤點 id |
 |---|---|---|---|
-| DATAI-556 | 字級 token | `--font-size-*` 改名 `--text-*`（display／h1／h2 的值改成與實際標題角色一致，與 DATAI-630 協調）；6 張卡片標題 16→24、首頁身分卡標題 18→24；`text-[10px]`、SVG 小字對齊 12px 下限 | tok-font-size-token-broken、tok-caption-12-floor、tok-text-size-scale |
 | DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`（受眾頁緊接 FAQ 細線前白色區塊依 §2.11／§6.2 例外，下距固定 32）；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白；卡片網格 `gap-6` 兩處改 `gap-5`（/brands/ 痛點兩卡、首頁身分卡） | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
 | DATAI-620 | 區塊標題組 | h2→說明 16（含頁尾 CTA）；說明寬 576；7 處小標籤改「緊」；首頁 Flywheel h2 改 `.section-heading`；標題組到下方內容 48（11 處） | mol-heading-group-h2-gap、mol-heading-group-desc-width、mol-heading-group-eyebrow-gap、mol-heading-flywheel |
 | DATAI-621 | 4px 間距刻度 | 非按鈕的半級與任意值往下取（例外見 §10.1）；`.label-eyebrow-pill` 內距 6→4；內容區資訊小膠囊 5 行不在本票（歸 DATAI-625） | tok-spacing |
