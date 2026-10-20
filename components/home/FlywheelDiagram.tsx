@@ -82,7 +82,8 @@ export function FlywheelDiagram() {
           <text x={CX} y={CY + 2} textAnchor="middle" fill="var(--color-surface)" fontSize="11" fontWeight="700" letterSpacing="0.8">
             ENGINE
           </text>
-          <text x={CX} y={CY + 20} textAnchor="middle" fill="var(--color-gold)" fontSize="9.5" fontWeight="500">
+          {/* Authored size at every width: approved exception, DESIGN.md §10.1. */}
+          <text x={CX} y={CY + 20} textAnchor="middle" fill="var(--color-gold)" fontSize="9.5" fontWeight="500" data-text-floor="off">
             intent · route · earn
           </text>
         </motion.g>

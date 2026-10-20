@@ -176,7 +176,7 @@
 | FAQ 題目 | 16／600 | `text-base font-semibold` |
 
 - 禁止：畫面上小於 12px 的字（包括 `text-[10px]`；SVG 圖表文字以畫面實際大小計，隨版面縮放的圖用 `useSvgTextFloor`，例外見 §10.1）；為單一區塊自訂字級。
-- `useSvgTextFloor`（`lib/useSvgTextFloor.ts`）的做法：只把畫面上小於 12 的 SVG 文字放大到剛好 12，已 ≥12 的維持原本字級；首頁飛輪圖在 <768 寬不放大（§10.1 首頁飛輪圖手機字級）。<!-- src: DATAI-556 -->
+- `useSvgTextFloor`（`lib/useSvgTextFloor.ts`）的做法：只把畫面上小於 12 的 SVG 文字放大到剛好 12，已 ≥12 的維持原本字級；首頁飛輪圖在 <768 寬不放大（§10.1 首頁飛輪圖手機字級）。個別文字可用 `data-text-floor="off"` 排除，只限 §10.1 核准例外。<!-- src: DATAI-556 -->
 - 已接受取捨：桌機 h1 與 h2 同為 48。
 - 現況偏離：見 §10 DATAI-626（/developers/ h1、404／錯誤頁標題目前 `text-3xl md:text-4xl`）、DATAI-622（「404」與「!」目前是主色）、DATAI-620（首頁 Flywheel h2 未用 `.section-heading`）
 <!-- src: tok-text-size-scale, tok-caption-12-floor, mol-display-statement, page-legal, page-404, org-hero-h1-standard, org-hero-home, tok-breakpoint-420, #29-6, #29-7, #31-1, #31-10 -->
@@ -1110,7 +1110,7 @@
 | /decisive-engine/ 產品頁頁尾 CTA 變體 | 頁尾 CTA 不用 `InlineEmailCTA`，改用連到 /book-a-demo 的 §3.2 標準 44「Contact Us」，必須呼叫 `trackCTA`（範圍：§4.7、§5.4） | org-de-cta-form (a) |
 | 首頁 Flywheel 計數動畫 | 首頁 Flywheel 展示大數字用元件內自己的 `CountUp`（`components/home/FlywheelSection.tsx:7`），不改用 `NumberTicker`（§3.13） | #33 |
 | 間距：受眾頁 FAQ 細線前白色區塊 | 僅緊接 FAQ 細線前的白色內容區塊：上 64／112、下固定 32（含桌機），`pt-16 lg:pt-28 pb-8`；搭配 FAQ `pt-8`，細線上下各 32（§2.11、§6.2） | #38（An 2026-10-16 細線上下對稱裁決） |
-| 首頁飛輪圖手機字級 | `components/home/FlywheelDiagram.tsx` 的 SVG 文字在 <768 寬維持原屬性大小（375 寬約 6.5–8.9px），≥768 照 12px 下限補償（`useSvgTextFloor` 帶 `media: '(min-width: 48rem)'`，§2.7） | #40 |
+| 首頁飛輪圖手機字級 | `components/home/FlywheelDiagram.tsx` 的 SVG 文字在 <768 寬維持原屬性大小（375 寬約 6.5–8.9px），≥768 照 12px 下限補償（`useSvgTextFloor` 帶 `media: '(min-width: 48rem)'`，§2.7）；中心小字「intent · route · earn」所有寬度皆維持原大小（768 寬約 8.9px、1280 寬約 10.3px，`data-text-floor="off"`） | #40、#41 |
 | 間距：手機選單開關 | `p-[11px]`／`-mr-[11px]`，讓 22px 圖示湊成 44×44（§2.10） | #29-4 |
 | 間距：/partnership/ 勾勾 | 2px 下移置中（§2.10） | #29-4 |
 | 間距：按鈕以整顆高度為準 | 按鈕高度 44／40／36 符合規格即可，內距不往下取（例：`py-2.5`）；外框按鈕可用扣 1px 框線的 `calc()` 內距（§2.10） | #30-4 |

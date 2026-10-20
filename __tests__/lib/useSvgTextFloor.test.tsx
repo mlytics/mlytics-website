@@ -94,3 +94,21 @@ describe('with a media query', () => {
     expect(small.style.fontSize).toBe('24px')
   })
 })
+
+it('skips text marked data-text-floor="off" and still enlarges the rest', () => {
+  let svg!: SVGSVGElement
+  function OptOutChart() {
+    const ref = useRef<SVGSVGElement | null>(null)
+    useSvgTextFloor(ref)
+    return (
+      <svg ref={(el) => { ref.current = el; if (el) { svg = el; setSize(el, 200, 100) } }} viewBox="0 0 400 200">
+        <text fontSize="10" data-text-floor="off">kept</text>
+        <text fontSize="10">enlarged</text>
+      </svg>
+    )
+  }
+  render(<OptOutChart />) // scale 0.5
+  const [kept, enlarged] = svg.querySelectorAll('text')
+  expect(kept.style.fontSize).toBe('')
+  expect(enlarged.style.fontSize).toBe('24px')
+})

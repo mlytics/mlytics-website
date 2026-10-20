@@ -15,6 +15,8 @@ type Options = {
 // too large on others; this enlarges a label only while it is below the
 // floor and restores the authored size once it is not. With `media`, the
 // floor applies only while that query matches (approved exceptions, §10.1).
+// A <text> with data-text-floor="off" is never enlarged and keeps its
+// authored size at every width; use it only for a §10.1 approved exception.
 export function useSvgTextFloor(ref: RefObject<SVGSVGElement | null>, options: Options = {}) {
   const { minPx = 12, media } = options
 
@@ -35,6 +37,10 @@ export function useSvgTextFloor(ref: RefObject<SVGSVGElement | null>, options: O
       if (!vb || !vb.width || !vb.height || !svg.clientWidth || !svg.clientHeight) return
       const scale = Math.min(svg.clientWidth / vb.width, svg.clientHeight / vb.height)
       texts.forEach((text) => {
+        if (text.getAttribute('data-text-floor') === 'off') {
+          text.style.fontSize = ''
+          return
+        }
         let base = text.getAttribute('data-base-font-size')
         if (base === null) {
           base = text.getAttribute('font-size') ?? ''
