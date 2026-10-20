@@ -55,7 +55,16 @@ export function ticketFor(v: Violation, lineText: string): string {
     if (size && Number(size[1]) < 12) return 'DATAI-556'
     throw new Error(`${v.file}:${v.line} ${v.match} 沒有對應的修正票，先問 An`)
   }
-  if (v.kind === 'opacity' && /(?:^|:)text-on-dark\//.test(v.match)) return 'DATAI-622'
+  if (v.kind === 'opacity') {
+    const m = v.match.match(/(?:^|:)text-on-dark\/(\d+(?:\.\d+)?|\[[^\]]+\])$/)
+    if (m) {
+      const raw = m[1]
+      const pct = raw.match(/^\[(\d*\.?\d+)%\]$/)
+      const alpha = pct ? Number(pct[1]) / 100 : raw.startsWith('[') ? Number(raw.slice(1, -1)) : Number(raw) / 100
+      if (alpha < 0.85) return 'DATAI-622'
+    }
+    return 'DATAI-623'
+  }
   const rgba = parseRgba(v.match)
   if (rgba?.base === 'on-dark' && rgba.alpha !== null && rgba.alpha < 0.85 && /(?<![\w-])color\s*[:=]/.test(lineText)) return 'DATAI-622'
   return 'DATAI-623'

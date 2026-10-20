@@ -67,7 +67,11 @@ function colorFnHint(match: string): string | null {
 const ARBITRARY = /(?<![\w\-[\]:/*])((?:(?:[\w/-]+(?:-\[[^\]\s]+\])?|\[[^\]\s]+\]|\*):)*)(-?)([a-z][a-z0-9]*(?:-[a-z0-9]+)*)-\[([^\]\s'"`]+)\]/g
 
 const SPACING = /^(?:p|px|py|pt|pr|pb|pl|ps|pe|m|mx|my|mt|mr|mb|ml|ms|me|gap|gap-x|gap-y|space-x|space-y)$/
-const COLOR_UTILITY = /^(?:text|bg|border(?:-[trblxy])?|fill|stroke|ring|outline|from|via|to|decoration|divide|caret|accent|shadow)$/
+// ONE list of colour utilities, used by the arbitrary-colour check and the opacity check.
+// Longer names come first so `inset-shadow`/`drop-shadow` are never read as `shadow`.
+const COLOR_UTILITY_NAMES =
+  '(?:drop-shadow|inset-shadow|inset-ring|ring-offset|placeholder|border-[trblxyse]|border|text|bg|fill|stroke|ring|outline|from|via|to|decoration|divide|caret|accent|shadow)'
+const COLOR_UTILITY = new RegExp(`^${COLOR_UTILITY_NAMES}$`)
 const COLOR_VALUE = /^(?:#|rgba?\(|hsla?\(|color:|var\(--color)/
 const OUTLINE_PADDING = /^p[xy]?$/
 const OUTLINE_CALC = /^calc\(\d*\.?\d+rem-1px\)$/
@@ -101,16 +105,15 @@ function arbitraryHint(minus: string, utility: string, value: string): string | 
 
 // A colour utility with an opacity modifier: `<variants>?<utility>-<colour>/<alpha>`, alpha an
 // integer percent (`/30`) or a bracket value (`/[0.3]`, `/[.3]`, `/[30%]`). Same prefix handling as ARBITRARY.
-const OPACITY_UTILITY = '(?:text|bg|border(?:-[trblxy])?|fill|stroke|ring|outline|from|via|to|decoration|divide|caret|accent|shadow)'
 const OPACITY = new RegExp(
-  String.raw`(?<![\w\-[\]:/*])((?:(?:[\w/-]+(?:-\[[^\]\s]+\])?|\[[^\]\s]+\]|\*):)*)(-?)(${OPACITY_UTILITY})-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)/(\d+|\[[^\]\s'"\x60]+\])(?![\w/\-[])`,
+  String.raw`(?<![\w\-[\]:/*])((?:(?:[\w/-]+(?:-\[[^\]\s]+\])?|\[[^\]\s]+\]|\*):)*)(-?)(${COLOR_UTILITY_NAMES})-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)/(\d+(?:\.\d+)?|\[[^\]\s'"\x60]+\])(?![\w/\-[])`,
   'g',
 )
 const TEXT_SIZE = /^(?:xs|sm|base|lg|[2-9]?xl)$/ // `text-sm/6` is font-size/line-height, not a colour
 const OPACITY_BASES = ['primary', 'on-dark']
 
 function opacityAlpha(raw: string): number | null {
-  if (/^\d+$/.test(raw)) return Number(raw) / 100
+  if (/^\d+(?:\.\d+)?$/.test(raw)) return Number(raw) / 100
   const pct = raw.match(/^\[(\d*\.?\d+)%\]$/)
   if (pct) return Number(pct[1]) / 100
   const num = raw.match(/^\[(\d*\.?\d+)\]$/)
@@ -122,6 +125,8 @@ function opacityHint(utility: string, colour: string, rawAlpha: string): string 
   const alpha = opacityAlpha(rawAlpha)
   if (alpha === null) return null
   if (!OPACITY_BASES.includes(colour)) return 'DESIGN.md §2.3：透明色只准 primary 與 on-dark 兩個基色（例：bg-primary/8、text-on-dark/85）'
+  if (alpha >= 1) return `DESIGN.md §2.3：α 1 是不透明，直接用色彩 token class 不加透明度修飾（例：${utility}-${colour}）`
+  if (alpha <= 0) return `DESIGN.md §2.3：α 0 是全透明，改用 ${utility}-transparent 或移除`
   if (!ALPHA_LADDER.includes(alpha)) {
     const near = nearestStep(alpha)
     return `DESIGN.md §2.3：α ${alpha} 不在階梯，就近改為 ${near}（例：${utility}-${colour}/${Math.round(near * 100)}）`

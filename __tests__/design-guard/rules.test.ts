@@ -173,4 +173,29 @@ describe('Tailwind opacity-modifier colours (DESIGN.md §2.3)', () => {
   it('does not look for class names in CSS files', () => {
     expect(found('a.module.css', '.x { content: "bg-white/10"; }')).toEqual([])
   })
+
+  it('covers Tailwind v4 colour utilities and reports the full token', () => {
+    const cls = ['drop-shadow-white/50', 'inset-shadow-white/50', 'inset-ring-white/50', 'ring-offset-white/50', 'placeholder-white/50', 'border-s-white/50', 'border-e-white/50']
+    for (const c of cls) expect(found('a.tsx', `className="${c}"`)).toEqual([`opacity ${c}`])
+    expect(found('a.tsx', 'className="md:inset-shadow-black/10"')).toEqual(['opacity md:inset-shadow-black/10'])
+    expect(found('a.tsx', 'className="text-sm/6 w-1/2 aspect-16/9"')).toEqual([])
+  })
+
+  it('shares the utility list with the arbitrary colour check', () => {
+    expect(found('a.tsx', 'className="inset-ring-[#fff]"')).toEqual(['hex #fff', 'arbitrary inset-ring-[#fff]'])
+  })
+
+  it('takes a decimal alpha whole', () => {
+    expect(found('a.tsx', 'className="bg-white/2.5"')).toEqual(['opacity bg-white/2.5'])
+    expect(found('a.tsx', 'className="bg-primary/2.5"')).toEqual(['opacity bg-primary/2.5'])
+    expect(hintOf('className="bg-primary/2.5"')).toContain('0.025')
+  })
+
+  it('says /100 is opaque and /0 is fully transparent', () => {
+    expect(found('a.tsx', 'className="bg-primary/100 bg-primary/0"')).toEqual(['opacity bg-primary/100', 'opacity bg-primary/0'])
+    expect(hintOf('className="bg-primary/100"')).toContain('不透明')
+    expect(hintOf('className="bg-primary/100"')).not.toContain('就近')
+    expect(hintOf('className="bg-primary/0"')).toContain('全透明')
+    expect(hintOf('className="bg-primary/0"')).toContain('bg-transparent')
+  })
 })
