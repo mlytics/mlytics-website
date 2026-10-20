@@ -41,14 +41,14 @@ export function HeroSection() {
 
         {/* Main content — vertically centred, masked top/bottom so chat items fade gracefully */}
         <div
-          className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-[96px] pb-14"
+          className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-24 pb-14"
           style={{
             maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 82%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 82%, transparent 100%)',
             overflow: 'hidden',
           }}
         >
-          <div className="max-w-[80rem] w-full mx-auto flex flex-col items-center text-center">
+          <div className="max-w-7xl w-full mx-auto flex flex-col items-center text-center">
 
             {/* Headline */}
             <h1

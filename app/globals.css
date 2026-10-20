@@ -3,7 +3,7 @@
 
 /* Site CSS entry. Tokens and shared classes live in ./site-base.css, which
    Storybook also imports (.storybook/storybook.css). Docs, agent instructions,
-   Storybook, test/CI config and design-system test files are not site code:
+   Storybook, test/CI config and design-system and design-guard test files are not site code:
    keep their class names out of the site CSS. */
 @source not "../DESIGN.md";
 @source not "../stories";
@@ -11,6 +11,7 @@
 @source not "../**/*.stories.tsx";
 @source not "../**/*.mdx";
 @source not "../__tests__/design-system";
+@source not "../__tests__/design-guard";
 @source not "../AGENTS.md";
 @source not "../CLAUDE.md";
 @source not "../vitest.config.ts";
