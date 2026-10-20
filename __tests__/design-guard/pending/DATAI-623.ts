@@ -12,6 +12,7 @@ const pending: PendingTicket = {
     { file: "components/home/FlywheelDiagram.tsx", match: "rgba(34,93,89,0.35)", count: 1 },
     { file: "components/home/FlywheelDiagram.tsx", match: "rgba(34,93,89,0.5)", count: 1 },
     { file: "components/home/FlywheelSection.tsx", match: "rgba(245,158,11,0.4)", count: 1 },
+    { file: "components/home/IntentPipeline.tsx", match: "rgba(168,197,195,0.15)", count: 1 },
     { file: "components/home/IntentPipeline.tsx", match: "rgba(245,158,11,0.08)", count: 1 },
     { file: "components/home/IntentPipeline.tsx", match: "rgba(245,158,11,0.1)", count: 1 },
     { file: "components/home/IntentPipeline.tsx", match: "rgba(245,158,11,0.12)", count: 1 },

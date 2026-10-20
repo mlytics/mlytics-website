@@ -8,6 +8,7 @@ import { readSource, scanRepo } from './scan-repo'
 // Regenerates pending/*.ts from the current violations. Skipped unless
 // DESIGN_GUARD_WRITE=1. Only for the initial baseline or a rebase onto a main
 // where fix tickets already landed — never to make room for new code.
+// Regenerating overwrites hand-made ticket moves (as of 2026-10-20: SVG text fills at FlywheelDiagram.tsx and BrandGEOSection.tsx moved 623→622), so re-check DATAI-622 after regenerating.
 it.runIf(process.env.DESIGN_GUARD_WRITE === '1')('writes pending/*.ts', () => {
   const dir = resolve(__dirname, 'pending')
   mkdirSync(dir, { recursive: true })
