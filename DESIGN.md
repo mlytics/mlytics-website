@@ -478,8 +478,8 @@
 | 控制 | 標準版 | 規格 |
 |---|---|---|
 | FAQ 題目列 | `components/pages/brands/BrandFAQ.tsx:80-100` | 見 §4.4；要有 `aria-expanded`＋`aria-controls`（第 8 章） |
-| 步驟清單 | `components/pages/publishers/KnowledgeBaseSection.tsx:204-243` | `<button>`，要有 tab 語意與鍵盤操作（第 8 章）；輪播行為見 §5.7 |
-| 輪播點 | `components/pages/publishers/KnowledgeBaseSection.tsx:303-317` | 點擊範圍維持 5×5（**明確接受**的例外，可能不符 WCAG 2.5.8）；要有可讀的標籤 |
+| 步驟清單 | `components/pages/publishers/KnowledgeBaseSection.tsx:212-251` | `<button>`，要有 tab 語意與鍵盤操作（第 8 章）；輪播行為見 §5.7 |
+| 輪播點 | `components/pages/publishers/KnowledgeBaseSection.tsx:312-330` | 點擊範圍維持 5×5（**明確接受**的例外，可能不符 WCAG 2.5.8）；要有可讀的標籤 |
 | 選單開關（漢堡／關閉） | `components/layout/Nav.tsx:289-300`、`:340-348` | `-mr-[11px] p-[11px]`＋22px 圖示，湊成 44×44 點擊範圍（§2.10 例外 1） |
 | 下拉鈕（國碼選單） | `app/book-a-demo/BookADemoForm.tsx:52-61` | 外觀同表單欄位（§3.10）；選單內放大鏡圖示 12（§2.17） |
 | 首頁流程列 | `components/home/IntentPipeline.tsx:189-219` | 改為真正的 `<button>`，外觀不變；節點用流程圖專用小底座（§3.12） |
@@ -508,7 +508,7 @@
   - 痛點段落：`color="var(--color-warn-deep)"`（例：`components/pages/brands/BrandPainSection.tsx:58`；該行的 `className="mb-3"` 不要抄）
   - 頁尾欄標題：`<Eyebrow color="rgba(168,197,195,0.85)">`（`components/layout/Footer.tsx:30`、`:39`、`:46`）。on-dark .85 在階梯上、符合深底文字 ≥.85，而且是用元件參數換色，合規；只用於頁尾欄標題。<!-- src: #33（頁尾欄標題顏色判定合規） -->
   - 與 h2 的距離「緊」：小標籤維持行內元素，**不加 `block`、不加 `mb-*`**（畫面上字到字約 16px）。行內元素上的 `mb-*` 本來就不會生效（§0 第 6 點）。
-  - `.label-eyebrow-md`（14px）：現況只用於 /brands/ 深色區塊「Your audience didn't disappear.」這行較大的標示文字（`components/pages/brands/BrandGEOSection.tsx:109`）。
+  - `.label-eyebrow-md`（14px）：現況只用於 /brands/ 深色區塊「Your audience didn't disappear.」這行較大的標示文字（`components/pages/brands/BrandGEOSection.tsx:117`）。
 - 禁止：用 className 覆寫顏色（例如 `className="text-on-dark/55"`，靠 tailwind-merge 剃掉預設色才生效，元件一改就失效）；加 `block mb-3` 拉開距離；深底小標籤 α 低於 .85。
 - 現況偏離：見 §10 DATAI-625（4 處用 className 覆寫顏色）、DATAI-620（7 處「鬆」）、DATAI-622（深底小標籤 on-dark .55）
 <!-- src: atom-eyebrow-section, atom-eyebrow-override-risk, mol-heading-group-eyebrow-gap, tok-on-dark-085 -->
@@ -641,7 +641,7 @@
   - 不適用：標題組下方直接接按鈕或 email 欄（32，`mb-8`，§5.4 頁尾 CTA 與 §5.6 AI Mode 入口）；首頁靠左雙欄的 Intent Refinery（`components/home/IntentRefinerySection.tsx`，桌機旁邊是圖表）；法律頁條文小標（§6.5）。<!-- src: #33 -->
 - 禁止：h2 不用 `.section-heading` 而自訂字級；h2 下方用 `mb-3`／`mb-2`／`mb-5`；說明用 `max-w-3xl` 或不限寬；小標籤加 `block mb-*`。
 - 現況偏離：見 §10 DATAI-620（6 個頁尾 CTA 與一處 h2 → 說明不是 16；16 處說明寬不是 576；7 處小標籤「鬆」；首頁 Flywheel h2 沒用 `.section-heading`）
-- 現況偏離：見 §10 DATAI-620（標題組 → 內容距離不是 48 的 11 處：44（`mb-11`）`components/pages/decisive-engine/DecisionLoop.tsx:40`、`DecisiveEnginePageCTA.tsx:22`、`EngineAdvantages.tsx:23`、`EngineComparison.tsx:24`、`EngineUseCases.tsx:23`；40（`mb-10`）`components/pages/developers/DeveloperSpecs.tsx:25`、`components/home/FlywheelSection.tsx:65`、`components/pages/publishers/KnowledgeBaseSection.tsx:171`、`components/pages/publishers/ZeroClickSection.tsx:24`；56（`mb-14`）`components/pages/publishers/LayerOverview.tsx:98`、`components/pages/partnership/PartnershipEarnings.tsx:109`）<!-- src: #33 -->
+- 現況偏離：見 §10 DATAI-620（標題組 → 內容距離不是 48 的 11 處：44（`mb-11`）`components/pages/decisive-engine/DecisionLoop.tsx:40`、`DecisiveEnginePageCTA.tsx:22`、`EngineAdvantages.tsx:23`、`EngineComparison.tsx:24`、`EngineUseCases.tsx:23`；40（`mb-10`）`components/pages/developers/DeveloperSpecs.tsx:25`、`components/home/FlywheelSection.tsx:73`、`components/pages/publishers/KnowledgeBaseSection.tsx:179`、`components/pages/publishers/ZeroClickSection.tsx:24`；56（`mb-14`）`components/pages/publishers/LayerOverview.tsx:98`、`components/pages/partnership/PartnershipEarnings.tsx:109`）<!-- src: #33 -->
 <!-- src: mol-heading-group, mol-heading-group-left, mol-heading-group-desc-width, mol-heading-group-h2-gap, mol-heading-group-eyebrow-gap, mol-heading-flywheel, #29-3, #30-2 -->
 
 ### 4.4 FAQ 單題
@@ -665,7 +665,7 @@
 
 | 類別 | 用在哪 | 寫法 |
 |---|---|---|
-| 展示大數字 | 整個區塊的主角（深色區塊） | `font-black tabular-nums leading-none text-white`＋`letterSpacing: '-0.04em'`；字級用 clamp：首頁 `clamp(2.5rem, 7vw, 4.5rem)`（`components/home/FlywheelSection.tsx:102-104`）、/brands/ `clamp(2rem, 11vw, 9rem)`（`components/pages/brands/BrandGEOSection.tsx:124-126`） |
+| 展示大數字 | 整個區塊的主角（深色區塊） | `font-black tabular-nums leading-none text-white`＋`letterSpacing: '-0.04em'`；字級用 clamp：首頁 `clamp(2.5rem, 7vw, 4.5rem)`（`components/home/FlywheelSection.tsx:110-112`）、/brands/ `clamp(2rem, 11vw, 9rem)`（`components/pages/brands/BrandGEOSection.tsx:132-134`） |
 | 卡片數字・主角 | 數字是卡片的主角（例：/content-owners/ 痛點數據） | 48／700：`text-4xl md:text-5xl font-bold`（`components/pages/publishers/ZeroClickSection.tsx:49`）；痛點段落用 `text-warn` |
 | 卡片數字・規格之一 | 數字只是規格之一（例：/developers/ 規格卡） | 20／700：`text-xl font-bold text-primary`（`components/pages/developers/DeveloperSpecs.tsx:50`，省略原始碼排版用的 `mb-1`） |
 | 方案價格 | 方案卡價格 | 36／900：`text-4xl font-black text-primary`（`components/pages/partnership/PartnershipMembership.tsx:50`） |

@@ -8,19 +8,27 @@ import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
 function CountUp({ target, duration, active }: { target: number; duration: number; active: boolean }) {
   const [value, setValue] = useState(0)
   const reduce = usePrefersReducedMotion()
+  // Once the final number is on screen it stays: turning reduced motion off
+  // afterwards must not count up from 0 again.
+  const doneRef = useRef(false)
   useEffect(() => {
     if (!active) return
     // Reduced motion: show the target at once (DESIGN.md §8.4).
-    if (reduce) { setValue(target); return }
+    if (reduce) { doneRef.current = true; setValue(target); return }
+    if (doneRef.current) return
     let start: number | null = null
+    let raf = 0
     const step = (ts: number) => {
       if (!start) start = ts
       const progress = Math.min((ts - start) / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
       setValue(Math.floor(eased * target))
-      if (progress < 1) requestAnimationFrame(step)
+      if (progress < 1) raf = requestAnimationFrame(step)
+      else doneRef.current = true
     }
-    requestAnimationFrame(step)
+    raf = requestAnimationFrame(step)
+    // Stop the loop if reduced motion switches on mid-count (or on unmount).
+    return () => cancelAnimationFrame(raf)
   }, [active, target, duration, reduce])
   return (
     <span>

@@ -138,3 +138,38 @@ it('turning reduced motion on mid-way returns to step 1; later clicks and arrow 
   act(() => { vi.advanceTimersByTime(13000) })
   expect(tabs()[2]).toHaveAttribute('aria-selected', 'true')
 })
+
+it('clicking the dot of the step already shown does not steal focus on the next auto-advance', async () => {
+  stubReducedMotion(false)
+  vi.useFakeTimers()
+  render(<KnowledgeBaseSection />)
+  fireEvent.click(screen.getByRole('button', { name: 'Show step 1: Content ingestion & structuring' }))
+  // Async advance lets AnimatePresence finish the swap so the new panel's dots mount.
+  await act(async () => { await vi.advanceTimersByTimeAsync(6000) })
+  await act(async () => { await vi.advanceTimersByTimeAsync(500) })
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('Cross-referencing & enrichment')
+  expect(document.activeElement?.hasAttribute('data-dot')).toBe(false)
+  // A later switch to another step must not pick up a stale request either.
+  await act(async () => { await vi.advanceTimersByTimeAsync(6500) })
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('Quality guardrails')
+  expect(document.activeElement?.hasAttribute('data-dot')).toBe(false)
+})
+
+it('arrow keys step from the tab that received the key, not from the auto-advanced step', () => {
+  stubReducedMotion(false)
+  vi.useFakeTimers()
+  render(<KnowledgeBaseSection />)
+  const tabs = () => screen.getAllByRole('tab')
+  // Mouse click on step 2 leaves focus there without pausing the carousel.
+  act(() => {
+    fireEvent.pointerDown(tabs()[1])
+    tabs()[1].focus()
+    fireEvent.click(tabs()[1])
+  })
+  act(() => { vi.advanceTimersByTime(6000) })
+  expect(tabs()[2]).toHaveAttribute('aria-selected', 'true')
+  expect(tabs()[1]).toHaveFocus()
+  fireEvent.keyDown(tabs()[1], { key: 'ArrowDown' })
+  expect(tabs()[2]).toHaveAttribute('aria-selected', 'true')
+  expect(tabs()[2]).toHaveFocus()
+})

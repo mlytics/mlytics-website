@@ -109,16 +109,18 @@ export function KnowledgeBaseSection() {
   }, [paused, focused, reduce, active])
 
   // Tab pattern keys: arrows move (wrapping), Home / End jump to the ends.
-  function onTabKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
+  // Steps from the tab that received the key (`from`), not from `active`: the
+  // carousel may have moved on while focus stayed on a clicked tab.
+  function onTabKeyDown(e: KeyboardEvent<HTMLButtonElement>, from: number) {
     let next: number
     switch (e.key) {
       case 'ArrowDown':
       case 'ArrowRight':
-        next = (active + 1) % STEPS.length
+        next = (from + 1) % STEPS.length
         break
       case 'ArrowUp':
       case 'ArrowLeft':
-        next = (active + STEPS.length - 1) % STEPS.length
+        next = (from + STEPS.length - 1) % STEPS.length
         break
       case 'Home':
         next = 0
@@ -141,6 +143,12 @@ export function KnowledgeBaseSection() {
       el.focus()
       pendingDotFocus.current = null
     }
+  }, [])
+  // Safety net on the panel itself: React attaches a parent's ref after its
+  // children's, so this runs once the new panel's dots have had their chance,
+  // and a request that matched no dot never lingers into a later switch.
+  const clearPendingDotFocus = useCallback((el: HTMLDivElement | null) => {
+    if (el) pendingDotFocus.current = null
   }, [])
 
   return (
@@ -210,7 +218,7 @@ export function KnowledgeBaseSection() {
                     aria-selected={isActive}
                     aria-controls={panelId}
                     tabIndex={isActive ? 0 : -1}
-                    onKeyDown={onTabKeyDown}
+                    onKeyDown={(e) => onTabKeyDown(e, i)}
                     onClick={() => setActive(i)}
                     className="w-full text-left px-5 py-4 md:py-0 transition-colors duration-200 relative flex flex-col justify-center md:flex-1"
                     style={{
@@ -276,6 +284,7 @@ export function KnowledgeBaseSection() {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active}
+                  ref={clearPendingDotFocus}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
@@ -307,7 +316,11 @@ export function KnowledgeBaseSection() {
                           data-dot={i}
                           aria-label={`Show step ${i + 1}: ${STEPS[i].label}`}
                           aria-current={active === i ? 'true' : undefined}
-                          onClick={() => { pendingDotFocus.current = i; setActive(i) }}
+                          onClick={() => {
+                            // Same step: nothing re-mounts, so there is no new dot to focus.
+                            if (i !== active) pendingDotFocus.current = i
+                            setActive(i)
+                          }}
                           className="rounded-full transition-[width,background-color] duration-300"
                           style={{
                             width: active === i ? 18 : 5,
