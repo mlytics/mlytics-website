@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
 
 // City coordinates: [x, y] in 1000×500 equirectangular SVG space
 // x = (lon + 180) / 360 * 1000,  y = (90 - lat) / 180 * 500
@@ -110,8 +111,12 @@ interface WorldMapDotsProps {
 export function WorldMapDots({ variant = 'dark' }: WorldMapDotsProps) {
   const isLight = variant === 'light'
   const [pings, setPings] = useState<Ping[]>([])
+  const reduce = usePrefersReducedMotion()
 
   useEffect(() => {
+    // Reduced motion: no signal pings, only the base dot map (DESIGN.md §8.4).
+    if (reduce) { setPings([]); return }
+    const removals = new Set<ReturnType<typeof setTimeout>>()
     // Add a ping every 1.2–2.4s
     const addPing = () => {
       const isAPAC = Math.random() < 0.55
@@ -130,14 +135,21 @@ export function WorldMapDots({ variant = 'dark' }: WorldMapDotsProps) {
         isStrong: topic.strong,
       }])
       // Remove after 3s
-      setTimeout(() => setPings(prev => prev.filter(p => p.id !== id)), 3000)
+      const removal = setTimeout(() => {
+        removals.delete(removal)
+        setPings(prev => prev.filter(p => p.id !== id))
+      }, 3000)
+      removals.add(removal)
     }
 
     const interval = setInterval(addPing, 1400 + Math.random() * 1000)
     addPing()
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => {
+      clearInterval(interval)
+      removals.forEach(clearTimeout)
+    }
+  }, [reduce])
 
   return (
     <div className="absolute inset-0 overflow-hidden">

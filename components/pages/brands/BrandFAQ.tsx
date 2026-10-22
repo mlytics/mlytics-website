@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 
@@ -29,6 +29,7 @@ const FAQS = [
 
 export function BrandFAQ() {
   const [open, setOpen] = useState<number | null>(null)
+  const baseId = useId()
 
   return (
     <section className="section-white pt-8 pb-16 lg:pb-20">
@@ -77,8 +78,11 @@ export function BrandFAQ() {
               transition={{ duration: 0.35, delay: i * 0.06 }}
             >
               <button
+                type="button"
                 className="w-full flex items-center justify-between gap-4 py-5 text-left"
                 onClick={() => setOpen(open === i ? null : i)}
+                aria-expanded={open === i}
+                aria-controls={`${baseId}-answer-${i}`}
               >
                 <span className="text-base font-semibold leading-snug text-ink">
                   {faq.q}
@@ -95,22 +99,25 @@ export function BrandFAQ() {
                 </span>
               </button>
 
-              <AnimatePresence initial={false}>
-                {open === i && (
-                  <motion.div
-                    key="answer"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: 'easeInOut' }}
-                    style={{ overflow: 'hidden' }}
-                  >
-                    <p className="pb-5 text-sm md:text-base leading-relaxed text-ink-muted">
-                      {faq.a}
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* Answer container stays mounted so aria-controls always points at it; the answer itself still renders only while open. */}
+              <div id={`${baseId}-answer-${i}`}>
+                <AnimatePresence initial={false}>
+                  {open === i && (
+                    <motion.div
+                      key="answer"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      <p className="pb-5 text-sm md:text-base leading-relaxed text-ink-muted">
+                        {faq.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
           ))}
         </div>

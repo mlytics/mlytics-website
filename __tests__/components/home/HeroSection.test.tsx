@@ -1,7 +1,8 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HeroSection } from '@/components/home/HeroSection'
+import { stubReducedMotion } from '../../helpers/matchMedia'
 
 // Mock framer-motion — AnimatePresence + motion.span used for rotating words
 vi.mock('framer-motion', () => ({
@@ -103,6 +104,35 @@ describe('HeroSection', () => {
       expect(screen.getByText(/email is required/i)).toBeInTheDocument()
       await userEvent.type(screen.getByPlaceholderText(/enter your email/i), 'a')
       expect(screen.queryByText(/email is required/i)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('rotating headline', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+      vi.unstubAllGlobals()
+    })
+
+    it('rotates to the second line after 2.6s', () => {
+      stubReducedMotion(false)
+      vi.useFakeTimers()
+      render(<HeroSection />)
+      act(() => { vi.advanceTimersByTime(2600) })
+      expect(screen.getByText('that turns AI discovery into revenue')).toBeInTheDocument()
+    })
+
+    it('stays on the first line when reduced motion is on', () => {
+      stubReducedMotion(true)
+      vi.useFakeTimers()
+      render(<HeroSection />)
+      // Check after every would-be tick (the cycle of three wraps back to the
+      // first line at 7.8s, so a single late check could pass by accident).
+      for (let tick = 0; tick < 4; tick++) {
+        act(() => { vi.advanceTimersByTime(2600) })
+        expect(screen.getByText('that puts your brand inside AI answers')).toBeInTheDocument()
+        expect(screen.queryByText('that turns AI discovery into revenue')).toBeNull()
+        expect(screen.queryByText('that wins qualified buyers at lower cost')).toBeNull()
+      }
     })
   })
 

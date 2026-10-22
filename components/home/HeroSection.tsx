@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { WorldMapDots } from './WorldMapDots'
 import { LogoMarquee } from './LogoMarquee'
 import { InlineEmailCTA } from '@/components/ui/InlineEmailCTA'
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
 
 const ROTATING_WORDS = [
   'that puts your brand inside AI answers',
@@ -14,13 +15,16 @@ const ROTATING_WORDS = [
 
 export function HeroSection() {
   const [wordIdx, setWordIdx] = useState(0)
+  const reduce = usePrefersReducedMotion()
 
   useEffect(() => {
+    // Reduced motion: no rotation, the first line stays (DESIGN.md §8.4).
+    if (reduce) { setWordIdx(0); return }
     const id = setInterval(() => {
       setWordIdx(i => (i + 1) % ROTATING_WORDS.length)
     }, 2600)
     return () => clearInterval(id)
-  }, [])
+  }, [reduce])
 
   return (
     <section
