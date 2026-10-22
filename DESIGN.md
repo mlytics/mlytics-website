@@ -427,10 +427,10 @@
 | 高度 | 標準寫法（新程式照抄） | 取自 |
 |---|---|---|
 | 44 | `inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90` | `components/ui/PlaygroundCTASection.tsx:72` |
-| 40 | `shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-[opacity,transform] hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap` | `components/ui/InlineEmailCTA.tsx:116` |
+| 40 | `shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-[opacity,scale] hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap` | `components/ui/InlineEmailCTA.tsx:116` |
 | 36 | `px-4 py-2 rounded-full text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-primary` | `components/layout/Nav.tsx:32` 的 `PRIMARY_BTN` |
 
-  - 過場只動實際變化的屬性（§2.16）：44 與 36 滑過只變透明度 → `transition-opacity`；40 滑過變透明度、按下（`active:scale-[0.98]`）變縮放 → `transition-[opacity,transform]`。過場時間都沿用預設。
+  - 過場只動實際變化的屬性（§2.16）：44 與 36 滑過只變透明度 → `transition-opacity`；40 滑過變透明度、按下（`active:scale-[0.98]`）變縮放（`scale` 屬性）→ `transition-[opacity,scale]`（Tailwind v4 的 `scale-*` 輸出獨立的 `scale` 屬性，不是 transform）。過場時間都沿用預設。
   - `active:scale-[0.98]`（按下微縮）**只屬於 40 送出鈕**的現況寫法，保留在這顆上；不是通則，不加到 44、36 或其他按鈕。<!-- src: 2026-10-15 文件審查（40 送出鈕的過場寫法） -->
   - 40 的 `py-2.5` 是 §2.10 的按鈕例外，保留。
   - 送出中的狀態用 `disabled:opacity-60`（§2.4）。

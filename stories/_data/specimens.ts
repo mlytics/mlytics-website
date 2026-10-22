@@ -17,7 +17,7 @@ export const SPECIMENS: Specimen[] = [
     id: 'button-solid-40',
     layer: 'atom',
     label: '實心藥丸・輸入框內 40',
-    className: 'shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-[opacity,transform] hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap',
+    className: 'shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-[opacity,scale] hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap',
   },
   {
     id: 'button-solid-36',
