@@ -59,8 +59,8 @@ describe('ticketFor', () => {
     expect(ticketFor(v('components/pages/ai-mode-playground/X.module.css', '#fff'), '')).toBe('DATAI-630')
   })
 
-  it('sends sub-12px arbitrary font sizes to DATAI-556', () => {
-    expect(ticketFor(v('a.tsx', 'text-[10px]', 'arbitrary'), '')).toBe('DATAI-556')
+  it('refuses to guess for a sub-12px arbitrary font size outside AI Mode (its fix ticket is closed)', () => {
+    expect(() => ticketFor(v('a.tsx', 'text-[10px]', 'arbitrary'), '')).toThrow(/先問 An/)
   })
 
   it('sends on-dark text below .85 to DATAI-622 and other colours to DATAI-623', () => {
@@ -94,8 +94,9 @@ describe('ticketFor', () => {
 
 describe('buildPending / serializePending', () => {
   it('groups by ticket, file and match, and always adds the AI Mode path entry', () => {
-    const tickets = buildPending([v('a.tsx', '#fff'), v('a.tsx', '#fff'), v('a.tsx', 'text-[10px]', 'arbitrary')], () => '')
-    expect(tickets.map((t) => t.ticket)).toEqual(['DATAI-556', 'DATAI-623', 'DATAI-630'])
+    const tickets = buildPending([v('a.tsx', '#fff'), v('a.tsx', '#fff'), v('a.tsx', 'text-on-dark/65', 'opacity')], () => '')
+    expect(tickets.map((t) => t.ticket)).toEqual(['DATAI-622', 'DATAI-623', 'DATAI-630'])
+    expect(tickets[0].entries).toEqual([{ file: 'a.tsx', match: 'text-on-dark/65', count: 1 }])
     expect(tickets[1].entries).toEqual([{ file: 'a.tsx', match: '#fff', count: 2 }])
     expect(tickets[2].paths?.map((p) => p.prefix)).toEqual(['app/ai-mode-playground/', 'components/pages/ai-mode-playground/'])
   })
