@@ -5,6 +5,7 @@ import { motion, useInView } from 'framer-motion'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { PlaygroundCTASection } from '@/components/ui/PlaygroundCTASection'
 import { useSvgTextFloor } from '@/lib/useSvgTextFloor'
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
 
 const STEPS = [
   {
@@ -56,8 +57,11 @@ function vToY(v: number) {
 
 function useCountUp(target: number, duration: number, active: boolean) {
   const [value, setValue] = useState(0)
+  const reduce = usePrefersReducedMotion()
   useEffect(() => {
     if (!active) return
+    // Reduced motion: show the target at once (DESIGN.md §8.4).
+    if (reduce) { setValue(target); return }
     let start: number | null = null
     const step = (ts: number) => {
       if (!start) start = ts
@@ -67,7 +71,7 @@ function useCountUp(target: number, duration: number, active: boolean) {
       if (progress < 1) requestAnimationFrame(step)
     }
     requestAnimationFrame(step)
-  }, [active, target, duration])
+  }, [active, target, duration, reduce])
   return value
 }
 

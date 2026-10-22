@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useId, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Globe, Zap, PenLine, MessageSquare, Target } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
 
 const LAYERS: Array<{
   Icon: LucideIcon
@@ -75,11 +76,22 @@ export function IntentPipeline() {
   const inViewRef = useRef(false)
   const hoveringRef = useRef(false)
   const userTookOverRef = useRef(false)
+  const focusedRef = useRef(false)
+  const baseId = useId()
+  // Reduced motion: no auto-cycling, the first row stays open (DESIGN.md §8.4).
+  const reduce = usePrefersReducedMotion()
+  const reduceRef = useRef(reduce)
+  useEffect(() => {
+    // Switched on mid-way: go back to the first row, like the Hero headline.
+    // Only on the false → true change, so later clicks are never undone.
+    if (reduce && !reduceRef.current) setExpanded(0)
+    reduceRef.current = reduce
+  }, [reduce])
 
   function startTimer() {
     if (timerRef.current) clearInterval(timerRef.current)
     timerRef.current = setInterval(() => {
-      if (!inViewRef.current || hoveringRef.current || userTookOverRef.current) return
+      if (!inViewRef.current || hoveringRef.current || userTookOverRef.current || reduceRef.current || focusedRef.current) return
       setExpanded(prev => (prev + 1) % LAYERS.length)
     }, CYCLE_INTERVAL)
   }
@@ -100,6 +112,14 @@ export function IntentPipeline() {
     el.addEventListener('pointerenter', onEnter)
     el.addEventListener('pointerleave', onLeave)
 
+    // Pause the same way while keyboard focus is inside (DESIGN.md §5.7)
+    const onFocusIn = () => { focusedRef.current = true }
+    const onFocusOut = (e: FocusEvent) => {
+      if (!el.contains(e.relatedTarget as Node)) focusedRef.current = false
+    }
+    el.addEventListener('focusin', onFocusIn)
+    el.addEventListener('focusout', onFocusOut)
+
     const measure = () => {
       const ghost = measureRef.current
       if (!ghost) return
@@ -118,6 +138,8 @@ export function IntentPipeline() {
       resizeObserver.disconnect()
       el.removeEventListener('pointerenter', onEnter)
       el.removeEventListener('pointerleave', onLeave)
+      el.removeEventListener('focusin', onFocusIn)
+      el.removeEventListener('focusout', onFocusOut)
       if (timerRef.current) clearInterval(timerRef.current)
     }
   }, [])
@@ -161,36 +183,44 @@ export function IntentPipeline() {
           const isOpen = expanded === i
           return (
             <div key={i}>
-              <motion.div
+              {/* A real button (DESIGN.md §3.6). w-full text-left undo the button's
+                  shrink-to-fit width and centred text; inside it only phrasing
+                  elements are allowed, so the former div/p are spans. */}
+              <motion.button
+                type="button"
                 onClick={() => handleClick(i)}
+                aria-expanded={isOpen}
+                aria-controls={`${baseId}-desc-${i}`}
                 whileHover={{ x: 2 }}
                 transition={{ duration: 0.1, ease: 'easeOut' }}
-                className="relative flex items-start gap-4 pl-14 pr-4 py-3.5 rounded-xl cursor-pointer"
+                className="w-full text-left relative flex items-start gap-4 pl-14 pr-4 py-3.5 rounded-xl cursor-pointer"
                 style={{
                   background: isOpen ? layer.color : 'transparent',
                   border: `1px solid ${isOpen ? layer.borderColor : 'transparent'}`,
                   transition: 'background 0.35s ease-in-out, border-color 0.35s ease-in-out',
                 }}
               >
-                <div
+                <span
                   className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-10 bg-primary-dark"
                   style={{ border: `2px solid ${layer.borderColor}` }}
                 >
                   <layer.Icon size={15} strokeWidth={1.8} className="text-on-dark" />
-                </div>
+                </span>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center flex-wrap gap-2">
+                <span className="block flex-1 min-w-0">
+                  <span className="flex items-center flex-wrap gap-2">
                     <span className="text-sm font-semibold text-white">{layer.name}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-white/8 text-on-dark">
                       {layer.audience}
                     </span>
-                  </div>
-                  <p className="text-sm mt-0.5 text-on-dark">{layer.sublabel}</p>
-                </div>
-              </motion.div>
+                  </span>
+                  <span className="block text-sm mt-0.5 text-on-dark">{layer.sublabel}</span>
+                </span>
+              </motion.button>
 
               <motion.div
+                id={`${baseId}-desc-${i}`}
+                aria-hidden={!isOpen}
                 className="pl-14 pr-4 overflow-hidden"
                 initial={false}
                 animate={{

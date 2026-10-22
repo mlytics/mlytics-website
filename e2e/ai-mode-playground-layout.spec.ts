@@ -384,9 +384,14 @@ test.describe('with prefers-reduced-motion: reduce', () => {
       await page.emulateMedia({ reducedMotion: 'reduce' })
       await page.goto('/ai-mode-playground/')
       expect(await page.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true)
-      // The page-wide smooth scroll is still in force; the scroll call itself
-      // has to opt out of it.
-      expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe('smooth')
+      // Site-wide, reduced motion already turns smooth scrolling off
+      // (app/site-base.css, DESIGN.md §8.4).
+      const scrollBehavior = () => page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)
+      expect(await scrollBehavior()).toBe('auto')
+      // Force smooth scrolling back on, so the samples below prove the scroll
+      // call itself opts out of it instead of relying on the page setting.
+      await page.addStyleTag({ content: 'html{scroll-behavior:smooth!important}' })
+      expect(await scrollBehavior()).toBe('smooth')
       await prepare(page)
       const control = trigger(page)
       await control.scrollIntoViewIfNeeded()

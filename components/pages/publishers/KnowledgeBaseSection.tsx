@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useId, useRef } from 'react'
+import type { KeyboardEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Eyebrow } from '@/components/ui/Eyebrow'
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
 
 const INTERVAL = 6000
 
@@ -66,14 +68,80 @@ const STEPS = [
 export function KnowledgeBaseSection() {
   const [active, setActive] = useState(0)
   const [paused, setPaused] = useState(false)
+  // Keyboard focus inside the card pauses auto-advance like hover does (DESIGN.md §5.7)
+  const [focused, setFocused] = useState(false)
+  // Reduced motion: no auto-advance, no progress bar (DESIGN.md §8.4)
+  const reduce = usePrefersReducedMotion()
+  // Switched on mid-way: go back to step 1, like the Hero headline. Only on
+  // the false → true change, so later clicks and arrow keys are never undone.
+  const prevReduce = useRef(reduce)
+  useEffect(() => {
+    if (reduce && !prevReduce.current) setActive(0)
+    prevReduce.current = reduce
+  }, [reduce])
+
+  const baseId = useId()
+  const tabId = (i: number) => `${baseId}-tab-${i}`
+  const panelId = `${baseId}-panel`
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const pendingDotFocus = useRef<number | null>(null)
+
+  // Only focus that arrives by keyboard pauses: a mouse click leaves focus on
+  // the clicked step in some browsers, and that must not stop the carousel.
+  const keyboardModality = useRef(true)
+  useEffect(() => {
+    const onKey = () => { keyboardModality.current = true }
+    const onPointer = () => { keyboardModality.current = false }
+    document.addEventListener('keydown', onKey, true)
+    document.addEventListener('pointerdown', onPointer, true)
+    return () => {
+      document.removeEventListener('keydown', onKey, true)
+      document.removeEventListener('pointerdown', onPointer, true)
+    }
+  }, [])
 
   useEffect(() => {
-    if (paused) return
+    if (paused || focused || reduce) return
     const id = setInterval(() => {
       setActive(prev => (prev + 1) % STEPS.length)
     }, INTERVAL)
     return () => clearInterval(id)
-  }, [paused, active])
+  }, [paused, focused, reduce, active])
+
+  // Tab pattern keys: arrows move (wrapping), Home / End jump to the ends.
+  function onTabKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
+    let next: number
+    switch (e.key) {
+      case 'ArrowDown':
+      case 'ArrowRight':
+        next = (active + 1) % STEPS.length
+        break
+      case 'ArrowUp':
+      case 'ArrowLeft':
+        next = (active + STEPS.length - 1) % STEPS.length
+        break
+      case 'Home':
+        next = 0
+        break
+      case 'End':
+        next = STEPS.length - 1
+        break
+      default:
+        return
+    }
+    e.preventDefault()
+    setActive(next)
+    tabRefs.current[next]?.focus()
+  }
+
+  // The dots live in the animated panel, which is replaced on every switch:
+  // move focus to the matching dot of the new panel once it mounts.
+  const registerDot = useCallback((el: HTMLButtonElement | null) => {
+    if (el && pendingDotFocus.current === Number(el.dataset.dot)) {
+      el.focus()
+      pendingDotFocus.current = null
+    }
+  }, [])
 
   return (
     <section className="section-dark py-16 lg:py-20 relative overflow-hidden" style={{ borderBottom: '1px solid rgba(168,197,195,0.12)' }}>
@@ -119,15 +187,30 @@ export function KnowledgeBaseSection() {
           }}
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
+          onFocus={() => setFocused(keyboardModality.current)}
+          onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setFocused(false) }}
         >
           <div className="grid md:grid-cols-[260px_1fr]">
             {/* Left: step list */}
-            <div className="flex flex-col" style={{ borderRight: '1px solid rgba(168,197,195,0.12)', background: 'rgba(255,255,255,0.04)' }}>
+            <div
+              role="tablist"
+              aria-label="AI infrastructure steps"
+              aria-orientation="vertical"
+              className="flex flex-col"
+              style={{ borderRight: '1px solid rgba(168,197,195,0.12)', background: 'rgba(255,255,255,0.04)' }}>
               {STEPS.map((step, i) => {
                 const isActive = active === i
                 return (
                   <button
                     key={i}
+                    ref={(el) => { tabRefs.current[i] = el }}
+                    type="button"
+                    role="tab"
+                    id={tabId(i)}
+                    aria-selected={isActive}
+                    aria-controls={panelId}
+                    tabIndex={isActive ? 0 : -1}
+                    onKeyDown={onTabKeyDown}
                     onClick={() => setActive(i)}
                     className="w-full text-left px-5 py-4 md:py-0 transition-colors duration-200 relative flex flex-col justify-center md:flex-1"
                     style={{
@@ -144,17 +227,18 @@ export function KnowledgeBaseSection() {
                     <span className="block text-sm font-semibold leading-snug" style={{ color: isActive ? '#FFFFFF' : 'rgba(168,197,195,0.7)' }}>
                       {step.label}
                     </span>
-                    {isActive && (
-                      <div className="mt-2.5 rounded-full overflow-hidden" style={{ height: 2, background: 'rgba(168,197,195,0.15)' }}>
-                        <motion.div
+                    {isActive && !reduce && (
+                      // Spans (not divs) because they sit inside the tab <button>; `block` keeps the layout.
+                      <span data-progress className="block mt-2.5 rounded-full overflow-hidden" style={{ height: 2, background: 'rgba(168,197,195,0.15)' }}>
+                        <motion.span
                           key={`bar-${i}`}
-                          className="h-full rounded-full"
+                          className="block h-full rounded-full"
                           style={{ background: 'rgba(168,197,195,0.6)' }}
                           initial={{ width: '0%' }}
-                          animate={{ width: paused ? undefined : '100%' }}
+                          animate={{ width: paused || focused ? undefined : '100%' }}
                           transition={{ duration: INTERVAL / 1000, ease: 'linear' }}
                         />
-                      </div>
+                      </span>
                     )}
                   </button>
                 )
@@ -162,7 +246,7 @@ export function KnowledgeBaseSection() {
             </div>
 
             {/* Right: content */}
-            <div className="relative overflow-hidden bg-white">
+            <div role="tabpanel" id={panelId} aria-labelledby={tabId(active)} className="relative overflow-hidden bg-white">
               {/* Invisible sizer */}
               {STEPS.map((step, si) => (
                 <div
@@ -218,7 +302,12 @@ export function KnowledgeBaseSection() {
                       {STEPS.map((_, i) => (
                         <button
                           key={i}
-                          onClick={() => setActive(i)}
+                          ref={registerDot}
+                          type="button"
+                          data-dot={i}
+                          aria-label={`Show step ${i + 1}: ${STEPS[i].label}`}
+                          aria-current={active === i ? 'true' : undefined}
+                          onClick={() => { pendingDotFocus.current = i; setActive(i) }}
                           className="rounded-full transition-[width,background-color] duration-300"
                           style={{
                             width: active === i ? 18 : 5,

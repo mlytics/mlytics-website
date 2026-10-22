@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useSvgTextFloor } from '@/lib/useSvgTextFloor'
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
 
 const NODES = [
   { label: '15M+ MAU',    sub: 'Installed Base',      angle: -90 },
@@ -30,6 +31,7 @@ export function FlywheelDiagram() {
   const chartRef = useRef<SVGSVGElement>(null)
   // <768: approved exception, authored sizes stay (DESIGN.md §10.1).
   useSvgTextFloor(chartRef, { media: '(min-width: 48rem)' })
+  const reduce = usePrefersReducedMotion()
   return (
     <div className="flex items-center justify-center py-2">
       <svg
@@ -104,9 +106,9 @@ export function FlywheelDiagram() {
           )
         })}
 
-        {/* ── Travelling particle ── */}
-        <circle r="5" fill="var(--color-gold)">
-          <animateMotion dur="9s" repeatCount="indefinite" path={ringPath} />
+        {/* ── Travelling particle (rests at the top of the ring when reduced motion is on, DESIGN.md §8.4) ── */}
+        <circle r="5" fill="var(--color-gold)" cx={reduce ? CX : undefined} cy={reduce ? CY - R : undefined}>
+          {!reduce && <animateMotion dur="9s" repeatCount="indefinite" path={ringPath} />}
         </circle>
 
         {/* ── Node labels — pass 2 (above particle) ── */}

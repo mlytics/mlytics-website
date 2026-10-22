@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
 
 interface NumberTickerProps {
   value: number
@@ -16,8 +17,11 @@ export function NumberTicker({ value, duration = 1200, prefix = '', suffix = '',
   const startRef = useRef<number | null>(null)
   const rafRef = useRef<number | null>(null)
   const startValueRef = useRef(0)
+  const reduce = usePrefersReducedMotion()
 
   useEffect(() => {
+    // Reduced motion: show the final value at once (DESIGN.md §8.4).
+    if (reduce) { setDisplayed(value); return }
     startValueRef.current = displayed
     startRef.current = null
     if (rafRef.current) cancelAnimationFrame(rafRef.current)
@@ -34,7 +38,7 @@ export function NumberTicker({ value, duration = 1200, prefix = '', suffix = '',
 
     rafRef.current = requestAnimationFrame(step)
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [value, duration]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [value, duration, reduce]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const display = formatter ? formatter(displayed) : displayed.toLocaleString()
   return <span className={className}>{prefix}{display}{suffix}</span>
