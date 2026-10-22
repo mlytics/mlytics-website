@@ -13,7 +13,6 @@ const CARDS: Array<{
   products: string
   metrics: { label: string; value: string }[]
   cta: string
-  ctaShort?: string
   href: string
   accent: string
 }> = [
@@ -27,7 +26,6 @@ const CARDS: Array<{
       { label: 'vs. human writing', value: '$250/piece' },
     ],
     cta: 'See media and content plan',
-    ctaShort: 'See media & content plan',
     href: '/content-owners',
     accent: 'var(--color-primary)',
   },
@@ -116,18 +114,17 @@ export function IdentityCards() {
               {/* CTA */}
               <Link
                 href={card.href}
-                className="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                style={{ background: card.accent }}
+                className="mt-auto gap-2 w-full inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
               >
-                {card.ctaShort ? (
-                  <>
-                    {/* Tablet (md–lg) squeezes three columns; show the shorter copy there */}
-                    <span className="md:hidden lg:inline">{card.cta}</span>
-                    <span className="hidden md:inline lg:hidden">{card.ctaShort}</span>
-                  </>
-                ) : (
-                  card.cta
-                )}
+                {/* Tablet (md–lg) squeezes three columns, so the full copy would
+                    wrap to two lines (64px tall); every card shows "Learn more"
+                    there instead (DECISIONS #43). The persona is visually hidden
+                    text after the visible label, not an aria-label, so the
+                    accessible name starts with what is on screen (WCAG 2.5.3).
+                    The space before the hidden span is a real separator: without
+                    it the name would read "Learn moreabout the …". */}
+                <span className="md:hidden lg:inline">{card.cta}</span>
+                <span className="hidden md:inline lg:hidden">Learn more<span className="sr-only"> about the {card.persona} plan</span></span>
               </Link>
             </motion.div>
           ))}

@@ -28,22 +28,19 @@ const DESKTOP_QUERY = '(min-width: 64rem)'
 
 const FOCUS_RING = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
 
-// Primary: the solid pill Book a Demo used to wear.
-const PRIMARY_BTN = 'px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 bg-primary'
+// Primary: the 36px solid pill (DESIGN.md §3.2, nav only).
+const PRIMARY_BTN = 'px-4 py-2 rounded-full text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-primary'
 
-// Secondary: the site's `.pill-btn` look (globals.css — white fill, primary
-// border, primary text, fills primary on hover) written as utilities.
-// `.pill-btn` itself is unlayered CSS, so it would beat Tailwind's padding
-// utilities and could not be sized to match the primary. The border is 1px,
-// not .pill-btn's 1.5px: Chrome snaps 1.5px to 1px on 1x screens, so a 1.5px
-// border cannot be offset in the padding consistently. The padding subtracts
-// the 1px so both buttons render at the same height.
-const SECONDARY_BTN =
-  'px-[calc(1rem-1px)] py-[calc(0.5rem-1px)] rounded-full text-sm font-semibold border border-primary bg-white text-primary transition-all hover:bg-primary hover:text-white'
+// Secondary: the site's one outline-button definition, `.pill-btn`
+// (app/site-base.css, DESIGN.md §3.4). It lives in the components layer, so
+// these padding utilities override its 44px padding and size it to 36, the
+// same height as PRIMARY_BTN; the padding subtracts its 1px border.
+const SECONDARY_BTN = 'pill-btn px-[calc(1rem-1px)] py-[calc(0.5rem-1px)]'
 
-// Bottom pair in the mobile overlay: equal-width cells of a 2-column grid.
-const OVERLAY_BTN =
-  'inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold transition-all'
+// Bottom pair in the mobile overlay (equal-width cells of a 2-column grid):
+// the 44px outline `.pill-btn` and the §3.2 standard 44 solid pill.
+const OVERLAY_SOLID_BTN =
+  'inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90 whitespace-nowrap'
 
 const FOCUSABLE = 'a[href], button:not([disabled])'
 
@@ -225,7 +222,6 @@ export function Nav() {
       alt="Mlytics"
       width={96}
       height={17}
-      className="transition-all duration-300"
     />
   )
 
@@ -233,7 +229,7 @@ export function Nav() {
     <>
       <nav
         ref={navRef}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-[transform,box-shadow] duration-300 ${navBg}`}
         style={{
           transform: visible ? 'translateY(0)' : 'translateY(-100%)',
           pointerEvents: visible ? 'auto' : 'none',
@@ -377,7 +373,7 @@ export function Nav() {
                   <Link
                     href="/book-a-demo"
                     onClick={() => { trackCTA('Book a Demo', 'nav_mobile'); closeMenu() }}
-                    className={`${OVERLAY_BTN} border border-primary bg-white text-primary hover:bg-primary hover:text-white ${FOCUS_RING}`}
+                    className={`pill-btn ${FOCUS_RING}`}
                   >
                     Book a Demo
                   </Link>
@@ -385,7 +381,7 @@ export function Nav() {
                     href={AI_MODE_HREF}
                     onClick={() => { trackCTA('Try AI Mode', 'nav_mobile'); closeMenu() }}
                     aria-current={isAiModePage ? 'page' : undefined}
-                    className={`${OVERLAY_BTN} bg-primary text-white hover:opacity-90 ${FOCUS_RING}`}
+                    className={`${OVERLAY_SOLID_BTN} ${FOCUS_RING}`}
                   >
                     Try AI Mode
                   </Link>

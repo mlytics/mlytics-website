@@ -17,7 +17,7 @@ export const SPECIMENS: Specimen[] = [
     id: 'button-solid-40',
     layer: 'atom',
     label: '實心藥丸・輸入框內 40',
-    className: 'shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-[opacity,transform] hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap',
+    className: 'shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-[opacity,scale] hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap',
   },
   {
     id: 'button-solid-36',
@@ -35,20 +35,19 @@ export const SPECIMENS: Specimen[] = [
     id: 'button-outline-36',
     layer: 'atom',
     label: '淺底外框 36',
-    className: 'px-[calc(1rem-1px)] py-[calc(0.5rem-1px)] rounded-full text-sm font-semibold border border-primary bg-white text-primary transition-colors hover:bg-primary hover:text-white',
+    className: 'pill-btn px-[calc(1rem-1px)] py-[calc(0.5rem-1px)]',
   },
   {
     id: 'button-outline-44',
     layer: 'atom',
     label: '淺底外框 44',
-    className: 'inline-flex items-center justify-center px-[calc(1.5rem-1px)] py-[calc(0.75rem-1px)] rounded-full text-sm font-semibold border border-primary bg-white text-primary transition-colors hover:bg-primary hover:text-white',
+    className: 'pill-btn',
   },
   {
     id: 'button-outline-dark',
     layer: 'atom',
     label: '深底外框',
     className: 'pill-btn pill-btn--dark',
-    note: 'DATAI-624 完成前只列規格，不渲染樣本。',
   },
   {
     id: 'focus-ring',

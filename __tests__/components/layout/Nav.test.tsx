@@ -45,7 +45,9 @@ let mqlListeners: Listener[] = []
 const fireDesktop = (matches: boolean) => act(() => { mqlListeners.forEach(l => l({ matches })) })
 
 const PRIMARY = ['bg-primary', 'text-white', 'rounded-full', 'px-4', 'py-2', 'text-sm', 'font-semibold']
-const SECONDARY = ['bg-white', 'text-primary', 'border-primary', 'border', 'rounded-full', 'text-sm', 'font-semibold']
+// The outline look (white fill, 1px primary border, 14/600) comes from .pill-btn;
+// the padding utilities size it to 36, the same height as PRIMARY.
+const SECONDARY = ['pill-btn', 'px-[calc(1rem-1px)]', 'py-[calc(0.5rem-1px)]']
 const AI_PATHS = ['/ai-mode-playground', '/ai-mode-playground/']
 
 const navEl = () => document.querySelector('nav') as HTMLElement
@@ -234,9 +236,11 @@ describe('Nav mobile overlay', () => {
     const ctas = within(grid).getAllByRole('link')
     expect(ctas.map(l => l.textContent)).toEqual(['Book a Demo', 'Try AI Mode'])
     expect(ctas[0]).toHaveAttribute('href', '/book-a-demo')
-    expect(ctas[0]).toHaveClass('border', 'border-primary', 'bg-white', 'text-primary', 'h-11', 'rounded-full')
+    expect(ctas[0]).toHaveClass('pill-btn')
+    expect(ctas[0]).not.toHaveClass('h-11')
     expect(ctas[1]).toHaveAttribute('href', '/ai-mode-playground')
-    expect(ctas[1]).toHaveClass('bg-primary', 'text-white', 'h-11', 'rounded-full')
+    expect(ctas[1]).toHaveClass('bg-primary', 'text-white', 'px-6', 'py-3', 'rounded-full')
+    expect(ctas[1]).not.toHaveClass('h-11')
   })
 
   it('moves focus to Close menu after opening', async () => {

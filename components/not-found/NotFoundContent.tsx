@@ -67,23 +67,17 @@ function CdnNotFound() {
             "Explore More Multi-CDN". */}
         <Link
           href={DECISIVE_ENGINE}
-          className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
-          style={{ background: 'var(--color-primary)' }}
+          className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
         >
           Explore More <span className="sr-only">Multi-CDN</span>
         </Link>
-        {/* Secondary uses the design system's .pill-btn--dark. Two overrides,
-            both inline because a class would lose to .pill-btn's later cascade
-            position: (1) .pill-btn's padding is smaller than the primary's;
-            (2) its 1.5px border would otherwise make this button 3px taller
-            than the borderless primary, so the vertical padding absorbs it. */}
+        {/* Secondary is the design system's dark outline pill (DESIGN.md
+            §3.5). .pill-btn already gives it 14/600 text, a 1px border and the
+            same 44px height as the solid primary beside it, so it needs no
+            overrides. */}
         <Link
           href={BOOK_A_DEMO}
-          className="pill-btn pill-btn--dark justify-center"
-          style={{
-            padding: 'calc(0.75rem - 1.5px) calc(1.5rem - 1.5px)',
-            fontWeight: 600,
-          }}
+          className="pill-btn pill-btn--dark"
         >
           Contact Us
         </Link>
@@ -105,8 +99,7 @@ function DefaultNotFound() {
       </p>
       <Link
         href="/"
-        className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
-        style={{ background: 'var(--color-primary)' }}
+        className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
       >
         Back to Home
       </Link>

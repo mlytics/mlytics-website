@@ -298,7 +298,6 @@
 | 框線 | 一律 1px（`border`、`border-t` 等） |
 
 - 禁止：行動按鈕用藥丸以外的圓角（方角滿版按鈕也改藥丸）；1px 以外的框線粗細。
-- 現況偏離：見 §10 DATAI-624（4 顆方角滿版按鈕、`.pill-btn` 的 1.5px 框線）
 <!-- src: tok-rounded, tok-border-width, #29-9 -->
 
 ### 2.14 陰影
@@ -346,7 +345,7 @@
     <!-- src: An 2026-10-16 缺口裁決 q4（AI 接手測試） -->
   - 減少動態：CSS 由 `app/site-base.css` 的 `prefers-reduced-motion` 規則全站處理；JS 動畫要自行處理（規則見 §8）。
 - 禁止：`transition-all`。
-- 現況偏離：見 §10 DATAI-624（13 處 `transition-all`）、DATAI-627（JS 動畫未處理減少動態）
+- 現況偏離：見 §10 DATAI-627（JS 動畫未處理減少動態）
 <!-- src: tok-duration, tok-transition-all, tok-motion, cross-reduced-motion-js, 2026-10-15 文件審查（過場時間與第 3 章標準字串一致） -->
 
 ### 2.17 圖示
@@ -383,8 +382,8 @@
 | `.section-white` | 白色區塊底 | — |
 | `.section-dark` | 深色區塊底（`--bg-dark`）與淺色文字 | 深色區塊一律用它，不用 `bg-primary-dark` |
 | `.section-light` | 淺灰區塊底（`--bg-light`） | 不用於區塊交替（現況偏離：見 §10 DATAI-619，/decisive-engine/ 淺灰改白） |
-| `.pill-btn` | 淺底外框藥丸按鈕 | 只留一份定義，對齊導覽列外框按鈕（1px 框、600 字重、同高、不用 `transition: all`）（現況偏離：見 §10 DATAI-624） |
-| `.pill-btn--dark` | 深底外框藥丸按鈕，只作深底次要按鈕 | 與旁邊主要按鈕同高（現況偏離：見 §10 DATAI-624） |
+| `.pill-btn` | 淺底外框藥丸按鈕 | 全站唯一的外框按鈕定義，位於 `@layer components`：1px 框、600 字重、高 44（與 §3.2 標準 44 同高）；導覽列用內距 utilities 改成 36（§3.4） |
+| `.pill-btn--dark` | 深底外框藥丸按鈕，只作深底次要按鈕 | 疊在 `.pill-btn` 上；與旁邊主要按鈕同高（44） |
 | `.nf-cdn`／`.nf-default` | 404 頁的兩個版本切換（由 `app/not-found.tsx` 的 inline script 決定） | 只用於 404 |
 | `.ping-ring` | 首頁世界地圖點陣的擴散圈動畫 | 只用於世界地圖點陣 |
 | `.animate-marquee` | 標誌跑馬燈的捲動動畫（滑鼠移上暫停） | 只用於標誌跑馬燈 |
@@ -428,17 +427,17 @@
 | 高度 | 標準寫法（新程式照抄） | 取自 |
 |---|---|---|
 | 44 | `inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90` | `components/ui/PlaygroundCTASection.tsx:72` |
-| 40 | `shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-[opacity,transform] hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap` | `components/ui/InlineEmailCTA.tsx:116` |
+| 40 | `shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-[opacity,scale] hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap` | `components/ui/InlineEmailCTA.tsx:116` |
 | 36 | `px-4 py-2 rounded-full text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-primary` | `components/layout/Nav.tsx:32` 的 `PRIMARY_BTN` |
 
-  - 三種高度的標準寫法和原始碼都只差一處：原始碼的 `transition-all` 依 §2.16 改成只過場實際變化的屬性。44 與 36 滑過只變透明度 → `transition-opacity`；40 滑過變透明度、按下（`active:scale-[0.98]`）變縮放 → `transition-[opacity,transform]`。過場時間都沿用預設，畫面不變。原始碼現況：44 為 `inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-all hover:opacity-90`；40 為 `shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap`；36 為 `px-4 py-2 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 bg-primary`。
+  - 過場只動實際變化的屬性（§2.16）：44 與 36 滑過只變透明度 → `transition-opacity`；40 滑過變透明度、按下（`active:scale-[0.98]`）變縮放（`scale` 屬性）→ `transition-[opacity,scale]`（Tailwind v4 的 `scale-*` 輸出獨立的 `scale` 屬性，不是 transform）。過場時間都沿用預設。
   - `active:scale-[0.98]`（按下微縮）**只屬於 40 送出鈕**的現況寫法，保留在這顆上；不是通則，不加到 44、36 或其他按鈕。<!-- src: 2026-10-15 文件審查（40 送出鈕的過場寫法） -->
   - 40 的 `py-2.5` 是 §2.10 的按鈕例外，保留。
   - 送出中的狀態用 `disabled:opacity-60`（§2.4）。
   - 導覽型按鈕要呼叫 `trackCTA`（第 7 章）。
 - 禁止：方角或 12px 圓角（`rounded-xl`）；用 `h-*` 定高；inline 上色（`style={{ background: 'var(--color-primary)' }}`）；把 36 或 40 用在獨立 CTA、把 44 塞進導覽列；在深底另做一顆不同顏色的主要按鈕。
 - 已接受取捨：深底上主色按鈕的形狀對比約 1.57:1，不處理。<!-- src: dark-primary-contrast（An 2026-09-11 裁決） -->
-- 現況偏離：見 §10 DATAI-624（13 行 `transition-all`；404、錯誤頁與 /book-a-demo/ 送出鈕的 inline 上色；手機滿版選單底部兩顆用 `h-11` 定高）、DATAI-628（部分導覽型按鈕沒有 `trackCTA`）
+- 現況偏離：見 §10 DATAI-628（部分導覽型按鈕沒有 `trackCTA`）
 <!-- src: atom-btn-primary, atom-btn-inline-submit, atom-btn-font, cross-dark-primary-shape, tok-transition-all, 按鈕盤點 A1／A2／A3, #29-9(1), #30-4 -->
 
 ### 3.3 滿版藥丸
@@ -447,35 +446,29 @@
 - 用在哪：卡片底部的單一行動（例：首頁身分卡「See … plan」）、表單送出（例：/book-a-demo/「Get a Personalized Demo」）。
 - 寫法：`w-full inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90`（＝§3.2 標準 44 加 `w-full`）。
 - 禁止：方角或 `rounded-xl`；inline 上色；另訂高度。
-- 現況偏離：見 §10 DATAI-624（首頁身分卡 3 顆與 /book-a-demo/ 送出 1 顆目前是 `rounded-xl` 方角、inline 上色）
 <!-- src: atom-btn-block, page-book-a-demo, 按鈕盤點 A7, #29-9(2) -->
 
 ### 3.4 外框藥丸（淺底次要）
 
-**規則：淺底的次要行動用白底、1px 主色框、主色字的藥丸；永遠與旁邊的實心按鈕同高；全站只有這一份定義。**
+**規則：淺底的次要行動用白底、1px 主色框、主色字的藥丸；永遠與旁邊的實心按鈕同高；全站只有 `.pill-btn` 這一份定義。**
 - 用在哪：淺底上、與實心按鈕並排的次要行動（例：導覽列「Book a Demo」、手機滿版選單底部「Book a Demo」）。
-- 寫法：以導覽列外框按鈕為準，用扣掉 1px 框線的 `calc()` 內距讓高度與旁邊實心相同（§2.10 例外 3）：
+- 寫法：一律用 `.pill-btn`（`app/site-base.css`）。類別提供白底、1px 主色框、主色字、14／600、圓角同 `rounded-full`、扣掉 1px 框線的內距（高 44，與 §3.2 標準 44 同高）；滑過填主色、白字（只在支援滑過的裝置，與 Tailwind `hover:` 相同）；過場只動文字色、底色與框色。`.pill-btn` 位於 `@layer components`，同一元素上的內距 utilities 可以覆寫它，導覽列就用扣掉 1px 框線的 `calc()` 內距改成 36（§2.10 例外 3）：
 
 | 旁邊的實心 | 標準寫法 | 取自 |
 |---|---|---|
-| 36（導覽列） | `px-[calc(1rem-1px)] py-[calc(0.5rem-1px)] rounded-full text-sm font-semibold border border-primary bg-white text-primary transition-colors hover:bg-primary hover:text-white` | `components/layout/Nav.tsx:41-42` 的 `SECONDARY_BTN`（原始碼的 `transition-all` 依 §2.16 改 `transition-colors`） |
-| 44 | `inline-flex items-center justify-center px-[calc(1.5rem-1px)] py-[calc(0.75rem-1px)] rounded-full text-sm font-semibold border border-primary bg-white text-primary transition-colors hover:bg-primary hover:text-white` | 由 §3.2 標準 44 的內距各扣 1px 框線推得（DATAI-624 把手機選單外框那顆改成此寫法） |
+| 36（導覽列） | `pill-btn px-[calc(1rem-1px)] py-[calc(0.5rem-1px)]` | `components/layout/Nav.tsx:38` 的 `SECONDARY_BTN` |
+| 44 | `pill-btn` | `components/layout/Nav.tsx:376`（手機滿版選單底部「Book a Demo」） |
 
-  - `app/site-base.css` 的 `.pill-btn` 由 DATAI-624 對齊上表（1px 框、600 字重、同高、不用 `transition: all`），之後只留一份定義。
-- 禁止：1.5px 框線；字重 500；與旁邊實心按鈕不同高；用在深底（改用 §3.5）。
-- 注意：DATAI-624 完成前，現行 `.pill-btn` 是現況偏離，不可當範本（§0 第 4 點）；新寫淺底外框一律用上表字串。
-- 現況偏離：見 §10 DATAI-624（`.pill-btn` 與導覽列外框按鈕兩份定義；手機選單外框鈕用 `h-11` 定高；`transition-all`）
-<!-- src: atom-btn-secondary-outline, 按鈕盤點 A4／A5, #29-9(4), #30-4 -->
+- 禁止：1.5px 框線；字重 500；與旁邊實心按鈕不同高；用在深底（改用 §3.5）；另寫一份外框按鈕的 utilities 字串。
+<!-- src: atom-btn-secondary-outline, 按鈕盤點 A4／A5, #29-9(4), #30-4, #42, DATAI-624 -->
 
 ### 3.5 深底外框
 
 **規則：深底的次要行動用 `.pill-btn--dark`；只作次要按鈕，與旁邊主要按鈕同高。**
 - 用在哪：深色區塊內、與實心按鈕並排的次要行動（例：404 CDN 版「Contact Us」）。
-- 寫法：`pill-btn pill-btn--dark`（`.pill-btn--dark` 疊在 `.pill-btn` 上）。顏色由類別提供：透明底、on-dark 字、on-dark .4 框；滑過為主色 .6 底、白字、`--color-primary-light` 框。字級 14／600、框線 1px、高度與旁邊主要按鈕相同——這三點要等 DATAI-624 統一 `.pill-btn` 定義後由類別提供。
-- 注意：DATAI-624 完成前，現行類別無法與 44 實心同高（404 CDN 版用 inline 覆寫，屬現況偏離，不可當範本，§0 第 4 點）；這段期間需要新增深底外框時，依 §0 第 2 點先詢問。<!-- src: 2026-10-15 文件審查（DATAI-624 前的外框按鈕過渡規則） -->
+- 寫法：`pill-btn pill-btn--dark`（`.pill-btn--dark` 疊在 `.pill-btn` 上）。顏色由類別提供：透明底、on-dark 字、on-dark .4 框；滑過為主色 .6 底、白字、`--color-primary-light` 框。字級 14／600、框線 1px、高 44（與旁邊 §3.2 標準 44 實心同高）也由 `.pill-btn` 提供，不需另加 class 或 inline `style`。<!-- src: atom-btn-dark-secondary, #42, DATAI-624 -->
 - 禁止：當主要按鈕；用在淺底；用 inline `style` 覆寫內距或字重。
 - 頁尾不放任何按鈕（§5.2）。
-- 現況偏離：見 §10 DATAI-624（404 CDN 版用 inline 覆寫內距與字重；`.pill-btn` 的 1.5px 框線與 `transition: all`）
 <!-- src: atom-btn-dark-secondary, org-footer, 按鈕盤點 A6, #26, #32-1 -->
 
 ### 3.6 控制類
@@ -488,12 +481,12 @@
 | FAQ 題目列 | `components/pages/brands/BrandFAQ.tsx:79-96` | 見 §4.4；要有 `aria-expanded`＋`aria-controls`（第 8 章） |
 | 步驟清單 | `components/pages/publishers/KnowledgeBaseSection.tsx:129-159` | `<button>`，要有 tab 語意與鍵盤操作（第 8 章）；輪播行為見 §5.7 |
 | 輪播點 | `components/pages/publishers/KnowledgeBaseSection.tsx:219-228` | 點擊範圍維持 5×5（**明確接受**的例外，可能不符 WCAG 2.5.8）；要有可讀的標籤 |
-| 選單開關（漢堡／關閉） | `components/layout/Nav.tsx:293-304`、`:344-352` | `-mr-[11px] p-[11px]`＋22px 圖示，湊成 44×44 點擊範圍（§2.10 例外 1） |
+| 選單開關（漢堡／關閉） | `components/layout/Nav.tsx:289-300`、`:340-348` | `-mr-[11px] p-[11px]`＋22px 圖示，湊成 44×44 點擊範圍（§2.10 例外 1） |
 | 下拉鈕（國碼選單） | `app/book-a-demo/BookADemoForm.tsx:52-61` | 外觀同表單欄位（§3.10）；選單內放大鏡圖示 12（§2.17） |
 | 首頁流程列 | `components/home/IntentPipeline.tsx:164-190` | 改為真正的 `<button>`，外觀不變；節點用流程圖專用小底座（§3.12） |
 
 - 禁止：可點的 `<div>`（`onClick` 加在 `<div>` 上）；把控制類做成藥丸行動按鈕的樣子。
-- 現況偏離：見 §10 DATAI-627（FAQ 與步驟清單缺 aria 狀態與鍵盤操作；首頁流程列是可點的 `<div>`；輪播點缺標籤）、DATAI-624（輪播點 `transition-all`）、DATAI-625（放大鏡 13→12）
+- 現況偏離：見 §10 DATAI-627（FAQ 與步驟清單缺 aria 狀態與鍵盤操作；首頁流程列是可點的 `<div>`；輪播點缺標籤）、DATAI-625（放大鏡 13→12）
 <!-- src: cross-aria-disclosure, 按鈕盤點 B1–B6, #29-9(6), #29-9(7), #32-5 -->
 
 ### 3.7 焦點外框
@@ -623,7 +616,7 @@
 | 級別 | 寫法 | 現有例子 |
 |---|---|---|
 | 小卡 20 | `p-5` | 統計數字卡 `ZeroClickSection.tsx:44`、規格卡 `DeveloperSpecs.tsx:42`、分類卡 `ContentOwnerVerticals.tsx:82`、`:144` |
-| 一般 24 | `p-6` | 首頁身分卡 `IdentityCards.tsx:86`、`IntentRefinerySection.tsx:33`、`BrandPainSection.tsx:70`、`:141`、`EngineUseCases.tsx:39` |
+| 一般 24 | `p-6` | 首頁身分卡 `IdentityCards.tsx:84`、`IntentRefinerySection.tsx:33`、`BrandPainSection.tsx:70`、`:141`、`EngineUseCases.tsx:39` |
 | 大卡 32 | `p-8` | `DecisionLoop.tsx:59`、方案卡 `PartnershipMembership.tsx:37`、`:97`、`PartnershipResponsibilities.tsx:45`、`:80` |
 
 - 選級時對照上表的同類卡片；拿不準時依 §0 第 2 點詢問。
@@ -698,7 +691,7 @@
 - 用在哪：首頁 Hero、首頁頁尾 CTA 與 4 個受眾頁（/brands/、/content-owners/、/developers/、/partnership/）的頁尾 CTA。/decisive-engine/ 例外（§5.4 產品頁變體）。
 - 寫法：`<InlineEmailCTA ctaLabel="…" pageName="…" className="mx-auto" />`（`components/ui/InlineEmailCTA.tsx`）。`ctaLabel` 是 `trackCTA` 的位置名稱，沿用該頁既有字串；`pageName` 送給 HubSpot。元件內含藥丸 email 欄（§3.10）、40 送出鈕（§3.2）、錯誤提示與成功狀態。
 - 禁止：自己另做 email 欄或送出鈕；改送出鈕高度。
-- 現況偏離：見 §10 DATAI-623（錯誤提示用 Tailwind 紅）、DATAI-625（email 欄拿掉焦點外框）、DATAI-622（提示文字用 ink-subtle）、DATAI-624（送出鈕 `transition-all`）
+- 現況偏離：見 §10 DATAI-623（錯誤提示用 Tailwind 紅）、DATAI-625（email 欄拿掉焦點外框）、DATAI-622（提示文字用 ink-subtle）
 <!-- src: org-page-cta, atom-input, atom-btn-inline-submit -->
 
 ### 4.8 卡片網格
@@ -715,7 +708,7 @@
 - 一排三張：`grid md:grid-cols-3 gap-5`（手機單欄、≥768 三欄；例：`components/pages/publishers/LayerOverview.tsx:114`）。
 - 選級時對照上表的同類排列；拿不準時依 §0 第 2 點詢問。
 - 禁止：卡片網格用上表以外的間距（例如 `gap-6`、`gap-3`、`gap-8`）。
-- 現況偏離：見 §10 DATAI-619（`gap-6` 兩處改 `gap-5`：/brands/ 痛點兩卡 `components/pages/brands/BrandPainSection.tsx:67`、首頁身分卡 `components/home/IdentityCards.tsx:82`）
+- 現況偏離：見 §10 DATAI-619（`gap-6` 兩處改 `gap-5`：/brands/ 痛點兩卡 `components/pages/brands/BrandPainSection.tsx:67`、首頁身分卡 `components/home/IdentityCards.tsx:80`）
 <!-- src: An 2026-10-16 缺口裁決 q1（AI 接手測試） -->
 
 ---
@@ -735,7 +728,7 @@
   - 追蹤位置：桌機 `nav`、手機導覽列 `nav_mobile_header`、滿版選單 `nav_mobile`。
 - 技術約束（改導覽列必讀）：滿版選單必須是 `<nav>` 的**兄弟元素**（`<nav>` 帶 transform／backdrop-blur，會困住 fixed 子元素）；選單內不可含 `<nav>`／`<header>`（AI Mode 頁以 `header, nav` 找導覽列）；導覽列高度維持 65px；斷點一律 `matchMedia('(min-width: 64rem)')`。選單的 dialog、焦點陷阱、Esc、捲動鎖等行為見 #26 與第 8 章。
 - 禁止：在 Hero 或頁面其他位置另放 Try AI Mode 入口；改變按鈕順序。
-- 現況偏離：見 §10 DATAI-623（底線用 Tailwind 灰 `border-gray-100/50`）、DATAI-624（`transition-all`；選單底部兩顆用 `h-11`）
+- 現況偏離：見 §10 DATAI-623（底線用 Tailwind 灰 `border-gray-100/50`）
 <!-- src: org-nav, org-nav-entry, #26 -->
 
 ### 5.2 頁尾
@@ -783,7 +776,7 @@
   （首頁容器 `max-w-6xl`。）
   - **產品頁變體**（/decisive-engine/，`components/pages/decisive-engine/DecisiveEnginePageCTA.tsx:55-68`）：email 欄改成連到 /book-a-demo 的 §3.2 標準 44 實心「Contact Us」，必須呼叫 `trackCTA`。
 - 禁止：在 `.section-dark` 上再疊 `bg-primary-dark`；自做 email 欄。
-- 現況偏離：見 §10 DATAI-620（h2 → 說明目前 12、說明不限寬）、DATAI-628（產品頁「Contact Us」沒有 `trackCTA`）、DATAI-623（/developers/ 多疊 `bg-primary-dark`）、DATAI-624（產品頁按鈕寫法）
+- 現況偏離：見 §10 DATAI-620（h2 → 說明目前 12、說明不限寬）、DATAI-628（產品頁「Contact Us」沒有 `trackCTA`）、DATAI-623（/developers/ 多疊 `bg-primary-dark`）
 <!-- src: org-page-cta, org-de-cta-form, mol-heading-group-h2-gap, cross-trackcta -->
 
 ### 5.5 FAQ 區塊
@@ -822,7 +815,7 @@
 | Logo 跑馬燈 | `components/home/LogoMarquee.tsx` | 首頁「Trusted by」標誌捲動列，用 `.animate-marquee`，左右淡出遮罩 | DATAI-623（遮罩寫死 `#FFFFFF`）、DATAI-621（`mb-1.5`）、DATAI-622（圖片載入失敗時的替代品牌名稱用 ink-subtle 當文字色） |
 | Flywheel | `components/home/FlywheelSection.tsx` | 首頁專屬深色區塊，含展示大數字（§4.5） | DATAI-620（h2 改 `.section-heading`）、DATAI-623（金色短線）、DATAI-619（手機上下距）、DATAI-622（深底淡綠字低於 .85）、DATAI-627（JS 動畫未處理減少動態） |
 | 世界地圖點陣 | `components/home/WorldMapDots.tsx` | 首頁 Hero 背景點陣，訊號點用 `--color-primary-light`、擴散圈用 `.ping-ring` | DATAI-627（`setInterval` 未處理減少動態） |
-| 預約表單 | `app/book-a-demo/BookADemoForm.tsx` | /book-a-demo/ 多欄位表單：欄位 §3.10、送出 §3.3；送出記錄 `contact_form_submit` 事件（維持，不用 `trackCTA`） | DATAI-624（送出鈕）、DATAI-623（Tailwind 灰）、DATAI-625（焦點外框、放大鏡 12）、DATAI-621（`gap-2.5`、`ml-0.5`）、DATAI-622（欄位提示文字未指定顏色）、DATAI-627（JS 動畫未處理減少動態） |
+| 預約表單 | `app/book-a-demo/BookADemoForm.tsx` | /book-a-demo/ 多欄位表單：欄位 §3.10、送出 §3.3；送出記錄 `contact_form_submit` 事件（維持，不用 `trackCTA`） | DATAI-623（Tailwind 灰）、DATAI-625（焦點外框、放大鏡 12）、DATAI-621（`gap-2.5`、`ml-0.5`）、DATAI-622（欄位提示文字未指定顏色）、DATAI-627（JS 動畫未處理減少動態） |
 | 換頁捲回頂端 | `components/layout/ScrollToTop.tsx` | 換頁時捲回頁首，沒有畫面 | — |
 
 - 規則：上表元件各只有一份，需要相同功能時重用，不另寫；改動前先看「待修」欄與 §10。
@@ -872,7 +865,7 @@
 - 區塊順序：白 Hero（`HeroSection`）→ 白 身分卡 → 深 Flywheel → 白 Intent Refinery → 深 頁尾 CTA（白／白／深／白／深）。
 - 首頁專屬項目：白／白開頭的區塊順序（白底 Hero）、h1 寫法（≤420px 27px、`tracking-tight`）、內容與頁尾 1152（`max-w-6xl`）、標準淺底光暈的首頁 Hero 用法。這些只限首頁，其他頁不可用。（Hero 的全螢幕高與標題輪播是現況，未列為標準。）<!-- src: tpl-order-home, home-hero-h1-narrow-27, org-hero-home -->
 - 禁止：把首頁的 1152 容器、白底 Hero 或白／白開頭用在其他頁。
-- 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）、DATAI-620（Flywheel h2）、DATAI-625（身分卡圖示底座）、DATAI-624（身分卡按鈕）、DATAI-628（身分卡按鈕追蹤）
+- 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）、DATAI-620（Flywheel h2）、DATAI-625（身分卡圖示底座）、DATAI-628（身分卡按鈕追蹤）
 <!-- src: tpl-order-home, tpl-container-home-6xl, org-hero-home, page-home -->
 
 ### 6.5 法律頁
@@ -889,7 +882,7 @@
 - 標準版：`app/book-a-demo/page.tsx`。
 - 結構：深 Hero（容器 672 `max-w-2xl`）→ 白 表單區（一般區塊上下距；容器 512 `max-w-lg`）。表單欄位 §3.10、送出用滿版藥丸 §3.3。
 - 禁止：表單區用其他容器寬；方角送出鈕；自做另一套欄位樣式。
-- 現況偏離：見 §10 DATAI-619（表單區上下距）、DATAI-624（送出鈕）、DATAI-623、DATAI-625
+- 現況偏離：見 §10 DATAI-619（表單區上下距）、DATAI-623、DATAI-625
 <!-- src: page-book-a-demo, tpl-container-widths -->
 
 ### 6.7 404／錯誤頁
@@ -902,7 +895,7 @@
   - 按鈕：§3.2 標準 44 實心；CDN 版另有 §3.5 深底外框。
   - 兩個 404 版本以 `.nf-cdn`／`.nf-default` 切換（只用於 404）。
 - 禁止：大字用主色；標題用 36；按鈕 inline 上色。
-- 現況偏離：見 §10 DATAI-626（標題目前 36）、DATAI-622（大字目前主色）、DATAI-624（按鈕寫法、深底外框 inline 覆寫）、DATAI-628（404 按鈕追蹤）
+- 現況偏離：見 §10 DATAI-626（標題目前 36）、DATAI-622（大字目前主色）、DATAI-628（404 按鈕追蹤）
 <!-- src: page-404, page-error, #31-1 -->
 
 ### 6.8 AI Mode 頁
@@ -921,7 +914,7 @@
 **規則：每個導覽型 CTA（點了會換頁或前往預約頁的按鈕與卡片）都要呼叫 `trackCTA(label, position)`。**
 - 用在哪：行動按鈕（§3.2、§3.3）、外框按鈕（§3.4、§3.5）、「Talk to us」這類可點的大卡片。
 - 寫法：在 `onClick` 呼叫 `trackCTA`（`lib/analytics.ts:28`，送出 GA4 `click_cta` 事件，參數 `cta_label`／`cta_position`／`page_audience`）。
-  - `label`＝**畫面上的按鈕文字**（例：`trackCTA('Book a Demo', 'nav')`，`components/layout/Nav.tsx:267`）。
+  - `label`＝**畫面上的按鈕文字**（例：`trackCTA('Book a Demo', 'nav')`，`components/layout/Nav.tsx:263`）。
   - `position`＝按鈕位置，沿用既有命名（例：導覽列 `nav`、手機導覽列 `nav_mobile_header`、滿版選單 `nav_mobile`、/content-owners/ 區塊 `content_owners_section`）；共用元件由參數傳入（例：`PlaygroundCTASection` 的 `trackingPosition`、`InlineEmailCTA` 的 `ctaLabel`）。
 - 不適用（維持現狀）：`InlineEmailCTA` 只在送出成功後記錄（`components/ui/InlineEmailCTA.tsx:48`）；/book-a-demo/ 表單送出記錄 `contact_form_submit` 事件；錯誤頁「Try again」是重試，不是 CTA。
 - 禁止：導覽型 CTA 不呼叫 `trackCTA`；`label` 與畫面文字不同。
@@ -966,10 +959,10 @@
 **規則：以下寫法不會報錯，但樣式會被靜默丟棄或被蓋掉；寫完一律在瀏覽器確認 computed style。**
 1. **自訂 token 撞 Tailwind 內建色名**：例如自訂 `--color-amber` 會無聲失效，所以痛點色叫 `warn`（`app/site-base.css:25-28` 註解）。新 token 不可用 Tailwind 內建色系名稱。
 2. **字級 token 必須叫 `--text-*`**：`--font-size-*` 不會產生 class；字級 token 一律用 `--text-*`（§2.8）。
-3. **自訂 class 內的 `text-wrap` 要用 `@apply`**：例如 `.section-heading` 寫 `@apply text-balance;`（`app/site-base.css:121`），不要手寫 `text-wrap` 屬性。
+3. **自訂 class 內的 `text-wrap` 要用 `@apply`**：例如 `.section-heading` 寫 `@apply text-balance;`（`app/site-base.css:148`），不要手寫 `text-wrap` 屬性。
 4. **`Eyebrow` 靠 `cn()`（tailwind-merge）合併 class**（`lib/utils.ts`）：用 className 覆寫顏色會靠 tailwind-merge 剃掉預設色才生效，元件一改就失效。換色一律用元件參數（§3.8）。
-5. **未分層的自訂 class 會蓋過 Tailwind utilities**：`app/site-base.css` 的 `.pill-btn` 等類別不在 `@layer` 內，同一元素上的 Tailwind 內距 class 會被它蓋掉（`components/layout/Nav.tsx:34-40` 註解）。不要在 `.pill-btn` 上疊內距 utilities 調高度（§3.4、§3.5）。
-- 現況偏離：見 §10 DATAI-625（4 處小標籤用 className 覆寫顏色）、DATAI-624（`.pill-btn` 定義）
+5. **未分層的自訂 class 會蓋過 Tailwind utilities**：`app/site-base.css` 裡不在 `@layer` 內的類別，會蓋掉同一元素上的 Tailwind utilities。`.pill-btn` 已放在 `@layer components`，同一元素上的內距 utilities 可以覆寫它；目前只有導覽列 36 用內距覆寫高度（`pill-btn px-[calc(1rem-1px)] py-[calc(0.5rem-1px)]`，§3.4），其他位置直接用類別的 44。新增要讓 utilities 覆寫的共用類別，同樣放進 `@layer components`。
+- 現況偏離：見 §10 DATAI-625（4 處小標籤用 className 覆寫顏色）
 <!-- src: tok-font-size-token-broken, atom-eyebrow-override-risk, atom-btn-secondary-outline, DATAI-556 -->
 
 ### 7.6 量測以瀏覽器為準
@@ -993,7 +986,7 @@
   - 新增或修改 token、共用類別：改 `app/site-base.css`。
   - 新增一種文件或 story 檔案類型：同時在 `app/globals.css` 加 `@source not` 排除，並在 `.storybook/storybook.css` 加 `@source`。
   - `storybook-static/`（Storybook 建置輸出）必須留在 `.gitignore`，否則會被網站 CSS 掃到。
-- 注意：有 5 處程式註解仍寫「globals.css」（`components/not-found/NotFoundContent.tsx:16`、`components/not-found/variantScript.ts:19`、`components/layout/Nav.tsx:34`、`components/pages/ai-mode-playground/AiModePlayground.tsx:87`、`components/pages/ai-mode-playground/ExperiencePanel.module.css:339`），規則實際都已在 `app/site-base.css`，讀到時以 `site-base.css` 為準。
+- 注意：有 4 處程式註解仍寫「globals.css」（`components/not-found/NotFoundContent.tsx:16`、`components/not-found/variantScript.ts:19`、`components/pages/ai-mode-playground/AiModePlayground.tsx:87`、`components/pages/ai-mode-playground/ExperiencePanel.module.css:339`），規則實際都已在 `app/site-base.css`，讀到時以 `site-base.css` 為準。
 - 禁止：在 `app/globals.css` 寫任何樣式規則；在文件或 story 用網站沒有的 class 卻不排除掃描。
 <!-- src: #32, app/globals.css, .storybook/storybook.css, storybook-static 被網站 CSS 掃描的實測 -->
 
@@ -1005,7 +998,7 @@
   - 沒有待修項目 → 同時加 story。
   - 有待修項目 → 列入 Storybook 的待修元件清單（`stories/_data/registry.ts`），寫上修正票號；修正票完成後再換成 story。
 - CI 會渲染每一個 story 並跑無障礙檢查（`__tests__/design-system/stories-render.test.tsx`），任一 story 出錯會讓 CI 失敗；但 CI 的測試環境（jsdom）無法檢查顏色對比，對比一律在瀏覽器實測（§8.1）。
-- DATAI-624、DATAI-621／DATAI-625 完成前，深底外框按鈕、Hero 小膠囊的 story 只列目標規格與待修票號，不渲染現況偏離的樣本，也不加 Storybook 私有樣式補丁；修正票完成後再補實際樣本。
+- DATAI-621／DATAI-625 完成前，Hero 小膠囊的 story 只列目標規格與待修票號，不渲染現況偏離的樣本，也不加 Storybook 私有樣式補丁；修正票完成後再補實際樣本。
 - 規則以本文件為準（§0 第 5 點）。
 <!-- src: #30, An 2026-10-15 裁決（待修共用樣式在 Storybook 只列標準與票號） -->
 
@@ -1055,7 +1048,7 @@
   1. **位移**（上移、縮放等）：要停。
   2. **淡入**：framer-motion 的全站設定只停位移、不停淡入，淡入要另外處理。
   3. **`setInterval` 自動輪播**（Hero 標題輪播、流程與步驟輪播、地圖光點）：停止自動切換。
-  - 現有範例：導覽列滿版選單用 framer-motion 的 `useReducedMotion`（`components/layout/Nav.tsx:64`），減少動態時不淡入淡出。
+  - 現有範例：導覽列滿版選單用 framer-motion 的 `useReducedMotion`（`components/layout/Nav.tsx:61`），減少動態時不淡入淡出。
 - 禁止：新增 JS 動畫卻不處理減少動態。
 - 現況偏離：見 §10 DATAI-627（34 個使用 framer-motion 的檔案只有導覽列處理；4 個 `setInterval` 輪播未處理）
 <!-- src: cross-reduced-motion-js, tok-motion -->
@@ -1147,7 +1140,6 @@
 | DATAI-621 | 4px 間距刻度 | 非按鈕的半級與任意值往下取（例外見 §10.1）；`.label-eyebrow-pill` 內距 6→4；內容區資訊小膠囊 5 行不在本票（歸 DATAI-625） | tok-spacing |
 | DATAI-622 | 對比修正 | `text-ink-subtle` 文字改 `text-ink-muted`；email 欄與 /book-a-demo/ 表單欄位提示文字改 `placeholder:text-ink-muted`；深底淡綠字低於 .85 改 ≥.85；主色字在深底改 on-dark；404「404」與錯誤頁「!」改白；白面板上的淡綠字改主色；比較卡編號改白；.75 文字改 .85 | cross-contrast-ink-subtle、tok-on-dark-085、cross-contrast-primary-on-dark、cross-contrast-ondark-on-white、cross-contrast-card-number |
 | DATAI-623 | 色彩寫法與 token | 寫死白色 14 處；Tailwind 灰／紅改 token；新增兩個錯誤色 token；inline `var()` 與 inline `rgba(…0.12)` 改 class；移除多疊的 `bg-primary-dark`；非基色透明與階梯外透明度就近對齊；淺底分隔線改 `border-line`；金／琥珀裝飾（痛點段落以外）改兩基色；`app/site-base.css` 階梯註解加 .6；移除 Geist 字型；/content-owners/ 陰影改標準級 | tok-color-hex-residue、tok-color-tailwind-gray、tok-color-error-red、tok-color-error-red-token、tok-color-two-syntaxes、tok-color-primary-dark-alias、tok-alpha-nonbase、tok-alpha-off-ladder、tok-alpha-pill-border-06、atom-divider、tok-font-family、tok-shadow |
-| DATAI-624 | 按鈕 | 4 顆方角滿版按鈕改藥丸；`.pill-btn` 單一定義（1px 框、600、同高、不用 `transition: all`）；外框與旁邊實心同高；`transition-all` 改具體屬性；主要按鈕上色統一為 `bg-primary`；手機選單底部按鈕不用 `h-11` 定高 | atom-btn-block、atom-btn-secondary-outline、atom-btn-primary、atom-btn-dark-secondary、tok-transition-all、page-book-a-demo（按鈕部分） |
 | DATAI-625 | Atom 樣式 | Hero 小膠囊 9 處統一 `.label-eyebrow-pill` 並補框線；小標籤換色改參數；首頁身分卡圖示底座改大號 48（底座到標題 28，`mb-7`）；全站焦點外框（含表單欄位）；28px 卡片內距 3 處改 24；放大鏡 13→12；流程圖小底座框線 2→1px；內容區資訊小膠囊統一高 24、無框 | atom-eyebrow-pill、atom-eyebrow-override-risk、atom-icon-badge、atom-focus、atom-focus-form、mol-card-padding |
 | DATAI-626 | Hero 對齊 | /developers/、/partnership/、/decisive-engine/ 對齊標準 Hero（下距 48、底部細線、h1 48）；/privacy-policy/、/terms-of-service/、/book-a-demo/ 的 h1 補 `text-balance`；404／錯誤頁標題 48 | org-hero-structure、org-hero-h1-standard、page-404、page-error |
 | DATAI-627 | 無障礙行為 | FAQ 加 `aria-expanded`／`aria-controls`；步驟清單 tab 語意與鍵盤；首頁流程列改 `<button>`；輪播點標籤；JS 動畫減少動態（位移、淡入、`setInterval` 輪播三類） | cross-aria-disclosure、cross-reduced-motion-js |

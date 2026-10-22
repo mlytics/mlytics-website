@@ -98,7 +98,7 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
             85% of searches end without a click — Mlytics Cortex captures your readers' intent and turns it into three new revenue streams.
           </p>
           <a
-            class="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            class="mt-auto gap-2 w-full inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
             href="/content-owners"
           >
             <span
@@ -109,7 +109,14 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
             <span
               class="hidden md:inline lg:hidden"
             >
-              See media & content plan
+              Learn more
+              <span
+                class="sr-only"
+              >
+                 about the 
+                Media and Content Owner
+                 plan
+              </span>
             </span>
           </a>
         </div>
@@ -176,10 +183,26 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
             60%+ of buyers get answers from AI without clicking through — Mlytics Cortex places your brand inside the answers they trust.
           </p>
           <a
-            class="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            class="mt-auto gap-2 w-full inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
             href="/brands"
           >
-            See brand plan
+            <span
+              class="md:hidden lg:inline"
+            >
+              See brand plan
+            </span>
+            <span
+              class="hidden md:inline lg:hidden"
+            >
+              Learn more
+              <span
+                class="sr-only"
+              >
+                 about the 
+                Brand
+                 plan
+              </span>
+            </span>
           </a>
         </div>
         <div
@@ -246,10 +269,26 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
             Fragmented CDN contracts and rising infra costs don't have to be trade-offs — Mlytics Cortex cuts TCO by 20% and routes every request in under 50ms, through one API.
           </p>
           <a
-            class="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            class="mt-auto gap-2 w-full inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
             href="/developers"
           >
-            See developer plan
+            <span
+              class="md:hidden lg:inline"
+            >
+              See developer plan
+            </span>
+            <span
+              class="hidden md:inline lg:hidden"
+            >
+              Learn more
+              <span
+                class="sr-only"
+              >
+                 about the 
+                Developer
+                 plan
+              </span>
+            </span>
           </a>
         </div>
       </div>
