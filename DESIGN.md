@@ -947,7 +947,6 @@
 - CI 把關：`__tests__/public/llms-sitemap.test.ts` 檢查 sitemap 裡的每一頁（首頁除外）都在 llms.txt 有連結，漏加會讓 CI 失敗。
 - 注意：**頁面有沒有加進 sitemap 本身沒有自動檢查**，要人工確認（§9 檢查表）。
 - 禁止：以「轉換頁」或「法律頁」為由不列入。
-- 現況偏離：見 §10 DATAI-632（/book-a-demo/ 不在 sitemap 也不在 llms.txt；/privacy-policy/、/terms-of-service/ 不在 sitemap，llms.txt 只在英文段的 Optional 有連結）<!-- src: #34 -->
 <!-- src: __tests__/public/llms-sitemap.test.ts, #2, #8, #34 -->
 
 ### 7.4 導覽列的技術約束
@@ -1155,5 +1154,4 @@
 | DATAI-628 | CTA 追蹤 | 7 顆導覽型按鈕補 `trackCTA`；「Talk to us」記錄名稱改為畫面文字（改名前先查 GA 報表） | cross-trackcta |
 | DATAI-629 | /content-owners/ 步驟面板 | 說明最後一行被固定高度切掉；輪播改為點擊後永久停止、捲出畫面不輪播，與首頁流程一致 | page-content-owners、org-home-pipeline-carousel |
 | DATAI-630 | AI Mode 頁對齊 | 14／9／7px 間距改 4px 刻度（分享區核准的 14px 除外）；legacy 變數改 `@theme` token；AI Mode 頁仍是例外 | tok-ai-mode-spacing、tok-ai-mode-legacy-vars |
-| DATAI-632 | SEO／可發現性 | /book-a-demo/、/privacy-policy/、/terms-of-service/ 補進 `public/sitemap.xml` 與 `public/llms.txt`（中英兩段），讓所有公開頁面兩邊都有 | —（2026-10-15 決策 #34） |
-<!-- src: 修正票 DATAI-556、DATAI-619–630、DATAI-632（皆為 DATAI-315 子票）, #30-5, #31, #32, #33, #34 -->
+<!-- src: 修正票 DATAI-556、DATAI-619–630（皆為 DATAI-315 子票）, #30-5, #31, #32, #33, #34 -->
