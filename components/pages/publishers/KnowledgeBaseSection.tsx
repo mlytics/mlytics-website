@@ -219,7 +219,7 @@ export function KnowledgeBaseSection() {
                         <button
                           key={i}
                           onClick={() => setActive(i)}
-                          className="rounded-full transition-all duration-300"
+                          className="rounded-full transition-[width,background-color] duration-300"
                           style={{
                             width: active === i ? 18 : 5,
                             height: 5,

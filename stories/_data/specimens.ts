@@ -35,20 +35,19 @@ export const SPECIMENS: Specimen[] = [
     id: 'button-outline-36',
     layer: 'atom',
     label: '淺底外框 36',
-    className: 'px-[calc(1rem-1px)] py-[calc(0.5rem-1px)] rounded-full text-sm font-semibold border border-primary bg-white text-primary transition-colors hover:bg-primary hover:text-white',
+    className: 'pill-btn px-[calc(1rem-1px)] py-[calc(0.5rem-1px)]',
   },
   {
     id: 'button-outline-44',
     layer: 'atom',
     label: '淺底外框 44',
-    className: 'inline-flex items-center justify-center px-[calc(1.5rem-1px)] py-[calc(0.75rem-1px)] rounded-full text-sm font-semibold border border-primary bg-white text-primary transition-colors hover:bg-primary hover:text-white',
+    className: 'pill-btn',
   },
   {
     id: 'button-outline-dark',
     layer: 'atom',
     label: '深底外框',
     className: 'pill-btn pill-btn--dark',
-    note: 'DATAI-624 完成前只列規格，不渲染樣本。',
   },
   {
     id: 'focus-ring',

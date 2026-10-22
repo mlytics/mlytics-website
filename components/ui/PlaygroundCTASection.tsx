@@ -69,7 +69,7 @@ export function PlaygroundCTASection({
       <Link
         href={`/ai-mode-playground/?lens=${lens}`}
         onClick={() => trackCTA(ctaLabel, trackingPosition)}
-        className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-all hover:opacity-90"
+        className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
       >
         {ctaLabel}
       </Link>

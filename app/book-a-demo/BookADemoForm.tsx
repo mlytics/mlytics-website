@@ -201,8 +201,7 @@ export function BookADemoForm() {
           </div>
           <button
             type="submit"
-            className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-            style={{ background: 'var(--color-primary)' }}
+            className="w-full inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
           >
             Get a Personalized Demo
           </button>

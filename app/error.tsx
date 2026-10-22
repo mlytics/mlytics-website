@@ -23,8 +23,7 @@ export default function Error({
         </p>
         <button
           onClick={reset}
-          className="inline-block px-6 py-3 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
-          style={{ background: 'var(--color-primary)' }}
+          className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
         >
           Try again
         </button>

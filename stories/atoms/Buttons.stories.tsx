@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import { PendingNotice, SpecimenBlock, StoryFrame, specimen, specimenClasses } from '../_components/StoryPrimitives'
+import { SpecimenBlock, StoryFrame, specimen, specimenClasses } from '../_components/StoryPrimitives'
 
 const meta = { title: 'Atoms/Buttons', parameters: { layout: 'fullscreen' } } satisfies Meta
 export default meta
@@ -32,19 +32,18 @@ export const 按鈕類型: Story = {
           <button type="button" className={specimenClasses('button-full-44', 'focus-ring')}>Complete request</button>
         </div>
       </SpecimenBlock>
-      <PendingNotice
-        title="深底外框"
-        ticket="DATAI-624"
-        className={specimen('button-outline-dark').className}
-        spec={[
-          '寫法：pill-btn pill-btn--dark（.pill-btn--dark 疊在 .pill-btn 上），只作深底次要按鈕。',
-          '平常：透明底、on-dark 字、on-dark .4 框。',
-          '滑過：主色 .6 底、白字、--color-primary-light 框。',
-          '字級 14／600、框線 1px、高度與旁邊主要按鈕相同：DATAI-624 統一 .pill-btn 定義後由類別提供。',
+      <SpecimenBlock
+        title={specimen('button-outline-dark').label}
+        lines={[
+          { element: '主要（實心藥丸・標準 44）', code: specimenClasses('button-solid-44', 'focus-ring') },
+          { element: '次要（深底外框，與主要同高）', code: specimenClasses('button-outline-dark', 'focus-ring') },
         ]}
       >
-        依 §7.8，DATAI-624 完成前只列目標規格與票號，不渲染樣本。
-      </PendingNotice>
+        <div className="section-dark flex flex-wrap items-center gap-3 rounded-2xl p-6">
+          <button type="button" className={specimenClasses('button-solid-44', 'focus-ring')}>Primary action</button>
+          <button type="button" className={specimenClasses('button-outline-dark', 'focus-ring')}>Secondary action</button>
+        </div>
+      </SpecimenBlock>
       <aside className="rounded-2xl border border-line bg-surface p-6">
         <h2 className="text-base font-semibold">控制類</h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">FAQ、分頁、輪播點、選單開關與下拉鈕依各自元件規格呈現，不套行動按鈕樣式。</p>

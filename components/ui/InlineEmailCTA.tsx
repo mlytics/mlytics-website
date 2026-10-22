@@ -113,7 +113,7 @@ export function InlineEmailCTA({ ctaLabel, pageName, className }: InlineEmailCTA
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap"
+          className="shrink-0 px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold transition-[opacity,transform] hover:opacity-90 active:scale-[0.98] bg-primary text-white disabled:opacity-60 whitespace-nowrap"
         >
           {status === 'loading' ? 'Sending…' : (
             <>
