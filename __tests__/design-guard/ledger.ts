@@ -51,8 +51,6 @@ export const AI_MODE_PREFIXES = ['app/ai-mode-playground/', 'components/pages/ai
 export function ticketFor(v: Violation, lineText: string): string {
   if (AI_MODE_PREFIXES.some((p) => v.file.startsWith(p))) return 'DATAI-630'
   if (v.kind === 'arbitrary') {
-    const size = v.match.match(/(?:^|:)text-\[(\d+)px\]$/)
-    if (size && Number(size[1]) < 12) return 'DATAI-556'
     throw new Error(`${v.file}:${v.line} ${v.match} 沒有對應的修正票，先問 An`)
   }
   if (v.kind === 'opacity') {
