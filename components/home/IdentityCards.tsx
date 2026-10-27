@@ -90,7 +90,7 @@ export function IdentityCards() {
                     <card.Icon size={22} strokeWidth={1.6} />
                   </div>
                   <h3 className="text-h3 font-bold leading-snug text-ink">{card.persona}</h3>
-                  <p className="text-sm mt-0.5 text-ink-subtle">{card.products}</p>
+                  <p className="text-sm text-ink-subtle">{card.products}</p>
                 </div>
               </div>
 

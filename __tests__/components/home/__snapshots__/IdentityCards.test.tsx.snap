@@ -85,7 +85,7 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
                 Media and Content Owner
               </h3>
               <p
-                class="text-sm mt-0.5 text-ink-subtle"
+                class="text-sm text-ink-subtle"
               >
                 AI Q&A Widget · CPL Revenue
               </p>
@@ -170,7 +170,7 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
                 Brand
               </h3>
               <p
-                class="text-sm mt-0.5 text-ink-subtle"
+                class="text-sm text-ink-subtle"
               >
                 Full Conversation CPL · Lead Pilot
               </p>
@@ -256,7 +256,7 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
                 Developer
               </h3>
               <p
-                class="text-sm mt-0.5 text-ink-subtle"
+                class="text-sm text-ink-subtle"
               >
                 Decisive Engine API
               </p>

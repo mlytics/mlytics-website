@@ -193,7 +193,7 @@ export function IntentPipeline() {
                 aria-controls={`${baseId}-desc-${i}`}
                 whileHover={{ x: 2 }}
                 transition={{ duration: 0.1, ease: 'easeOut' }}
-                className="w-full text-left relative flex items-start gap-4 pl-14 pr-4 py-3.5 rounded-xl cursor-pointer"
+                className="w-full text-left relative flex items-start gap-4 pl-14 pr-4 py-3 rounded-xl cursor-pointer"
                 style={{
                   background: isOpen ? layer.color : 'transparent',
                   border: `1px solid ${isOpen ? layer.borderColor : 'transparent'}`,
@@ -214,7 +214,7 @@ export function IntentPipeline() {
                       {layer.audience}
                     </span>
                   </span>
-                  <span className="block text-sm mt-0.5 text-on-dark">{layer.sublabel}</span>
+                  <span className="block text-sm text-on-dark">{layer.sublabel}</span>
                 </span>
               </motion.button>
 

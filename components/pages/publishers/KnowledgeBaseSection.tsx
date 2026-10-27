@@ -232,7 +232,7 @@ export function KnowledgeBaseSection() {
                     </span>
                     {isActive && !reduce && (
                       // Spans (not divs) because they sit inside the tab <button>; `block` keeps the layout.
-                      <span data-progress className="block mt-2.5 rounded-full overflow-hidden" style={{ height: 2, background: 'rgba(168,197,195,0.12)' }}>
+                      <span data-progress className="block mt-2 rounded-full overflow-hidden" style={{ height: 2, background: 'rgba(168,197,195,0.12)' }}>
                         <motion.span
                           key={`bar-${i}`}
                           className="block h-full rounded-full"
@@ -259,7 +259,7 @@ export function KnowledgeBaseSection() {
                   style={{ position: si === 0 ? 'relative' : 'absolute', inset: 0 }}
                 >
                   <div className="flex flex-col md:overflow-hidden md:h-[170px]">
-                    <div className="flex flex-col gap-1.5 mb-4 md:mb-5">
+                    <div className="flex flex-col gap-1 mb-4 md:mb-5">
                       <span>{step.icon}</span>
                       <Eyebrow>{step.sub}</Eyebrow>
                     </div>
@@ -267,7 +267,7 @@ export function KnowledgeBaseSection() {
                     <p className="text-sm md:text-base leading-relaxed">{step.desc}</p>
                   </div>
                   <div className="flex items-center justify-between pt-4 mt-6 md:mt-8" style={{ borderTop: '1px solid rgba(168,197,195,0.12)' }}>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                       {STEPS.map((_, i) => <div key={i} style={{ width: 5, height: 5 }} />)}
                     </div>
                     <span className="text-4xl md:text-5xl font-black tabular-nums">01</span>
@@ -287,7 +287,7 @@ export function KnowledgeBaseSection() {
                   className="absolute inset-0 p-6 md:p-8 flex flex-col justify-between"
                 >
                   <div className="flex flex-col md:overflow-hidden md:h-[170px]">
-                    <div className="flex flex-col gap-1.5 mb-4 md:mb-5">
+                    <div className="flex flex-col gap-1 mb-4 md:mb-5">
                       <span className="text-primary">{STEPS[active].icon}</span>
                       <Eyebrow dark>{STEPS[active].sub}</Eyebrow>
                     </div>
@@ -302,7 +302,7 @@ export function KnowledgeBaseSection() {
                     className="flex items-center justify-between pt-4 mt-6 md:mt-8"
                     style={{ borderTop: '1px solid rgba(34,93,89,0.08)' }}
                   >
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                       {STEPS.map((_, i) => (
                         <button
                           key={i}
