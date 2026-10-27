@@ -56,7 +56,6 @@ export const SPECIMENS: Specimen[] = [
     layer: 'atom',
     label: 'Hero 小膠囊',
     className: 'label-eyebrow-pill mb-4 bg-primary/40 text-on-dark',
-    note: 'DATAI-621 完成前只列規格，不渲染樣本。',
   },
   {
     id: 'input',

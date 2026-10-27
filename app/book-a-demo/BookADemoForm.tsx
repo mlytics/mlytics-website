@@ -57,7 +57,7 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
       >
         <span>{isoToFlag(value.iso2)}</span>
         <span className="text-ink">+{value.dialCode}</span>
-        <ChevronDown size={12} className="text-ink-muted ml-0.5" />
+        <ChevronDown size={12} className="text-ink-muted" />
       </button>
       {open && (
         <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-line rounded-xl shadow-xl overflow-hidden" style={{ width: 260 }}>
@@ -73,7 +73,7 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
             ) : filtered.map(c => (
               <button key={`${c.iso2}-${c.dialCode}`} type="button"
                 onClick={() => { onChange(c); setOpen(false) }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left ${c.iso2 === value.iso2 ? 'bg-primary/6' : 'hover:bg-surface'}`}
+                className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors text-left ${c.iso2 === value.iso2 ? 'bg-primary/6' : 'hover:bg-surface'}`}
               >
                 <span className="flex-shrink-0 text-base">{isoToFlag(c.iso2)}</span>
                 <span className="flex-1 text-ink truncate">{c.name.replace(/\s*\(.*?\)\s*/g, '').trim()}</span>

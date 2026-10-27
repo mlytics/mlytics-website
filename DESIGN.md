@@ -235,7 +235,6 @@
   3. **按鈕以整顆高度為準**：按鈕高度符合規格（44／40／36）即可，內距不套「往下取」，例如輸入框內送出鈕的 `py-2.5` 保留；外框按鈕可用扣掉 1px 框線的 `calc()` 內距，例如 `py-[calc(0.5rem-1px)]`。
   4. 手機滿版選單底部 `pb-[max(1.5rem,env(safe-area-inset-bottom))]`：至少 24px，並讓出 iPhone 底部安全區，只限這個位置。<!-- src: #39 -->
 - AI Mode 頁不計入本規則的慣例；其 14／9／7px 另由 DATAI-630 處理（分享區 An 核准的 14px 除外）。
-- 現況偏離：見 §10 DATAI-621（非按鈕的半級與任意值、`.label-eyebrow-pill` 內距 6px）
 <!-- src: tok-spacing, tok-ai-mode-spacing, #29-4, #29-7, #30-4 -->
 
 ### 2.11 區塊上下距
@@ -372,7 +371,7 @@
 |---|---|---|
 | `.label-eyebrow` | 區塊小標籤：12px／600／大寫／字距 0.1em | 換色用 `Eyebrow` 元件參數，不用 className 覆寫 |
 | `.label-eyebrow-md` | 14px 版小標籤，現況用於 /brands/ 較大的標示文字 | — |
-| `.label-eyebrow-pill` | Hero 小膠囊（小標籤放在藥丸內） | 類別含 1px primary .6 框線、行高 16；內距 6px 改 4px 刻度（現況偏離：見 §10 DATAI-621） |
+| `.label-eyebrow-pill` | Hero 小膠囊（小標籤放在藥丸內） | 類別含 1px primary .6 框線、行高 16、內距上下 4・左右 12（高 26） |
 | `.section-heading` | 區塊標題 h2：30／36／48、700 | 所有 h2 都用它（現況偏離：見 §10 DATAI-620） |
 | `.section-white` | 白色區塊底 | — |
 | `.section-dark` | 深色區塊底（`--bg-dark`）與淺色文字 | 深色區塊一律用它，不用 `bg-primary-dark` |
@@ -528,9 +527,8 @@
 
 **規則：深色 Hero 的 h1 上方小膠囊一律用 `.label-eyebrow-pill`。**
 - 用在哪：深色 Hero（§5.3）的 h1 上方，以及 404 CDN 版。
-- 寫法：`<span className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark">`（取自 /partnership/ `components/pages/partnership/PartnershipHero.tsx:8`）。1px primary .6 框線與 16px 行高由 `.label-eyebrow-pill` 類別提供，不再另寫框線；類別內距由 DATAI-621 從 6px 改到 4px 刻度。
+- 寫法：`<span className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark">`（取自 /partnership/ `components/pages/partnership/PartnershipHero.tsx:8`）。1px primary .6 框線、16px 行高與內距（上下 4・左右 12，高 26）由 `.label-eyebrow-pill` 類別提供，不再另寫框線或內距。
 - 禁止：手寫一份（`inline-block text-xs font-semibold uppercase tracking-widest px-3 py-1.5 rounded-full`＋inline 底色／字色／框線）；inline `style` 補框線。
-- 現況偏離：見 §10 DATAI-621（類別內距 6px）
 <!-- src: atom-eyebrow-pill, tok-alpha-pill-border-06 -->
 
 ### 3.10 輸入框
@@ -736,9 +734,9 @@
 ### 5.2 頁尾
 
 - 標準版：`components/layout/Footer.tsx`。
-- 規格：深色（`.section-dark`）；品牌區＋ Solutions／Resources／Legal 三欄；欄標題用 `<Eyebrow color="rgba(168,197,195,0.85)">`（合規，見 §3.8）；連結 14px on-dark、滑過白色；目前頁白色 600；**AI Mode 連結固定在 Partnership 與 Contact 之間**；寬度跟各頁內容（首頁 1152、內頁 1024，§2.12）。
+- 規格：深色（`.section-dark`）；品牌區＋ Solutions／Resources／Legal 三欄；欄標題用 `<Eyebrow color="rgba(168,197,195,0.85)">`（合規，見 §3.8）；連結 14px on-dark、滑過白色；目前頁白色 600；**AI Mode 連結固定在 Partnership 與 Contact 之間**；寬度跟各頁內容（首頁 1152、內頁 1024，§2.12）。頁尾 LinkedIn 圖示鈕：16px 圖示＋`p-1 -ml-1`，點擊範圍 24×24（§8.5 下限），圖示與上方文字左緣對齊。
 - 禁止：放任何按鈕（包括 Try AI Mode 與外框次要按鈕）；寫死白色。
-- 現況偏離：見 §10 DATAI-619（寬度固定 1152）、DATAI-621（LinkedIn 圖示鈕 `p-1.5`）
+- 現況偏離：見 §10 DATAI-619（寬度固定 1152）
 <!-- src: org-footer, tpl-container-footer, #7, #26 -->
 
 ### 5.3 Hero
@@ -815,10 +813,10 @@
 
 | 元件 | 檔案 | 角色 | 待修 |
 |---|---|---|---|
-| Logo 跑馬燈 | `components/home/LogoMarquee.tsx` | 首頁「Trusted by」標誌捲動列，用 `.animate-marquee`，左右淡出遮罩 | DATAI-621（`mb-1.5`）、DATAI-622（圖片載入失敗時的替代品牌名稱用 ink-subtle 當文字色） |
+| Logo 跑馬燈 | `components/home/LogoMarquee.tsx` | 首頁「Trusted by」標誌捲動列，用 `.animate-marquee`，左右淡出遮罩 | DATAI-622（圖片載入失敗時的替代品牌名稱用 ink-subtle 當文字色） |
 | Flywheel | `components/home/FlywheelSection.tsx` | 首頁專屬深色區塊，含展示大數字（§4.5） | DATAI-620（h2 改 `.section-heading`）、DATAI-619（手機上下距）、DATAI-622（深底淡綠字低於 .85） |
 | 世界地圖點陣 | `components/home/WorldMapDots.tsx` | 首頁 Hero 背景點陣，訊號點用 `--color-primary-light`、擴散圈用 `.ping-ring`；強訊號點與其擴散圈用 `--color-gold`（`components/home/WorldMapDots.tsx:181`、`:191`） | — |
-| 預約表單 | `app/book-a-demo/BookADemoForm.tsx` | /book-a-demo/ 多欄位表單：欄位 §3.10、送出 §3.3；送出記錄 `contact_form_submit` 事件（維持，不用 `trackCTA`） | DATAI-621（`gap-2.5`、`ml-0.5`）、DATAI-622（欄位提示文字未指定顏色） |
+| 預約表單 | `app/book-a-demo/BookADemoForm.tsx` | /book-a-demo/ 多欄位表單：欄位 §3.10、送出 §3.3；送出記錄 `contact_form_submit` 事件（維持，不用 `trackCTA`） | DATAI-622（欄位提示文字未指定顏色） |
 | 換頁捲回頂端 | `components/layout/ScrollToTop.tsx` | 換頁時捲回頁首，沒有畫面 | — |
 | 減少動態全站開關 | `components/layout/ReducedMotion.tsx` | 依系統「減少動態效果」設定 framer-motion 全站略過動畫，沒有畫面（§8.4） | — |
 
@@ -1001,7 +999,7 @@
   - 沒有待修項目 → 同時加 story。
   - 有待修項目 → 列入 Storybook 的待修元件清單（`stories/_data/registry.ts`），寫上修正票號；修正票完成後再換成 story。
 - CI 會渲染每一個 story 並跑無障礙檢查（`__tests__/design-system/stories-render.test.tsx`），任一 story 出錯會讓 CI 失敗；但 CI 的測試環境（jsdom）無法檢查顏色對比，對比一律在瀏覽器實測（§8.1）。
-- DATAI-621 完成前，Hero 小膠囊的 story 只列目標規格與待修票號，不渲染現況偏離的樣本，也不加 Storybook 私有樣式補丁；修正票完成後再補實際樣本。
+- 有待修的共用樣式，story 只列目標規格與待修票號，不渲染現況偏離的樣本，也不加 Storybook 私有樣式補丁；修正票完成後再補實際樣本。
 - 規則以本文件為準（§0 第 5 點）。
 <!-- src: #30, An 2026-10-15 裁決（待修共用樣式在 Storybook 只列標準與票號） -->
 
@@ -1139,7 +1137,6 @@
 |---|---|---|---|
 | DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`（受眾頁緊接 FAQ 細線前白色區塊依 §2.11／§6.2 例外，下距固定 32）；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白；卡片網格 `gap-6` 兩處改 `gap-5`（/brands/ 痛點兩卡、首頁身分卡） | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
 | DATAI-620 | 區塊標題組 | h2→說明 16（含頁尾 CTA）；說明寬 576；7 處小標籤改「緊」；首頁 Flywheel h2 改 `.section-heading`；標題組到下方內容 48（11 處） | mol-heading-group-h2-gap、mol-heading-group-desc-width、mol-heading-group-eyebrow-gap、mol-heading-flywheel |
-| DATAI-621 | 4px 間距刻度 | 非按鈕的半級與任意值往下取（例外見 §10.1）；`.label-eyebrow-pill` 內距 6→4 | tok-spacing |
 | DATAI-622 | 對比修正 | `text-ink-subtle` 文字改 `text-ink-muted`；email 欄與 /book-a-demo/ 表單欄位提示文字改 `placeholder:text-ink-muted`；深底淡綠字低於 .85 改 ≥.85；主色字在深底改 on-dark；404「404」與錯誤頁「!」改白；白面板上的淡綠字改主色；比較卡編號改白；.75 文字改 .85 | cross-contrast-ink-subtle、tok-on-dark-085、cross-contrast-primary-on-dark、cross-contrast-ondark-on-white、cross-contrast-card-number |
 | DATAI-626 | Hero 對齊 | /developers/、/partnership/、/decisive-engine/ 對齊標準 Hero（下距 48、底部細線、h1 48）；/privacy-policy/、/terms-of-service/、/book-a-demo/ 的 h1 補 `text-balance`；404／錯誤頁標題 48 | org-hero-structure、org-hero-h1-standard、page-404、page-error |
 | DATAI-628 | CTA 追蹤 | 7 顆導覽型按鈕補 `trackCTA`；「Talk to us」記錄名稱改為畫面文字（改名前先查 GA 報表） | cross-trackcta |
