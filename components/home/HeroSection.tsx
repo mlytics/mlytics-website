@@ -80,7 +80,7 @@ export function HeroSection() {
             </h1>
 
             {/* Early access CTA */}
-            <InlineEmailCTA ctaLabel="hero" pageName="Homepage Hero" />
+            <InlineEmailCTA ctaLabel="hero" pageName="Homepage Hero" tone="light" />
 
           </div>
         </div>

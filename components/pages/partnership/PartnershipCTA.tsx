@@ -12,7 +12,7 @@ export function PartnershipCTA() {
         <p className="text-base mb-8 text-on-dark">
           Tell us about your digital asset platform and audience.
         </p>
-        <InlineEmailCTA ctaLabel="partnership_cta" pageName="Partnership Page CTA" className="mx-auto" />
+        <InlineEmailCTA ctaLabel="partnership_cta" pageName="Partnership Page CTA" tone="dark" className="mx-auto" />
       </div>
     </section>
   )

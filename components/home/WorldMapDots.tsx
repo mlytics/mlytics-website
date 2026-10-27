@@ -165,7 +165,7 @@ export function WorldMapDots({ variant = 'dark' }: WorldMapDotsProps) {
             cx={d.x}
             cy={d.y}
             r={1.4}
-            fill={isLight ? 'rgba(34,93,89,0.14)' : 'rgba(34,93,89,0.55)'}
+            fill={isLight ? 'rgba(34,93,89,0.12)' : 'rgba(34,93,89,0.55)'}
           />
         ))}
 

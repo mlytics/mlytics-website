@@ -11,11 +11,7 @@ function LayerCard({ item, i }: { item: Layer; i: number }) {
 
   return (
     <motion.div
-      className="relative rounded-2xl p-7 flex flex-col overflow-hidden cursor-default"
-      style={{
-        background: 'rgba(34,93,89,0.22)',
-        border: '1px solid rgba(168,197,195,0.1)',
-      }}
+      className="relative rounded-2xl p-7 flex flex-col overflow-hidden cursor-default border border-on-dark/12 bg-primary/25"
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
@@ -27,7 +23,7 @@ function LayerCard({ item, i }: { item: Layer; i: number }) {
       <motion.div
         className="absolute inset-0 pointer-events-none z-0"
         style={{
-          background: 'radial-gradient(ellipse 70% 60% at 100% 0%, rgba(168,197,195,0.22) 0%, rgba(168,197,195,0.08) 45%, transparent 75%)',
+          background: 'radial-gradient(ellipse 70% 60% at 100% 0%, rgba(168,197,195,0.25) 0%, rgba(168,197,195,0.08) 45%, transparent 75%)',
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: hovered ? 1 : 0 }}
@@ -51,7 +47,7 @@ function LayerCard({ item, i }: { item: Layer; i: number }) {
         </p>
         <h3 className="text-h3 font-bold text-white leading-snug mb-2">{item.name}</h3>
         <p className="text-sm font-bold mb-6 text-gold">{item.price}</p>
-        <p className="text-sm md:text-base leading-relaxed mt-auto text-on-dark" style={{ borderTop: '1px solid rgba(168,197,195,0.1)', paddingTop: 16 }}>
+        <p className="text-sm md:text-base leading-relaxed mt-auto text-on-dark border-t border-on-dark/12" style={{ paddingTop: 16 }}>
           {item.desc}
         </p>
       </div>
@@ -89,7 +85,7 @@ export function LayerOverview() {
       {/* Background glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 900px 500px at 50% 50%, rgba(34,93,89,0.18) 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(ellipse 900px 500px at 50% 50%, rgba(34,93,89,0.12) 0%, transparent 70%)' }}
       />
 
       <div className="max-w-5xl mx-auto px-6 relative z-10">

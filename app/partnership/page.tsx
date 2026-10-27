@@ -32,7 +32,7 @@ export default function PartnershipPage() {
       <PartnershipHowItWorks />
       <div className="section-white">
         <div className="max-w-5xl mx-auto px-6">
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.07)' }} />
+          <div className="h-px bg-line" />
         </div>
       </div>
       <PartnershipResponsibilities />

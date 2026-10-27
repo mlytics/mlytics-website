@@ -62,8 +62,7 @@ export function PartnershipResponsibilities() {
                   transition={{ duration: 0.3, delay: 0.15 + i * 0.05 }}
                 >
                   <span
-                    className="mt-0.5 shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
-                    style={{ background: 'rgba(34,93,89,0.1)' }}
+                    className="mt-0.5 shrink-0 w-4 h-4 rounded-full flex items-center justify-center bg-primary/12"
                   >
                     <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
                       <path d="M1 3l2 2 4-4" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -77,8 +76,7 @@ export function PartnershipResponsibilities() {
 
           {/* You bring */}
           <motion.div
-            className="rounded-2xl p-8"
-            style={{ background: 'rgba(34,93,89,0.03)', border: '1px solid rgba(34,93,89,0.1)' }}
+            className="rounded-2xl p-8 bg-primary/6 border border-primary/12"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
@@ -98,8 +96,7 @@ export function PartnershipResponsibilities() {
                   transition={{ duration: 0.3, delay: 0.25 + i * 0.06 }}
                 >
                   <span
-                    className="mt-0.5 shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
-                    style={{ background: 'rgba(34,93,89,0.1)' }}
+                    className="mt-0.5 shrink-0 w-4 h-4 rounded-full flex items-center justify-center bg-primary/12"
                   >
                     <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
                       <path d="M1 3l2 2 4-4" stroke="var(--color-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

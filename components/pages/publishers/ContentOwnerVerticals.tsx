@@ -79,14 +79,12 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[number]; i: number }
   const [hovered, setHovered] = useState(false)
   return (
     <div
-      className={`${item.colClass} p-5 rounded-2xl border transition-colors duration-200`}
-      style={{ borderColor: hovered ? 'var(--color-primary)' : 'var(--color-line)' }}
+      className={`${item.colClass} p-5 rounded-2xl border transition-colors duration-200 ${hovered ? 'border-primary' : 'border-line'}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <p
-        className="text-xs font-bold uppercase tracking-widest mb-4 transition-colors duration-200"
-        style={{ color: hovered ? 'var(--color-primary)' : 'var(--color-ink-subtle)' }}
+        className={`text-xs font-bold uppercase tracking-widest mb-4 transition-colors duration-200 ${hovered ? 'text-primary' : 'text-ink-subtle'}`}
       >
         {item.vertical}
       </p>
@@ -149,12 +147,12 @@ export function ContentOwnerVerticals() {
               </p>
               <motion.div
                 className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(255,255,255,0.15)' }}
+                style={{ background: 'rgba(168,197,195,0.25)' }}
                 variants={{
-                  rest: { x: 0, background: 'rgba(255,255,255,0.15)' },
+                  rest: { x: 0, background: 'rgba(168,197,195,0.25)' },
                   hover: {
                     x: [0, 6, -2, 4, 0],
-                    background: 'rgba(255,255,255,0.28)',
+                    background: 'rgba(168,197,195,0.4)',
                     transition: { x: { duration: 0.5, ease: 'easeOut' }, background: { duration: 0.2 } },
                   },
                 }}

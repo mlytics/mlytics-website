@@ -16,6 +16,8 @@ const SWATCH_CLASSES: Record<(typeof COLOR_TOKENS)[number]['token'], string> = {
   '--color-ink-subtle': 'bg-ink-subtle',
   '--color-on-dark': 'bg-on-dark',
   '--color-line': 'bg-line',
+  '--color-error': 'bg-error',
+  '--color-error-on-dark': 'bg-error-on-dark',
 }
 
 const meta = { title: 'Foundations/Colors', parameters: { layout: 'fullscreen' } } satisfies Meta

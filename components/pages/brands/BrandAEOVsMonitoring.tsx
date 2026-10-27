@@ -86,27 +86,23 @@ export function BrandAEOVsMonitoring() {
 
         {/* Column headers */}
         <div
-          className="grid grid-cols-2 mb-3 z-20 transition-colors duration-200"
+          className={`grid grid-cols-2 mb-3 z-20 transition-colors duration-200${showBackdrop ? ' bg-white border-b border-line' : ''}`}
           style={{
             position: isDesktop ? 'static' : 'sticky',
             top: 64,
-            ...(showBackdrop ? {
-              background: '#FFFFFF',
-              borderBottom: '1px solid rgba(0,0,0,0.06)',
-            } : {}),
           }}
         >
           <div className="px-5 py-4 text-center">
-            <p className="text-base font-bold uppercase tracking-widest" style={{ color: 'var(--color-ink-subtle)' }}>
+            <p className="text-base font-bold uppercase tracking-widest text-ink-subtle">
               AEO Monitoring
             </p>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-ink-subtle)' }}>tracking & reporting tools</p>
+            <p className="text-sm mt-1 text-ink-subtle">tracking & reporting tools</p>
           </div>
           <div className="px-5 py-4 text-center">
             <p className="text-base font-bold uppercase tracking-widest text-primary">
               Mlytics Cortex
             </p>
-            <p className="text-sm mt-1" style={{ color: 'rgba(34,93,89,0.75)' }}>AEO Execution</p>
+            <p className="text-sm mt-1 text-primary/85">AEO Execution</p>
           </div>
         </div>
 
@@ -128,8 +124,7 @@ export function BrandAEOVsMonitoring() {
             </div>
 
             <div
-              className="grid grid-cols-2 items-center py-5"
-              style={{ borderBottom: i < ROWS.length - 1 ? '1px solid rgba(0,0,0,0.06)' : undefined }}
+              className={`grid grid-cols-2 items-center py-5${i < ROWS.length - 1 ? ' border-b border-line' : ''}`}
             >
               <div className="px-5 text-center">
                 <p className="text-sm md:text-base leading-relaxed text-ink-muted">

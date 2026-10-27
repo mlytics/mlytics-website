@@ -83,7 +83,7 @@ export function FlywheelSection() {
               {/* Thin separator */}
               <motion.div
                 className="mb-6"
-                style={{ width: 40, height: 1, background: 'rgba(245,158,11,0.4)' }}
+                style={{ width: 40, height: 1, background: 'rgba(168,197,195,0.4)' }}
                 initial={{ opacity: 0, scaleX: 0 }}
                 animate={inView ? { opacity: 1, scaleX: 1 } : {}}
                 transition={{ duration: 0.5, delay: 0.3 }}

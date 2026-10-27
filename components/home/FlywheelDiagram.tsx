@@ -77,7 +77,7 @@ export function FlywheelDiagram() {
         >
           <circle cx={CX} cy={CY} r={68} fill="none" stroke="rgba(168,197,195,0.4)" strokeWidth="1" />
           <circle cx={CX} cy={CY} r={60} fill="var(--color-primary-dark)" />
-          <circle cx={CX} cy={CY} r={52} fill="rgba(34,93,89,0.5)" />
+          <circle cx={CX} cy={CY} r={52} fill="rgba(34,93,89,0.55)" />
           <text x={CX} y={CY - 14} textAnchor="middle" fill="var(--color-surface)" fontSize="11" fontWeight="700" letterSpacing="0.8">
             DECISION
           </text>
@@ -100,8 +100,8 @@ export function FlywheelDiagram() {
               transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
             >
               <circle cx={pos.x} cy={pos.y} r={18} fill="var(--color-primary-dark)" stroke="rgba(168,197,195,0.55)" strokeWidth="1.5" />
-              <circle cx={pos.x} cy={pos.y} r={14} fill="rgba(34,93,89,0.35)" />
-              <circle cx={pos.x} cy={pos.y} r={3}  fill="rgba(168,197,195,0.8)" />
+              <circle cx={pos.x} cy={pos.y} r={14} fill="rgba(34,93,89,0.4)" />
+              <circle cx={pos.x} cy={pos.y} r={3}  fill="rgba(168,197,195,0.85)" />
             </motion.g>
           )
         })}

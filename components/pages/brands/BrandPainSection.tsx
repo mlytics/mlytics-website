@@ -86,8 +86,8 @@ export function BrandPainSection() {
             <svg ref={chartRef} viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="w-full" style={{ overflow: 'visible' }}>
               <defs>
                 <linearGradient id="cpm-fill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" style={{ stopColor: 'var(--color-warn-deep)' }} stopOpacity="0.12" />
-                  <stop offset="100%" style={{ stopColor: 'var(--color-warn-deep)' }} stopOpacity="0" />
+                  <stop offset="0%" stopColor="var(--color-warn-deep)" stopOpacity="0.12" />
+                  <stop offset="100%" stopColor="var(--color-warn-deep)" stopOpacity="0" />
                 </linearGradient>
                 <clipPath id="cpm-clip">
                   <motion.rect
@@ -101,7 +101,7 @@ export function BrandPainSection() {
               {/* Grid */}
               {[30, 60, 90].map(v => (
                 <line key={v} x1={PAD_L} y1={vToY(v)} x2={SVG_W - PAD_R} y2={vToY(v)}
-                  stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
+                  stroke="var(--color-line)" strokeWidth="1" />
               ))}
               {/* Area */}
               <path
@@ -111,9 +111,8 @@ export function BrandPainSection() {
               {/* Line */}
               <path
                 ref={pathRef} d={pathD} fill="none"
-                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                stroke="var(--color-warn-deep)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                 style={{
-                  stroke: 'var(--color-warn-deep)',
                   ...(pathLen > 0 ? {
                     strokeDasharray: pathLen,
                     strokeDashoffset: inView ? 0 : pathLen,
@@ -124,7 +123,7 @@ export function BrandPainSection() {
               {/* End dot */}
               <motion.circle
                 cx={iToX(CPM_POINTS.length - 1)} cy={vToY(14)} r={5}
-                style={{ fill: 'var(--color-warn-deep)' }}
+                fill="var(--color-warn-deep)"
                 initial={{ opacity: 0, scale: 0 }}
                 animate={inView ? { opacity: 1, scale: 1 } : {}}
                 transition={{ duration: 0.3, delay: 2.0 }}
@@ -132,10 +131,10 @@ export function BrandPainSection() {
               {/* X labels */}
               {CPM_POINTS.map((p, i) => (
                 <text key={i} x={iToX(i)} y={SVG_H - 6} textAnchor="middle"
-                  fill="rgba(107,107,107,0.5)" fontSize="10" fontWeight="500">{p.label}</text>
+                  fill="var(--color-ink-muted)" fontSize="10" fontWeight="500">{p.label}</text>
               ))}
               {/* Y label */}
-              <text x={PAD_L} y={vToY(92) - 4} fill="rgba(107,107,107,0.5)" fontSize="10">ROAS</text>
+              <text x={PAD_L} y={vToY(92) - 4} fill="var(--color-ink-muted)" fontSize="10">ROAS</text>
             </svg>
           </motion.div>
 
@@ -167,7 +166,7 @@ export function BrandPainSection() {
                   animate={inView ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.35, delay: 0.7 + i * 0.1 }}
                 >
-                  <span className="text-xl font-black shrink-0" style={{ color: 'var(--color-warn)' }}>{item.stat}</span>
+                  <span className="text-xl font-black shrink-0 text-warn">{item.stat}</span>
                   <span className="text-sm leading-relaxed text-ink-muted">{item.desc}</span>
                 </motion.div>
               ))}
@@ -211,7 +210,7 @@ export function BrandPainSection() {
             transition={{ duration: 0.8, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
             Where is your brand
-            <span className="block" style={{ color: 'var(--color-warn-deep)' }}>when people ask AI?</span>
+            <span className="block text-warn-deep">when people ask AI?</span>
           </motion.h3>
         </div>
       </div>

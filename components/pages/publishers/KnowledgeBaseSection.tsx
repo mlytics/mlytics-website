@@ -152,12 +152,12 @@ export function KnowledgeBaseSection() {
   }, [])
 
   return (
-    <section className="section-dark py-16 lg:py-20 relative overflow-hidden" style={{ borderBottom: '1px solid rgba(168,197,195,0.12)' }}>
+    <section className="section-dark py-16 lg:py-20 relative overflow-hidden border-b border-on-dark/12">
       {/* Background glow */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 700px 400px at 50% 65%, rgba(34,93,89,0.2) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 700px 400px at 50% 65%, rgba(34,93,89,0.25) 0%, transparent 70%)',
         }}
       />
       {/* Decorative corner rings */}
@@ -167,11 +167,11 @@ export function KnowledgeBaseSection() {
       />
       <div
         className="absolute rounded-full pointer-events-none"
-        style={{ width: '24vw', height: '24vw', top: '-6vw', right: '-5vw', border: '1px solid rgba(168,197,195,0.05)' }}
+        style={{ width: '24vw', height: '24vw', top: '-6vw', right: '-5vw', border: '1px solid rgba(168,197,195,0.06)' }}
       />
       <div
         className="absolute rounded-full pointer-events-none"
-        style={{ width: '12vw', height: '12vw', top: '-1vw', right: '0vw', border: '1px solid rgba(168,197,195,0.04)' }}
+        style={{ width: '12vw', height: '12vw', top: '-1vw', right: '0vw', border: '1px solid rgba(168,197,195,0.06)' }}
       />
 
       <div className="max-w-5xl mx-auto px-6 relative z-10">
@@ -188,11 +188,7 @@ export function KnowledgeBaseSection() {
 
         {/* Unified interactive card */}
         <div
-          className="rounded-2xl overflow-hidden"
-          style={{
-            border: '1px solid rgba(34,93,89,0.45)',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2), 0 8px 24px rgba(34,93,89,0.2)',
-          }}
+          className="rounded-2xl overflow-hidden border border-primary/40 shadow-lg"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           onFocus={() => setFocused(keyboardModality.current)}
@@ -204,8 +200,7 @@ export function KnowledgeBaseSection() {
               role="tablist"
               aria-label="AI infrastructure steps"
               aria-orientation="vertical"
-              className="flex flex-col"
-              style={{ borderRight: '1px solid rgba(168,197,195,0.12)', background: 'rgba(255,255,255,0.04)' }}>
+              className="flex flex-col border-r border-on-dark/12 bg-on-dark/6">
               {STEPS.map((step, i) => {
                 const isActive = active === i
                 return (
@@ -232,12 +227,12 @@ export function KnowledgeBaseSection() {
                     >
                       0{i + 1}
                     </span>
-                    <span className="block text-sm font-semibold leading-snug" style={{ color: isActive ? '#FFFFFF' : 'rgba(168,197,195,0.7)' }}>
+                    <span className={`block text-sm font-semibold leading-snug${isActive ? ' text-white' : ''}`} style={isActive ? undefined : { color: 'rgba(168,197,195,0.7)' }}>
                       {step.label}
                     </span>
                     {isActive && !reduce && (
                       // Spans (not divs) because they sit inside the tab <button>; `block` keeps the layout.
-                      <span data-progress className="block mt-2.5 rounded-full overflow-hidden" style={{ height: 2, background: 'rgba(168,197,195,0.15)' }}>
+                      <span data-progress className="block mt-2.5 rounded-full overflow-hidden" style={{ height: 2, background: 'rgba(168,197,195,0.12)' }}>
                         <motion.span
                           key={`bar-${i}`}
                           className="block h-full rounded-full"
@@ -271,7 +266,7 @@ export function KnowledgeBaseSection() {
                     <p className="text-lg md:text-xl font-bold leading-snug mb-2">{step.label}</p>
                     <p className="text-sm md:text-base leading-relaxed">{step.desc}</p>
                   </div>
-                  <div className="flex items-center justify-between pt-4 mt-6 md:mt-8" style={{ borderTop: '1px solid rgba(168,197,195,0.1)' }}>
+                  <div className="flex items-center justify-between pt-4 mt-6 md:mt-8" style={{ borderTop: '1px solid rgba(168,197,195,0.12)' }}>
                     <div className="flex items-center gap-1.5">
                       {STEPS.map((_, i) => <div key={i} style={{ width: 5, height: 5 }} />)}
                     </div>
@@ -321,18 +316,17 @@ export function KnowledgeBaseSection() {
                             if (i !== active) pendingDotFocus.current = i
                             setActive(i)
                           }}
-                          className="rounded-full transition-[width,background-color] duration-300"
+                          className={`rounded-full transition-[width,background-color] duration-300 ${active === i ? 'bg-primary' : 'bg-primary/12'}`}
                           style={{
                             width: active === i ? 18 : 5,
                             height: 5,
-                            background: active === i ? 'var(--color-primary)' : 'rgba(34,93,89,0.15)',
                           }}
                         />
                       ))}
                     </div>
                     <span
                       className="text-4xl md:text-5xl font-black tabular-nums select-none"
-                      style={{ color: 'rgba(180,83,9,0.12)', letterSpacing: '-0.04em', lineHeight: 1 }}
+                      style={{ color: 'rgba(34,93,89,0.12)', letterSpacing: '-0.04em', lineHeight: 1 }}
                     >
                       0{active + 1}
                     </span>

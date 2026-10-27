@@ -12,7 +12,7 @@ export function FinalCTA() {
         <p className="text-base mb-8 text-on-dark">
           Real analysis from your actual data — not a template.
         </p>
-        <InlineEmailCTA ctaLabel="home_cta" pageName="Home Final CTA" className="mx-auto" />
+        <InlineEmailCTA ctaLabel="home_cta" pageName="Home Final CTA" tone="dark" className="mx-auto" />
       </div>
     </section>
   )

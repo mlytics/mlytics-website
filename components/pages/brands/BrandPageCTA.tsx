@@ -12,7 +12,7 @@ export function BrandPageCTA() {
         <p className="text-base mb-8 text-on-dark">
           See where your brand fits inside the AI answers buyers already trust.
         </p>
-        <InlineEmailCTA ctaLabel="brands_cta" pageName="Brands Page CTA" className="mx-auto" />
+        <InlineEmailCTA ctaLabel="brands_cta" pageName="Brands Page CTA" tone="dark" className="mx-auto" />
       </div>
     </section>
   )

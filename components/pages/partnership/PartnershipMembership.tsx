@@ -54,7 +54,7 @@ export function PartnershipMembership() {
               <div
                 className="px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 mt-1 bg-primary/8 text-primary"
                 style={{
-                  border: '1px solid rgba(34,93,89,0.15)',
+                  border: '1px solid rgba(34,93,89,0.12)',
                 }}
               >
                 One-time
@@ -72,8 +72,7 @@ export function PartnershipMembership() {
                   transition={{ duration: 0.3, delay: 0.2 + i * 0.06 }}
                 >
                   <span
-                    className="mt-0.5 shrink-0 w-4 h-4 rounded-full flex items-center justify-center"
-                    style={{ background: 'rgba(34,93,89,0.1)' }}
+                    className="mt-0.5 shrink-0 w-4 h-4 rounded-full flex items-center justify-center bg-primary/12"
                   >
                     <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
                       <path
@@ -94,16 +93,14 @@ export function PartnershipMembership() {
 
           {/* Custom / Enterprise card */}
           <motion.div
-            className="rounded-2xl p-8 flex flex-col"
-            style={{ background: 'rgba(34,93,89,0.04)', border: '1px solid rgba(34,93,89,0.12)' }}
+            className="rounded-2xl p-8 flex flex-col bg-primary/6 border border-primary/12"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
             <div
-              className="flex items-start justify-between gap-4 mb-6 pb-6"
-              style={{ borderBottom: '1px solid rgba(34,93,89,0.1)' }}
+              className="flex items-start justify-between gap-4 mb-6 pb-6 border-b border-primary/12"
             >
               <div>
                 <p className="text-sm font-semibold mb-1 text-ink-subtle">
@@ -116,7 +113,7 @@ export function PartnershipMembership() {
               <div
                 className="px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 mt-1 bg-primary/8 text-primary"
                 style={{
-                  border: '1px solid rgba(34,93,89,0.15)',
+                  border: '1px solid rgba(34,93,89,0.12)',
                 }}
               >
                 Let's talk

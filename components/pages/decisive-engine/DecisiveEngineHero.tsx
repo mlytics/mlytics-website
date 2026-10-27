@@ -25,16 +25,11 @@ export function DecisiveEngineHero() {
               below gets the wider max-w-5xl measure so five pills can fit on
               one row at desktop widths. */}
           <div className="max-w-3xl mx-auto">
-            {/* Pill badge — same markup/inline-style as app/developers/page.tsx and
+            {/* Pill badge — same markup/classes as app/developers/page.tsx and
                 components/not-found/NotFoundContent.tsx's .nf-cdn variant. Keep all
                 three identical. */}
             <span
-              className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
-              style={{
-                background: 'rgba(34,93,89,0.4)',
-                color: 'var(--color-on-dark)',
-                border: '1px solid rgba(34,93,89,0.6)',
-              }}
+              className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full bg-primary/40 text-on-dark border border-primary/60"
             >
               Mlytics Multi-CDN Intelligence
             </span>

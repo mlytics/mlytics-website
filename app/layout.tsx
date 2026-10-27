@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 import { Nav } from '@/components/layout/Nav'
@@ -8,8 +7,6 @@ import { ScrollToTop } from '@/components/layout/ScrollToTop'
 import { ReducedMotion } from '@/components/layout/ReducedMotion'
 import { SectionViewTracker } from '@/components/analytics/SectionViewTracker'
 import { ScrollDepthTracker } from '@/components/analytics/ScrollDepthTracker'
-
-const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.mlytics.com'),
@@ -68,7 +65,7 @@ const softwareApplicationSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geist.variable} h-full antialiased`}>
+    <html lang="en" className="h-full antialiased">
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }} />

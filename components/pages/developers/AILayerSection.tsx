@@ -62,7 +62,7 @@ export function AILayerSection() {
       {/* Background glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 700px 400px at 50% 50%, rgba(34,93,89,0.18) 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(ellipse 700px 400px at 50% 50%, rgba(34,93,89,0.12) 0%, transparent 70%)' }}
       />
 
       <div className="max-w-5xl mx-auto px-6 relative z-10">
@@ -90,23 +90,19 @@ export function AILayerSection() {
 
         {/* Column headers */}
         <div
-          className="grid grid-cols-2 mb-3 z-20 transition-colors duration-200"
+          className={`grid grid-cols-2 mb-3 z-20 transition-colors duration-200${showBackdrop ? ' bg-primary-dark border-b border-on-dark/12' : ''}`}
           style={{
             position: isDesktop ? 'static' : 'sticky',
             top: 64,
-            ...(showBackdrop ? {
-              background: 'var(--color-primary-dark)',
-              borderBottom: '1px solid rgba(168,197,195,0.1)',
-            } : {}),
           }}
         >
           <div className="px-5 py-4 flex items-center justify-center">
-            <p className="text-base font-bold uppercase tracking-widest text-center" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            <p className="text-base font-bold uppercase tracking-widest text-center text-on-dark">
               Before
             </p>
           </div>
           <div className="px-5 py-4 flex items-center justify-center">
-            <p className="text-base font-bold uppercase tracking-widest text-center" style={{ color: 'rgba(255,255,255,0.9)' }}>
+            <p className="text-base font-bold uppercase tracking-widest text-center text-white">
               With Mlytics
             </p>
           </div>
@@ -153,12 +149,12 @@ export function AILayerSection() {
         <div className="mt-20 text-center relative">
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse 80% 70% at 50% 60%, rgba(34,93,89,0.45) 0%, transparent 70%)' }}
+            style={{ background: 'radial-gradient(ellipse 80% 70% at 50% 60%, rgba(34,93,89,0.4) 0%, transparent 70%)' }}
           />
 
           <motion.div
             className="mx-auto mb-8"
-            style={{ width: 40, height: 1, background: 'rgba(168,197,195,0.3)' }}
+            style={{ width: 40, height: 1, background: 'rgba(168,197,195,0.25)' }}
             initial={{ opacity: 0, scaleX: 0 }}
             whileInView={{ opacity: 1, scaleX: 1 }}
             viewport={{ once: true, margin: '-40px' }}
