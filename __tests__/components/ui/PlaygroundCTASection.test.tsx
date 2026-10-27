@@ -206,9 +206,11 @@ describe('PlaygroundCTASection — text colour per variant', () => {
     expect(body).not.toHaveClass('text-ink-muted')
   })
 
-  it('dims the embedded eyebrow against the dark ground', () => {
+  it('colours the embedded eyebrow through the dark prop (on-dark, no className override)', () => {
     render(<PlaygroundCTASection {...embeddedProps} />)
 
-    expect(screen.getByText('Try the experience')).toHaveClass('text-on-dark/55')
+    const eyebrow = screen.getByText('Try the experience')
+    expect(eyebrow).toHaveClass('text-on-dark')
+    expect(eyebrow).not.toHaveClass('text-on-dark/55')
   })
 })

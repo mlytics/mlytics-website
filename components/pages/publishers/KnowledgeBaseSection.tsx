@@ -215,7 +215,7 @@ export function KnowledgeBaseSection() {
                     tabIndex={isActive ? 0 : -1}
                     onKeyDown={(e) => onTabKeyDown(e, i)}
                     onClick={() => setActive(i)}
-                    className="w-full text-left px-5 py-4 md:py-0 transition-colors duration-200 relative flex flex-col justify-center md:flex-1"
+                    className="w-full text-left px-5 py-4 md:py-0 transition-colors duration-200 relative flex flex-col justify-center md:flex-1 focus-visible:-outline-offset-2"
                     style={{
                       borderBottom: i < STEPS.length - 1 ? '1px solid rgba(168,197,195,0.08)' : undefined,
                       background: isActive ? 'rgba(34,93,89,0.55)' : 'transparent',

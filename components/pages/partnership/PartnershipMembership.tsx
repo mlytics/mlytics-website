@@ -52,10 +52,7 @@ export function PartnershipMembership() {
                 </p>
               </div>
               <div
-                className="px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 mt-1 bg-primary/8 text-primary"
-                style={{
-                  border: '1px solid rgba(34,93,89,0.12)',
-                }}
+                className="px-3 py-1 rounded-full text-xs font-semibold shrink-0 mt-1 bg-primary/8 text-primary"
               >
                 One-time
               </div>
@@ -111,10 +108,7 @@ export function PartnershipMembership() {
                 </p>
               </div>
               <div
-                className="px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 mt-1 bg-primary/8 text-primary"
-                style={{
-                  border: '1px solid rgba(34,93,89,0.12)',
-                }}
+                className="px-3 py-1 rounded-full text-xs font-semibold shrink-0 mt-1 bg-primary/8 text-primary"
               >
                 Let's talk
               </div>

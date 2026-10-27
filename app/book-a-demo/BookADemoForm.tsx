@@ -17,7 +17,7 @@ function isoToFlag(iso2: string) {
 interface Country { name: string; iso2: string; dialCode: string }
 const COUNTRIES: Country[] = (allCountries as Country[]).filter(c => c.dialCode)
 
-const inputCls = 'w-full px-3 py-2 text-sm border border-line rounded-lg focus:outline-none focus:border-primary transition-colors'
+const inputCls = 'w-full px-3 py-2 text-sm border border-line rounded-lg focus:border-primary transition-colors'
 const labelCls = 'block text-xs font-medium text-ink-muted mb-1'
 
 function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: Country) => void }) {
@@ -52,7 +52,7 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1 px-2 py-2 text-sm border border-line rounded-lg focus:outline-none focus:border-primary transition-colors bg-white whitespace-nowrap"
+        className="flex items-center gap-1 px-2 py-2 text-sm border border-line rounded-lg focus:border-primary transition-colors bg-white whitespace-nowrap"
         style={{ minWidth: 90 }}
       >
         <span>{isoToFlag(value.iso2)}</span>
@@ -62,10 +62,10 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
       {open && (
         <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-line rounded-xl shadow-xl overflow-hidden" style={{ width: 260 }}>
           <div className="p-2 border-b border-line flex items-center gap-2">
-            <Search size={13} className="text-ink-muted flex-shrink-0" />
+            <Search size={12} className="text-ink-muted flex-shrink-0" />
             <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)}
               placeholder="Search country or code..."
-              className="flex-1 text-sm outline-none text-ink placeholder:text-ink-muted" />
+              className="flex-1 text-sm text-ink placeholder:text-ink-muted" />
           </div>
           <div className="overflow-y-auto" style={{ maxHeight: 220 }}>
             {filtered.length === 0 ? (

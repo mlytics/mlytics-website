@@ -11,7 +11,7 @@ function LayerCard({ item, i }: { item: Layer; i: number }) {
 
   return (
     <motion.div
-      className="relative rounded-2xl p-7 flex flex-col overflow-hidden cursor-default border border-on-dark/12 bg-primary/25"
+      className="relative rounded-2xl p-6 flex flex-col overflow-hidden cursor-default border border-on-dark/12 bg-primary/25"
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}

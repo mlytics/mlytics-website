@@ -8,7 +8,7 @@ type Story = StoryObj<typeof meta>
 
 export const 小標籤: Story = {
   render: () => (
-    <StoryFrame title="小標籤" intro="區塊小標籤一律用 Eyebrow 元件，依底色選參數；Hero 小膠囊在共用類別修復前只列規格。">
+    <StoryFrame title="小標籤" intro="區塊小標籤一律用 Eyebrow 元件，依底色選參數；Hero 小膠囊在類別內距修正前只列規格。">
       <div className="grid gap-4 md:grid-cols-2">
         <SpecimenBlock title="區塊小標籤 12px・淺底" lines={[{ element: '元件用法（§3.8）', code: '<Eyebrow>' }]}>
           <Eyebrow>Foundation</Eyebrow>
@@ -27,15 +27,15 @@ export const 小標籤: Story = {
       </div>
       <PendingNotice
         title="Hero 小膠囊"
-        ticket="DATAI-621／DATAI-625"
+        ticket="DATAI-621"
         className={specimen('hero-pill').className}
         spec={[
           '寫法：label-eyebrow-pill mb-4 bg-primary/40 text-on-dark，用在深色 Hero 的 h1 上方與 404 CDN 版。',
-          '框線：1px primary .6，由 DATAI-625 補進 .label-eyebrow-pill 類別，之後不再另寫框線。',
+          '框線與行高：1px primary .6 框線與 16px 行高已在 .label-eyebrow-pill 類別內，不再另寫。',
           '內距：由 DATAI-621 從 6px 改到 4px 刻度。',
         ]}
       >
-        依 §7.8，DATAI-621／DATAI-625 完成前只列目標規格與票號，不渲染樣本。
+        依 §7.8，DATAI-621（類別內距）完成前只列目標規格與票號，不渲染樣本。
       </PendingNotice>
     </StoryFrame>
   ),

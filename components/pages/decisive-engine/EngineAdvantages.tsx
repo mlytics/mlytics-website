@@ -40,7 +40,7 @@ export function EngineAdvantages() {
           {ADVANTAGES.map((item, i) => (
             <motion.article
               key={item.num}
-              className="rounded-2xl border border-line bg-surface p-7"
+              className="rounded-2xl border border-line bg-surface p-6"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}

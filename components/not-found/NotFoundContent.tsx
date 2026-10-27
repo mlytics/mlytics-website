@@ -32,7 +32,7 @@ function CdnNotFound() {
       {/* Eyebrow styling matches the dark hero pages (developers, brands,
           content-owners, book-a-demo, privacy-policy, terms-of-service). */}
       <span
-        className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full bg-primary/40 text-on-dark border border-primary/60"
+        className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark"
       >
         Multi-CDN
       </span>

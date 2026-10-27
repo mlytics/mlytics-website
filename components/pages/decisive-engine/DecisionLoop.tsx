@@ -82,7 +82,7 @@ export function DecisionLoop() {
                 {item.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/8 text-primary"
+                    className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/8 text-primary"
                   >
                     {tag}
                   </span>

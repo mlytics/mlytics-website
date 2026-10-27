@@ -49,12 +49,6 @@ export const SPECIMENS: Specimen[] = [
     label: '深底外框',
     className: 'pill-btn pill-btn--dark',
   },
-  {
-    id: 'focus-ring',
-    layer: 'atom',
-    label: '互動元素焦點外框',
-    className: 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-  },
   { id: 'eyebrow', layer: 'atom', label: '區塊小標籤', className: 'label-eyebrow' },
   { id: 'eyebrow-medium', layer: 'atom', label: '較大小標籤', className: 'label-eyebrow-md' },
   {
@@ -62,7 +56,7 @@ export const SPECIMENS: Specimen[] = [
     layer: 'atom',
     label: 'Hero 小膠囊',
     className: 'label-eyebrow-pill mb-4 bg-primary/40 text-on-dark',
-    note: 'DATAI-621／DATAI-625 完成前只列規格，不渲染樣本。',
+    note: 'DATAI-621 完成前只列規格，不渲染樣本。',
   },
   {
     id: 'input',
