@@ -136,8 +136,10 @@
   line-height: 1.5;
 }
 
-/* Eyebrow pill — label-eyebrow inside a rounded pill badge
-   Usage: <span className="label-eyebrow-pill">FOR BRANDS</span>        */
+/* Eyebrow pill — label-eyebrow inside a rounded pill badge (DESIGN.md §3.9)
+   The class carries the 1px primary .6 border and the 16px line height;
+   the caller adds only margin and colours:
+   Usage: <span className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark">FOR BRANDS</span> */
 .label-eyebrow-pill {
   display: inline-block;
   font-size: 0.75rem;
@@ -146,6 +148,8 @@
   letter-spacing: 0.1em;
   padding: 0.375rem 0.75rem;
   border-radius: 9999px;
+  line-height: 1rem;
+  @apply border border-primary/60;
 }
 
 /* Section heading — standardised h2 across all page sections
@@ -193,6 +197,26 @@ body {
 .nf-cdn { display: none; }
 [data-nf="cdn"] .nf-cdn { display: block; }
 [data-nf="cdn"] .nf-default { display: none; }
+
+/* Focus ring (DESIGN.md §3.7, DECISIONS #47): one rule for every interactive
+   element. Dark sections switch to on-dark (primary on --bg-dark is 1.57:1);
+   white or surface panels inside a dark section switch back to primary.
+   Attribute selectors, not .bg-white/.bg-surface, so the Tailwind utilities
+   are matched without being redefined here.
+   In the base layer so a utility on the element (e.g. the email pill's
+   container ring, the overlay dialog's outline-none) still wins. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  .section-dark :focus-visible {
+    outline-color: var(--color-on-dark);
+  }
+  .section-dark :is([class~="bg-white"], [class~="bg-surface"]) :focus-visible {
+    outline-color: var(--color-primary);
+  }
+}
 
 /* Outline pill button — the site's only outline-button definition
    (DESIGN.md §3.4, §3.5). 44px tall by default: 11px + 20px line + 11px

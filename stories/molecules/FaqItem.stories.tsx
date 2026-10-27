@@ -1,6 +1,6 @@
 import { useId, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import { SpecimenBlock, StoryFrame, specimen, specimenClasses } from '../_components/StoryPrimitives'
+import { SpecimenBlock, StoryFrame, specimen } from '../_components/StoryPrimitives'
 
 const meta = { title: 'Molecules/FaqItem', parameters: { layout: 'fullscreen' } } satisfies Meta
 export default meta
@@ -17,7 +17,7 @@ function FaqSpecimen() {
     <div className={ROW}>
       <button
         type="button"
-        className={specimenClasses('faq-trigger', 'focus-ring')}
+        className={specimen('faq-trigger').className}
         aria-expanded={open}
         aria-controls={answerId}
         onClick={() => setOpen((value) => !value)}
@@ -40,7 +40,7 @@ export const 可展開單題: Story = {
         title="展開與收合"
         lines={[
           { element: '列線 <div>', code: ROW },
-          { element: '題目列 <button>（含 §3.7 焦點外框）', code: specimenClasses('faq-trigger', 'focus-ring') },
+          { element: '題目列 <button>（焦點外框由全站規則提供，§3.7）', code: specimen('faq-trigger').className },
           { element: '題目文字 <span>', code: specimen('faq-question').className },
           { element: '加號 <span>（展開時另加 rotate-45）', code: specimen('faq-icon').className },
           { element: '答案 <div>', code: specimen('faq-answer').className },

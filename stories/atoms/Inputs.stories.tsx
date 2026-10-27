@@ -15,7 +15,7 @@ export const 表單欄位: Story = {
         title="多欄表單輸入框"
         lines={[
           { element: '表單標籤 <label>', code: LABEL },
-          { element: '輸入框 <input>（含 §3.7 焦點外框）', code: specimenClasses('input', 'focus-ring') },
+          { element: '輸入框 <input>（焦點外框由全站規則提供，§3.7）', code: specimenClasses('input') },
         ]}
       >
         <div className="max-w-lg">
@@ -23,7 +23,7 @@ export const 表單欄位: Story = {
           <input
             id="storybook-name"
             type="text"
-            className={specimenClasses('input', 'focus-ring')}
+            className={specimenClasses('input')}
             placeholder="Enter a name"
           />
         </div>

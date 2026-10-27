@@ -202,7 +202,7 @@ export function IntentPipeline() {
               >
                 <span
                   className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-10 bg-primary-dark"
-                  style={{ border: `2px solid ${layer.borderColor}` }}
+                  style={{ border: `1px solid ${layer.borderColor}` }}
                 >
                   <layer.Icon size={15} strokeWidth={1.8} className="text-on-dark" />
                 </span>
@@ -210,7 +210,7 @@ export function IntentPipeline() {
                 <span className="block flex-1 min-w-0">
                   <span className="flex items-center flex-wrap gap-2">
                     <span className="text-sm font-semibold text-white">{layer.name}</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-on-dark/8 text-on-dark">
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-on-dark/8 text-on-dark">
                       {layer.audience}
                     </span>
                   </span>

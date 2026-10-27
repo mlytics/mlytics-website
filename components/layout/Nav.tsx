@@ -26,8 +26,6 @@ const MOBILE_BAR_POSITION = 'nav_mobile_header'
 // when the browser's default font size is larger than 16px.
 const DESKTOP_QUERY = '(min-width: 64rem)'
 
-const FOCUS_RING = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-
 // Primary: the 36px solid pill (DESIGN.md §3.2, nav only).
 const PRIMARY_BTN = 'px-4 py-2 rounded-full text-sm font-semibold text-white transition-opacity hover:opacity-90 bg-primary'
 
@@ -261,7 +259,7 @@ export function Nav() {
             <Link
               href="/book-a-demo"
               onClick={() => trackCTA('Book a Demo', 'nav')}
-              className={`${SECONDARY_BTN} ${FOCUS_RING}`}
+              className={SECONDARY_BTN}
             >
               Book a Demo
             </Link>
@@ -269,7 +267,7 @@ export function Nav() {
               href={AI_MODE_HREF}
               onClick={() => trackCTA('Try AI Mode', 'nav')}
               aria-current={isAiModePage ? 'page' : undefined}
-              className={`${PRIMARY_BTN} ${FOCUS_RING}`}
+              className={PRIMARY_BTN}
             >
               Try AI Mode
             </Link>
@@ -281,7 +279,7 @@ export function Nav() {
               href={AI_MODE_HREF}
               onClick={() => trackCTA('Try AI Mode', MOBILE_BAR_POSITION)}
               aria-current={isAiModePage ? 'page' : undefined}
-              className={`${PRIMARY_BTN} whitespace-nowrap ${FOCUS_RING}`}
+              className={`${PRIMARY_BTN} whitespace-nowrap`}
             >
               Try AI Mode
             </Link>
@@ -289,7 +287,7 @@ export function Nav() {
             <button
               ref={menuButtonRef}
               type="button"
-              className={`-mr-[11px] p-[11px] transition-colors ${logoColor} ${FOCUS_RING}`}
+              className={`-mr-[11px] p-[11px] transition-colors ${logoColor}`}
               onClick={openMenu}
               aria-label="Open menu"
               aria-expanded={mobileOpen}
@@ -334,13 +332,13 @@ export function Nav() {
               >
                 <div className="shrink-0 border-b border-line">
                   <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <Link href="/" onClick={closeMenu} className={`flex items-center ${FOCUS_RING}`}>
+                    <Link href="/" onClick={closeMenu} className="flex items-center">
                       {logo}
                     </Link>
                     <button
                       ref={closeButtonRef}
                       type="button"
-                      className={`-mr-[11px] p-[11px] transition-colors ${logoColor} ${FOCUS_RING}`}
+                      className={`-mr-[11px] p-[11px] transition-colors ${logoColor}`}
                       onClick={closeMenu}
                       aria-label="Close menu"
                     >
@@ -360,7 +358,7 @@ export function Nav() {
                           aria-current={active ? 'page' : undefined}
                           className={`flex items-center min-h-14 py-4 text-base ${
                             active ? 'text-primary font-semibold' : 'text-ink font-medium'
-                          } ${FOCUS_RING}`}
+                          }`}
                         >
                           {link.label}
                         </Link>
@@ -373,7 +371,7 @@ export function Nav() {
                   <Link
                     href="/book-a-demo"
                     onClick={() => { trackCTA('Book a Demo', 'nav_mobile'); closeMenu() }}
-                    className={`pill-btn ${FOCUS_RING}`}
+                    className="pill-btn"
                   >
                     Book a Demo
                   </Link>
@@ -381,7 +379,7 @@ export function Nav() {
                     href={AI_MODE_HREF}
                     onClick={() => { trackCTA('Try AI Mode', 'nav_mobile'); closeMenu() }}
                     aria-current={isAiModePage ? 'page' : undefined}
-                    className={`${OVERLAY_SOLID_BTN} ${FOCUS_RING}`}
+                    className={OVERLAY_SOLID_BTN}
                   >
                     Try AI Mode
                   </Link>

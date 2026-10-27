@@ -31,7 +31,7 @@ export default function PublishersPage() {
       <div className="section-dark pt-32 pb-12 text-center border-b border-on-dark/12">
         <div className="max-w-3xl mx-auto px-6">
           <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full bg-primary/40 text-on-dark border border-primary/60"
+            className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark"
           >
             For Media and Content
           </span>

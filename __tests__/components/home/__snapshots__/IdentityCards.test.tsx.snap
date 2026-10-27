@@ -46,19 +46,19 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
           >
             <div>
               <div
-                class="mb-2 w-8 h-8 rounded-lg flex items-center justify-center bg-primary/8"
+                class="grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white mb-7"
               >
                 <svg
                   aria-hidden="true"
-                  class="lucide lucide-newspaper text-primary"
+                  class="lucide lucide-newspaper"
                   fill="none"
-                  height="17"
+                  height="22"
                   stroke="currentColor"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  stroke-width="1.8"
+                  stroke-width="1.6"
                   viewBox="0 0 24 24"
-                  width="17"
+                  width="22"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
@@ -132,19 +132,19 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
           >
             <div>
               <div
-                class="mb-2 w-8 h-8 rounded-lg flex items-center justify-center bg-primary/8"
+                class="grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white mb-7"
               >
                 <svg
                   aria-hidden="true"
-                  class="lucide lucide-target text-primary"
+                  class="lucide lucide-target"
                   fill="none"
-                  height="17"
+                  height="22"
                   stroke="currentColor"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  stroke-width="1.8"
+                  stroke-width="1.6"
                   viewBox="0 0 24 24"
-                  width="17"
+                  width="22"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <circle
@@ -217,19 +217,19 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
           >
             <div>
               <div
-                class="mb-2 w-8 h-8 rounded-lg flex items-center justify-center bg-primary/8"
+                class="grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white mb-7"
               >
                 <svg
                   aria-hidden="true"
-                  class="lucide lucide-settings2 lucide-settings-2 text-primary"
+                  class="lucide lucide-settings2 lucide-settings-2"
                   fill="none"
-                  height="17"
+                  height="22"
                   stroke="currentColor"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  stroke-width="1.8"
+                  stroke-width="1.6"
                   viewBox="0 0 24 24"
-                  width="17"
+                  width="22"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path

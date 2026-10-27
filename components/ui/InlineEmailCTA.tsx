@@ -27,6 +27,9 @@ type InlineEmailCTAProps = {
 export function InlineEmailCTA({ ctaLabel, pageName, tone, className }: InlineEmailCTAProps) {
   const errorText = tone === 'light' ? 'text-error' : 'text-error-on-dark'
   const errorBorder = tone === 'light' ? 'border-error' : 'border-error-on-dark'
+  // Focus ring on the pill, not on the bare text field inside it (DECISIONS #47):
+  // the ring sits on the section background, so its colour follows `tone`.
+  const pillRing = `has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 ${tone === 'dark' ? 'has-[input:focus-visible]:outline-on-dark' : 'has-[input:focus-visible]:outline-primary'}`
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [status, setStatus] = useState<SubmitStatus>('idle')
@@ -102,7 +105,7 @@ export function InlineEmailCTA({ ctaLabel, pageName, tone, className }: InlineEm
 
   return (
     <form onSubmit={handleSubmit} noValidate className={`flex flex-col items-center gap-2 w-full max-w-md ${className ?? ''}`}>
-      <div className={`flex items-center w-full rounded-full border bg-white pl-5 pr-1 py-1 transition-colors focus-within:border-primary ${emailError ? errorBorder : 'border-line'}`}>
+      <div className={`flex items-center w-full rounded-full border bg-white pl-5 pr-1 py-1 transition-colors focus-within:border-primary ${pillRing} ${emailError ? errorBorder : 'border-line'}`}>
         <input
           type="email"
           required

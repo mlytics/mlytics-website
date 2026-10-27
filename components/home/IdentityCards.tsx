@@ -86,8 +86,8 @@ export function IdentityCards() {
               {/* Header */}
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="mb-2 w-8 h-8 rounded-lg flex items-center justify-center bg-primary/8">
-                    <card.Icon size={17} strokeWidth={1.8} className="text-primary" />
+                  <div className="grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white mb-7">
+                    <card.Icon size={22} strokeWidth={1.6} />
                   </div>
                   <h3 className="text-h3 font-bold leading-snug text-ink">{card.persona}</h3>
                   <p className="text-sm mt-0.5 text-ink-subtle">{card.products}</p>

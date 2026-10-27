@@ -15,11 +15,11 @@ const BUTTONS = [
 
 export const 按鈕類型: Story = {
   render: () => (
-    <StoryFrame title="按鈕" intro="行動按鈕依類型選擇固定高度與寫法；所有可互動樣本都帶全站焦點外框。">
+    <StoryFrame title="按鈕" intro="行動按鈕依類型選擇固定高度與寫法；焦點外框由全站規則提供（§3.7），不需另加 class。">
       <div className="grid gap-4 md:grid-cols-2">
         {BUTTONS.map(([id, text]) => {
-          // Button classes and the §3.7 focus ring sit on the same element: one string.
-          const className = specimenClasses(id, 'focus-ring')
+          // The §3.7 focus ring comes from the site-wide rule, not from these classes.
+          const className = specimenClasses(id)
           return (
             <SpecimenBlock key={id} title={specimen(id).label} className={className}>
               <button type="button" className={className}>{text}</button>
@@ -27,21 +27,21 @@ export const 按鈕類型: Story = {
           )
         })}
       </div>
-      <SpecimenBlock title="滿版藥丸 44" className={specimenClasses('button-full-44', 'focus-ring')}>
+      <SpecimenBlock title="滿版藥丸 44" className={specimenClasses('button-full-44')}>
         <div className="max-w-lg">
-          <button type="button" className={specimenClasses('button-full-44', 'focus-ring')}>Complete request</button>
+          <button type="button" className={specimenClasses('button-full-44')}>Complete request</button>
         </div>
       </SpecimenBlock>
       <SpecimenBlock
         title={specimen('button-outline-dark').label}
         lines={[
-          { element: '主要（實心藥丸・標準 44）', code: specimenClasses('button-solid-44', 'focus-ring') },
-          { element: '次要（深底外框，與主要同高）', code: specimenClasses('button-outline-dark', 'focus-ring') },
+          { element: '主要（實心藥丸・標準 44）', code: specimenClasses('button-solid-44') },
+          { element: '次要（深底外框，與主要同高）', code: specimenClasses('button-outline-dark') },
         ]}
       >
         <div className="section-dark flex flex-wrap items-center gap-3 rounded-2xl p-6">
-          <button type="button" className={specimenClasses('button-solid-44', 'focus-ring')}>Primary action</button>
-          <button type="button" className={specimenClasses('button-outline-dark', 'focus-ring')}>Secondary action</button>
+          <button type="button" className={specimenClasses('button-solid-44')}>Primary action</button>
+          <button type="button" className={specimenClasses('button-outline-dark')}>Secondary action</button>
         </div>
       </SpecimenBlock>
       <aside className="rounded-2xl border border-line bg-surface p-6">

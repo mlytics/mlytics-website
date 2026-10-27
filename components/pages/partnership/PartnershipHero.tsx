@@ -5,7 +5,7 @@ export function PartnershipHero() {
     >
       <div className="max-w-3xl mx-auto px-6">
         <span
-          className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark border border-primary/60"
+          className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark"
         >
           Media Partner Program
         </span>

@@ -29,7 +29,7 @@ export function DecisiveEngineHero() {
                 components/not-found/NotFoundContent.tsx's .nf-cdn variant. Keep all
                 three identical. */}
             <span
-              className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full bg-primary/40 text-on-dark border border-primary/60"
+              className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark"
             >
               Mlytics Multi-CDN Intelligence
             </span>
@@ -48,11 +48,7 @@ export function DecisiveEngineHero() {
             {PILLS.map((pill) => (
               <span
                 key={pill}
-                className="px-3 py-1.5 rounded-full text-xs font-semibold text-on-dark"
-                style={{
-                  background: 'rgba(168,197,195,0.08)',
-                  border: '1px solid rgba(168,197,195,0.25)',
-                }}
+                className="px-3 py-1 rounded-full text-xs font-semibold bg-on-dark/8 text-on-dark"
               >
                 {pill}
               </span>

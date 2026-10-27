@@ -51,7 +51,7 @@ export function PlaygroundCTASection({
       {/* `block` is load-bearing: `.label-eyebrow` leaves the span inline, and a
           non-replaced inline element drops the vertical margin, collapsing the
           gap to the eyebrow's own line-height. */}
-      <Eyebrow className={isEmbedded ? 'mb-3 block text-on-dark/55' : 'mb-3 block'}>{eyebrow}</Eyebrow>
+      <Eyebrow dark={isEmbedded} className="mb-3 block">{eyebrow}</Eyebrow>
       <h2 className={isEmbedded ? 'section-heading text-white mb-4' : 'section-heading mb-4 text-ink'}>
         {heading}
       </h2>

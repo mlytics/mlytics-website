@@ -11,7 +11,7 @@ export default function PrivacyPolicyPage() {
     <>
       <div className="section-dark pt-32 pb-12 text-center border-b border-on-dark/12">
         <div className="max-w-3xl mx-auto px-6">
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full bg-primary/40 text-on-dark border border-primary/60">Privacy Policy</span>
+          <span className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark">Privacy Policy</span>
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">Mlytics</h1>
           <p className="text-base max-w-xl mx-auto text-on-dark">Learn about Mlytics Privacy Policy</p>
         </div>
