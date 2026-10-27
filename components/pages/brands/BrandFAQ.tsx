@@ -67,11 +67,11 @@ export function BrandFAQ() {
         </motion.div>
 
         {/* Accordion */}
-        <div style={{ borderTop: '1px solid rgba(0,0,0,0.08)' }}>
+        <div className="border-t border-line">
           {FAQS.map((faq, i) => (
             <motion.div
               key={i}
-              style={{ borderBottom: '1px solid rgba(0,0,0,0.08)' }}
+              className="border-b border-line"
               initial={{ opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}

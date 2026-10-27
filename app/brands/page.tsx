@@ -25,18 +25,17 @@ export default function BrandsPage() {
   return (
     <>
       {/* Hero */}
-      <div className="section-dark pt-32 pb-12 text-center" style={{ borderBottom: '1px solid rgba(168,197,195,0.12)' }}>
+      <div className="section-dark pt-32 pb-12 text-center border-b border-on-dark/12">
         <div className="max-w-3xl mx-auto px-6">
           <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
-            style={{ background: 'rgba(34,93,89,0.4)', color: 'var(--color-on-dark)', border: '1px solid rgba(34,93,89,0.6)' }}
+            className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full bg-primary/40 text-on-dark border border-primary/60"
           >
             For Brands
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4 text-balance">
             Get your brand cited in AI answers.
           </h1>
-          <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--color-on-dark)' }}>
+          <p className="text-base max-w-xl mx-auto text-on-dark">
             Mlytics Cortex places your brand inside the AI answers your buyers already trust — across a managed publisher network with 15M+ monthly active users.
           </p>
         </div>
@@ -52,7 +51,7 @@ export default function BrandsPage() {
       <BrandAEOVsMonitoring />
       <div className="section-white">
         <div className="max-w-5xl mx-auto px-6">
-          <div style={{ height: 1, background: 'rgba(0,0,0,0.06)' }} />
+          <div className="h-px bg-line" />
         </div>
       </div>
       <BrandFAQ />

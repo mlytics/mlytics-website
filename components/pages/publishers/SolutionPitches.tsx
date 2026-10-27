@@ -52,11 +52,7 @@ export function SolutionPitches() {
           {PITCHES.map((pitch, i) => (
             <motion.div
               key={i}
-              className="rounded-2xl overflow-hidden"
-              style={{
-                border: '1px solid rgba(34,93,89,0.14)',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(34,93,89,0.08)',
-              }}
+              className="rounded-2xl overflow-hidden border border-primary/12 shadow-sm"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
@@ -64,8 +60,7 @@ export function SolutionPitches() {
             >
               {/* Label bar */}
               <div
-                className="px-5 py-3 flex items-center justify-between border-b"
-                style={{ background: 'var(--color-primary)', borderColor: 'rgba(168,197,195,0.08)' }}
+                className="px-5 py-3 flex items-center justify-between border-b bg-primary border-on-dark/8"
               >
                 <span className="text-sm font-bold text-white">{pitch.label}</span>
                 <span className="text-xs font-bold tabular-nums text-on-dark/60">
@@ -86,7 +81,7 @@ export function SolutionPitches() {
                 </div>
 
                 {/* Arrow divider */}
-                <div className="hidden md:flex items-center justify-center border-l border-r bg-surface" style={{ borderColor: 'var(--color-line)' }}>
+                <div className="hidden md:flex items-center justify-center border-l border-r bg-surface border-line">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M2 7h10M7.5 3L12 7l-4.5 4" stroke={pitch.accent} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -94,8 +89,7 @@ export function SolutionPitches() {
 
                 {/* Right — Mlytics */}
                 <div
-                  className="p-5 flex flex-col gap-2 border-t md:border-t-0 md:border-l"
-                  style={{ background: 'rgba(34,93,89,0.04)', borderColor: 'rgba(34,93,89,0.12)' }}
+                  className="p-5 flex flex-col gap-2 border-t md:border-t-0 md:border-l bg-primary/6 border-primary/12"
                 >
                   <Eyebrow color={pitch.accent}>
                     Mlytics

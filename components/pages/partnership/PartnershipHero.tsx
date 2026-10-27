@@ -1,13 +1,11 @@
 export function PartnershipHero() {
   return (
     <div
-      className="section-dark pt-32 pb-14 text-center"
-      style={{ borderBottom: '1px solid rgba(168,197,195,0.12)' }}
+      className="section-dark pt-32 pb-14 text-center border-b border-on-dark/12"
     >
       <div className="max-w-3xl mx-auto px-6">
         <span
-          className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark"
-          style={{ border: '1px solid rgba(34,93,89,0.6)' }}
+          className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark border border-primary/60"
         >
           Media Partner Program
         </span>

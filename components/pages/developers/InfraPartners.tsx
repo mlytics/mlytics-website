@@ -78,9 +78,9 @@ function MarqueeRow({ items, reverse = false }: { items: { name: string; src: st
     <div className="relative overflow-hidden">
       {/* Fade edges */}
       <div className="absolute left-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to right, #fff 0%, transparent 100%)' }} />
+        style={{ background: 'linear-gradient(to right, var(--color-white) 0%, transparent 100%)' }} />
       <div className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to left, #fff 0%, transparent 100%)' }} />
+        style={{ background: 'linear-gradient(to left, var(--color-white) 0%, transparent 100%)' }} />
       <div
         className="flex items-center gap-10 py-2"
         style={{
@@ -101,8 +101,7 @@ export function InfraPartners() {
     <section className="section-white py-16 border-t border-line">
       <div className="max-w-4xl mx-auto px-6">
         <motion.p
-          className="label-eyebrow text-center mb-10"
-          style={{ color: 'var(--color-ink-subtle)' }}
+          className="label-eyebrow text-center mb-10 text-ink-subtle"
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
@@ -119,7 +118,7 @@ export function InfraPartners() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.05 }}
         >
-          <p className="label-eyebrow text-center mb-4" style={{ color: 'var(--color-ink-subtle)' }}>
+          <p className="label-eyebrow text-center mb-4 text-ink-subtle">
             Cloud Platforms
           </p>
           <div className="flex flex-wrap items-center justify-center gap-10">
@@ -139,7 +138,7 @@ export function InfraPartners() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <p className="label-eyebrow text-center mb-4" style={{ color: 'var(--color-ink-subtle)' }}>
+          <p className="label-eyebrow text-center mb-4 text-ink-subtle">
             AI Model Providers
           </p>
           <div className="flex flex-wrap items-center justify-center gap-10">
@@ -158,7 +157,7 @@ export function InfraPartners() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.15 }}
         >
-          <p className="label-eyebrow text-center mb-5" style={{ color: 'var(--color-ink-subtle)' }}>
+          <p className="label-eyebrow text-center mb-5 text-ink-subtle">
             Integrated CDN Networks — 12 providers
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8">

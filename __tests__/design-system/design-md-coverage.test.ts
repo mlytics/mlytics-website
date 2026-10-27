@@ -335,7 +335,6 @@ describe('DESIGN.md', () => {
   // key must still have a §10.2 row, and each name must still be missing from
   // the CSS (once the ticket adds it, drop it here).
   const PLANNED_BY_TICKET: Record<string, string[]> = {
-    'DATAI-623': ['--color-error', '--color-error-on-dark'], // §2.2 錯誤色，建議名稱
   }
   const planned = new Set(Object.values(PLANNED_BY_TICKET).flat())
 

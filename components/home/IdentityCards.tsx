@@ -14,7 +14,6 @@ const CARDS: Array<{
   metrics: { label: string; value: string }[]
   cta: string
   href: string
-  accent: string
 }> = [
   {
     persona: 'Media and Content Owner',
@@ -27,7 +26,6 @@ const CARDS: Array<{
     ],
     cta: 'See media and content plan',
     href: '/content-owners',
-    accent: 'var(--color-primary)',
   },
   {
     persona: 'Brand',
@@ -40,7 +38,6 @@ const CARDS: Array<{
     ],
     cta: 'See brand plan',
     href: '/brands',
-    accent: 'var(--color-primary)',
   },
   {
     persona: 'Developer',
@@ -53,7 +50,6 @@ const CARDS: Array<{
     ],
     cta: 'See developer plan',
     href: '/developers',
-    accent: 'var(--color-primary)',
   },
 ]
 
@@ -106,7 +102,7 @@ export function IdentityCards() {
                 {card.metrics.map((m, j) => (
                   <div key={j} className="px-3 py-2.5 rounded-xl bg-surface border border-line">
                     <p className="label-eyebrow mb-0.5 whitespace-nowrap text-ink-subtle">{m.label}</p>
-                    <p className="text-sm font-bold" style={{ color: card.accent }}>{m.value}</p>
+                    <p className="text-sm font-bold text-primary">{m.value}</p>
                   </div>
                 ))}
               </div> */}

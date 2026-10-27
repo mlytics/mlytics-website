@@ -21,7 +21,7 @@ const LAYERS: Array<{
     sublabel: 'Raw attention',
     audience: 'Raw material',
     desc: 'Every page view across media platforms is raw intent signal — unrefined, unmonetized, waiting to be captured.',
-    color: 'rgba(168,197,195,0.15)',
+    color: 'rgba(168,197,195,0.12)',
     borderColor: 'rgba(168,197,195,0.25)',
   },
   {
@@ -30,8 +30,8 @@ const LAYERS: Array<{
     sublabel: 'Route · Observe · Decide',
     audience: 'Developers / Tech',
     desc: 'Every request routed optimally in real time — and every routing decision feeds the intent system.',
-    color: 'rgba(34,93,89,0.2)',
-    borderColor: 'rgba(34,93,89,0.5)',
+    color: 'rgba(34,93,89,0.25)',
+    borderColor: 'rgba(34,93,89,0.55)',
   },
   {
     Icon: PenLine,
@@ -39,8 +39,8 @@ const LAYERS: Array<{
     sublabel: 'Capture weak intent',
     audience: 'Media and Content',
     desc: 'AI-generated Q&A at a fraction of human writing cost — every article becomes an intent capture point.',
-    color: 'rgba(245,158,11,0.08)',
-    borderColor: 'rgba(245,158,11,0.3)',
+    color: 'rgba(34,93,89,0.4)',
+    borderColor: 'rgba(168,197,195,0.25)',
   },
   {
     Icon: MessageSquare,
@@ -48,8 +48,8 @@ const LAYERS: Array<{
     sublabel: 'Capture strong intent',
     audience: 'Media and Content + Brands',
     desc: 'Readers move from browsing to decision. Strong intent captured, qualified, and matched to relevant brands.',
-    color: 'rgba(245,158,11,0.1)',
-    borderColor: 'rgba(245,158,11,0.4)',
+    color: 'rgba(34,93,89,0.55)',
+    borderColor: 'rgba(168,197,195,0.4)',
   },
   {
     Icon: Target,
@@ -57,8 +57,8 @@ const LAYERS: Array<{
     sublabel: 'Qualify · Deliver · Convert',
     audience: 'Brands',
     desc: 'Verified strong intent, delivered CRM-ready. Replaces junior SDR workflow at a fraction of the cost.',
-    color: 'rgba(245,158,11,0.12)',
-    borderColor: 'rgba(245,158,11,0.5)',
+    color: 'rgba(34,93,89,0.7)',
+    borderColor: 'rgba(168,197,195,0.55)',
   },
 ]
 
@@ -173,7 +173,7 @@ export function IntentPipeline() {
         <div className="h-full" style={{ animation: 'flow-particle 3s linear infinite' }}>
           <div
             className="w-1.5 h-1.5 rounded-full bg-gold"
-            style={{ boxShadow: '0 0 6px var(--color-gold)' }}
+            style={{ boxShadow: '0 0 6px rgba(168,197,195,0.6)' }}
           />
         </div>
       </div>
@@ -210,7 +210,7 @@ export function IntentPipeline() {
                 <span className="block flex-1 min-w-0">
                   <span className="flex items-center flex-wrap gap-2">
                     <span className="text-sm font-semibold text-white">{layer.name}</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-white/8 text-on-dark">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-on-dark/8 text-on-dark">
                       {layer.audience}
                     </span>
                   </span>

@@ -18,7 +18,7 @@ interface Country { name: string; iso2: string; dialCode: string }
 const COUNTRIES: Country[] = (allCountries as Country[]).filter(c => c.dialCode)
 
 const inputCls = 'w-full px-3 py-2 text-sm border border-line rounded-lg focus:outline-none focus:border-primary transition-colors'
-const labelCls = 'block text-xs font-medium text-gray-600 mb-1'
+const labelCls = 'block text-xs font-medium text-ink-muted mb-1'
 
 function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: Country) => void }) {
   const [open, setOpen] = useState(false)
@@ -56,29 +56,28 @@ function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: 
         style={{ minWidth: 90 }}
       >
         <span>{isoToFlag(value.iso2)}</span>
-        <span className="text-gray-700">+{value.dialCode}</span>
-        <ChevronDown size={12} className="text-gray-400 ml-0.5" />
+        <span className="text-ink">+{value.dialCode}</span>
+        <ChevronDown size={12} className="text-ink-muted ml-0.5" />
       </button>
       {open && (
         <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-line rounded-xl shadow-xl overflow-hidden" style={{ width: 260 }}>
-          <div className="p-2 border-b border-gray-100 flex items-center gap-2">
-            <Search size={13} className="text-gray-400 flex-shrink-0" />
+          <div className="p-2 border-b border-line flex items-center gap-2">
+            <Search size={13} className="text-ink-muted flex-shrink-0" />
             <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)}
               placeholder="Search country or code..."
-              className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400" />
+              className="flex-1 text-sm outline-none text-ink placeholder:text-ink-muted" />
           </div>
           <div className="overflow-y-auto" style={{ maxHeight: 220 }}>
             {filtered.length === 0 ? (
-              <p className="px-3 py-3 text-xs text-gray-400 text-center">No results</p>
+              <p className="px-3 py-3 text-xs text-ink-muted text-center">No results</p>
             ) : filtered.map(c => (
               <button key={`${c.iso2}-${c.dialCode}`} type="button"
                 onClick={() => { onChange(c); setOpen(false) }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-gray-50 transition-colors text-left"
-                style={{ background: c.iso2 === value.iso2 ? 'rgba(34,93,89,0.06)' : undefined }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left ${c.iso2 === value.iso2 ? 'bg-primary/6' : 'hover:bg-surface'}`}
               >
                 <span className="flex-shrink-0 text-base">{isoToFlag(c.iso2)}</span>
-                <span className="flex-1 text-gray-700 truncate">{c.name.replace(/\s*\(.*?\)\s*/g, '').trim()}</span>
-                <span className="text-gray-400 text-xs flex-shrink-0">+{c.dialCode}</span>
+                <span className="flex-1 text-ink truncate">{c.name.replace(/\s*\(.*?\)\s*/g, '').trim()}</span>
+                <span className="text-ink-muted text-xs flex-shrink-0">+{c.dialCode}</span>
               </button>
             ))}
           </div>
@@ -157,12 +156,12 @@ export function BookADemoForm() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center text-center py-16 gap-4"
         >
-          <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: 'rgba(34,93,89,0.1)' }}>
-            <CheckCircle size={32} style={{ color: 'var(--color-primary)' }} />
+          <div className="w-16 h-16 rounded-full flex items-center justify-center bg-primary/12">
+            <CheckCircle size={32} className="text-primary" />
           </div>
           <div>
-            <p className="text-xl font-semibold text-gray-900">Request received.</p>
-            <p className="text-sm text-gray-500 mt-1">We'll get back to you as soon as possible.</p>
+            <p className="text-xl font-semibold text-ink">Request received.</p>
+            <p className="text-sm text-ink-muted mt-1">We'll get back to you as soon as possible.</p>
           </div>
         </motion.div>
       ) : (

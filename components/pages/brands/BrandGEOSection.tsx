@@ -106,10 +106,10 @@ export function BrandGEOSection() {
 
       {/* ── MAU part ──────────────────────────────────────────────── */}
       <div className="relative z-10 pt-16 lg:pt-20 pb-16" ref={mauRef}>
-        {/* Amber ambient glow */}
+        {/* Ambient glow */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 40%, rgba(245,158,11,0.06) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 40%, rgba(168,197,195,0.06) 0%, transparent 70%)' }}
         />
 
         <div className="max-w-5xl mx-auto px-6 relative z-10 text-center">
@@ -161,8 +161,7 @@ export function BrandGEOSection() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 px-5 py-3 rounded-xl w-full sm:w-[400px] lg:w-auto"
-                style={{ background: 'rgba(168,197,195,0.07)', border: '1px solid rgba(168,197,195,0.12)' }}
+                className="flex items-center gap-3 px-5 py-3 rounded-xl w-full sm:w-[400px] lg:w-auto border border-on-dark/12 bg-on-dark/6"
               >
                 <span className="text-xl font-black tabular-nums w-16 shrink-0 text-gold">{item.stat}</span>
                 <span className="text-sm leading-snug text-left flex-1 text-on-dark/70">{item.desc}</span>
@@ -178,7 +177,7 @@ export function BrandGEOSection() {
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <div style={{ height: 1, background: 'rgba(168,197,195,0.12)' }} />
+          <div className="h-px bg-on-dark/12" />
         </motion.div>
 
         {/* Chart + copy */}
@@ -189,7 +188,7 @@ export function BrandGEOSection() {
           transition={{ duration: 0.6, delay: 0.55 }}
         >
           {/* Left — chart */}
-          <div className="pt-8 pb-4 lg:border-r" style={{ borderColor: 'rgba(168,197,195,0.12)' }}>
+          <div className="pt-8 pb-4 lg:border-r border-on-dark/12">
             <svg ref={chartRef} viewBox={`0 0 ${SVG_W / 2} ${SVG_H}`} className="w-full" style={{ overflow: 'visible' }}>
               <defs>
                 <linearGradient id="geo-mau-fill" x1="0" y1="0" x2="0" y2="1">
@@ -289,7 +288,7 @@ export function BrandGEOSection() {
 
       {/* ── Thin divider ──────────────────────────────────────────── */}
       <div className="max-w-5xl mx-auto px-6">
-        <div style={{ height: 1, background: 'rgba(168,197,195,0.12)' }} />
+        <div className="h-px bg-on-dark/12" />
       </div>
 
       {/* ── Media AEO workflow ────────────────────────────────────── */}
@@ -316,8 +315,8 @@ export function BrandGEOSection() {
         <div className="grid grid-cols-1 sm:grid-cols-5 relative">
           {/* Connecting line — desktop only */}
           <div
-            className="hidden sm:block absolute left-0 right-0 pointer-events-none"
-            style={{ height: 1, top: '4px', background: 'rgba(168,197,195,0.15)' }}
+            className="hidden sm:block absolute left-0 right-0 pointer-events-none bg-on-dark/12"
+            style={{ height: 1, top: '4px' }}
           />
 
           {STEPS.map((step, i) => (
@@ -331,8 +330,8 @@ export function BrandGEOSection() {
             >
               {/* Dot */}
               <div
-                className="hidden sm:block w-[10px] h-[10px] rounded-full mb-4 relative z-10 shrink-0"
-                style={{ background: 'var(--color-on-dark)', border: '2px solid rgba(168,197,195,0.4)' }}
+                className="hidden sm:block w-[10px] h-[10px] rounded-full mb-4 relative z-10 shrink-0 bg-on-dark"
+                style={{ border: '2px solid rgba(168,197,195,0.4)' }}
               />
               {/* Number */}
               <span className="text-xs font-bold tabular-nums mb-2" style={{ color: 'rgba(168,197,195,0.45)' }}>{step.num}</span>
@@ -356,7 +355,7 @@ export function BrandGEOSection() {
         viewport={{ once: true, margin: '-80px' }}
         transition={{ duration: 0.5 }}
       >
-        <div style={{ height: 1, background: 'rgba(168,197,195,0.12)' }} />
+        <div className="h-px bg-on-dark/12" />
       </motion.div>
 
       {/* ── Playground entry point — brands lens ──────────────────── */}

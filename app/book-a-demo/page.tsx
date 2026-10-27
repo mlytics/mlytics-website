@@ -21,20 +21,18 @@ export default function BookADemoPage() {
   return (
     <>
       <div
-        className="section-dark pt-32 pb-12 text-center"
-        style={{ borderBottom: '1px solid rgba(168,197,195,0.12)' }}
+        className="section-dark pt-32 pb-12 text-center border-b border-on-dark/12"
       >
         <div className="max-w-2xl mx-auto px-6">
           <span
-            className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full"
-            style={{ background: 'rgba(34,93,89,0.4)', color: 'var(--color-on-dark)', border: '1px solid rgba(34,93,89,0.6)' }}
+            className="inline-block text-xs font-semibold uppercase tracking-widest mb-4 px-3 py-1.5 rounded-full bg-primary/40 text-on-dark border border-primary/60"
           >
             Contact Sales
           </span>
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
             Let&apos;s use your data to talk.
           </h1>
-          <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--color-on-dark)' }}>
+          <p className="text-base max-w-xl mx-auto text-on-dark">
             We&apos;ll get back to you as soon as possible.
           </p>
         </div>

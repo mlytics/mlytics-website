@@ -36,8 +36,8 @@ function ClientLogo({ name, logo, w, invert, brightness, opacity, maxWidth, heig
   if (failed) {
     return (
       <span
-        className="text-sm font-semibold whitespace-nowrap select-none"
-        style={{ color: 'var(--color-ink-subtle)', letterSpacing: '0.01em' }}
+        className="text-sm font-semibold whitespace-nowrap select-none text-ink-subtle"
+        style={{ letterSpacing: '0.01em' }}
       >
         {name}
       </span>
@@ -78,8 +78,7 @@ export function LogoMarquee({ isFixed = false }: { isFixed?: boolean }) {
       {/* Label — above on mobile, left on desktop */}
       <div className="flex-shrink-0 flex flex-col items-center md:flex-row md:items-center md:gap-3 md:px-5 mb-1.5 md:mb-0">
         <p
-          className="label-eyebrow font-medium whitespace-nowrap"
-          style={{ color: 'var(--color-ink-muted)' }}
+          className="label-eyebrow font-medium whitespace-nowrap text-ink-muted"
         >
           Trusted by
         </p>
@@ -91,12 +90,12 @@ export function LogoMarquee({ isFixed = false }: { isFixed?: boolean }) {
         {/* Left fade */}
         <div
           className="absolute left-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
-          style={{ background: 'linear-gradient(to right, #FFFFFF, transparent)' }}
+          style={{ background: 'linear-gradient(to right, var(--color-white), transparent)' }}
         />
         {/* Right fade */}
         <div
           className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
-          style={{ background: 'linear-gradient(to left, #FFFFFF, transparent)' }}
+          style={{ background: 'linear-gradient(to left, var(--color-white), transparent)' }}
         />
 
         {/* Marquee track */}

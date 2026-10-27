@@ -44,8 +44,8 @@ export function PartnershipHowItWorks() {
         <div className="grid grid-cols-1 md:grid-cols-3 relative">
           {/* Connecting line — desktop only */}
           <div
-            className="hidden md:block absolute left-0 right-0 pointer-events-none"
-            style={{ height: 1, top: '4px', background: 'rgba(0,0,0,0.1)' }}
+            className="hidden md:block absolute left-0 right-0 pointer-events-none bg-line"
+            style={{ height: 1, top: '4px' }}
           />
 
           {STEPS.map((step, i) => (
@@ -62,8 +62,7 @@ export function PartnershipHowItWorks() {
                 className="hidden md:block w-[10px] h-[10px] rounded-full mb-6 relative z-10 shrink-0 bg-primary"
               />
               <span
-                className="text-xs font-bold tabular-nums mb-2"
-                style={{ color: 'rgba(107,107,107,0.5)' }}
+                className="text-xs font-bold tabular-nums mb-2 text-ink-muted"
               >
                 {step.num}
               </span>

@@ -48,9 +48,7 @@ describe('Footer', () => {
     usePathnameMock.mockReturnValue('/ai-mode-playground/')
     render(<Footer />)
 
-    expect(screen.getByRole('link', { name: 'AI Mode' })).toHaveStyle({
-      color: '#fff',
-      fontWeight: 600,
-    })
+    expect(screen.getByRole('link', { name: 'AI Mode' })).toHaveClass('text-white', 'font-semibold')
+    expect(screen.getByRole('link', { name: 'Brands' })).not.toHaveClass('text-white')
   })
 })

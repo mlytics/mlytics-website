@@ -46,7 +46,7 @@ export function ZeroClickSection() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.45, delay: 0.15 + i * 0.08, ease: 'easeOut' }}
             >
-              <p className="text-4xl md:text-5xl font-bold" style={{ color: 'var(--color-warn)' }}>
+              <p className="text-4xl md:text-5xl font-bold text-warn">
                 {inView
                   ? <NumberTicker value={item.value} suffix={item.suffix} duration={900} />
                   : `0${item.suffix}`}

@@ -19,10 +19,14 @@ type InlineEmailCTAProps = {
   ctaLabel: string
   /** sent as HubSpot context.pageName so submissions are attributable per page */
   pageName: string
+  /** background the field sits on — picks the error colour (DESIGN.md §2.2): 'light' = white / light section (home Hero), 'dark' = .section-dark page CTA */
+  tone: 'light' | 'dark'
   className?: string
 }
 
-export function InlineEmailCTA({ ctaLabel, pageName, className }: InlineEmailCTAProps) {
+export function InlineEmailCTA({ ctaLabel, pageName, tone, className }: InlineEmailCTAProps) {
+  const errorText = tone === 'light' ? 'text-error' : 'text-error-on-dark'
+  const errorBorder = tone === 'light' ? 'border-error' : 'border-error-on-dark'
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [status, setStatus] = useState<SubmitStatus>('idle')
@@ -98,7 +102,7 @@ export function InlineEmailCTA({ ctaLabel, pageName, className }: InlineEmailCTA
 
   return (
     <form onSubmit={handleSubmit} noValidate className={`flex flex-col items-center gap-2 w-full max-w-md ${className ?? ''}`}>
-      <div className={`flex items-center w-full rounded-full border bg-white pl-5 pr-1 py-1 transition-colors focus-within:border-primary ${emailError ? 'border-red-400' : 'border-line'}`}>
+      <div className={`flex items-center w-full rounded-full border bg-white pl-5 pr-1 py-1 transition-colors focus-within:border-primary ${emailError ? errorBorder : 'border-line'}`}>
         <input
           type="email"
           required
@@ -124,12 +128,12 @@ export function InlineEmailCTA({ ctaLabel, pageName, className }: InlineEmailCTA
         </button>
       </div>
       {emailError && (
-        <p id={`${ctaLabel}-email-error`} className="text-xs text-red-500 self-start pl-4">
+        <p id={`${ctaLabel}-email-error`} className={`text-xs ${errorText} self-start pl-4`}>
           {emailError}
         </p>
       )}
       {status === 'error' && !emailError && (
-        <p className="text-xs text-red-500">
+        <p className={`text-xs ${errorText}`}>
           Something went wrong — please try again.
         </p>
       )}

@@ -209,8 +209,8 @@ export function Nav() {
   }
 
   const navBg = scrolled
-    ? 'bg-white/80 backdrop-blur-sm border-b border-gray-100/50 shadow-sm'
-    : 'bg-white/80 backdrop-blur-sm border-b border-gray-100/50'
+    ? 'bg-white/80 backdrop-blur-sm border-b border-line shadow-sm'
+    : 'bg-white/80 backdrop-blur-sm border-b border-line'
 
   const logoColor = 'text-primary'
   const linkColor = 'text-ink-muted hover:text-primary'

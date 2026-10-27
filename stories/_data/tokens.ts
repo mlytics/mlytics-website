@@ -18,4 +18,6 @@ export const COLOR_TOKENS: ColorToken[] = [
   { token: '--color-ink-subtle', hex: '#9B9B9B', usage: '不可用於文字' },
   { token: '--color-on-dark', hex: '#A8C5C3', usage: '深底文字' },
   { token: '--color-line', hex: '#E5E5E5', usage: '淺底框線與分隔線' },
+  { token: '--color-error', hex: '#B91C1C', usage: '錯誤提示專用，淺底的錯誤訊息與錯誤框線（§2.2）' },
+  { token: '--color-error-on-dark', hex: '#FCA5A5', usage: '錯誤提示專用，深底的錯誤訊息與錯誤框線（§2.2）' },
 ]
