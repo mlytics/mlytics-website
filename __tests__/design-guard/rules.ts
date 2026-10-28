@@ -2,8 +2,10 @@
 // §2.1 colour tokens, §2.3 transparency (two bases, fixed alpha ladder),
 // §2.7／§2.9 type, §2.10 spacing scale. These functions only look at one
 // file's text; repo-wide bookkeeping lives in ledger.ts.
+import postcss from 'postcss'
+import ts from 'typescript'
 
-export type Kind = 'hex' | 'color-fn' | 'arbitrary' | 'opacity'
+export type Kind = 'hex' | 'color-fn' | 'named-color' | 'arbitrary' | 'opacity'
 
 export interface Violation {
   file: string
@@ -31,8 +33,88 @@ export function stripComments(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, blank).replace(/^[ \t]*\/\/.*$/gm, blank)
 }
 
-/** Blanks every exact occurrence of `text`. */
-export const blankText = (source: string, text: string) => source.split(text).join(blank(text))
+type LiteralContext = { output: string; offsets: Array<number | null>; combined: boolean }
+
+function literalContexts(source: string): LiteralContext[] {
+  const file = ts.createSourceFile('approved.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+  const contexts: LiteralContext[] = []
+  const unwrap = (node: ts.Expression): ts.Expression => ts.isParenthesizedExpression(node) ? unwrap(node.expression) : node
+  const combined = (node: ts.Node): boolean => {
+    let current = node
+    while (ts.isParenthesizedExpression(current.parent)) current = current.parent
+    return ts.isBinaryExpression(current.parent) && current.parent.operatorToken.kind === ts.SyntaxKind.PlusToken
+  }
+  const build = (node: ts.Expression): LiteralContext => {
+    node = unwrap(node)
+    if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) {
+      const start = node.getStart(file) + 1
+      const end = node.getEnd() - 1
+      const raw = source.slice(start, end)
+      if (raw.includes('\\') || raw !== node.text) return { output: '\0', offsets: [null], combined: false }
+      return { output: raw, offsets: raw.split('').map((_, index) => start + index), combined: false }
+    }
+    if (ts.isTemplateExpression(node)) {
+      let output = ''
+      const offsets: Array<number | null> = []
+      const append = (start: number, end: number) => {
+        const raw = source.slice(start, end)
+        if (raw.includes('\\')) { output += '\0'; offsets.push(null); return }
+        output += raw
+        for (let i = start; i < end; i++) offsets.push(i)
+      }
+      append(node.head.getStart(file) + 1, node.head.getEnd() - 2)
+      for (const span of node.templateSpans) {
+        const part = build(span.expression)
+        output += part.output
+        offsets.push(...part.offsets)
+        const tail = span.literal
+        append(tail.getStart(file) + 1, tail.getEnd() - (ts.isTemplateTail(tail) ? 1 : 2))
+      }
+      return { output, offsets, combined: false }
+    }
+    return { output: '\0', offsets: [null], combined: false }
+  }
+  const visit = (node: ts.Node) => {
+    if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) || ts.isTemplateExpression(node)) {
+      const context = build(node)
+      contexts.push({ ...context, combined: combined(node) })
+      return // The outer template owns every nested literal.
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(file)
+  return contexts
+}
+
+/** Blanks approved occurrences using one immutable AST snapshot of the original source. */
+export function blankApprovedTexts(source: string, approvals: ReadonlyArray<{ text: string; wholeValue?: boolean }>): string {
+  const contexts = literalContexts(source)
+  const positions = new Set<number>()
+  for (const { text, wholeValue } of approvals) {
+    if (!text) continue
+    for (const context of contexts) {
+      if (context.combined) continue
+      for (let at = context.output.indexOf(text); at >= 0; at = context.output.indexOf(text, at + 1)) {
+        const end = at + text.length
+        const complete = wholeValue
+          ? at === 0 && end === context.output.length
+          : (at === 0 || /\s/.test(context.output[at - 1])) && (end === context.output.length || /\s/.test(context.output[end]))
+        if (!complete) continue
+        const offsets = context.offsets.slice(at, end)
+        if (offsets.some((offset) => offset === null)) continue
+        for (const offset of offsets) positions.add(offset!)
+      }
+    }
+  }
+  const chars = source.split('')
+  for (const offset of positions) if (chars[offset] !== '\n') chars[offset] = ' '
+  return chars.join('')
+}
+
+/** Blanks a complete class token or property value, never a substring of a longer token. */
+export function blankText(source: string, text: string, wholeValue = false): string {
+  return blankApprovedTexts(source, [{ text, wholeValue }])
+}
 
 const lineOf = (source: string, index: number) => source.slice(0, index).split('\n').length
 
@@ -40,8 +122,79 @@ const lineOf = (source: string, index: number) => source.slice(0, index).split('
 // `_` is allowed so `shadow-[0_0_0_1px_#fff]` is seen)
 // and not followed by a word char or hyphen (so `#section-2` and `#faq` are not colours).
 const HEX = /(?<![&0-9A-Za-z])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})(?![\w-])/g
-const COLOR_FN = /(?<![A-Za-z0-9-])(?:rgba?|hsla?)\([^)]*\)/g
-const RGBA = /^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d*\.?\d+)\s*)?\)$/
+const COLOR_FN_START = /(?<![A-Za-z0-9-])(?:rgba?|hsla?|oklch|oklab|lab|lch|hwb|color-mix)\(/gi
+const RGBA = /^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d*\.?\d+)\s*)?\)$/i
+
+function* colourFunctions(code: string): Generator<{ index: number; match: string }> {
+  let coveredUntil = 0
+  for (const start of code.matchAll(COLOR_FN_START)) {
+    if (start.index! < coveredUntil) continue
+    const open = start.index! + start[0].length - 1
+    let depth = 1
+    let end = open + 1
+    for (; end < code.length && depth > 0; end++) {
+      if (code[end] === '(') depth++
+      if (code[end] === ')') depth--
+    }
+    if (depth === 0) {
+      coveredUntil = end
+      yield { index: start.index!, match: code.slice(start.index!, end) }
+    }
+  }
+}
+
+// CSS named colours only; special paint keywords such as transparent and currentColor
+// are intentionally absent. The context scanner below avoids prose and Tailwind tokens.
+const NAMED_COLORS = new Set(`aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue slateblue slategray slategrey snow springgreen steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen`.split(' '))
+
+function namedInValue(value: string, base: number, push: (index: number, match: string) => void) {
+  const withoutReferences = value.replace(/url\([^)]*\)/gi, blank)
+  for (const word of withoutReferences.matchAll(/(?<![\w-])[a-z]+(?![\w-])/gi)) {
+    if (NAMED_COLORS.has(word[0].toLowerCase())) push(base + word.index!, word[0])
+  }
+}
+
+function namedColours(file: string, code: string, push: (index: number, match: string) => void) {
+  if (file.endsWith('.css')) {
+    const alphaMasks = new Map<number, boolean>()
+    try {
+      const root = postcss.parse(code)
+      root.walkDecls((decl) => {
+        if (!/^(?:-webkit-)?mask-image$/i.test(decl.prop)) return
+        const siblings = decl.parent?.nodes?.filter((node): node is postcss.Declaration => node.type === 'decl' && node.prop.toLowerCase() === 'mask-mode') ?? []
+        let winner: postcss.Declaration | undefined
+        for (const mode of siblings) if (!winner || (mode.important && !winner.important) || mode.important === winner.important) winner = mode
+        alphaMasks.set(decl.source?.start?.offset ?? -1, !winner || alphaModeList(winner.value))
+      })
+    } catch { /* Invalid CSS cannot prove that a mask uses alpha. */ }
+    const declarations = /(?:^|[;{}])\s*((?:-webkit-)?mask-image|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|inline(?:-start|-end)?|block(?:-start|-end)?))?(?:-color)?|outline(?:-color)?|text-decoration(?:-color)?|box-shadow|text-shadow|--[\w-]+|fill|stroke|color)\s*:\s*([^;{}]*)/gim
+    for (const m of code.matchAll(declarations)) {
+      const property = m[1]
+      const value = m[2]
+      if (property.toLowerCase().endsWith('mask-image')) {
+        if (alphaMasks.get(m.index! + m[0].indexOf(property))) continue
+      }
+      namedInValue(value, m.index! + m[0].lastIndexOf(value), push)
+    }
+    return
+  }
+  for (const style of code.matchAll(/\bstyle\s*=\s*\{\{([\s\S]*?)\}\}/g)) {
+    const body = style[1]
+    const lastModeKey = [...body.matchAll(/['"]?(?:WebkitMaskMode|maskMode)['"]?\s*:/g)].at(-1)
+    const mode = lastModeKey ? body.slice(lastModeKey.index! + lastModeKey[0].length).match(/^\s*(['"`])([^'"`]*)\1/)?.[2] : undefined
+    const alphaMask = !lastModeKey || (mode !== undefined && alphaModeList(mode))
+    for (const prop of body.matchAll(/(?<![\w-])['"]?(WebkitMaskImage|maskImage|background(?:Color|Image)?|border(?:Top|Right|Bottom|Left|Inline|Block)?(?:Color)?|outline(?:Color)?|textDecoration(?:Color)?|boxShadow|textShadow|fill|stroke|color)['"]?\s*:\s*(['"`])([^'"`]*?)\2/g)) {
+      if ((prop[1] === 'maskImage' || prop[1] === 'WebkitMaskImage') && alphaMask) continue
+      namedInValue(prop[3], style.index! + style[0].indexOf(body) + prop.index! + prop[0].indexOf(prop[3]), push)
+    }
+  }
+  for (const attr of code.matchAll(/\b(?:fill|stroke|color|stopColor)\s*=\s*(?:\{\s*)?(['"`])([^'"`]*)\1(?:\s*\})?/g)) {
+    if (attr[1] === '`' && attr[2].includes('${')) continue
+    namedInValue(attr[2], attr.index! + attr[0].indexOf(attr[2]), push)
+  }
+}
+
+const alphaModeList = (mode: string) => mode.split(',').every((part) => part.trim().toLowerCase() === 'alpha')
 
 export function parseRgba(match: string): { base: 'primary' | 'on-dark' | null; alpha: number | null } | null {
   const m = match.match(RGBA)
@@ -64,7 +217,8 @@ function colorFnHint(match: string): string | null {
 // A class token with an arbitrary value: optional variant chain (variants may
 // themselves be arbitrary, e.g. `max-[420px]:`, `[&>svg]:`, `*:`, `group-hover/item:`), optional leading minus,
 // utility name, `-[value]`. The lookbehind stops matches starting mid-token.
-const ARBITRARY = /(?<![\w\-[\]:/*])((?:(?:[\w/-]+(?:-\[[^\]\s]+\])?|\[[^\]\s]+\]|\*):)*)(-?)([a-z][a-z0-9]*(?:-[a-z0-9]+)*)-\[([^\]\s'"`]+)\]/g
+const VARIANT = String.raw`(?:\*+|[\w-]+(?:-\[[^\]\s]+\])?(?:/[\w-]+)?|\[[^\]\s]+\]):`
+const ARBITRARY = new RegExp(String.raw`(?<![\w\-[\]:/*])((?:${VARIANT})*)(-?)([a-z][a-z0-9]*(?:-[a-z0-9]+)*)-\[([^\]\s'"\x60]+)\]`, 'g')
 
 const SPACING = /^(?:p|px|py|pt|pr|pb|pl|ps|pe|m|mx|my|mt|mr|mb|ml|ms|me|gap|gap-x|gap-y|space-x|space-y)$/
 // ONE list of colour utilities, used by the arbitrary-colour check and the opacity check.
@@ -72,7 +226,7 @@ const SPACING = /^(?:p|px|py|pt|pr|pb|pl|ps|pe|m|mx|my|mt|mr|mb|ml|ms|me|gap|gap
 const COLOR_UTILITY_NAMES =
   '(?:drop-shadow|inset-shadow|inset-ring|ring-offset|placeholder|border-[trblxyse]|border|text|bg|fill|stroke|ring|outline|from|via|to|decoration|divide|caret|accent|shadow)'
 const COLOR_UTILITY = new RegExp(`^${COLOR_UTILITY_NAMES}$`)
-const COLOR_VALUE = /^(?:#|rgba?\(|hsla?\(|color:|var\(--color)/
+const COLOR_VALUE = /^(?:#|rgba?\(|hsla?\(|oklch\(|oklab\(|lab\(|lch\(|hwb\(|color-mix\(|color:|var\(--color)/
 const OUTLINE_PADDING = /^p[xy]?$/
 const OUTLINE_CALC = /^calc\(\d*\.?\d+rem-1px\)$/
 /** The DESIGN.md wording that sanctions OUTLINE_CALC; repo.test.ts checks it is still there. */
@@ -86,7 +240,9 @@ const toPx = (value: string): number | null => {
 }
 
 function arbitraryHint(minus: string, utility: string, value: string): string | null {
-  if (COLOR_UTILITY.test(utility) && COLOR_VALUE.test(value)) {
+  let containsNamed = false
+  namedInValue(value.replace(/_/g, ' '), 0, () => { containsNamed = true })
+  if (COLOR_UTILITY.test(utility) && (COLOR_VALUE.test(value) || containsNamed)) {
     return 'DESIGN.md §2.1／§2.3：顏色不可寫成方括號，改用色彩 token class（例：bg-primary、text-on-dark、bg-primary/8）'
   }
   if (SPACING.test(utility)) {
@@ -106,7 +262,7 @@ function arbitraryHint(minus: string, utility: string, value: string): string | 
 // A colour utility with an opacity modifier: `<variants>?<utility>-<colour>/<alpha>`, alpha an
 // integer percent (`/30`) or a bracket value (`/[0.3]`, `/[.3]`, `/[30%]`). Same prefix handling as ARBITRARY.
 const OPACITY = new RegExp(
-  String.raw`(?<![\w\-[\]:/*])((?:(?:[\w/-]+(?:-\[[^\]\s]+\])?|\[[^\]\s]+\]|\*):)*)(-?)(${COLOR_UTILITY_NAMES})-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)/(\d+(?:\.\d+)?|\[[^\]\s'"\x60]+\])(?![\w/\-[])`,
+  String.raw`(?<![\w\-[\]:/*])((?:${VARIANT})*)(-?)(${COLOR_UTILITY_NAMES})-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)/(\d+(?:\.\d+)?|\[[^\]\s'"\x60]+\])(?![\w/\-[])`,
   'g',
 )
 const TEXT_SIZE = /^(?:xs|sm|base|lg|[2-9]?xl)$/ // `text-sm/6` is font-size/line-height, not a colour
@@ -143,10 +299,11 @@ export function findViolations(file: string, source: string): Violation[] {
   for (const m of code.matchAll(HEX)) {
     push(m.index!, 'hex', m[0], 'DESIGN.md §2.1：不可寫死色碼，改用色彩 token（例：白色用 text-white／bg-white）')
   }
-  for (const m of code.matchAll(COLOR_FN)) {
-    const hint = colorFnHint(m[0])
-    if (hint) push(m.index!, 'color-fn', m[0], hint)
+  for (const m of colourFunctions(code)) {
+    const hint = colorFnHint(m.match)
+    if (hint) push(m.index, 'color-fn', m.match, hint)
   }
+  namedColours(file, code, (index, match) => push(index, 'named-color', match, 'DESIGN.md §2.1：可見顏色請改用色彩 token 或白色 Tailwind class'))
   if (!file.endsWith('.css')) {
     for (const m of code.matchAll(ARBITRARY)) {
       const hint = arbitraryHint(m[2], m[3], m[4])
