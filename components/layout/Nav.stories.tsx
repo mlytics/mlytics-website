@@ -22,7 +22,7 @@ export const 規格說明: Story = {
       <SpecimenBlock title="外觀" lines={[{ element: '掛載位置（app/layout.tsx 的 <body> 內，<main> 之前）', code: '<Nav />' }]}>
         <ul className="space-y-1 text-sm leading-relaxed text-ink-muted">
           <li>高 65px；fixed、z-50；底色 bg-white/80 加 backdrop-blur-sm（§2.3 核准例外）；底線 1px border-line。</li>
-          <li>連結 14／500 text-ink-muted、滑過主色；目前頁 14／600 主色。</li>
+          <li>連結 14／500 text-ink、滑過主色；目前頁 14／600 主色（顏色與滿版選單連結相同；半透明白底蓋在深色區塊上會變灰，不可用 text-ink-muted）。</li>
         </ul>
       </SpecimenBlock>
       <SpecimenBlock title="入口排法" lines={[{ element: '桌機右側（≥1024）', code: '[Book a Demo 外框 36｜Try AI Mode 實心 36]' }]}>

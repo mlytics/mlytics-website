@@ -94,6 +94,32 @@ const scrollToScrolledState = async (page: Page) => {
   }).toPass({ timeout: 6000 })
 }
 
+// Scroll until a dark section below the hero sits under the Nav, then scroll up
+// a little so the desktop Nav slides back in over it (DATAI-680: the
+// translucent Nav over a dark section is where text-ink-muted fell to 3.69:1).
+const scrollNavOverDarkSection = async (page: Page) => {
+  const target = await page.evaluate(() => {
+    const s = [...document.querySelectorAll<HTMLElement>('.section-dark')]
+      .find((e) => e.getBoundingClientRect().top + window.scrollY > 300)
+    return s ? Math.round(s.getBoundingClientRect().top + window.scrollY + 40) : null
+  })
+  expect(target, 'page has a dark section below the hero').not.toBeNull()
+  const nav = page.locator('nav.fixed')
+  await expect(async () => {
+    await page.evaluate((y) => window.scrollTo({ top: y + 150, behavior: 'instant' }), target!)
+    await page.waitForTimeout(100)
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), target!)
+    await expect.poll(async () => (await nav.boundingBox())!.y, { timeout: 1000 }).toBe(0)
+  }).toPass({ timeout: 6000 })
+  const overDark = await page.evaluate(() => {
+    const n = document.querySelector('nav.fixed')!
+    const r = n.getBoundingClientRect()
+    const under = document.elementsFromPoint(r.width / 2, r.bottom - 10).find((e) => !n.contains(e))
+    return !!under?.closest('.section-dark')
+  })
+  expect(overDark, 'a dark section is under the Nav').toBe(true)
+}
+
 test.describe('desktop 1280', () => {
   test.use({ viewport: { width: 1280, height: 800 } })
 
@@ -124,6 +150,26 @@ test.describe('desktop 1280', () => {
           const m = await measureButton(page, label)
           expect.soft(m.text, `${label} text ${JSON.stringify(m)}`).toBeGreaterThanOrEqual(4.5)
           expect.soft(m.boundary, `${label} boundary ${JSON.stringify(m)}`).toBeGreaterThanOrEqual(3)
+        }
+      })
+    }
+  }
+
+  // DATAI-680: the four center links over a dark hero (/brands/, /content-owners/,
+  // /does-not-exist/) or a dark section further down were 3.69:1 with text-ink-muted.
+  // measureButton composites the nav layer over the page element under it, which
+  // is what is actually painted.
+  for (const path of ['/', '/brands/', '/content-owners/', '/does-not-exist/']) {
+    for (const state of ['top', 'over dark section'] as const) {
+      // The 404 page is one dark viewport tall: its top already is the dark case.
+      if (path === '/does-not-exist/' && state !== 'top') continue
+      test(`nav link contrast on ${path} (${state})`, async ({ page }) => {
+        await page.goto(path)
+        await expect(page.locator(DESKTOP_GROUP)).toBeVisible()
+        if (state !== 'top') await scrollNavOverDarkSection(page)
+        for (const label of ['Media and Content', 'Brands', 'Developers', 'Partnership']) {
+          const m = await measureButton(page, label)
+          expect.soft(m.text, `${label} text ${JSON.stringify(m)}`).toBeGreaterThanOrEqual(4.5)
         }
       })
     }
