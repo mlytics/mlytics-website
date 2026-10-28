@@ -1,5 +1,6 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { IdentityCards } from '@/components/home/IdentityCards'
 
 vi.mock('framer-motion', () => ({
@@ -11,20 +12,22 @@ vi.mock('framer-motion', () => ({
 }))
 
 vi.mock('next/link', () => ({
-  default: ({
-    href,
-    children,
-    className,
-  }: {
+  default: ({ href, children, className, onClick, ...rest }: {
     href: string
     children: React.ReactNode
     className?: string
+    onClick?: React.MouseEventHandler<HTMLAnchorElement>
   }) => (
-    <a href={href} className={className}>
+    <a href={href} className={className} {...rest}
+      onClick={(e) => { e.preventDefault(); onClick?.(e) }}>
       {children}
     </a>
   ),
 }))
+
+const trackCTA = vi.hoisted(() => vi.fn())
+vi.mock('@/lib/analytics', () => ({ trackCTA }))
+afterEach(() => { trackCTA.mockClear(); vi.unstubAllGlobals() })
 
 describe('IdentityCards', () => {
   describe('structure', () => {
@@ -107,5 +110,39 @@ describe('IdentityCards', () => {
       const { container } = render(<IdentityCards />)
       expect(container).toMatchSnapshot()
     })
+  })
+})
+
+function stubWidth(width: number) {
+  vi.stubGlobal('matchMedia', vi.fn((query: string) => {
+    const m = /min-width:\s*([\d.]+)rem/.exec(query)
+    const min = m ? parseFloat(m[1]) * 16 : 0
+    return { matches: width >= min, media: query, onchange: null,
+      addEventListener: vi.fn(), removeEventListener: vi.fn(),
+      addListener: vi.fn(), removeListener: vi.fn(), dispatchEvent: vi.fn() }
+  }))
+}
+
+describe('tracking (DATAI-628, DECISIONS #53)', () => {
+  const FULL = [
+    ['See media and content plan', 'home_identity_content_owners'],
+    ['See brand plan', 'home_identity_brands'],
+    ['See developer plan', 'home_identity_developers'],
+  ] as const
+
+  it.each([375, 1280])('records the full on-screen label at %ipx', async (w) => {
+    stubWidth(w)
+    render(<IdentityCards />)
+    const links = screen.getAllByRole('link')
+    for (let i = 0; i < 3; i++) await userEvent.click(links[i])
+    expect(trackCTA.mock.calls).toEqual(FULL.map(([l, p]) => [l, p]))
+  })
+
+  it.each([768, 1023])('records "Learn more" with the card position at %ipx', async (w) => {
+    stubWidth(w)
+    render(<IdentityCards />)
+    const links = screen.getAllByRole('link')
+    for (let i = 0; i < 3; i++) await userEvent.click(links[i])
+    expect(trackCTA.mock.calls).toEqual(FULL.map(([, p]) => ['Learn more', p]))
   })
 })

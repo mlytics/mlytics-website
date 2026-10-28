@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { trackCTA } from '@/lib/analytics'
 
 /**
  * Same-origin, like every other book-a-demo CTA in the app (Nav, Footer,
@@ -62,6 +65,7 @@ function CdnNotFound() {
             "Explore More Multi-CDN". */}
         <Link
           href={DECISIVE_ENGINE}
+          onClick={() => trackCTA('Explore More', 'not_found_cdn')}
           className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
         >
           Explore More <span className="sr-only">Multi-CDN</span>
@@ -72,6 +76,7 @@ function CdnNotFound() {
             overrides. */}
         <Link
           href={BOOK_A_DEMO}
+          onClick={() => trackCTA('Contact Us', 'not_found_cdn')}
           className="pill-btn pill-btn--dark"
         >
           Contact Us
@@ -94,6 +99,7 @@ function DefaultNotFound() {
       </p>
       <Link
         href="/"
+        onClick={() => trackCTA('Back to Home', 'not_found')}
         className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
       >
         Back to Home

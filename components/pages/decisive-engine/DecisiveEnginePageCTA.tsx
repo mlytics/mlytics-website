@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { EngineFAQ } from '@/components/pages/decisive-engine/EngineFAQ'
+import { trackCTA } from '@/lib/analytics'
 
 const OUTCOMES = [
   'Better regional performance through measured CDN selection',
@@ -62,6 +63,7 @@ export function DecisiveEnginePageCTA() {
           </p>
           <Link
             href="/book-a-demo"
+            onClick={() => trackCTA('Contact Us', 'decisive_engine_cta')}
             className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
           >
             Contact Us

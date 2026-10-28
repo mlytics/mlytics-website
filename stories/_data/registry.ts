@@ -96,7 +96,7 @@ export const REGISTRY: RegistryEntry[] = [
     component: 'BrandPageCTA',
     file: 'components/pages/brands/BrandPageCTA.tsx',
     status: 'pending',
-    tickets: ['DATAI-620', 'DATAI-628'],
+    tickets: ['DATAI-620'],
     livePage: '/brands/',
     standard: '深色、上下 64、置中的標題組加 InlineEmailCTA；產品頁變體改用標準 44「Contact Us」（§5.4）。',
   },
