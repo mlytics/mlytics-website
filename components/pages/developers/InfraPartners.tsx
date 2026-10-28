@@ -46,7 +46,7 @@ function HoverLogo({ name, src, height = 28 }: { name: string; src: string | nul
 
   if (!src || failed) {
     return (
-      <span className="text-xs font-semibold whitespace-nowrap text-ink-subtle">
+      <span className="text-xs font-semibold whitespace-nowrap text-ink-muted">
         {name}
       </span>
     )
@@ -101,7 +101,7 @@ export function InfraPartners() {
     <section className="section-white py-16 border-t border-line">
       <div className="max-w-4xl mx-auto px-6">
         <motion.p
-          className="label-eyebrow text-center mb-10 text-ink-subtle"
+          className="label-eyebrow text-center mb-10 text-ink-muted"
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
@@ -118,7 +118,7 @@ export function InfraPartners() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.05 }}
         >
-          <p className="label-eyebrow text-center mb-4 text-ink-subtle">
+          <p className="label-eyebrow text-center mb-4 text-ink-muted">
             Cloud Platforms
           </p>
           <div className="flex flex-wrap items-center justify-center gap-10">
@@ -138,7 +138,7 @@ export function InfraPartners() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <p className="label-eyebrow text-center mb-4 text-ink-subtle">
+          <p className="label-eyebrow text-center mb-4 text-ink-muted">
             AI Model Providers
           </p>
           <div className="flex flex-wrap items-center justify-center gap-10">
@@ -157,7 +157,7 @@ export function InfraPartners() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.15 }}
         >
-          <p className="label-eyebrow text-center mb-5 text-ink-subtle">
+          <p className="label-eyebrow text-center mb-5 text-ink-muted">
             Integrated CDN Networks — 12 providers
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8">

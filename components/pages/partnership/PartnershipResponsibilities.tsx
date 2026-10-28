@@ -82,7 +82,7 @@ export function PartnershipResponsibilities() {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
-            <p className="label-eyebrow mb-5 text-ink-subtle">
+            <p className="label-eyebrow mb-5 text-ink-muted">
               What you bring
             </p>
             <ul className="space-y-3">

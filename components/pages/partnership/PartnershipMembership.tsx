@@ -44,7 +44,7 @@ export function PartnershipMembership() {
               className="flex items-start justify-between gap-4 mb-6 pb-6 border-b border-line"
             >
               <div>
-                <p className="text-sm font-semibold mb-1 text-ink-subtle">
+                <p className="text-sm font-semibold mb-1 text-ink-muted">
                   Starter Membership
                 </p>
                 <p className="text-4xl font-black text-primary">
@@ -100,7 +100,7 @@ export function PartnershipMembership() {
               className="flex items-start justify-between gap-4 mb-6 pb-6 border-b border-primary/12"
             >
               <div>
-                <p className="text-sm font-semibold mb-1 text-ink-subtle">
+                <p className="text-sm font-semibold mb-1 text-ink-muted">
                   Enterprise
                 </p>
                 <p className="text-4xl font-black text-primary">
@@ -122,7 +122,7 @@ export function PartnershipMembership() {
         </div>
 
         <motion.p
-          className="text-xs text-center mt-6 text-ink-subtle"
+          className="text-xs text-center mt-6 text-ink-muted"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}

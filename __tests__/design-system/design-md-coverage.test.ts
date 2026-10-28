@@ -602,7 +602,7 @@ describe('storybook registry', () => {
     // MDX can import and render components, so both are entry points. So is
     // .storybook/preview.ts(x): its decorators wrap every story. (main.ts is
     // Node-side config and is never loaded into the preview.)
-    const entries = ['stories', 'components'].flatMap((dir) =>
+    const entries = ['stories', 'components', 'app'].flatMap((dir) =>
       (readdirSync(resolve(root, dir), { recursive: true }) as string[])
         .filter((f) => /\.stories\.tsx?$|\.mdx$/.test(f))
         .map((f) => join(dir, f)))
