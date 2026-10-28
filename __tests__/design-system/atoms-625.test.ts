@@ -58,7 +58,7 @@ describe('badges, card padding, info pills', () => {
     expect(read('components/pages/decisive-engine/DecisiveEngineHero.tsx')).not.toContain("border: '1px solid rgba(168,197,195,0.25)'")
     expect(read('components/pages/partnership/PartnershipMembership.tsx').match(/px-3 py-1 rounded-full text-xs font-semibold shrink-0/g)).toHaveLength(2)
     expect(read('components/pages/partnership/PartnershipMembership.tsx')).not.toContain('rgba(34,93,89,0.12)')
-    expect(read('components/home/IntentPipeline.tsx')).toContain('px-3 py-1 rounded-full text-xs font-semibold bg-on-dark/8 text-on-dark')
+    expect(read('components/home/IntentPipeline.tsx')).toContain("px-3 py-1 rounded-full text-xs font-semibold bg-on-dark/8 ${isOpen ? 'text-white' : 'text-on-dark'}")
     expect(read('components/pages/decisive-engine/DecisionLoop.tsx')).toContain('px-3 py-1 rounded-full text-xs font-semibold bg-primary/8 text-primary')
   })
   it('pipeline node badge border is 1px', () => {

@@ -17,7 +17,7 @@ function isoToFlag(iso2: string) {
 interface Country { name: string; iso2: string; dialCode: string }
 const COUNTRIES: Country[] = (allCountries as Country[]).filter(c => c.dialCode)
 
-const inputCls = 'w-full px-3 py-2 text-sm border border-line rounded-lg focus:border-primary transition-colors'
+const inputCls = 'w-full px-3 py-2 text-sm border border-line rounded-lg focus:border-primary transition-colors placeholder:text-ink-muted'
 const labelCls = 'block text-xs font-medium text-ink-muted mb-1'
 
 function CountryCodePicker({ value, onChange }: { value: Country; onChange: (c: Country) => void }) {

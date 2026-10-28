@@ -29,7 +29,7 @@ export const 規格說明: Story = {
         <ul className="space-y-1 text-sm leading-relaxed text-ink-muted">
           <li>每列是真正的 &lt;button&gt;，帶 aria-expanded 與 aria-controls；外觀不像行動按鈕。</li>
           <li>節點用流程圖專用小底座（§3.12）：32px 圓形、框線 1px、內放 15px 圖示。</li>
-          <li>受眾標籤是內容區資訊小膠囊深底版（§3.14）。</li>
+          <li>受眾標籤是內容區資訊小膠囊深底版（§3.14）。選中列字改白。</li>
         </ul>
       </SpecimenBlock>
     </StoryFrame>

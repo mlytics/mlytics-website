@@ -63,7 +63,7 @@ export function SolutionPitches() {
                 className="px-5 py-3 flex items-center justify-between border-b bg-primary border-on-dark/8"
               >
                 <span className="text-sm font-bold text-white">{pitch.label}</span>
-                <span className="text-xs font-bold tabular-nums text-on-dark/60">
+                <span className="text-xs font-bold tabular-nums text-white">
                   {pitch.num}
                 </span>
               </div>
@@ -72,7 +72,7 @@ export function SolutionPitches() {
               <div className="grid md:grid-cols-[1fr_40px_1fr]">
                 {/* Left — Them (muted) */}
                 <div className="p-5 flex flex-col gap-2 bg-surface">
-                  <Eyebrow color="var(--color-ink-subtle)">
+                  <Eyebrow color="var(--color-ink-muted)">
                     {pitch.them.who}
                   </Eyebrow>
                   <p className="text-sm md:text-base leading-relaxed text-ink-muted">

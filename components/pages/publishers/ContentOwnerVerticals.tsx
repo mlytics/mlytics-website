@@ -84,7 +84,7 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[number]; i: number }
       onMouseLeave={() => setHovered(false)}
     >
       <p
-        className={`text-xs font-bold uppercase tracking-widest mb-4 transition-colors duration-200 ${hovered ? 'text-primary' : 'text-ink-subtle'}`}
+        className={`text-xs font-bold uppercase tracking-widest mb-4 transition-colors duration-200 ${hovered ? 'text-primary' : 'text-ink-muted'}`}
       >
         {item.vertical}
       </p>

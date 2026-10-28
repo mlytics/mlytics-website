@@ -75,7 +75,6 @@
 | `--color-error-on-dark` | `#FCA5A5` | 深底錯誤提示、錯誤框線（§2.2） | 只用於錯誤提示；不可用在淺底 |
 
 <!-- src: tok-color-accents, tok-color-primary-dark-alias, cross-contrast-ink-subtle, cross-contrast-primary-on-dark, cross-contrast-ondark-on-white, #29-8 -->
-- 現況偏離：見 §10 DATAI-622（`text-ink-subtle` 當文字、主色字放在深底、淡綠字放在白面板）
 
 ### 2.2 錯誤色
 
@@ -100,7 +99,6 @@
   3. /brands/ 痛點段落的琥珀光暈與琥珀短線（§2.4），只限痛點段落。
   4. §2.14 的深底卡片 hover 發光配方（含階梯外的 .28、.24），只限逐字照抄。
   5. /brands/ 深色區 MAU 折線圖的金色終點發光與線下金色漸層填色（`components/pages/brands/BrandGEOSection.tsx:195-196`、`:245`），只限這張圖表（§2.4）。<!-- src: #46 -->
-- 現況偏離：見 §10 DATAI-622（深底文字 α 低於 .85、比較卡編號、.75 文字）
 <!-- src: tok-alpha-nonbase, tok-alpha-off-ladder, tok-alpha-pill-border-06, tok-on-dark-085, atom-divider, cross-contrast-card-number, #31-3, #31-4 -->
 
 ### 2.4 光暈、漸層、模糊與透明效果
@@ -179,7 +177,7 @@
 - 禁止：畫面上小於 12px 的字（包括 `text-[10px]`；SVG 圖表文字以畫面實際大小計，隨版面縮放的圖用 `useSvgTextFloor`，例外見 §10.1）；為單一區塊自訂字級。
 - `useSvgTextFloor`（`lib/useSvgTextFloor.ts`）的做法：只把畫面上小於 12 的 SVG 文字放大到剛好 12，已 ≥12 的維持原本字級；首頁飛輪圖在 <768 寬不放大（§10.1 首頁飛輪圖手機字級）。個別文字可用 `data-text-floor="off"` 排除，只限 §10.1 核准例外。<!-- src: DATAI-556 -->
 - 已接受取捨：桌機 h1 與 h2 同為 48。
-- 現況偏離：見 §10 DATAI-626（/developers/ h1、404／錯誤頁標題目前 `text-3xl md:text-4xl`）、DATAI-622（「404」與「!」目前是主色）、DATAI-620（首頁 Flywheel h2 未用 `.section-heading`）
+- 現況偏離：見 §10 DATAI-626（/developers/ h1、404／錯誤頁標題目前 `text-3xl md:text-4xl`）、DATAI-620（首頁 Flywheel h2 未用 `.section-heading`）
 <!-- src: tok-text-size-scale, tok-caption-12-floor, mol-display-statement, page-legal, page-404, org-hero-h1-standard, org-hero-home, tok-breakpoint-420, #29-6, #29-7, #31-1, #31-10 -->
 
 ### 2.8 字級 token
@@ -309,6 +307,7 @@
   boxShadow: '0 0 0 1px rgba(168,197,195,0.28), 0 6px 28px rgba(34,93,89,0.24)'
   ```
   未 hover 時為 `'0 0 0 1px transparent'`。禁止：用在淺底卡片，或改動配方的透明度與尺寸。<!-- src: #32-4 -->
+  卡片左上角編號（`.label-eyebrow`）滑過時改白，避免落在光暈上對比不足（#52）。<!-- src: #52 -->
 - 首頁流程圖小圓點的發光（`components/home/IntentPipeline.tsx:176`）不算陰影，屬於 §2.4 的**深色區塊光暈**，發光用 on-dark .6（`0 0 6px rgba(168,197,195,0.6)`）；它不是本節「禁止自訂 `boxShadow`」的例外。
 <!-- src: tok-shadow, tok-gradient, #31-5, #31-7 -->
 
@@ -473,7 +472,7 @@
 | 控制 | 標準版 | 規格 |
 |---|---|---|
 | FAQ 題目列 | `components/pages/brands/BrandFAQ.tsx:80-100` | 見 §4.4；要有 `aria-expanded`＋`aria-controls`（第 8 章） |
-| 步驟清單 | `components/pages/publishers/KnowledgeBaseSection.tsx:207-246` | `<button>`，要有 tab 語意與鍵盤操作（第 8 章）；輪播行為見 §5.7 |
+| 步驟清單 | `components/pages/publishers/KnowledgeBaseSection.tsx:207-246` | `<button>`，要有 tab 語意與鍵盤操作（第 8 章）；輪播行為見 §5.7；選中那一步的編號與文字用白色，未選中用 on-dark 全色（`text-on-dark`）<!-- src: #50, #52 --> |
 | 輪播點 | `components/pages/publishers/KnowledgeBaseSection.tsx:307-324` | 點擊範圍維持 5×5（**明確接受**的例外，可能不符 WCAG 2.5.8）；要有可讀的標籤 |
 | 選單開關（漢堡／關閉） | `components/layout/Nav.tsx:287-298`、`:338-346` | `-mr-[11px] p-[11px]`＋22px 圖示，湊成 44×44 點擊範圍（§2.10 例外 1） |
 | 下拉鈕（國碼選單） | `app/book-a-demo/BookADemoForm.tsx:52-61` | 外觀同表單欄位（§3.10）；選單內放大鏡圖示 12（§2.17） |
@@ -520,7 +519,8 @@
   - 與 h2 的距離「緊」：小標籤維持行內元素，**不加 `block`、不加 `mb-*`**（畫面上字到字約 16px）。行內元素上的 `mb-*` 本來就不會生效（§0 第 6 點）。
   - `.label-eyebrow-md`（14px）：現況只用於 /brands/ 深色區塊「Your audience didn't disappear.」這行較大的標示文字（`components/pages/brands/BrandGEOSection.tsx:117`）。
 - 禁止：用 className 覆寫顏色（例如 `className="text-on-dark/55"`，靠 tailwind-merge 剃掉預設色才生效，元件一改就失效）；加 `block mb-3` 拉開距離；深底小標籤 α 低於 .85。
-- 現況偏離：見 §10 DATAI-620（7 處「鬆」）、DATAI-622（深底小標籤 on-dark .55）
+- 現況寫法：首頁「The Flywheel」（`components/home/FlywheelSection.tsx`）、/developers/「Same API contract」（`components/pages/developers/AILayerSection.tsx`）、/content-owners/ 與 /partnership/ 深色卡編號（`components/pages/publishers/LayerOverview.tsx`、`components/pages/partnership/PartnershipEarnings.tsx`）這 4 處把 `.label-eyebrow` 寫在動畫元素或段落上、顏色 on-dark 全色（`text-on-dark`），畫面與 `<Eyebrow dark>` 相同；其中兩處深色卡編號滑過時改白（`hovered`），與卡片標題一致（§2.14）。換成元件會改變間距，維持現狀。新程式一律用 `Eyebrow`。<!-- src: #50, #52 -->
+- 現況偏離：見 §10 DATAI-620（7 處「鬆」）
 <!-- src: atom-eyebrow-section, atom-eyebrow-override-risk, mol-heading-group-eyebrow-gap, tok-on-dark-085 -->
 
 ### 3.9 Hero 小膠囊
@@ -536,13 +536,12 @@
 **規則：多欄位表單用方角欄位；單欄 email 用 `InlineEmailCTA` 的藥丸欄。**
 - 用在哪：表單欄位用於 /book-a-demo/ 這類多欄位表單；email 欄只透過 `InlineEmailCTA`（§4.7）使用。
 - 寫法：
-  - 表單欄位：`w-full px-3 py-2 text-sm border border-line rounded-lg focus:border-primary transition-colors placeholder:text-ink-muted`（取自 `app/book-a-demo/BookADemoForm.tsx:20`，並加上原始碼沒有的 `placeholder:text-ink-muted`）。8px 圓角、1px line 框、14px、聚焦框線變主色；焦點外框由全站規則提供（§3.7）。
+  - 表單欄位：`w-full px-3 py-2 text-sm border border-line rounded-lg focus:border-primary transition-colors placeholder:text-ink-muted`（取自 `app/book-a-demo/BookADemoForm.tsx:20`）。8px 圓角、1px line 框、14px、聚焦框線變主色；焦點外框由全站規則提供（§3.7）。
   - 表單標籤：`block text-xs font-medium text-ink-muted mb-1`（取自 `app/book-a-demo/BookADemoForm.tsx:21`，Tailwind 灰改 `text-ink-muted`）。
   - email 欄：藥丸外框（`rounded-full border border-line bg-white`）、聚焦時 `focus-within:border-primary`、內嵌 §3.2 的 40 送出鈕（`components/ui/InlineEmailCTA.tsx:108-124`）；焦點外框畫在藥丸容器（§3.7）。
   - 錯誤狀態：用 §2.2 錯誤色，依輸入框所在底色選淺底或深底那一個。
   - 提示文字（placeholder）一律用 `placeholder:text-ink-muted`（白底對比約 5.3:1；§2.1 淡一階文字一律 `text-ink-muted`，§8.1 提示文字也要 AA）；不可用 `text-ink-subtle`、Tailwind 灰或瀏覽器預設提示文字色。email 欄（`InlineEmailCTA`）同此規則。<!-- src: An 2026-10-16 裁決（提示文字顏色） -->
 - 禁止：其他圓角或框色；Tailwind 內建灰／紅；拿掉焦點外框；自己再做一個 email 欄。
-- 現況偏離：見 §10 DATAI-622（email 欄提示文字用 ink-subtle；/book-a-demo/ 表單欄位提示文字未指定顏色，瀏覽器預設灰，白底約 3.4:1）
 <!-- src: atom-input, atom-focus-form, tok-color-tailwind-gray, tok-color-error-red-token, cross-contrast-ink-subtle -->
 
 ### 3.11 分隔線
@@ -581,6 +580,7 @@
 - 寫法：字 12／600、內距上下 4・左右 12、高 24：
   - 淺底：`px-3 py-1 rounded-full text-xs font-semibold bg-primary/8 text-primary`
   - 深底：`px-3 py-1 rounded-full text-xs font-semibold bg-on-dark/8 text-on-dark`
+- 深底膠囊放在選中狀態的主色半透明底上時（首頁流程圖選中列，`components/home/IntentPipeline.tsx`），字改白（`text-white`），未選中維持 `text-on-dark`（§2.3）。<!-- src: #50 -->
 - 禁止：加框線；其他高度或內距；小於 12px 的字；白色透明底；inline `style` 上色。
 <!-- src: #33（An 2026-10-15 決策頁 3 q11 選 a） -->
 
@@ -692,7 +692,6 @@
 - 用在哪：首頁 Hero、首頁頁尾 CTA 與 4 個受眾頁（/brands/、/content-owners/、/developers/、/partnership/）的頁尾 CTA。/decisive-engine/ 例外（§5.4 產品頁變體）。
 - 寫法：`<InlineEmailCTA ctaLabel="…" pageName="…" tone="dark" className="mx-auto" />`（`components/ui/InlineEmailCTA.tsx`）。`ctaLabel` 是 `trackCTA` 的位置名稱，沿用該頁既有字串；`pageName` 送給 HubSpot；`tone` 必填，依 email 欄所在底色決定錯誤色（§2.2）：`tone="light"`（白／淺底，只有首頁 Hero）、`tone="dark"`（`.section-dark` 頁尾 CTA）。元件內含藥丸 email 欄（§3.10）、40 送出鈕（§3.2）、錯誤提示與成功狀態。
 - 禁止：自己另做 email 欄或送出鈕；改送出鈕高度。
-- 現況偏離：見 §10 DATAI-622（提示文字用 ink-subtle）
 <!-- src: org-page-cta, atom-input, atom-btn-inline-submit -->
 
 ### 4.8 卡片網格
@@ -797,7 +796,7 @@
   - `variant="embedded"`：只輸出內容，放進既有的 `.section-dark` 區塊（/brands/ 方案區塊第四段）。放在淺底會變白字白底，禁止。
   - 標題組照 §4.3；按鈕是 §3.2 標準 44，呼叫 `trackCTA(ctaLabel, trackingPosition)`。
 - 禁止：用 className 覆寫小標籤顏色；embedded 放在淺底。
-- 現況偏離：見 §10 DATAI-622（深底小標籤 on-dark .55）、DATAI-620（小標籤「鬆」、說明寬）、DATAI-619（區塊上下距）
+- 現況偏離：見 §10 DATAI-620（小標籤「鬆」、說明寬）、DATAI-619（區塊上下距）
 <!-- src: org-playground-entry -->
 
 ### 5.7 自動輪播
@@ -813,10 +812,10 @@
 
 | 元件 | 檔案 | 角色 | 待修 |
 |---|---|---|---|
-| Logo 跑馬燈 | `components/home/LogoMarquee.tsx` | 首頁「Trusted by」標誌捲動列，用 `.animate-marquee`，左右淡出遮罩 | DATAI-622（圖片載入失敗時的替代品牌名稱用 ink-subtle 當文字色） |
-| Flywheel | `components/home/FlywheelSection.tsx` | 首頁專屬深色區塊，含展示大數字（§4.5） | DATAI-620（h2 改 `.section-heading`）、DATAI-619（手機上下距）、DATAI-622（深底淡綠字低於 .85） |
+| Logo 跑馬燈 | `components/home/LogoMarquee.tsx` | 首頁「Trusted by」標誌捲動列，用 `.animate-marquee`，左右淡出遮罩 | — |
+| Flywheel | `components/home/FlywheelSection.tsx` | 首頁專屬深色區塊，含展示大數字（§4.5） | DATAI-620（h2 改 `.section-heading`）、DATAI-619（手機上下距） |
 | 世界地圖點陣 | `components/home/WorldMapDots.tsx` | 首頁 Hero 背景點陣，訊號點用 `--color-primary-light`、擴散圈用 `.ping-ring`；強訊號點與其擴散圈用 `--color-gold`（`components/home/WorldMapDots.tsx:181`、`:191`） | — |
-| 預約表單 | `app/book-a-demo/BookADemoForm.tsx` | /book-a-demo/ 多欄位表單：欄位 §3.10、送出 §3.3；送出記錄 `contact_form_submit` 事件（維持，不用 `trackCTA`） | DATAI-622（欄位提示文字未指定顏色） |
+| 預約表單 | `app/book-a-demo/BookADemoForm.tsx` | /book-a-demo/ 多欄位表單：欄位 §3.10、送出 §3.3；送出記錄 `contact_form_submit` 事件（維持，不用 `trackCTA`） | — |
 | 換頁捲回頂端 | `components/layout/ScrollToTop.tsx` | 換頁時捲回頁首，沒有畫面 | — |
 | 減少動態全站開關 | `components/layout/ReducedMotion.tsx` | 依系統「減少動態效果」設定 framer-motion 全站略過動畫，沒有畫面（§8.4） | — |
 
@@ -897,7 +896,7 @@
   - 按鈕：§3.2 標準 44 實心；CDN 版另有 §3.5 深底外框。
   - 兩個 404 版本以 `.nf-cdn`／`.nf-default` 切換（只用於 404）。
 - 禁止：大字用主色；標題用 36；按鈕 inline 上色。
-- 現況偏離：見 §10 DATAI-626（標題目前 36）、DATAI-622（大字目前主色）、DATAI-628（404 按鈕追蹤）
+- 現況偏離：見 §10 DATAI-626（標題目前 36）、DATAI-628（404 按鈕追蹤）
 <!-- src: page-404, page-error, #31-1 -->
 
 ### 6.8 AI Mode 頁
@@ -1017,8 +1016,8 @@
   - `text-ink-subtle` 不可用於文字（§2.1），淡一階的文字用 `text-ink-muted`。
   - 主色底上的文字一律白色（§2.3）。
   - 疊在半透明卡片上的文字，用實際合成後的背景色計算對比。
+  - 純裝飾、與畫面上其他文字重複的大字不計對比，但要加 `aria-hidden="true"`；只限 §10.1 列出的位置。<!-- src: #50 -->
 - 禁止：只靠目測判斷對比；用透明度把文字調淡到低於上述門檻。
-- 現況偏離：見 §10 DATAI-622
 <!-- src: cross-contrast-list, cross-contrast-ink-subtle, tok-on-dark-085, cross-contrast-card-number -->
 
 ### 8.2 鍵盤焦點
@@ -1122,9 +1121,10 @@
 | /partnership/ 標題孤字 | Hero 標題「channel.」孤字換行維持現狀，不改文案或字級 | #1 |
 | 輪播點點擊範圍 | 維持 5×5（可能不符 WCAG 2.5.8）（§3.6、§8.5） | #29 |
 | /content-owners/ 步驟清單內側焦點外框 | 步驟按鈕被 `overflow-hidden` 的容器裁切，外框畫在按鈕內側：`focus-visible:-outline-offset-2`（`components/pages/publishers/KnowledgeBaseSection.tsx:218`）；顏色仍由全站規則給，只限此處（§3.7） | #47 |
+| /content-owners/ 步驟面板浮水印數字 | 白色面板右下角大數字（主色 .12，`components/pages/publishers/KnowledgeBaseSection.tsx`）與左欄步驟編號重複，視為裝飾不計對比；加 `aria-hidden="true"`（§8.1） | #50 |
 | 桌機 h1／h2 同 48 | 維持（§2.7、§8.6） | #29、第二個 #12 |
 | 深底主色按鈕形狀對比 | 約 1.57:1，不處理（§3.2、§8.6） | dark-primary-contrast（An 2026-09-11 裁決） |
-<!-- src: #1, #20, #24, #25, #26, #28, #29, #30, #31, #32, #33, #47 -->
+<!-- src: #1, #20, #24, #25, #26, #28, #29, #30, #31, #32, #33, #47, #50 -->
 
 ### 10.2 待修清單
 
@@ -1137,7 +1137,6 @@
 |---|---|---|---|
 | DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`（受眾頁緊接 FAQ 細線前白色區塊依 §2.11／§6.2 例外，下距固定 32）；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白；卡片網格 `gap-6` 兩處改 `gap-5`（/brands/ 痛點兩卡、首頁身分卡） | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
 | DATAI-620 | 區塊標題組 | h2→說明 16（含頁尾 CTA）；說明寬 576；7 處小標籤改「緊」；首頁 Flywheel h2 改 `.section-heading`；標題組到下方內容 48（11 處） | mol-heading-group-h2-gap、mol-heading-group-desc-width、mol-heading-group-eyebrow-gap、mol-heading-flywheel |
-| DATAI-622 | 對比修正 | `text-ink-subtle` 文字改 `text-ink-muted`；email 欄與 /book-a-demo/ 表單欄位提示文字改 `placeholder:text-ink-muted`；深底淡綠字低於 .85 改 ≥.85；主色字在深底改 on-dark；404「404」與錯誤頁「!」改白；白面板上的淡綠字改主色；比較卡編號改白；.75 文字改 .85 | cross-contrast-ink-subtle、tok-on-dark-085、cross-contrast-primary-on-dark、cross-contrast-ondark-on-white、cross-contrast-card-number |
 | DATAI-626 | Hero 對齊 | /developers/、/partnership/、/decisive-engine/ 對齊標準 Hero（下距 48、底部細線、h1 48）；/privacy-policy/、/terms-of-service/、/book-a-demo/ 的 h1 補 `text-balance`；404／錯誤頁標題 48 | org-hero-structure、org-hero-h1-standard、page-404、page-error |
 | DATAI-628 | CTA 追蹤 | 7 顆導覽型按鈕補 `trackCTA`；「Talk to us」記錄名稱改為畫面文字（改名前先查 GA 報表） | cross-trackcta |
 | DATAI-629 | /content-owners/ 步驟面板 | 說明最後一行被固定高度切掉；輪播改為點擊後永久停止、捲出畫面不輪播，與首頁流程一致 | page-content-owners、org-home-pipeline-carousel |

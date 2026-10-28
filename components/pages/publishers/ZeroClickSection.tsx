@@ -52,7 +52,7 @@ export function ZeroClickSection() {
                   : `0${item.suffix}`}
               </p>
               <p className="text-sm leading-relaxed text-ink">{item.desc}</p>
-              <p className="text-xs mt-auto text-ink-subtle">{item.source}</p>
+              <p className="text-xs mt-auto text-ink-muted">{item.source}</p>
             </motion.div>
           ))}
         </div>

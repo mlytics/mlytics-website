@@ -114,7 +114,7 @@ export function BrandGEOSection() {
 
         <div className="max-w-5xl mx-auto px-6 relative z-10 text-center">
           <motion.p
-            className="label-eyebrow-md mb-8 text-primary"
+            className="label-eyebrow-md mb-8 text-on-dark"
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6 }}
@@ -164,7 +164,7 @@ export function BrandGEOSection() {
                 className="flex items-center gap-3 px-5 py-3 rounded-xl w-full sm:w-[400px] lg:w-auto border border-on-dark/12 bg-on-dark/6"
               >
                 <span className="text-xl font-black tabular-nums w-16 shrink-0 text-gold">{item.stat}</span>
-                <span className="text-sm leading-snug text-left flex-1 text-on-dark/70">{item.desc}</span>
+                <span className="text-sm leading-snug text-left flex-1 text-on-dark">{item.desc}</span>
               </div>
             ))}
           </motion.div>
@@ -255,7 +255,7 @@ export function BrandGEOSection() {
                 const textAnchor = i === 0 ? 'start' : i === DATA_POINTS.length - 1 ? 'end' : 'middle'
                 // <768 shows the short date so the enlarged labels fit; ≥768 the full one.
                 return (
-                  <g key={i} fill="rgba(168,197,195,0.35)">
+                  <g key={i} fill="rgba(168,197,195,0.85)">
                     <text className="md:hidden" x={x} y={SVG_H - 6}
                       textAnchor={textAnchor}
                       fontSize="11" fontWeight="500"
@@ -334,11 +334,11 @@ export function BrandGEOSection() {
                 style={{ border: '2px solid rgba(168,197,195,0.4)' }}
               />
               {/* Number */}
-              <span className="text-xs font-bold tabular-nums mb-2" style={{ color: 'rgba(168,197,195,0.45)' }}>{step.num}</span>
+              <span className="text-xs font-bold tabular-nums mb-2 text-on-dark/85">{step.num}</span>
               {/* Title */}
               <p className="text-sm font-bold text-white mb-1 leading-snug">{step.label}</p>
               {/* Desc */}
-              <p className="text-sm leading-relaxed text-on-dark/60">{step.desc}</p>
+              <p className="text-sm leading-relaxed text-on-dark/85">{step.desc}</p>
             </motion.div>
           ))}
         </div>

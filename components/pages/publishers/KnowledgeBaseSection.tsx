@@ -222,12 +222,12 @@ export function KnowledgeBaseSection() {
                     }}
                   >
                     <span
-                      className="block text-xs font-bold tabular-nums mb-1"
-                      style={{ color: isActive ? 'rgba(168,197,195,0.7)' : 'rgba(168,197,195,0.45)', letterSpacing: '0.05em' }}
+                      className={`block text-xs font-bold tabular-nums mb-1 ${isActive ? 'text-white' : 'text-on-dark'}`}
+                      style={{ letterSpacing: '0.05em' }}
                     >
                       0{i + 1}
                     </span>
-                    <span className={`block text-sm font-semibold leading-snug${isActive ? ' text-white' : ''}`} style={isActive ? undefined : { color: 'rgba(168,197,195,0.7)' }}>
+                    <span className={`block text-sm font-semibold leading-snug ${isActive ? 'text-white' : 'text-on-dark'}`}>
                       {step.label}
                     </span>
                     {isActive && !reduce && (
@@ -289,7 +289,7 @@ export function KnowledgeBaseSection() {
                   <div className="flex flex-col md:overflow-hidden md:h-[170px]">
                     <div className="flex flex-col gap-1 mb-4 md:mb-5">
                       <span className="text-primary">{STEPS[active].icon}</span>
-                      <Eyebrow dark>{STEPS[active].sub}</Eyebrow>
+                      <Eyebrow>{STEPS[active].sub}</Eyebrow>
                     </div>
                     <p className="text-lg md:text-xl font-bold leading-snug mb-2 text-ink">
                       {STEPS[active].label}
@@ -325,7 +325,7 @@ export function KnowledgeBaseSection() {
                       ))}
                     </div>
                     <span
-                      className="text-4xl md:text-5xl font-black tabular-nums select-none"
+                      className="text-4xl md:text-5xl font-black tabular-nums select-none" aria-hidden="true"
                       style={{ color: 'rgba(34,93,89,0.12)', letterSpacing: '-0.04em', lineHeight: 1 }}
                     >
                       0{active + 1}
@@ -339,7 +339,7 @@ export function KnowledgeBaseSection() {
 
         {/* Databricks credit */}
         <div className="flex items-center justify-center gap-2 mt-6">
-          <span className="text-xs" style={{ color: 'rgba(168,197,195,0.4)' }}>Enterprise infrastructure powered by</span>
+          <span className="text-xs text-on-dark/85">Enterprise infrastructure powered by</span>
           <img
             src="/logos/databricks.svg"
             alt="Databricks"

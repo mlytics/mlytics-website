@@ -16,7 +16,7 @@ export default function Error({
   return (
     <div className="flex-1 section-dark flex items-center justify-center text-center px-6 pt-32 pb-16">
       <div className="max-w-lg mx-auto">
-        <p className="text-7xl font-bold mb-4 text-primary">!</p>
+        <p className="text-7xl font-bold mb-4 text-white">!</p>
         <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Something went wrong</h1>
         <p className="text-base mb-8 text-on-dark">
           An unexpected error occurred. Please try again.

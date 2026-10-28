@@ -115,7 +115,7 @@ export function InlineEmailCTA({ ctaLabel, pageName, tone, className }: InlineEm
           placeholder="Enter your email"
           aria-invalid={!!emailError}
           aria-describedby={emailError ? `${ctaLabel}-email-error` : undefined}
-          className="flex-1 min-w-0 text-base md:text-sm outline-none bg-transparent py-2 text-ink placeholder:text-ink-subtle"
+          className="flex-1 min-w-0 text-base md:text-sm outline-none bg-transparent py-2 text-ink placeholder:text-ink-muted"
         />
         <button
           type="submit"

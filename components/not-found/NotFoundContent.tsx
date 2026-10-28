@@ -85,7 +85,7 @@ function CdnNotFound() {
 function DefaultNotFound() {
   return (
     <div className="nf-default max-w-lg mx-auto">
-      <p className="text-7xl font-bold mb-4 text-primary">
+      <p className="text-7xl font-bold mb-4 text-white">
         404
       </p>
       <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Page not found</h1>

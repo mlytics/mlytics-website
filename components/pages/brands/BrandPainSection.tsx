@@ -76,7 +76,7 @@ export function BrandPainSection() {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
           >
-            <p className="label-eyebrow mb-3 text-ink-subtle">
+            <p className="label-eyebrow mb-3 text-ink-muted">
               CPM Performance
             </p>
             <p className="text-sm md:text-base leading-relaxed mb-5 text-ink-muted">
@@ -146,7 +146,7 @@ export function BrandPainSection() {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
-            <p className="label-eyebrow mb-3 text-ink-subtle">
+            <p className="label-eyebrow mb-3 text-ink-muted">
               Zero-Click Reality
             </p>
             <p className="text-sm md:text-base leading-relaxed mb-5 text-ink-muted">
@@ -193,7 +193,7 @@ export function BrandPainSection() {
           />
 
           <motion.p
-            className="label-eyebrow mb-6 text-ink-subtle"
+            className="label-eyebrow mb-6 text-ink-muted"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-40px' }}
