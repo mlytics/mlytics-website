@@ -211,7 +211,7 @@ export function Nav() {
     : 'bg-white/80 backdrop-blur-sm border-b border-line'
 
   const logoColor = 'text-primary'
-  const linkColor = 'text-ink-muted hover:text-primary'
+  const linkColor = 'text-ink hover:text-primary'
   const activeLinkColor = 'text-primary'
 
   const logo = (

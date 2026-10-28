@@ -138,6 +138,24 @@ describe('Nav desktop CTA group', () => {
   })
 })
 
+// DATAI-680: the nav is translucent white over the page; over a dark section
+// the composite turns grey and text-ink-muted drops to 3.69:1. Desktop links
+// use text-ink (same as the overlay links); hover and the current page stay primary.
+describe('Nav desktop links', () => {
+  it('uses text-ink for inactive links and primary for the current page', () => {
+    mockPathname = '/brands/'
+    render(<Nav />)
+    const bar = screen.getByRole('navigation')
+    const brands = within(bar).getByRole('link', { name: 'Brands' })
+    expect(brands).toHaveClass('text-primary', 'font-semibold')
+    for (const name of ['Media and Content', 'Developers', 'Partnership']) {
+      const link = within(bar).getByRole('link', { name })
+      expect(link).toHaveClass('text-ink', 'hover:text-primary', 'font-medium')
+      expect(link).not.toHaveClass('text-ink-muted')
+    }
+  })
+})
+
 describe('Nav mobile bar (<1024px)', () => {
   it('shows a solid Try AI Mode link inside the lg:hidden wrapper, before the hamburger', () => {
     render(<Nav />)
