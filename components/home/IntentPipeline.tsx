@@ -210,7 +210,7 @@ export function IntentPipeline() {
                 <span className="block flex-1 min-w-0">
                   <span className="flex items-center flex-wrap gap-2">
                     <span className="text-sm font-semibold text-white">{layer.name}</span>
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-on-dark/8 text-on-dark">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-on-dark/8 ${isOpen ? 'text-white' : 'text-on-dark'}`}>
                       {layer.audience}
                     </span>
                   </span>

@@ -42,7 +42,7 @@ function LayerCard({ item, i }: { item: Layer; i: number }) {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col flex-1">
-        <p className="label-eyebrow mb-3 text-on-dark/60">
+        <p className={`label-eyebrow mb-3 transition-colors ${hovered ? 'text-white' : 'text-on-dark'}`}>
           {item.num} · {item.tag}
         </p>
         <h3 className="text-h3 font-bold text-white leading-snug mb-2">{item.name}</h3>
@@ -115,8 +115,7 @@ export function LayerOverview() {
 
         {/* Bottom note */}
         <motion.p
-          className="text-center text-xs mt-10"
-          style={{ color: 'rgba(168,197,195,0.5)' }}
+          className="text-center text-xs mt-10 text-on-dark/85"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}

@@ -36,7 +36,7 @@ function ClientLogo({ name, logo, w, invert, brightness, opacity, maxWidth, heig
   if (failed) {
     return (
       <span
-        className="text-sm font-semibold whitespace-nowrap select-none text-ink-subtle"
+        className="text-sm font-semibold whitespace-nowrap select-none text-ink-muted"
         style={{ letterSpacing: '0.01em' }}
       >
         {name}

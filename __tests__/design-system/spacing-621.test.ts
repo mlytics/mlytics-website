@@ -34,7 +34,7 @@ describe('half steps rounded down (DESIGN.md §2.10)', () => {
   it('exact replacements', () => {
     expect(read('components/layout/Footer.tsx')).toContain('inline-flex items-center p-1 -ml-1 rounded-lg')
     expect(read('components/home/LogoMarquee.tsx')).toContain('md:px-5 mb-1 md:mb-0')
-    expect(read('components/home/IdentityCards.tsx')).toContain('<p className="text-sm text-ink-subtle">{card.products}</p>')
+    expect(read('components/home/IdentityCards.tsx')).toContain('<p className="text-sm text-ink-muted">{card.products}</p>')
     expect(read('components/home/IntentPipeline.tsx')).toContain('pl-14 pr-4 py-3 rounded-xl')
     expect(read('components/home/IntentPipeline.tsx')).toContain('<span className="block text-sm text-on-dark">{layer.sublabel}</span>')
     const kb = read('components/pages/publishers/KnowledgeBaseSection.tsx')

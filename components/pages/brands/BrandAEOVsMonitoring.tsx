@@ -93,10 +93,10 @@ export function BrandAEOVsMonitoring() {
           }}
         >
           <div className="px-5 py-4 text-center">
-            <p className="text-base font-bold uppercase tracking-widest text-ink-subtle">
+            <p className="text-base font-bold uppercase tracking-widest text-ink-muted">
               AEO Monitoring
             </p>
-            <p className="text-sm mt-1 text-ink-subtle">tracking & reporting tools</p>
+            <p className="text-sm mt-1 text-ink-muted">tracking & reporting tools</p>
           </div>
           <div className="px-5 py-4 text-center">
             <p className="text-base font-bold uppercase tracking-widest text-primary">

@@ -162,7 +162,7 @@ export function AILayerSection() {
           />
 
           <motion.p
-            className="label-eyebrow mb-6 text-on-dark/50"
+            className="label-eyebrow mb-6 text-on-dark"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-40px' }}

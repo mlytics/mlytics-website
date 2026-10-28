@@ -137,7 +137,7 @@ export function FlywheelDiagram() {
                 {node.label}
               </text>
               <text x={textX} y={subY} textAnchor={anchor}
-                fill="rgba(168,197,195,0.75)" fontSize="10.5">
+                fill="rgba(168,197,195,0.85)" fontSize="10.5">
                 {node.sub}
               </text>
             </motion.g>

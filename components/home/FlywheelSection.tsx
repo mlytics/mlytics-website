@@ -53,7 +53,7 @@ export function FlywheelSection() {
           {/* Right: copy */}
           <div ref={ref} className="min-w-0">
             <motion.span
-              className="label-eyebrow text-on-dark/55 mb-4"
+              className="label-eyebrow text-on-dark mb-4"
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5 }}
@@ -70,7 +70,7 @@ export function FlywheelSection() {
               the harder it is to stop.
             </motion.h2>
             <motion.p
-              className="text-base leading-relaxed mb-10 text-on-dark/65"
+              className="text-base leading-relaxed mb-10 text-on-dark/85"
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -119,7 +119,7 @@ export function FlywheelSection() {
 
               {/* Sub text */}
               <motion.p
-                className="text-sm mt-4 text-on-dark/65"
+                className="text-sm mt-4 text-on-dark/85"
                 initial={{ opacity: 0 }}
                 animate={inView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.6, delay: 0.6 }}

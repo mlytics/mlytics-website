@@ -67,7 +67,7 @@ function EarningCard({ item, i }: { item: EarningItem; i: number }) {
       {/* Content */}
       <div className="relative z-10 flex flex-col flex-1">
         <p
-          className="label-eyebrow mb-3 text-on-dark/60"
+          className={`label-eyebrow mb-3 transition-colors ${hovered ? 'text-white' : 'text-on-dark'}`}
         >
           {item.num} · {item.tag}
         </p>

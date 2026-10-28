@@ -16,7 +16,7 @@ vi.unmock('next/navigation')
 setProjectAnnotations([a11yAddonAnnotations, preview])
 
 const modules = import.meta.glob(
-  ['../../stories/**/*.stories.tsx', '../../components/**/*.stories.tsx'],
+  ['../../stories/**/*.stories.tsx', '../../components/**/*.stories.tsx', '../../app/**/*.stories.tsx'],
   { eager: true },
 ) as Record<string, Parameters<typeof composeStories>[0]>
 
@@ -37,7 +37,7 @@ describe('stories render', () => {
     // never needs a count bumped here, while a glob that matches nothing or
     // misses a directory (or a .stories.ts file it does not cover) still fails.
     // MDX docs pages are not story modules, so they don't count.
-    const onDisk = ['stories', 'components']
+    const onDisk = ['stories', 'components', 'app']
       .flatMap((dir) => readdirSync(resolve(root, dir), { recursive: true, encoding: 'utf8' }).map((f) => `${dir}/${f}`))
       .filter((f) => /\.stories\.tsx?$/.test(f))
       .map((f) => f.split(sep).join('/'))
