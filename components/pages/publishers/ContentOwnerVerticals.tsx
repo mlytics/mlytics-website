@@ -138,7 +138,7 @@ export function ContentOwnerVerticals() {
           >
           <Link
             href="/book-a-demo"
-            onClick={() => trackCTA('Get Started', 'content_owners_section')}
+            onClick={() => trackCTA('Talk to us', 'content_owners_section')}
             className="p-5 rounded-2xl flex flex-col items-start justify-between w-full h-full text-left relative bg-primary"
           >
             <div className="flex items-center justify-between w-full">

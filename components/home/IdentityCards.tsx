@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Newspaper, Target, Settings2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { Eyebrow } from '@/components/ui/Eyebrow'
+import { trackCTA } from '@/lib/analytics'
 
 const CARDS: Array<{
   persona: string
@@ -14,6 +15,7 @@ const CARDS: Array<{
   metrics: { label: string; value: string }[]
   cta: string
   href: string
+  position: string
 }> = [
   {
     persona: 'Media and Content Owner',
@@ -26,6 +28,7 @@ const CARDS: Array<{
     ],
     cta: 'See media and content plan',
     href: '/content-owners',
+    position: 'home_identity_content_owners',
   },
   {
     persona: 'Brand',
@@ -38,6 +41,7 @@ const CARDS: Array<{
     ],
     cta: 'See brand plan',
     href: '/brands',
+    position: 'home_identity_brands',
   },
   {
     persona: 'Developer',
@@ -50,8 +54,18 @@ const CARDS: Array<{
     ],
     cta: 'See developer plan',
     href: '/developers',
+    position: 'home_identity_developers',
   },
 ]
+
+/** Tablet (md–lg) shows "Learn more" instead of card.cta (DECISIONS #43).
+ *  Same breakpoints as the md:/lg: spans on the button; the label must be the
+ *  on-screen text (DESIGN.md §7.1), so it is resolved at click time. Reading
+ *  innerText is not an option: it includes the sr-only persona suffix. */
+function isTabletWidth() {
+  return window.matchMedia('(min-width: 48rem)').matches
+    && !window.matchMedia('(min-width: 64rem)').matches
+}
 
 export function IdentityCards() {
   return (
@@ -110,6 +124,7 @@ export function IdentityCards() {
               {/* CTA */}
               <Link
                 href={card.href}
+                onClick={() => trackCTA(isTabletWidth() ? 'Learn more' : card.cta, card.position)}
                 className="mt-auto gap-2 w-full inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
               >
                 {/* Tablet (md–lg) squeezes three columns, so the full copy would

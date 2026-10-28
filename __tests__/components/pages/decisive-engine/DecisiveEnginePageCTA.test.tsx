@@ -1,5 +1,6 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { DecisiveEnginePageCTA } from '@/components/pages/decisive-engine/DecisiveEnginePageCTA'
 
 vi.mock('framer-motion', () => ({
@@ -12,20 +13,22 @@ vi.mock('framer-motion', () => ({
 }))
 
 vi.mock('next/link', () => ({
-  default: ({
-    href,
-    children,
-    className,
-  }: {
+  default: ({ href, children, className, onClick, ...rest }: {
     href: string
     children: React.ReactNode
     className?: string
+    onClick?: React.MouseEventHandler<HTMLAnchorElement>
   }) => (
-    <a href={href} className={className}>
+    <a href={href} className={className} {...rest}
+      onClick={(e) => { e.preventDefault(); onClick?.(e) }}>
       {children}
     </a>
   ),
 }))
+
+const trackCTA = vi.hoisted(() => vi.fn())
+vi.mock('@/lib/analytics', () => ({ trackCTA }))
+afterEach(() => { trackCTA.mockClear(); vi.unstubAllGlobals() })
 
 describe('DecisiveEnginePageCTA', () => {
   it('renders the business outcome heading', () => {
@@ -104,4 +107,10 @@ describe('DecisiveEnginePageCTA', () => {
     ).toBeInTheDocument()
   })
 
+  it('tracks the closing Contact Us CTA (DATAI-628)', async () => {
+    render(<DecisiveEnginePageCTA />)
+    await userEvent.click(screen.getByRole('link', { name: 'Contact Us' }))
+    expect(trackCTA).toHaveBeenCalledTimes(1)
+    expect(trackCTA).toHaveBeenCalledWith('Contact Us', 'decisive_engine_cta')
+  })
 })

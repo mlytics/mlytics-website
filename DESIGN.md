@@ -431,7 +431,6 @@
   - 導覽型按鈕要呼叫 `trackCTA`（第 7 章）。
 - 禁止：方角或 12px 圓角（`rounded-xl`）；用 `h-*` 定高；inline 上色（`style={{ background: 'var(--color-primary)' }}`）；把 36 或 40 用在獨立 CTA、把 44 塞進導覽列；在深底另做一顆不同顏色的主要按鈕。
 - 已接受取捨：深底上主色按鈕的形狀對比約 1.57:1，不處理。<!-- src: dark-primary-contrast（An 2026-09-11 裁決） -->
-- 現況偏離：見 §10 DATAI-628（部分導覽型按鈕沒有 `trackCTA`）
 <!-- src: atom-btn-primary, atom-btn-inline-submit, atom-btn-font, cross-dark-primary-shape, tok-transition-all, 按鈕盤點 A1／A2／A3, #29-9(1), #30-4 -->
 
 ### 3.3 滿版藥丸
@@ -558,7 +557,7 @@
 **規則：圖示底座只有兩種：大號底座（一般卡片）與流程圖專用小底座。**
 - 用在哪與寫法：
   - **大號底座**：卡片內的功能圖示。`grid place-items-center w-12 h-12 rounded-2xl bg-primary text-white`，內放 22px 圖示（`components/pages/decisive-engine/EngineUseCases.tsx:45`，逐字相同）。/developers/ 規格卡的圖示不加底座（核准例外）。<!-- src: An 2026-10-16 裁決（大號底座補回置中寫法） -->
-    - **大號底座在文字上方時**：底座到下一個文字元素（例如卡片標題）的距離 **28**，在底座上加 `mb-7`（現有例子 `components/pages/decisive-engine/DecisionLoop.tsx:74`，該處底座寫成 `inline-grid`，瀏覽器實測為 28px；標準寫法 `grid` 的底座加 `mb-7` 同樣是 28，瀏覽器實測 28）。首頁身分卡同樣用 28（`components/home/IdentityCards.tsx:89`）。底座在文字左側時不適用（例：`EngineUseCases.tsx` 用雙欄 `gap-4`）。
+    - **大號底座在文字上方時**：底座到下一個文字元素（例如卡片標題）的距離 **28**，在底座上加 `mb-7`（現有例子 `components/pages/decisive-engine/DecisionLoop.tsx:74`，該處底座寫成 `inline-grid`，瀏覽器實測為 28px；標準寫法 `grid` 的底座加 `mb-7` 同樣是 28，瀏覽器實測 28）。首頁身分卡同樣用 28（`components/home/IdentityCards.tsx:103`）。底座在文字左側時不適用（例：`EngineUseCases.tsx` 用雙欄 `gap-4`）。
     <!-- src: An 2026-10-16 缺口裁決 q2（AI 接手測試） -->
   - **流程圖專用小底座**：只用於首頁流程圖（`components/home/IntentPipeline.tsx`）每一層的節點。32px 圓形：`w-8 h-8 rounded-full flex items-center justify-center bg-primary-dark`，框線 1px（顏色跟各層，依 §2.3 只用兩基色），內放 `size={15}` 的 `text-on-dark` 圖示。
 - 禁止：其他尺寸或形狀的底座（例如 32px 淡底方塊）；把流程圖小底座用在流程圖以外；2px 框線。
@@ -609,7 +608,6 @@
   - **深色區塊內的卡片**：`rounded-2xl`、primary .25 底、on-dark .12 框，用 class 寫法（例：`rounded-2xl border border-on-dark/12 bg-primary/25`）；滑過時用 §2.14 的深底卡片 hover 發光。
   - 卡片內層元件 `rounded-xl`、小元件 `rounded-lg`（§2.13）；卡片標題 24（§2.7）；圖示底座見 §3.12；內距見 §4.2；多張卡片排成網格時的間距見 §4.8。
 - 禁止：其他圓角；自訂 `boxShadow`（§2.14）；深色區塊卡片用 inline `rgba` 寫法或階梯外的透明度。
-- 現況偏離：見 §10 DATAI-628（「Talk to us」記錄名稱與畫面文字不同）
 <!-- src: mol-card, tok-alpha-off-ladder, 按鈕盤點 A8, #29-9(3), #32-4 -->
 
 ### 4.2 卡片內距
@@ -620,7 +618,7 @@
 | 級別 | 寫法 | 現有例子 |
 |---|---|---|
 | 小卡 20 | `p-5` | 統計數字卡 `ZeroClickSection.tsx:44`、規格卡 `DeveloperSpecs.tsx:42`、分類卡 `ContentOwnerVerticals.tsx:82`、`:142` |
-| 一般 24 | `p-6` | 首頁身分卡 `IdentityCards.tsx:80`、`IntentRefinerySection.tsx:33`、`BrandPainSection.tsx:73`、`:143`、`EngineUseCases.tsx:39` |
+| 一般 24 | `p-6` | 首頁身分卡 `IdentityCards.tsx:94`、`IntentRefinerySection.tsx:33`、`BrandPainSection.tsx:73`、`:143`、`EngineUseCases.tsx:39` |
 | 大卡 32 | `p-8` | `DecisionLoop.tsx:59`、方案卡 `PartnershipMembership.tsx:37`、`:93`、`PartnershipResponsibilities.tsx:45`、`:79` |
 
 - 選級時對照上表的同類卡片；拿不準時依 §0 第 2 點詢問。
@@ -646,7 +644,7 @@
   - 不適用：標題組下方直接接按鈕或 email 欄（32，`mb-8`，§5.4 頁尾 CTA 與 §5.6 AI Mode 入口）；首頁靠左雙欄的 Intent Refinery（`components/home/IntentRefinerySection.tsx`，桌機旁邊是圖表）；法律頁條文小標（§6.5）。<!-- src: #33 -->
 - 禁止：h2 不用 `.section-heading` 而自訂字級；h2 下方用 `mb-3`／`mb-2`／`mb-5`；說明用 `max-w-3xl` 或不限寬；小標籤加 `block mb-*`。
 - 現況偏離：見 §10 DATAI-620（6 個頁尾 CTA 與一處 h2 → 說明不是 16；16 處說明寬不是 576；7 處小標籤「鬆」；首頁 Flywheel h2 沒用 `.section-heading`）
-- 現況偏離：見 §10 DATAI-620（標題組 → 內容距離不是 48 的 11 處：44（`mb-11`）`components/pages/decisive-engine/DecisionLoop.tsx:40`、`DecisiveEnginePageCTA.tsx:22`、`EngineAdvantages.tsx:23`、`EngineComparison.tsx:24`、`EngineUseCases.tsx:23`；40（`mb-10`）`components/pages/developers/DeveloperSpecs.tsx:25`、`components/home/FlywheelSection.tsx:73`、`components/pages/publishers/KnowledgeBaseSection.tsx:179`、`components/pages/publishers/ZeroClickSection.tsx:24`；56（`mb-14`）`components/pages/publishers/LayerOverview.tsx:94`、`components/pages/partnership/PartnershipEarnings.tsx:104`）<!-- src: #33 -->
+- 現況偏離：見 §10 DATAI-620（標題組 → 內容距離不是 48 的 11 處：44（`mb-11`）`components/pages/decisive-engine/DecisionLoop.tsx:40`、`DecisiveEnginePageCTA.tsx:23`、`EngineAdvantages.tsx:23`、`EngineComparison.tsx:24`、`EngineUseCases.tsx:23`；40（`mb-10`）`components/pages/developers/DeveloperSpecs.tsx:25`、`components/home/FlywheelSection.tsx:73`、`components/pages/publishers/KnowledgeBaseSection.tsx:179`、`components/pages/publishers/ZeroClickSection.tsx:24`；56（`mb-14`）`components/pages/publishers/LayerOverview.tsx:94`、`components/pages/partnership/PartnershipEarnings.tsx:104`）<!-- src: #33 -->
 <!-- src: mol-heading-group, mol-heading-group-left, mol-heading-group-desc-width, mol-heading-group-h2-gap, mol-heading-group-eyebrow-gap, mol-heading-flywheel, #29-3, #30-2 -->
 
 ### 4.4 FAQ 單題
@@ -709,7 +707,7 @@
 - 一排三張：`grid md:grid-cols-3 gap-5`（手機單欄、≥768 三欄；例：`components/pages/publishers/LayerOverview.tsx:110`）。
 - 選級時對照上表的同類排列；拿不準時依 §0 第 2 點詢問。
 - 禁止：卡片網格用上表以外的間距（例如 `gap-6`、`gap-3`、`gap-8`）。
-- 現況偏離：見 §10 DATAI-619（`gap-6` 兩處改 `gap-5`：/brands/ 痛點兩卡 `components/pages/brands/BrandPainSection.tsx:70`、首頁身分卡 `components/home/IdentityCards.tsx:76`）
+- 現況偏離：見 §10 DATAI-619（`gap-6` 兩處改 `gap-5`：/brands/ 痛點兩卡 `components/pages/brands/BrandPainSection.tsx:70`、首頁身分卡 `components/home/IdentityCards.tsx:90`）
 <!-- src: An 2026-10-16 缺口裁決 q1（AI 接手測試） -->
 
 ---
@@ -774,9 +772,9 @@
   </section>
   ```
   （首頁容器 `max-w-6xl`。）
-  - **產品頁變體**（/decisive-engine/，`components/pages/decisive-engine/DecisiveEnginePageCTA.tsx:55-68`）：email 欄改成連到 /book-a-demo 的 §3.2 標準 44 實心「Contact Us」，必須呼叫 `trackCTA`。
+  - **產品頁變體**（/decisive-engine/，`components/pages/decisive-engine/DecisiveEnginePageCTA.tsx:56-70`）：email 欄改成連到 /book-a-demo 的 §3.2 標準 44 實心「Contact Us」，必須呼叫 `trackCTA`。
 - 禁止：在 `.section-dark` 上再疊 `bg-primary-dark`；自做 email 欄。
-- 現況偏離：見 §10 DATAI-620（h2 → 說明目前 12、說明不限寬）、DATAI-628（產品頁「Contact Us」沒有 `trackCTA`）
+- 現況偏離：見 §10 DATAI-620（h2 → 說明目前 12、說明不限寬）
 <!-- src: org-page-cta, org-de-cta-form, mol-heading-group-h2-gap, cross-trackcta -->
 
 ### 5.5 FAQ 區塊
@@ -858,7 +856,7 @@
 - 區塊順序：深 Hero（膠囊列 1024 例外）→ 白 決策迴圈 → 白 優勢 → 白 比較 → 白 使用案例 → 深 結果區 → 白 FAQ（上方用一般區塊距離）→ 深 頁尾 CTA（產品頁變體「Contact Us」，§5.4）。
 - 連續白底之間可用細線區隔或不區隔（§6.1）。
 - 禁止：淺灰交替；FAQ 緊貼深色區塊（上方只留 32）；頁尾 CTA 改回 email 欄（產品頁用「Contact Us」變體）。
-- 現況偏離：見 §10 DATAI-619（淺灰交替、FAQ 上方距離、區塊上下距）、DATAI-626（Hero）、DATAI-628（頁尾按鈕追蹤）
+- 現況偏離：見 §10 DATAI-619（淺灰交替、FAQ 上方距離、區塊上下距）、DATAI-626（Hero）
 <!-- src: tpl-order-de-surface, page-decisive-engine, org-faq-top-after-dark, org-de-cta-form -->
 
 ### 6.4 首頁（首頁專屬，不可照抄）
@@ -867,7 +865,7 @@
 - 區塊順序：白 Hero（`HeroSection`）→ 白 身分卡 → 深 Flywheel → 白 Intent Refinery → 深 頁尾 CTA（白／白／深／白／深）。
 - 首頁專屬項目：白／白開頭的區塊順序（白底 Hero）、h1 寫法（≤420px 27px、`tracking-tight`）、內容與頁尾 1152（`max-w-6xl`）、標準淺底光暈的首頁 Hero 用法。這些只限首頁，其他頁不可用。（Hero 的全螢幕高與標題輪播是現況，未列為標準。）<!-- src: tpl-order-home, home-hero-h1-narrow-27, org-hero-home -->
 - 禁止：把首頁的 1152 容器、白底 Hero 或白／白開頭用在其他頁。
-- 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）、DATAI-620（Flywheel h2）、DATAI-628（身分卡按鈕追蹤）
+- 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）、DATAI-620（Flywheel h2）
 <!-- src: tpl-order-home, tpl-container-home-6xl, org-hero-home, page-home -->
 
 ### 6.5 法律頁
@@ -897,7 +895,7 @@
   - 按鈕：§3.2 標準 44 實心；CDN 版另有 §3.5 深底外框。
   - 兩個 404 版本以 `.nf-cdn`／`.nf-default` 切換（只用於 404）。
 - 禁止：大字用主色；標題用 36；按鈕 inline 上色。
-- 現況偏離：見 §10 DATAI-626（標題目前 36）、DATAI-622（大字目前主色）、DATAI-628（404 按鈕追蹤）
+- 現況偏離：見 §10 DATAI-626（標題目前 36）、DATAI-622（大字目前主色）
 <!-- src: page-404, page-error, #31-1 -->
 
 ### 6.8 AI Mode 頁
@@ -917,11 +915,11 @@
 - 用在哪：行動按鈕（§3.2、§3.3）、外框按鈕（§3.4、§3.5）、「Talk to us」這類可點的大卡片。
 - 寫法：在 `onClick` 呼叫 `trackCTA`（`lib/analytics.ts:28`，送出 GA4 `click_cta` 事件，參數 `cta_label`／`cta_position`／`page_audience`）。
   - `label`＝**畫面上的按鈕文字**（例：`trackCTA('Book a Demo', 'nav')`，`components/layout/Nav.tsx:261`）。
-  - `position`＝按鈕位置，沿用既有命名（例：導覽列 `nav`、手機導覽列 `nav_mobile_header`、滿版選單 `nav_mobile`、/content-owners/ 區塊 `content_owners_section`）；共用元件由參數傳入（例：`PlaygroundCTASection` 的 `trackingPosition`、`InlineEmailCTA` 的 `ctaLabel`）。
+  - `position`＝按鈕位置，沿用既有命名（例：導覽列 `nav`、手機導覽列 `nav_mobile_header`、滿版選單 `nav_mobile`、/content-owners/ 區塊 `content_owners_section`、/decisive-engine/ 頁尾 `decisive_engine_cta`、404 `not_found`／`not_found_cdn`）；共用元件由參數傳入（例：`PlaygroundCTASection` 的 `trackingPosition`、`InlineEmailCTA` 的 `ctaLabel`）。
+  - 按鈕文字隨寬度不同時（例：首頁身分卡平板寬顯示「Learn more」），`label` 記點擊當下畫面上的文字，用 `matchMedia` 依與按鈕相同的斷點判斷，不讀 `innerText`（會含 sr-only 文字）；同字樣的多顆按鈕以 `position` 區分（例：`home_identity_content_owners`／`home_identity_brands`／`home_identity_developers`，`components/home/IdentityCards.tsx`）。<!-- src: #53 -->
 - 不適用（維持現狀）：`InlineEmailCTA` 只在送出成功後記錄（`components/ui/InlineEmailCTA.tsx:55`）；/book-a-demo/ 表單送出記錄 `contact_form_submit` 事件；錯誤頁「Try again」是重試，不是 CTA。
 - 禁止：導覽型 CTA 不呼叫 `trackCTA`；`label` 與畫面文字不同。
-- 現況偏離：見 §10 DATAI-628（首頁身分卡 3 顆、/decisive-engine/ 頁尾「Contact Us」、404 三顆沒有 `trackCTA`；「Talk to us」卡片記錄成「Get Started」）
-<!-- src: cross-trackcta, lib/analytics.ts:27, #26, #31-11 -->
+<!-- src: cross-trackcta, lib/analytics.ts:28, #26, #31-11 -->
 
 ### 7.2 FAQ 結構化資料
 
@@ -987,7 +985,7 @@
   - 新增或修改 token、共用類別：改 `app/site-base.css`。
   - 新增一種文件或 story 檔案類型：同時在 `app/globals.css` 加 `@source not` 排除，並在 `.storybook/storybook.css` 加 `@source`。
   - `storybook-static/`（Storybook 建置輸出）必須留在 `.gitignore`，否則會被網站 CSS 掃到。
-- 注意：有 4 處程式註解仍寫「globals.css」（`components/not-found/NotFoundContent.tsx:16`、`components/not-found/variantScript.ts:19`、`components/pages/ai-mode-playground/AiModePlayground.tsx:87`、`components/pages/ai-mode-playground/ExperiencePanel.module.css:339`），規則實際都已在 `app/site-base.css`，讀到時以 `site-base.css` 為準。
+- 注意：有 4 處程式註解仍寫「globals.css」（`components/not-found/NotFoundContent.tsx:19`、`components/not-found/variantScript.ts:19`、`components/pages/ai-mode-playground/AiModePlayground.tsx:87`、`components/pages/ai-mode-playground/ExperiencePanel.module.css:339`），規則實際都已在 `app/site-base.css`，讀到時以 `site-base.css` 為準。
 - 禁止：在 `app/globals.css` 寫任何樣式規則；在文件或 story 用網站沒有的 class 卻不排除掃描。
 <!-- src: #32, app/globals.css, .storybook/storybook.css, storybook-static 被網站 CSS 掃描的實測 -->
 
@@ -1139,7 +1137,6 @@
 | DATAI-620 | 區塊標題組 | h2→說明 16（含頁尾 CTA）；說明寬 576；7 處小標籤改「緊」；首頁 Flywheel h2 改 `.section-heading`；標題組到下方內容 48（11 處） | mol-heading-group-h2-gap、mol-heading-group-desc-width、mol-heading-group-eyebrow-gap、mol-heading-flywheel |
 | DATAI-622 | 對比修正 | `text-ink-subtle` 文字改 `text-ink-muted`；email 欄與 /book-a-demo/ 表單欄位提示文字改 `placeholder:text-ink-muted`；深底淡綠字低於 .85 改 ≥.85；主色字在深底改 on-dark；404「404」與錯誤頁「!」改白；白面板上的淡綠字改主色；比較卡編號改白；.75 文字改 .85 | cross-contrast-ink-subtle、tok-on-dark-085、cross-contrast-primary-on-dark、cross-contrast-ondark-on-white、cross-contrast-card-number |
 | DATAI-626 | Hero 對齊 | /developers/、/partnership/、/decisive-engine/ 對齊標準 Hero（下距 48、底部細線、h1 48）；/privacy-policy/、/terms-of-service/、/book-a-demo/ 的 h1 補 `text-balance`；404／錯誤頁標題 48 | org-hero-structure、org-hero-h1-standard、page-404、page-error |
-| DATAI-628 | CTA 追蹤 | 7 顆導覽型按鈕補 `trackCTA`；「Talk to us」記錄名稱改為畫面文字（改名前先查 GA 報表） | cross-trackcta |
 | DATAI-629 | /content-owners/ 步驟面板 | 說明最後一行被固定高度切掉；輪播改為點擊後永久停止、捲出畫面不輪播，與首頁流程一致 | page-content-owners、org-home-pipeline-carousel |
 | DATAI-630 | AI Mode 頁對齊 | 14／9／7px 間距改 4px 刻度（分享區核准的 14px 除外）；legacy 變數改 `@theme` token；AI Mode 頁仍是例外 | tok-ai-mode-spacing、tok-ai-mode-legacy-vars |
 <!-- src: 修正票 DATAI-556、DATAI-619–630（皆為 DATAI-315 子票）, #30-5, #31, #32, #33, #34 -->

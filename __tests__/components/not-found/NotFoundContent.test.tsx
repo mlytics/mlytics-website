@@ -1,23 +1,25 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import NotFoundContent from '@/components/not-found/NotFoundContent'
 
 vi.mock('next/link', () => ({
-  default: ({
-    href,
-    children,
-    className,
-    ...rest
-  }: {
+  default: ({ href, children, className, onClick, ...rest }: {
     href: string
     children: React.ReactNode
     className?: string
+    onClick?: React.MouseEventHandler<HTMLAnchorElement>
   }) => (
-    <a href={href} className={className} {...rest}>
+    <a href={href} className={className} {...rest}
+      onClick={(e) => { e.preventDefault(); onClick?.(e) }}>
       {children}
     </a>
   ),
 }))
+
+const trackCTA = vi.hoisted(() => vi.fn())
+vi.mock('@/lib/analytics', () => ({ trackCTA }))
+afterEach(() => { trackCTA.mockClear(); vi.unstubAllGlobals() })
 
 describe('NotFoundContent — CDN variant', () => {
   it('points the primary CTA at the Decisive Engine page', () => {
@@ -88,5 +90,18 @@ describe('NotFoundContent — CDN variant', () => {
     const homeLink = fallback.querySelector('a[href="/"]')
     expect(homeLink).not.toBeNull()
     expect(homeLink).toHaveTextContent('Back to Home')
+  })
+})
+
+describe('NotFoundContent — tracking (DATAI-628)', () => {
+  it.each([
+    ['Explore More Multi-CDN', 'Explore More', 'not_found_cdn'],
+    ['Contact Us', 'Contact Us', 'not_found_cdn'],
+    ['Back to Home', 'Back to Home', 'not_found'],
+  ])('clicking %s records %s at %s', async (name, label, position) => {
+    render(<NotFoundContent />)
+    await userEvent.click(screen.getByRole('link', { name }))
+    expect(trackCTA).toHaveBeenCalledTimes(1)
+    expect(trackCTA).toHaveBeenCalledWith(label, position)
   })
 })
