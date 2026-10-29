@@ -239,6 +239,9 @@ function decodedSegment(source: string, start: number, end: number, expected: st
         if (escape === undefined) return UNKNOWN_VALUE
         decoded = ({ n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', v: '\v', '0': '\0' } as Record<string, string>)[escape] ?? escape
       }
+    } else if (decoded === '\r') {
+      if (raw[i] === '\n') i++
+      decoded = '\n'
     }
     text += decoded
     for (let j = 0; j < decoded.length; j++) offsets.push(start + at)

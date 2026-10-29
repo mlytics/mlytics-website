@@ -239,6 +239,11 @@ describe('new colour syntax regressions', () => {
     expect(found('a.tsx', `<div style={{ filter: \`drop-shadow(0 0 2px \${'red'})\` }} />`)).toEqual(['named-color red'])
   })
 
+  it.each([['LF', '\n'], ['CRLF', '\r\n'], ['CR', '\r']])('scans template colours with %s source newlines', (_, newline) => {
+    const source = '<div style={{ background: `linear-gradient(' + newline + 'red, blue' + newline + ')` }} />'
+    expect(found('a.tsx', source)).toEqual(['named-color red', 'named-color blue'])
+  })
+
   it('scans decoded JavaScript colour escapes at their source line', () => {
     expect(found('a.tsx', '<div style={{ color: "r\\u0065d" }} />')).toEqual(['named-color red'])
     expect(found('a.tsx', '<path stroke={"\\x72ed"} />')).toEqual(['named-color red'])
