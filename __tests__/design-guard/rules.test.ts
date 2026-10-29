@@ -157,6 +157,15 @@ describe('new colour syntax regressions', () => {
     ])
   })
 
+  it('catches named colours in CSS and TSX colour shorthands', () => {
+    expect(found('a.module.css', '.x { column-rule: 1px solid red; text-emphasis: filled blue; -webkit-text-stroke: 1px green; }')).toEqual([
+      'named-color red', 'named-color blue', 'named-color green',
+    ])
+    expect(found('a.tsx', `<div style={{ columnRule: '1px solid red', textEmphasis: 'filled blue', WebkitTextStroke: '1px green' }} />`)).toEqual([
+      'named-color red', 'named-color blue', 'named-color green',
+    ])
+  })
+
   it('catches conditional static string leaves in TSX style and SVG colour contexts', () => {
     const source = `<svg
       style={{ accentColor: active ? 'red' : ('blue' as string), filter: active ? 'drop-shadow(0 0 2px green)' : undefined }}
@@ -224,6 +233,18 @@ describe('new colour syntax regressions', () => {
     ])
   })
 
+  it('keeps interpolated URL and var names inside their full CSS value', () => {
+    expect(found('a.tsx', `<div style={{ filter: \`url(/\${'red'}.svg) drop-shadow(0 0 2px var(--color-primary))\` }} />`)).toEqual([])
+    expect(found('a.tsx', `<div style={{ filter: \`drop-shadow(0 0 2px var(--\${'red'}))\` }} />`)).toEqual([])
+    expect(found('a.tsx', `<div style={{ filter: \`drop-shadow(0 0 2px \${'red'})\` }} />`)).toEqual(['named-color red'])
+  })
+
+  it('scans decoded JavaScript colour escapes at their source line', () => {
+    expect(found('a.tsx', '<div style={{ color: "r\\u0065d" }} />')).toEqual(['named-color red'])
+    expect(found('a.tsx', '<path stroke={"\\x72ed"} />')).toEqual(['named-color red'])
+    expect(findViolations('a.tsx', '\n<div style={{ color: "r\\u0065d" }} />')[0]?.line).toBe(2)
+  })
+
   it('keeps prose and Tailwind text-white outside named-colour contexts', () => {
     expect(found('a.tsx', `const prose = condition ? 'red' : 'blue'; <p className="text-white">white prose</p>`)).toEqual([])
     expect(found('a.module.css', '.x { content: "red"; filter: blur(2px); }')).toEqual([])
@@ -287,6 +308,14 @@ describe('new colour syntax regressions', () => {
       'named-color black',
       'named-color white',
     ])
+  })
+
+  it('resolves wrapped computed mask keys and conservatively handles unknown keys', () => {
+    const blocked = ['named-color black', 'named-color white']
+    expect(found('a.tsx', `<div style={{ [('maskMode')]: 'luminance', maskImage: 'linear-gradient(black, white)' }} />`)).toEqual(blocked)
+    expect(found('a.tsx', `<div style={{ ['maskMode' as const]: 'luminance', maskImage: 'linear-gradient(black, white)' }} />`)).toEqual(blocked)
+    expect(found('a.tsx', `<div style={{ [dynamicKey]: 'luminance', maskImage: 'linear-gradient(black, white)' }} />`)).toEqual(blocked)
+    expect(found('a.tsx', `<div style={{ [dynamicKey]: 'luminance', maskMode: 'alpha', maskImage: 'linear-gradient(black, white)' }} />`)).toEqual([])
   })
 
   it('honours mask-mode importance and declaration order within the direct CSS rule', () => {

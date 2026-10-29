@@ -189,7 +189,7 @@ function namedInValue(value: string, base: number, push: (index: number, match: 
   }
 }
 
-const CSS_NAMED_COLOUR_PROPERTY = /^(?:(?:-webkit-)?mask-image|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|inline(?:-start|-end)?|block(?:-start|-end)?))?(?:-color)?|outline(?:-color)?|text-decoration(?:-color)?|box-shadow|text-shadow|accent-color|caret-color|column-rule-color|flood-color|lighting-color|stop-color|text-emphasis-color|-webkit-text-fill-color|-webkit-text-stroke-color|scrollbar-color|fill|stroke|color|--[\w-]+)$/i
+const CSS_NAMED_COLOUR_PROPERTY = /^(?:(?:-webkit-)?mask-image|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|inline(?:-start|-end)?|block(?:-start|-end)?))?(?:-color)?|outline(?:-color)?|text-decoration(?:-color)?|box-shadow|text-shadow|accent-color|caret-color|column-rule(?:-color)?|flood-color|lighting-color|stop-color|text-emphasis(?:-color)?|-webkit-text-fill-color|-webkit-text-stroke(?:-color)?|scrollbar-color|fill|stroke|color|--[\w-]+)$/i
 const STYLE_NAMED_COLOUR_PROPERTIES = new Set([
   'background', 'backgroundcolor', 'backgroundimage',
   'border', 'bordercolor', 'bordertop', 'bordertopcolor', 'borderright', 'borderrightcolor',
@@ -198,58 +198,100 @@ const STYLE_NAMED_COLOUR_PROPERTIES = new Set([
   'borderinlineendcolor', 'borderblock', 'borderblockcolor', 'borderblockstart',
   'borderblockstartcolor', 'borderblockend', 'borderblockendcolor',
   'outline', 'outlinecolor', 'textdecoration', 'textdecorationcolor', 'boxshadow', 'textshadow',
-  'accentcolor', 'caretcolor', 'columnrulecolor', 'floodcolor', 'lightingcolor', 'stopcolor',
-  'textemphasiscolor', 'webkittextfillcolor', 'webkittextstrokecolor', 'scrollbarcolor',
+  'accentcolor', 'caretcolor', 'columnrule', 'columnrulecolor', 'floodcolor', 'lightingcolor', 'stopcolor',
+  'textemphasis', 'textemphasiscolor', 'webkittextfillcolor', 'webkittextstroke', 'webkittextstrokecolor', 'scrollbarcolor',
   'fill', 'stroke', 'color', 'filter', 'maskimage', 'webkitmaskimage',
 ])
 const SVG_NAMED_COLOUR_ATTRIBUTES = new Set(['fill', 'stroke', 'color', 'stopcolor', 'floodcolor', 'lightingcolor'])
 
 const propertyName = (name: ts.PropertyName): string | undefined => {
   if (ts.isIdentifier(name) || ts.isStringLiteral(name) || ts.isNumericLiteral(name)) return name.text
-  if (ts.isComputedPropertyName(name) && (ts.isStringLiteral(name.expression) || ts.isNoSubstitutionTemplateLiteral(name.expression))) return name.expression.text
+  if (ts.isComputedPropertyName(name)) {
+    const expression = unwrapExpression(name.expression)
+    if (ts.isStringLiteral(expression) || ts.isNoSubstitutionTemplateLiteral(expression)) return expression.text
+  }
   return undefined
 }
 
 const jsxAttributeName = (name: ts.JsxAttributeName) => name.getText().replace(/-/g, '').toLowerCase()
 
-function scanStaticStringLeaves(sourceFile: ts.SourceFile, source: string, node: ts.Node, push: (index: number, match: string) => void) {
-  if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) {
-    const start = node.getStart(sourceFile) + 1
-    const value = source.slice(start, node.getEnd() - 1)
-    namedInValue(value, start, push)
-    return
-  }
-  if (ts.isTemplateExpression(node)) {
-    const scanPart = (start: number, end: number) => {
-      const value = source.slice(start, end)
-      namedInValue(value, start, push)
+type ValueOutput = { text: string; offsets: number[] }
+const UNKNOWN_VALUE: ValueOutput = { text: '\0', offsets: [-1] }
+
+function decodedSegment(source: string, start: number, end: number, expected: string): ValueOutput {
+  const raw = source.slice(start, end)
+  let text = ''
+  const offsets: number[] = []
+  for (let i = 0; i < raw.length;) {
+    const at = i
+    let decoded = raw[i++]
+    if (decoded === '\\') {
+      const rest = raw.slice(at)
+      const hex = rest.match(/^\\x([0-9a-fA-F]{2})/)
+      const unicode = rest.match(/^\\u([0-9a-fA-F]{4})/)
+      const codepoint = rest.match(/^\\u\{([0-9a-fA-F]{1,6})\}/)
+      if (hex) { decoded = String.fromCharCode(parseInt(hex[1], 16)); i = at + hex[0].length }
+      else if (unicode) { decoded = String.fromCharCode(parseInt(unicode[1], 16)); i = at + unicode[0].length }
+      else if (codepoint) { decoded = String.fromCodePoint(parseInt(codepoint[1], 16)); i = at + codepoint[0].length }
+      else if (raw[i] === '\n' || raw[i] === '\r') { i += raw[i] === '\r' && raw[i + 1] === '\n' ? 2 : 1; continue }
+      else {
+        const escape = raw[i++]
+        if (escape === undefined) return UNKNOWN_VALUE
+        decoded = ({ n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', v: '\v', '0': '\0' } as Record<string, string>)[escape] ?? escape
+      }
     }
-    scanPart(node.head.getStart(sourceFile) + 1, node.head.getEnd() - 2)
-    for (const span of node.templateSpans) {
-      scanStaticStringLeaves(sourceFile, source, span.expression, push)
+    text += decoded
+    for (let j = 0; j < decoded.length; j++) offsets.push(start + at)
+  }
+  return text === expected ? { text, offsets } : UNKNOWN_VALUE
+}
+
+const combineValues = (left: ValueOutput[], right: ValueOutput[]): ValueOutput[] =>
+  left.flatMap((a) => right.map((b) => ({ text: a.text + b.text, offsets: [...a.offsets, ...b.offsets] })))
+
+function valueOutputs(sourceFile: ts.SourceFile, source: string, expression: ts.Expression): ValueOutput[] {
+  expression = unwrapExpression(expression)
+  if (ts.isStringLiteral(expression) || ts.isNoSubstitutionTemplateLiteral(expression)) {
+    return [decodedSegment(source, expression.getStart(sourceFile) + 1, expression.getEnd() - 1, expression.text)]
+  }
+  if (ts.isTemplateExpression(expression)) {
+    const head = expression.head
+    let outputs = [decodedSegment(source, head.getStart(sourceFile) + 1, head.getEnd() - 2, head.text)]
+    for (const span of expression.templateSpans) {
       const tail = span.literal
-      scanPart(tail.getStart(sourceFile) + 1, tail.getEnd() - (ts.isTemplateTail(tail) ? 1 : 2))
+      outputs = combineValues(outputs, valueOutputs(sourceFile, source, span.expression))
+      outputs = combineValues(outputs, [decodedSegment(source, tail.getStart(sourceFile) + 1, tail.getEnd() - (ts.isTemplateTail(tail) ? 1 : 2), tail.text)])
     }
-    return
+    return outputs
   }
-  const expression = wrappedExpression(node)
-  if (expression) {
-    scanStaticStringLeaves(sourceFile, source, expression, push)
-    return
+  if (ts.isConditionalExpression(expression)) {
+    return [...valueOutputs(sourceFile, source, expression.whenTrue), ...valueOutputs(sourceFile, source, expression.whenFalse)]
   }
-  if (ts.isConditionalExpression(node)) {
-    scanStaticStringLeaves(sourceFile, source, node.whenTrue, push)
-    scanStaticStringLeaves(sourceFile, source, node.whenFalse, push)
-    return
+  if (ts.isBinaryExpression(expression)) {
+    if (expression.operatorToken.kind === ts.SyntaxKind.PlusToken) {
+      return combineValues(valueOutputs(sourceFile, source, expression.left), valueOutputs(sourceFile, source, expression.right))
+    }
+    if (expression.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) return [UNKNOWN_VALUE, ...valueOutputs(sourceFile, source, expression.right)]
+    if (expression.operatorToken.kind === ts.SyntaxKind.BarBarToken || expression.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) {
+      return [...valueOutputs(sourceFile, source, expression.left), ...valueOutputs(sourceFile, source, expression.right)]
+    }
   }
-  if (ts.isBinaryExpression(node) && [
-    ts.SyntaxKind.PlusToken,
-    ts.SyntaxKind.AmpersandAmpersandToken,
-    ts.SyntaxKind.BarBarToken,
-    ts.SyntaxKind.QuestionQuestionToken,
-  ].includes(node.operatorToken.kind)) {
-    scanStaticStringLeaves(sourceFile, source, node.left, push)
-    scanStaticStringLeaves(sourceFile, source, node.right, push)
+  return [UNKNOWN_VALUE]
+}
+
+function scanStaticStringLeaves(sourceFile: ts.SourceFile, source: string, node: ts.Expression, push: (index: number, match: string) => void) {
+  const seen = new Set<string>()
+  for (const output of valueOutputs(sourceFile, source, node)) {
+    const withoutReferences = output.text.replace(/url\([^)]*\)/gi, blank)
+    for (const word of withoutReferences.matchAll(/(?<![\w-])[a-z]+(?![\w-])/gi)) {
+      if (!NAMED_COLORS.has(word[0].toLowerCase())) continue
+      const index = output.offsets[word.index!]
+      if (index === undefined || index < 0) continue
+      const key = `${index}:${word[0]}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      push(index, word[0])
+    }
   }
 }
 
@@ -296,7 +338,9 @@ function alphaMaskOutcome(entries: StyleOutcome): boolean {
   let mode: string | null | undefined
   for (const entry of entries) {
     if (entry === null) { mode = null; continue }
-    const name = propertyName(entry.name)?.replace(/-/g, '').toLowerCase()
+    const rawName = propertyName(entry.name)
+    if (rawName === undefined && ts.isComputedPropertyName(entry.name)) { mode = null; continue }
+    const name = rawName?.replace(/-/g, '').toLowerCase()
     if (name === 'maskmode' || name === 'webkitmaskmode') mode = staticStringExpression(entry.initializer) ?? null
   }
   return mode === undefined || (mode !== null && alphaModeList(mode))
