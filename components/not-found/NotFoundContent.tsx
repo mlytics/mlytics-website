@@ -4,86 +4,12 @@ import Link from 'next/link'
 import { trackCTA } from '@/lib/analytics'
 
 /**
- * Same-origin, like every other book-a-demo CTA in the app (Nav, Footer,
- * ContentOwnerVerticals). An absolute production URL would send staging and
- * local traffic to the live site.
- */
-const BOOK_A_DEMO = '/book-a-demo'
-
-/** Destination for the CDN variant's primary CTA (DATAI-553). */
-const DECISIVE_ENGINE = '/decisive-engine'
-
-/**
- * Both variants are rendered into the single prerendered 404.html; the inline
- * script in app/not-found.tsx stamps `data-nf` on <html> before first paint and
- * the .nf-cdn / .nf-default rules in globals.css reveal the right one. See
- * ./variantScript for why the choice cannot be made at render time.
+ * The PROD release branch ships only the generic 404 (DATAI-681): the
+ * CDN-specific variant (#41) and its variant script are switched off, so no
+ * `data-nf` is stamped and the .nf-default block is always visible.
  */
 export default function NotFoundContent() {
-  return (
-    <>
-      <CdnNotFound />
-      <DefaultNotFound />
-    </>
-  )
-}
-
-/** Variant shown for legacy CDN / Multi-CDN URLs. */
-function CdnNotFound() {
-  return (
-    <div className="nf-cdn max-w-xl mx-auto">
-      {/* Eyebrow styling matches the dark hero pages (developers, brands,
-          content-owners, book-a-demo, privacy-policy, terms-of-service). */}
-      <span
-        className="label-eyebrow-pill mb-4 bg-primary/40 text-on-dark"
-      >
-        Multi-CDN
-      </span>
-
-      <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 text-balance">
-        Looking for Multi-CDN?
-      </h1>
-
-      {/* Kept short so it sits on a single line from md upward. */}
-      <p className="text-base mb-8 text-on-dark">
-        This page has moved, but our Multi-CDN service is still available.
-      </p>
-
-      <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-        {/* Primary now leads to the product page: visitors arriving from legacy
-            Multi-CDN URLs want the capability, not the sales form. Contact Us
-            stays one step away, and repeats at the bottom of that page.
-            The extra context is visually hidden text appended after the visible
-            label, not an aria-label: WCAG 2.5.3 (Label in Name) requires the
-            accessible name to contain the visible label, and an aria-label
-            replaces the accessible name outright rather than extending it — do
-            not "simplify" this back to aria-label. The space before the hidden
-            span is a real separating character (invisible to sighted users,
-            since nothing renders after it): without it the accessible-name
-            computation joins the two text nodes with no separator at all,
-            producing "Explore MoreMulti-CDN" instead of the intended
-            "Explore More Multi-CDN". */}
-        <Link
-          href={DECISIVE_ENGINE}
-          onClick={() => trackCTA('Explore More', 'not_found_cdn')}
-          className="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold text-white bg-primary transition-opacity hover:opacity-90"
-        >
-          Explore More <span className="sr-only">Multi-CDN</span>
-        </Link>
-        {/* Secondary is the design system's dark outline pill (DESIGN.md
-            §3.5). .pill-btn already gives it 14/600 text, a 1px border and the
-            same 44px height as the solid primary beside it, so it needs no
-            overrides. */}
-        <Link
-          href={BOOK_A_DEMO}
-          onClick={() => trackCTA('Contact Us', 'not_found_cdn')}
-          className="pill-btn pill-btn--dark"
-        >
-          Contact Us
-        </Link>
-      </div>
-    </div>
-  )
+  return <DefaultNotFound />
 }
 
 /** Generic variant — unchanged from the original 404. */

@@ -8,7 +8,7 @@ const read = (f: string) => readFileSync(resolve(root, f), 'utf8')
 const HERO_FILES = [
   'app/brands/page.tsx', 'app/book-a-demo/page.tsx', 'app/content-owners/page.tsx',
   'app/privacy-policy/page.tsx', 'app/terms-of-service/page.tsx', 'app/developers/page.tsx',
-  'components/not-found/NotFoundContent.tsx', 'components/pages/decisive-engine/DecisiveEngineHero.tsx',
+  'components/pages/decisive-engine/DecisiveEngineHero.tsx',
   'components/pages/partnership/PartnershipHero.tsx',
 ]
 

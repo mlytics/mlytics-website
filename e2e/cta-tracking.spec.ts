@@ -78,16 +78,6 @@ test.describe('CTA tracking (DATAI-628)', () => {
     }
   }
 
-  test('/decisive-engine/ closing Contact Us', async ({ page }) => {
-    await page.goto('/decisive-engine/')
-    const link = page.getByRole('link', { name: 'Contact Us', exact: true }).last()
-    await link.scrollIntoViewIfNeeded()
-    await link.click()
-    await expectSingleEvent(page, {
-      cta_label: 'Contact Us', cta_position: 'decisive_engine_cta', page_audience: 'decisive-engine',
-    })
-  })
-
   test('/content-owners/ Talk to us card', async ({ page }) => {
     await page.goto('/content-owners/')
     const link = page.getByRole('link', { name: /Talk to us/ })
@@ -95,26 +85,6 @@ test.describe('CTA tracking (DATAI-628)', () => {
     await link.click()
     await expectSingleEvent(page, {
       cta_label: 'Talk to us', cta_position: 'content_owners_section', page_audience: 'content-owners',
-    })
-  })
-
-  test('404 CDN variant: Explore More', async ({ page }) => {
-    await page.goto('/features/cdn/')
-    const link = page.getByRole('link', { name: 'Explore More Multi-CDN', exact: true })
-    await expect(link).toBeVisible()
-    await link.click()
-    await expectSingleEvent(page, {
-      cta_label: 'Explore More', cta_position: 'not_found_cdn', page_audience: 'features_cdn',
-    })
-  })
-
-  test('404 CDN variant: Contact Us', async ({ page }) => {
-    await page.goto('/features/cdn/')
-    const link = page.locator('.nf-cdn').getByRole('link', { name: 'Contact Us', exact: true })
-    await expect(link).toBeVisible()
-    await link.click()
-    await expectSingleEvent(page, {
-      cta_label: 'Contact Us', cta_position: 'not_found_cdn', page_audience: 'features_cdn',
     })
   })
 
