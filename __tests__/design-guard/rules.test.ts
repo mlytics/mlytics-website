@@ -94,8 +94,15 @@ describe('new colour syntax regressions', () => {
   })
 
   it('captures every added colour function through nested parentheses', () => {
-    const values = ['oklch(50% 0.1 20)', 'oklab(0.5 0.1 0.1)', 'lab(50% 0 0)', 'lch(50% 0 0)', 'hwb(0 0% 0%)', 'color-mix(in srgb, var(--color-primary) 18%, transparent)']
+    const values = ['oklch(50% 0.1 20)', 'oklab(0.5 0.1 0.1)', 'lab(50% 0 0)', 'lch(50% 0 0)', 'hwb(0 0% 0%)', 'color(display-p3 1 0 0)', 'color(from var(--brand) srgb r g b / calc(alpha * .5))', 'color-mix(in srgb, var(--color-primary) 18%, transparent)']
     expect(found('a.module.css', values.map((x) => `color: ${x};`).join('\n'))).toEqual(values.map((x) => `color-fn ${x}`))
+  })
+
+  it('flags color() in Tailwind arbitrary colour utilities', () => {
+    expect(found('a.tsx', 'className="bg-[color(display-p3_1_0_0)]"')).toEqual([
+      'color-fn color(display-p3_1_0_0)',
+      'arbitrary bg-[color(display-p3_1_0_0)]',
+    ])
   })
 
   it('reports a nested colour function once as its complete outer match', () => {
@@ -118,6 +125,108 @@ describe('new colour syntax regressions', () => {
 
   it('catches border-inline and text-decoration shorthand named colours', () => {
     expect(found('a.module.css', '.a { border-inline-color: red; text-decoration: underline blue; }')).toEqual(['named-color red', 'named-color blue'])
+  })
+
+  it('catches named colours in every visible CSS colour context', () => {
+    const properties = [
+      'accent-color: red',
+      'caret-color: blue',
+      'column-rule-color: green',
+      'flood-color: gold',
+      'lighting-color: white',
+      'stop-color: black',
+      'text-emphasis-color: purple',
+      '-webkit-text-fill-color: orange',
+      '-webkit-text-stroke-color: pink',
+      'scrollbar-color: teal silver',
+      'filter: blur(1px) drop-shadow(0 0 2px brown)',
+    ]
+    expect(found('a.module.css', `.x { ${properties.join('; ')}; }`)).toEqual([
+      'named-color red',
+      'named-color blue',
+      'named-color green',
+      'named-color gold',
+      'named-color white',
+      'named-color black',
+      'named-color purple',
+      'named-color orange',
+      'named-color pink',
+      'named-color teal',
+      'named-color silver',
+      'named-color brown',
+    ])
+  })
+
+  it('catches conditional static string leaves in TSX style and SVG colour contexts', () => {
+    const source = `<svg
+      style={{ accentColor: active ? 'red' : ('blue' as string), filter: active ? 'drop-shadow(0 0 2px green)' : undefined }}
+      stroke={active ? 'white' : 'black'}
+      floodColor={active ? \`gold\` : \`purple\`}
+    />`
+    expect(found('a.tsx', source)).toEqual([
+      'named-color red',
+      'named-color blue',
+      'named-color green',
+      'named-color white',
+      'named-color black',
+      'named-color gold',
+      'named-color purple',
+    ])
+  })
+
+  it('catches visible colours inside inline style-object spreads', () => {
+    expect(found('a.tsx', `<div style={{ ...(active ? { color: 'red' } : { color: 'blue' }) }} />`)).toEqual([
+      'named-color red',
+      'named-color blue',
+    ])
+  })
+
+  it('resolves inline spread mask modes conservatively without losing alpha masks', () => {
+    expect(found('a.tsx', `<div style={{ ...{ maskMode: 'luminance' }, maskImage: 'linear-gradient(black, white)' }} />`)).toEqual([
+      'named-color black',
+      'named-color white',
+    ])
+    expect(found('a.tsx', `<div style={{ ...{ maskMode: 'alpha' }, maskImage: 'linear-gradient(black, white)' }} />`)).toEqual([])
+    expect(found('a.tsx', `<div style={{ ...(active ? { maskMode: 'alpha' } : { maskMode: 'luminance' }), maskImage: 'linear-gradient(black, white)' }} />`)).toEqual([
+      'named-color black',
+      'named-color white',
+    ])
+  })
+
+  it('uses the final inline style mask mode for mask images inside spreads', () => {
+    const blocked = ['named-color black', 'named-color white']
+    expect(found('a.tsx', `<div style={{ ...{ maskImage: 'linear-gradient(black, white)', maskMode: 'alpha' }, maskMode: 'luminance' }} />`)).toEqual(blocked)
+    expect(found('a.tsx', `<div style={{ ...{ maskImage: 'linear-gradient(black, white)', maskMode: 'luminance' }, maskMode: 'alpha' }} />`)).toEqual([])
+  })
+
+  it('scans value-producing logical spread branches and their final mask modes', () => {
+    expect(found('a.tsx', `<div style={{ ...(enabled && { color: 'red' }), ...(choice || { color: 'blue' }), ...(option ?? { color: 'green' }) }} />`)).toEqual([
+      'named-color red', 'named-color blue', 'named-color green',
+    ])
+    expect(found('a.tsx', `<div style={{ ...(enabled && { maskImage: 'linear-gradient(black, white)' }), maskMode: 'luminance' }} />`)).toEqual([
+      'named-color black', 'named-color white',
+    ])
+    expect(found('a.tsx', `<div style={{ ...(theme === 'red' && { color: 'blue' }) }} />`)).toEqual(['named-color blue'])
+    expect(found('a.tsx', `<div style={{ ...({ color: 'red' } || { color: 'blue' }), ...({ color: 'green' } ?? { color: 'gold' }) }} />`)).toEqual([
+      'named-color red', 'named-color green',
+    ])
+  })
+
+  it('scans only value-producing conditional branches, not tests or type nodes', () => {
+    expect(found('a.tsx', `<div style={{ color: theme === 'red' ? 'var(--color-primary)' : 'currentColor' }} />`)).toEqual([])
+    expect(found('a.tsx', `<path stroke={value as 'red' | 'blue'} />`)).toEqual([])
+  })
+
+  it('catches conditional colours inside a drop-shadow template interpolation', () => {
+    expect(found('a.tsx', `<div style={{ filter: \`drop-shadow(0 0 2px \${active ? 'red' : 'blue'})\` }} />`)).toEqual([
+      'named-color red',
+      'named-color blue',
+    ])
+  })
+
+  it('keeps prose and Tailwind text-white outside named-colour contexts', () => {
+    expect(found('a.tsx', `const prose = condition ? 'red' : 'blue'; <p className="text-white">white prose</p>`)).toEqual([])
+    expect(found('a.module.css', '.x { content: "red"; filter: blur(2px); }')).toEqual([])
   })
 
   it('matches CSS colour property names without case sensitivity', () => {
@@ -170,6 +279,14 @@ describe('new colour syntax regressions', () => {
     expect(found('a.module.css', '.x { mask-image: linear-gradient(black, white); mask-mode: alpha, ALPHA; }')).toEqual([])
     expect(found('a.tsx', "style={{ maskMode: 'alpha, ALPHA', maskImage: 'linear-gradient(black, white)' }}")).toEqual([])
     expect(found('a.tsx', "style={{ maskMode: 'ALPHA', maskImage: 'linear-gradient(black, white)' }}")).toEqual([])
+  })
+
+  it('keeps alpha mask mode through transparent TypeScript wrappers', () => {
+    expect(found('a.tsx', `<div style={{ maskMode: ('alpha' as const)!, maskImage: 'linear-gradient(black, white)' }} />`)).toEqual([])
+    expect(found('a.tsx', `<div style={{ maskMode: ('luminance' satisfies string), maskImage: 'linear-gradient(black, white)' }} />`)).toEqual([
+      'named-color black',
+      'named-color white',
+    ])
   })
 
   it('honours mask-mode importance and declaration order within the direct CSS rule', () => {
@@ -267,6 +384,19 @@ describe('new Tailwind variant regressions', () => {
   it('keeps the same new prefixes for opacity modifiers', () => {
     expect(found('a.tsx', 'className="**:bg-white/10 group-data-[state=open]/item:text-white/50"')).toEqual([
       'opacity **:bg-white/10', 'opacity group-data-[state=open]/item:text-white/50',
+    ])
+  })
+
+  it('keeps arbitrary selectors with nested brackets in arbitrary-value matches', () => {
+    expect(found('a.tsx', 'className="[&[data-active]]:mt-[7px] group-[&[data-active]]/item:gap-[7px]"')).toEqual([
+      'arbitrary [&[data-active]]:mt-[7px]',
+      'arbitrary group-[&[data-active]]/item:gap-[7px]',
+    ])
+  })
+
+  it('keeps arbitrary selectors with nested brackets in opacity matches', () => {
+    expect(found('a.tsx', 'className="hover:[&[data-active]]:bg-white/50"')).toEqual([
+      'opacity hover:[&[data-active]]:bg-white/50',
     ])
   })
 })

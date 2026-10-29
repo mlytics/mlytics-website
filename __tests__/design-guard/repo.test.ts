@@ -108,6 +108,55 @@ describe('scanner boundaries', () => {
     }
   })
 
+  it('does not blank approved literals wrapped in transparent TypeScript expressions before concatenation', () => {
+    const file = 'components/layout/Nav.tsx'
+    const matches = (expression: string) => scanSource(file, `const value = ${expression}`, APPROVED).map((v) => v.match)
+    for (const expression of [
+      '("p-[11px]" as const) + suffix',
+      '("p-[11px]" satisfies string) + suffix',
+      '(<string>"p-[11px]") + suffix',
+      '("p-[11px]"!) + suffix',
+      '(("p-[11px]" as const)!) + suffix',
+    ]) {
+      expect(matches(expression), expression).toEqual(['p-[11px]'])
+    }
+  })
+
+  it('still blanks complete approved literals inside transparent TypeScript wrappers', () => {
+    const file = 'components/layout/Nav.tsx'
+    for (const expression of [
+      '("p-[11px]")',
+      '("p-[11px]" as const)',
+      '("p-[11px]" satisfies string)',
+      '(<string>"p-[11px]")',
+      '("p-[11px]"!)',
+    ]) {
+      expect(scanSource(file, `const value = ${expression}`, APPROVED), expression).toEqual([])
+    }
+  })
+
+  it('keeps angle-bracket assertions owned by their outer template and concatenation', () => {
+    const file = 'components/layout/Nav.tsx'
+    const matches = (expression: string) => scanSource(file, `const value = ${expression}`, APPROVED).map((v) => v.match)
+    expect(matches('`hover:${<string>"p-[11px]"}`')).toEqual(['p-[11px]'])
+    expect(matches('`${<string>"p-[11px]"}` + suffix')).toEqual(['p-[11px]'])
+    expect(matches('`${<string>"p-[11px]"}`')).toEqual([])
+  })
+
+  it('uses the outermost template for nested angle-assertion token boundaries', () => {
+    const file = 'components/layout/Nav.tsx'
+    const matches = (expression: string) => scanSource(file, `const value = ${expression}`, APPROVED).map((v) => v.match)
+    expect(matches('`hover:${`${<string>"p-[11px]"}`}`')).toEqual(['p-[11px]'])
+    expect(matches('`${`${<string>"p-[11px]"}`}` + suffix')).toEqual(['p-[11px]'])
+    expect(matches('`${`${<string>"p-[11px]"}`}`')).toEqual([])
+  })
+
+  it('never blanks an approved literal anywhere inside plus concatenation', () => {
+    const file = 'components/layout/Nav.tsx'
+    const source = 'const value = (active ? "p-[11px]" : "") + suffix'
+    expect(scanSource(file, source, APPROVED).map((v) => v.match)).toEqual(['p-[11px]'])
+  })
+
   it('allows a complete approved token in multiline templates while checking its neighbours', () => {
     const file = 'components/layout/Nav.tsx'
     expect(scanSource(file, '<div className={`\n p-[11px]\n`} />', APPROVED)).toEqual([])
