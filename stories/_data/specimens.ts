@@ -51,6 +51,7 @@ export const SPECIMENS: Specimen[] = [
   },
   { id: 'eyebrow', layer: 'atom', label: '區塊小標籤', className: 'label-eyebrow' },
   { id: 'eyebrow-medium', layer: 'atom', label: '較大小標籤', className: 'label-eyebrow-md' },
+  { id: 'eyebrow-muted', layer: 'atom', label: '灰色小標籤', className: 'label-eyebrow text-ink-muted' },
   {
     id: 'hero-pill',
     layer: 'atom',

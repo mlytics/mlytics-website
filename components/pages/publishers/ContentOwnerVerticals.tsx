@@ -116,11 +116,11 @@ export function ContentOwnerVerticals() {
     <section className="section-white py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-6">
         <div className="text-center mb-12">
-          <Eyebrow className="mb-3">Trusted By</Eyebrow>
-          <h2 className="section-heading mb-2 text-ink">
+          <Eyebrow>Trusted By</Eyebrow>
+          <h2 className="section-heading mb-4 text-ink">
             Which media categories are losing the most revenue to zero-click AI search?
           </h2>
-          <p className="text-base leading-relaxed text-ink-muted">
+          <p className="text-base leading-relaxed max-w-xl mx-auto text-ink-muted">
             Find someone like you — already running on Mlytics Cortex.
           </p>
         </div>

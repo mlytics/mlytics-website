@@ -74,7 +74,7 @@ export function AILayerSection() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow dark className="mb-3">
+          <Eyebrow dark>
             AI-Era Infrastructure
           </Eyebrow>
           <h2 className="section-heading text-white mb-4">

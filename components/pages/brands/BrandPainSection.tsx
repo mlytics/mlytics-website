@@ -58,7 +58,7 @@ export function BrandPainSection() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow color="var(--color-warn-deep)" className="mb-3">
+          <Eyebrow color="var(--color-warn-deep)">
             The Problem
           </Eyebrow>
           <h2 className="section-heading text-ink">

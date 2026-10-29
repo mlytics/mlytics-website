@@ -20,13 +20,13 @@ export function DecisiveEnginePageCTA() {
       <section className="section-dark py-16 lg:py-20">
         <div className="max-w-5xl mx-auto px-6">
           <motion.div
-            className="text-center max-w-3xl mx-auto mb-11"
+            className="text-center max-w-3xl mx-auto mb-12"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.5 }}
           >
-            <Eyebrow dark className="mb-3 block">
+            <Eyebrow dark>
               The business outcome
             </Eyebrow>
             <h2 className="section-heading text-white">One control layer for global delivery.</h2>
@@ -55,10 +55,10 @@ export function DecisiveEnginePageCTA() {
 
       <section className="section-dark py-16 text-center">
         <div className="max-w-5xl mx-auto px-6">
-          <h2 className="section-heading text-white mb-3">
+          <h2 className="section-heading text-white mb-4">
             Which markets are underperforming today?
           </h2>
-          <p className="text-base mb-8 text-on-dark">
+          <p className="text-base max-w-xl mx-auto mb-8 text-on-dark">
             Bring your traffic profile — we will map it against measured CDN quality.
           </p>
           <Link

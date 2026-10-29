@@ -6,10 +6,10 @@ export function PublisherPageCTA() {
   return (
     <section className="section-dark py-16 text-center">
       <div className="max-w-5xl mx-auto px-6">
-        <h2 className="section-heading text-white mb-3">
+        <h2 className="section-heading text-white mb-4">
           Want to see your site's real intent data?
         </h2>
-        <p className="text-base mb-8 text-on-dark">
+        <p className="text-base max-w-xl mx-auto mb-8 text-on-dark">
           See what your readers' intent is already worth.
         </p>
         <InlineEmailCTA ctaLabel="content_owners_cta" pageName="Content Owners Page CTA" tone="dark" className="mx-auto" />

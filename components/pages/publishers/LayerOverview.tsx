@@ -91,17 +91,17 @@ export function LayerOverview() {
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         {/* Header */}
         <motion.div
-          className="text-center mb-14"
+          className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow dark className="mb-3">
+          <Eyebrow dark>
             Product Suite
           </Eyebrow>
           <h2 className="section-heading text-white mb-4">What does a complete AI monetization stack look like for publishers?</h2>
-          <p className="text-base max-w-3xl mx-auto text-on-dark">
+          <p className="text-base max-w-xl mx-auto text-on-dark">
             Three independently profitable layers — infrastructure routing, AI Q&A, and outcome-based CPL — each compounding the last from a single API integration.
           </p>
         </motion.div>

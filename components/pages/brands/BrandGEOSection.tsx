@@ -300,7 +300,7 @@ export function BrandGEOSection() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow dark className="mb-3 block">
+          <Eyebrow dark>
             Media AEO — Answer Engine Optimization
           </Eyebrow>
           <h2 className="section-heading text-white mb-4">

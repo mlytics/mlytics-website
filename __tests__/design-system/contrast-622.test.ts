@@ -38,7 +38,7 @@ describe('dark-background mint text is >= .85 (DESIGN.md §2.3)', () => {
     expect(read(f)).not.toMatch(old)
   })
   it('the touched text uses the agreed classes', () => {
-    expect(read('components/home/FlywheelSection.tsx')).toContain('label-eyebrow text-on-dark mb-4')
+    expect(read('components/home/FlywheelSection.tsx')).toContain('className="label-eyebrow text-on-dark"')
     expect(read('components/home/FlywheelSection.tsx').match(/text-on-dark\/85/g)).toHaveLength(2)
     expect(read('components/pages/brands/BrandGEOSection.tsx')).toContain('<span className="text-xs font-bold tabular-nums mb-2 text-on-dark/85">{step.num}</span>')
     expect(read('components/pages/developers/AILayerSection.tsx')).toContain('label-eyebrow mb-6 text-on-dark"')

@@ -20,13 +20,13 @@ export function EngineUseCases() {
     <section className="section-white py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
-          className="text-center max-w-3xl mx-auto mb-11"
+          className="text-center max-w-3xl mx-auto mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow className="mb-3 block">High-value use cases</Eyebrow>
+          <Eyebrow>High-value use cases</Eyebrow>
           <h2 className="section-heading text-ink">
             Built for delivery that changes by market and moment.
           </h2>
