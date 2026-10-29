@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 import { Nav } from '@/components/layout/Nav'
 import { Footer } from '@/components/layout/Footer'
@@ -7,6 +6,7 @@ import { ScrollToTop } from '@/components/layout/ScrollToTop'
 import { ReducedMotion } from '@/components/layout/ReducedMotion'
 import { SectionViewTracker } from '@/components/analytics/SectionViewTracker'
 import { ScrollDepthTracker } from '@/components/analytics/ScrollDepthTracker'
+import { GoogleAnalyticsLoader } from '@/components/analytics/GoogleAnalyticsLoader'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.mlytics.com'),
@@ -66,7 +66,6 @@ const softwareApplicationSchema = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="h-full antialiased">
-      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }} />
       {/* Preconnect hints */}
@@ -74,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {/* HubSpot Tracking Code */}
       <script async defer src="//js.hs-scripts.com/4284310.js" />
       <body className="min-h-full flex flex-col">
+        <GoogleAnalyticsLoader />
         <ScrollToTop />
         <ReducedMotion />
         <Nav />

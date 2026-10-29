@@ -24,6 +24,10 @@ else
     exit 1
 fi
 
+# GA 檢查（DATAI-681）：out/ 必須是帶 GA loader 的新版 build，否則不上傳
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+"$SCRIPT_DIR/scripts/verify-ga-build.sh" "$ENV" "$SCRIPT_DIR/out" || exit 1
+
 echo "------------------------------------------"
 echo "🌐 準備切換至環境: $(echo "$ENV" | tr '[:lower:]' '[:upper:]')"
 echo "🆔 專案 ID: $PROJECT"
@@ -42,7 +46,6 @@ fi
 # 3. 執行上傳 (只上傳 out/ 靜態檔案)
 # -m: 開啟多執行緒 (加速大量小檔案上傳)
 # -r: 遞迴上傳子目錄
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 OUT_DIR="$SCRIPT_DIR/out"
 
 if [ ! -d "$OUT_DIR" ]; then

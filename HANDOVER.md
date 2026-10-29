@@ -55,11 +55,7 @@ cd mlytics-website
 # 2. 安裝套件
 npm install
 
-# 3. 建立本機環境變數（參考第 7 節）
-cp .env.production .env.local
-# 修改 .env.local 內的 GA ID 為 UAT 用的值
-
-# 4. 登入 gcloud（部署時才需要）
+# 3. 登入 gcloud（部署時才需要）
 gcloud auth login
 ```
 
@@ -94,6 +90,7 @@ mlytics-website/
 │   └── ui/                     # 通用 UI 元件
 │
 ├── lib/                        # 工具函式
+│   └── ga.ts                   # GA ID 對照表（依網址選擇）
 ├── public/                     # 靜態資源（圖片、logo、sitemap）
 │   ├── logos/                  # 合作夥伴 Logo
 │   ├── .well-known/
@@ -101,8 +98,7 @@ mlytics-website/
 │   └── og-image.png
 │
 ├── out/                        # Build 輸出（不進 git，部署用）
-├── .env.local                  # 本機環境變數（不進 git）
-├── .env.production             # Production 環境變數
+├── scripts/verify-ga-build.sh  # 部署前 GA 檢查
 ├── next.config.ts              # Next.js 設定（static export）
 ├── deploy.sh                   # 部署腳本
 └── HANDOVER.md                 # 本文件
@@ -162,6 +158,7 @@ npm run build
 - `deploy.sh` 只會上傳 `out/` 資料夾的內容，原始碼不會上傳
 - 快取設定為 5 分鐘（`max-age=300`），部署後約 5 分鐘生效
 - 腳本會自動切換 gcloud 專案，防止部署到錯誤環境
+- `deploy.sh` 上傳前會檢查 `out/`（每頁有 GA loader、沒有 `id=undefined`、首頁同時含正式與 UAT 兩個 GA ID），不符即中止，請 `rm -rf out && npm run build` 後重試
 
 ### UAT 與 Production 差異
 
@@ -169,18 +166,15 @@ npm run build
 |--|-----|-----------|
 | GCP Project | `uat-env-888888` | `mlytics-174006` |
 | GCS Bucket | `mlytics-static-web-uat` | `mlytics-static-web-prod` |
-| GA ID | `.env.local` 內的值 | `.env.production` 內的值 |
+| GA ID | `G-6QKQKHMYJV`（mlytics.co） | `G-BHS28B1S3P`（www.mlytics.com） |
+
+同一份 build 可部兩環境，網站依網址自動選 GA ID；本機開發不送 GA。
 
 ---
 
 ## 7. 環境變數
 
-| 變數 | 說明 |
-|------|------|
-| `NEXT_PUBLIC_GA_ID` | Google Analytics 4 Measurement ID |
-
-- `.env.local`：本機開發用（UAT GA ID），**不進 git**
-- `.env.production`：Production 用，已進 git
+GA ID 不使用環境變數，寫在 `lib/ga.ts`（公開值）。新增網域時在該檔加一行。修改 GA ID 時要同步更新 `scripts/verify-ga-build.sh` 開頭的兩個 ID（單元測試會比對）。
 
 ---
 

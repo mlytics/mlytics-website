@@ -12,7 +12,6 @@
     "build-storybook": "storybook build -o storybook-static"
   },
   "dependencies": {
-    "@next/third-parties": "^16.2.4",
     "clsx": "^2.1.1",
     "country-telephone-data": "^0.6.3",
     "framer-motion": "^12.38.0",
