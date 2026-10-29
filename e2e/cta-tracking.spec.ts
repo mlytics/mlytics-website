@@ -3,11 +3,12 @@ import { test, expect, type Page } from '@playwright/test'
 /**
  * DATAI-628: navigation CTAs send GA4 `click_cta` with the on-screen label.
  *
- * `@next/third-parties` redefines `window.gtag` during init, so a gtag stub
+ * The GA loader (`lib/ga.ts`) defines `window.gtag` itself, so a gtag stub
  * would be overwritten. Instead we pre-create `window.dataLayer` and wrap its
- * `push`: GA's init reuses `window.dataLayer || []`, and every gtag() call
- * lands here as an `arguments` object. Entries are mirrored to sessionStorage
- * so they survive the navigation the click triggers.
+ * `push`: the loader reuses `window.dataLayer || []` (on localhost it never
+ * loads gtag.js, so nothing is sent), and every gtag() call lands here as an
+ * `arguments` object. Entries are mirrored to sessionStorage so they survive
+ * the navigation the click triggers.
  */
 const KEY = '__dl'
 
