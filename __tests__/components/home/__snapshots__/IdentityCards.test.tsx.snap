@@ -16,7 +16,7 @@ exports[`IdentityCards > snapshot > matches snapshot 1`] = `
         whileinview="[object Object]"
       >
         <span
-          class="label-eyebrow text-primary mb-3"
+          class="label-eyebrow text-primary"
         >
           Who are you?
         </span>

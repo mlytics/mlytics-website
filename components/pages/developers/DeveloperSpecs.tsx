@@ -22,12 +22,12 @@ export function DeveloperSpecs() {
     <section className="section-white py-16 lg:py-20" ref={ref}>
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
-          className="text-center mb-10"
+          className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow className="mb-3">
+          <Eyebrow>
             Performance Specs
           </Eyebrow>
           <h2 className="section-heading text-ink">

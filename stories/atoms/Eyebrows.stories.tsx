@@ -24,6 +24,9 @@ export const 小標籤: Story = {
         <SpecimenBlock title="較大小標籤 14px" className={specimen('eyebrow-medium').className}>
           <span className={specimen('eyebrow-medium').className}>Supporting signal</span>
         </SpecimenBlock>
+        <SpecimenBlock title="灰色小標籤・淺底（§3.8）" className={specimen('eyebrow-muted').className}>
+          <span className={specimen('eyebrow-muted').className}>Cloud Platforms</span>
+        </SpecimenBlock>
       </div>
       <section className="section-dark space-y-3 rounded-2xl p-6">
         <h2 className="text-base font-semibold text-white">Hero 小膠囊（§3.9）</h2>

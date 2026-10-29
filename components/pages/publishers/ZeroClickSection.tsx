@@ -21,16 +21,16 @@ export function ZeroClickSection() {
       <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <motion.div
-          className="text-center mb-10"
+          className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow color="var(--color-warn-deep)" className="mb-4">The Problem</Eyebrow>
+          <Eyebrow color="var(--color-warn-deep)">The Problem</Eyebrow>
           <h2 className="section-heading mb-4 text-ink">
             How is zero-click search affecting your content revenue?
           </h2>
-          <p className="text-base max-w-3xl mx-auto text-ink-muted">
+          <p className="text-base max-w-xl mx-auto text-ink-muted">
             But your readers are still there — they&apos;re asking AI instead of clicking. That intent is monetizable. Most publishers just don&apos;t have the infrastructure to capture it.
           </p>
 

@@ -32,7 +32,7 @@ export function PartnershipHowItWorks() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow className="mb-3">How It Works</Eyebrow>
+          <Eyebrow>How It Works</Eyebrow>
           <h2 className="section-heading mb-4 text-ink">
             How do media partners activate and earn?
           </h2>

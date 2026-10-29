@@ -48,10 +48,10 @@ export function PlaygroundCTASection({
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.5 }}
     >
-      {/* `block` is load-bearing: `.label-eyebrow` leaves the span inline, and a
-          non-replaced inline element drops the vertical margin, collapsing the
-          gap to the eyebrow's own line-height. */}
-      <Eyebrow dark={isEmbedded} className="mb-3 block">{eyebrow}</Eyebrow>
+      {/* The eyebrow stays inline with no margin: eyebrow → h2 is "tight"
+          (DESIGN.md §3.8), the same gap as every other heading group.
+          `block mb-3` here was the "loose" variant; keep it inline. */}
+      <Eyebrow dark={isEmbedded}>{eyebrow}</Eyebrow>
       <h2 className={isEmbedded ? 'section-heading text-white mb-4' : 'section-heading mb-4 text-ink'}>
         {heading}
       </h2>

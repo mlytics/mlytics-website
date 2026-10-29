@@ -176,12 +176,12 @@ export function KnowledgeBaseSection() {
 
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         {/* Header */}
-        <div className="text-center mb-10">
-          <Eyebrow dark className="mb-3">AI Infrastructure</Eyebrow>
+        <div className="text-center mb-12">
+          <Eyebrow dark>AI Infrastructure</Eyebrow>
           <h2 className="section-heading text-white mb-4">
             How should a publisher's content be structured for AI retrieval and citation?
           </h2>
-          <p className="text-base max-w-3xl mx-auto text-on-dark">
+          <p className="text-base max-w-xl mx-auto text-on-dark">
             Custom-built from your content. Structured, cross-referenced, and governed by your editorial standards.
           </p>
         </div>

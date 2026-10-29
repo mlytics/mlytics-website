@@ -78,7 +78,7 @@ export function IdentityCards() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow className="mb-3">
+          <Eyebrow>
             Who are you?
           </Eyebrow>
           <h2 className="section-heading mb-4 text-ink">What does Mlytics Cortex offer brands, media and content owners, and developers?</h2>

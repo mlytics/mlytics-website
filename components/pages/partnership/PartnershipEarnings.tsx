@@ -101,13 +101,13 @@ export function PartnershipEarnings() {
 
       <div className="max-w-5xl mx-auto px-6 relative z-10">
         <motion.div
-          className="text-center mb-14"
+          className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow dark className="mb-3">
+          <Eyebrow dark>
             Partner Benefits
           </Eyebrow>
           <h2 className="section-heading text-white mb-4">

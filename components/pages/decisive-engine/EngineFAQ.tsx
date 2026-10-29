@@ -89,7 +89,7 @@ export function EngineFAQ() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow className="mb-3">
+          <Eyebrow>
             FAQ
           </Eyebrow>
           <h2 className="section-heading text-ink">

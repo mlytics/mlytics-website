@@ -53,7 +53,7 @@ export function FlywheelSection() {
           {/* Right: copy */}
           <div ref={ref} className="min-w-0">
             <motion.span
-              className="label-eyebrow text-on-dark mb-4"
+              className="label-eyebrow text-on-dark"
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5 }}
@@ -61,16 +61,16 @@ export function FlywheelSection() {
               The Flywheel
             </motion.span>
             <motion.h2
-              className="text-3xl md:text-4xl font-bold leading-tight mb-5 text-white"
+              className="section-heading mb-4 text-white"
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              The longer it spins,<br />
+              The longer it spins,
               the harder it is to stop.
             </motion.h2>
             <motion.p
-              className="text-base leading-relaxed mb-10 text-on-dark/85"
+              className="text-base leading-relaxed max-w-xl mb-12 text-on-dark/85"
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.2 }}

@@ -70,13 +70,13 @@ export function BrandAEOVsMonitoring() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow className="mb-3">
+          <Eyebrow>
             Execution vs. Monitoring
           </Eyebrow>
           <h2 className="section-heading text-ink">
             What's the difference between AEO monitoring and AEO execution?
           </h2>
-          <p className="text-base max-w-3xl mx-auto mt-4 text-ink-muted">
+          <p className="text-base max-w-xl mx-auto mt-4 text-ink-muted">
             AEO monitoring tools tell you your AI search score. Mlytics changes it — by placing your brand inside the AI answers your buyers already trust.
           </p>
         </motion.div>

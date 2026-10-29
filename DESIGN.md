@@ -177,7 +177,7 @@
 - 禁止：畫面上小於 12px 的字（包括 `text-[10px]`；SVG 圖表文字以畫面實際大小計，隨版面縮放的圖用 `useSvgTextFloor`，例外見 §10.1）；為單一區塊自訂字級。
 - `useSvgTextFloor`（`lib/useSvgTextFloor.ts`）的做法：只把畫面上小於 12 的 SVG 文字放大到剛好 12，已 ≥12 的維持原本字級；首頁飛輪圖在 <768 寬不放大（§10.1 首頁飛輪圖手機字級）。個別文字可用 `data-text-floor="off"` 排除，只限 §10.1 核准例外。<!-- src: DATAI-556 -->
 - 已接受取捨：桌機 h1 與 h2 同為 48。
-- 現況偏離：見 §10 DATAI-626（/developers/ h1、404／錯誤頁標題目前 `text-3xl md:text-4xl`）、DATAI-620（首頁 Flywheel h2 未用 `.section-heading`）
+- 現況偏離：見 §10 DATAI-626（/developers/ h1、404／錯誤頁標題目前 `text-3xl md:text-4xl`）
 <!-- src: tok-text-size-scale, tok-caption-12-floor, mol-display-statement, page-legal, page-404, org-hero-h1-standard, org-hero-home, tok-breakpoint-420, #29-6, #29-7, #31-1, #31-10 -->
 
 ### 2.8 字級 token
@@ -277,7 +277,7 @@
 
 - 禁止：上表以外的容器寬；/developers/ 合作夥伴區不再用 896。
 - 例外：/decisive-engine/ Hero 的文字區 768，底部膠囊列維持 1024。
-- 現況偏離：見 §10 DATAI-619（頁尾寬、/developers/ 合作夥伴區）、DATAI-620（說明文字寬度）、DATAI-626（/decisive-engine/ Hero）
+- 現況偏離：見 §10 DATAI-619（頁尾寬、/developers/ 合作夥伴區）、DATAI-626（/decisive-engine/ Hero）
 <!-- src: tpl-container-widths, tpl-container-home-6xl, tpl-container-footer, tpl-container-infra, tok-max-w, #29-2, #30-2, #31-9 -->
 
 ### 2.13 圓角與框線
@@ -368,10 +368,10 @@
 
 | 類別 | 角色 | 注意 |
 |---|---|---|
-| `.label-eyebrow` | 區塊小標籤：12px／600／大寫／字距 0.1em | 換色用 `Eyebrow` 元件參數，不用 className 覆寫 |
+| `.label-eyebrow` | 區塊小標籤：12px／600／大寫／字距 0.1em | 換色用 `Eyebrow` 元件參數，不用 className 覆寫；灰色小標籤除外（§3.8） |
 | `.label-eyebrow-md` | 14px 版小標籤，現況用於 /brands/ 較大的標示文字 | — |
 | `.label-eyebrow-pill` | Hero 小膠囊（小標籤放在藥丸內） | 類別含 1px primary .6 框線、行高 16、內距上下 4・左右 12（高 26） |
-| `.section-heading` | 區塊標題 h2：30／36／48、700 | 所有 h2 都用它（現況偏離：見 §10 DATAI-620） |
+| `.section-heading` | 區塊標題 h2：30／36／48、700 | 區塊標題 h2 都用它 |
 | `.section-white` | 白色區塊底 | — |
 | `.section-dark` | 深色區塊底（`--bg-dark`）與淺色文字 | 深色區塊一律用它，不用 `bg-primary-dark` |
 | `.section-light` | 淺灰區塊底（`--bg-light`） | 不用於區塊交替（現況偏離：見 §10 DATAI-619，/decisive-engine/ 淺灰改白） |
@@ -513,13 +513,14 @@
 - 寫法：`<Eyebrow>`（`components/ui/Eyebrow.tsx`，渲染 `.label-eyebrow`：12／600／大寫／字距 0.1em）。顏色依底色選參數：
   - 淺底：預設（主色）——`<Eyebrow>`
   - 深底：`dark`（on-dark）——`<Eyebrow dark>`
-  - 痛點段落：`color="var(--color-warn-deep)"`（例：`components/pages/brands/BrandPainSection.tsx:61`；該行的 `className="mb-3"` 不要抄）
+  - 痛點段落：`color="var(--color-warn-deep)"`（例：`components/pages/brands/BrandPainSection.tsx:61`）
   - 頁尾欄標題：`<Eyebrow color="rgba(168,197,195,0.85)">`（`components/layout/Footer.tsx:30`、`:39`、`:46`）。on-dark .85 在階梯上、符合深底文字 ≥.85，而且是用元件參數換色，合規；只用於頁尾欄標題。<!-- src: #33（頁尾欄標題顏色判定合規） -->
+  - **灰色小標籤**（淺底的次要標示，例：卡片內小標、分組標題；不是區塊標題上方的小標籤）：寫法 `label-eyebrow text-ink-muted`（白底 5.33:1），不用 `Eyebrow` 元件。例：/content-owners/ 比較卡左欄（`components/pages/publishers/SolutionPitches.tsx:75`）、/developers/ 合作夥伴區分組標題（`components/pages/developers/InfraPartners.tsx:121`）、/brands/ 痛點卡（`components/pages/brands/BrandPainSection.tsx:79`）。可寫在 `<span>` 或 `<p>` 上；寫在區塊元素上時，與下方內容的距離由所在元件決定。<!-- src: #56 -->
+    - 禁止：灰色小標籤用 `Eyebrow` 的 `color` 參數換成灰色；用 `text-ink-subtle` 或透明度調淡。<!-- src: #56 -->
   - 與 h2 的距離「緊」：小標籤維持行內元素，**不加 `block`、不加 `mb-*`**（畫面上字到字約 16px）。行內元素上的 `mb-*` 本來就不會生效（§0 第 6 點）。
   - `.label-eyebrow-md`（14px）：現況只用於 /brands/ 深色區塊「Your audience didn't disappear.」這行較大的標示文字（`components/pages/brands/BrandGEOSection.tsx:117`）。
 - 禁止：用 className 覆寫顏色（例如 `className="text-on-dark/55"`，靠 tailwind-merge 剃掉預設色才生效，元件一改就失效）；加 `block mb-3` 拉開距離；深底小標籤 α 低於 .85。
 - 現況寫法：首頁「The Flywheel」（`components/home/FlywheelSection.tsx`）、/developers/「Same API contract」（`components/pages/developers/AILayerSection.tsx`）、/content-owners/ 與 /partnership/ 深色卡編號（`components/pages/publishers/LayerOverview.tsx`、`components/pages/partnership/PartnershipEarnings.tsx`）這 4 處把 `.label-eyebrow` 寫在動畫元素或段落上、顏色 on-dark 全色（`text-on-dark`），畫面與 `<Eyebrow dark>` 相同；其中兩處深色卡編號滑過時改白（`hovered`），與卡片標題一致（§2.14）。換成元件會改變間距，維持現狀。新程式一律用 `Eyebrow`。<!-- src: #50, #52 -->
-- 現況偏離：見 §10 DATAI-620（7 處「鬆」）
 <!-- src: atom-eyebrow-section, atom-eyebrow-override-risk, mol-heading-group-eyebrow-gap, tok-on-dark-085 -->
 
 ### 3.9 Hero 小膠囊
@@ -643,8 +644,6 @@
   - 標題組與下方內容（卡片、表格、列表等）的距離 **48**：標題組容器加 `mb-12`（例：`components/pages/brands/BrandFAQ.tsx:55` 的 `text-center mb-12`）。量法：說明文字底部（沒有說明時是 h2 底部）到下方第一個內容元素頂部，手機與桌機相同。
   - 不適用：標題組下方直接接按鈕或 email 欄（32，`mb-8`，§5.4 頁尾 CTA 與 §5.6 AI Mode 入口）；首頁靠左雙欄的 Intent Refinery（`components/home/IntentRefinerySection.tsx`，桌機旁邊是圖表）；法律頁條文小標（§6.5）。<!-- src: #33 -->
 - 禁止：h2 不用 `.section-heading` 而自訂字級；h2 下方用 `mb-3`／`mb-2`／`mb-5`；說明用 `max-w-3xl` 或不限寬；小標籤加 `block mb-*`。
-- 現況偏離：見 §10 DATAI-620（6 個頁尾 CTA 與一處 h2 → 說明不是 16；16 處說明寬不是 576；7 處小標籤「鬆」；首頁 Flywheel h2 沒用 `.section-heading`）
-- 現況偏離：見 §10 DATAI-620（標題組 → 內容距離不是 48 的 11 處：44（`mb-11`）`components/pages/decisive-engine/DecisionLoop.tsx:40`、`DecisiveEnginePageCTA.tsx:23`、`EngineAdvantages.tsx:23`、`EngineComparison.tsx:24`、`EngineUseCases.tsx:23`；40（`mb-10`）`components/pages/developers/DeveloperSpecs.tsx:25`、`components/home/FlywheelSection.tsx:73`、`components/pages/publishers/KnowledgeBaseSection.tsx:179`、`components/pages/publishers/ZeroClickSection.tsx:24`；56（`mb-14`）`components/pages/publishers/LayerOverview.tsx:94`、`components/pages/partnership/PartnershipEarnings.tsx:104`）<!-- src: #33 -->
 <!-- src: mol-heading-group, mol-heading-group-left, mol-heading-group-desc-width, mol-heading-group-h2-gap, mol-heading-group-eyebrow-gap, mol-heading-flywheel, #29-3, #30-2 -->
 
 ### 4.4 FAQ 單題
@@ -773,7 +772,6 @@
   （首頁容器 `max-w-6xl`。）
   - **產品頁變體**（/decisive-engine/，`components/pages/decisive-engine/DecisiveEnginePageCTA.tsx:56-70`）：email 欄改成連到 /book-a-demo 的 §3.2 標準 44 實心「Contact Us」，必須呼叫 `trackCTA`。
 - 禁止：在 `.section-dark` 上再疊 `bg-primary-dark`；自做 email 欄。
-- 現況偏離：見 §10 DATAI-620（h2 → 說明目前 12、說明不限寬）
 <!-- src: org-page-cta, org-de-cta-form, mol-heading-group-h2-gap, cross-trackcta -->
 
 ### 5.5 FAQ 區塊
@@ -781,7 +779,6 @@
 - 標準版：`components/pages/brands/BrandFAQ.tsx`（與 `ContentOwnerFAQ.tsx`、`EngineFAQ.tsx` 三份一致）。
 - 規格：白底 `section-white pt-8 pb-16 lg:pb-20`（§2.11；**接在深色區塊之後時，上方改用一般區塊距離**）；1024 容器；置中標題組「FAQ」＋「Common questions.」（`.section-heading`）；每題照 §4.4。
 - **必帶 FAQPage JSON-LD**（`components/pages/brands/BrandFAQ.tsx:36-50`）。
-- 照抄標準版時注意：`BrandFAQ.tsx:61` 的 `<Eyebrow className="mb-3">` 不要抄（§3.8，小標籤不加 `mb-*`）。
 - 禁止：沒有 JSON-LD 的 FAQ；自訂題目樣式。
 - 現況偏離：見 §10 DATAI-619（/decisive-engine/ FAQ 緊接深色區塊、上方只有 32）
 <!-- src: org-faq-group, org-faq-top-after-dark, cross-faq-jsonld -->
@@ -794,7 +791,7 @@
   - `variant="embedded"`：只輸出內容，放進既有的 `.section-dark` 區塊（/brands/ 方案區塊第四段）。放在淺底會變白字白底，禁止。
   - 標題組照 §4.3；按鈕是 §3.2 標準 44，呼叫 `trackCTA(ctaLabel, trackingPosition)`。
 - 禁止：用 className 覆寫小標籤顏色；embedded 放在淺底。
-- 現況偏離：見 §10 DATAI-620（小標籤「鬆」、說明寬）、DATAI-619（區塊上下距）
+- 現況偏離：見 §10 DATAI-619（區塊上下距）
 <!-- src: org-playground-entry -->
 
 ### 5.7 自動輪播
@@ -811,7 +808,7 @@
 | 元件 | 檔案 | 角色 | 待修 |
 |---|---|---|---|
 | Logo 跑馬燈 | `components/home/LogoMarquee.tsx` | 首頁「Trusted by」標誌捲動列，用 `.animate-marquee`，左右淡出遮罩 | — |
-| Flywheel | `components/home/FlywheelSection.tsx` | 首頁專屬深色區塊，含展示大數字（§4.5） | DATAI-620（h2 改 `.section-heading`）、DATAI-619（手機上下距） |
+| Flywheel | `components/home/FlywheelSection.tsx` | 首頁專屬深色區塊，含展示大數字（§4.5） | DATAI-619（手機上下距） |
 | 世界地圖點陣 | `components/home/WorldMapDots.tsx` | 首頁 Hero 背景點陣，訊號點用 `--color-primary-light`、擴散圈用 `.ping-ring`；強訊號點與其擴散圈用 `--color-gold`（`components/home/WorldMapDots.tsx:181`、`:191`） | — |
 | 預約表單 | `app/book-a-demo/BookADemoForm.tsx` | /book-a-demo/ 多欄位表單：欄位 §3.10、送出 §3.3；送出記錄 `contact_form_submit` 事件（維持，不用 `trackCTA`） | — |
 | 換頁捲回頂端 | `components/layout/ScrollToTop.tsx` | 換頁時捲回頁首，沒有畫面 | — |
@@ -864,7 +861,7 @@
 - 區塊順序：白 Hero（`HeroSection`）→ 白 身分卡 → 深 Flywheel → 白 Intent Refinery → 深 頁尾 CTA（白／白／深／白／深）。
 - 首頁專屬項目：白／白開頭的區塊順序（白底 Hero）、h1 寫法（≤420px 27px、`tracking-tight`）、內容與頁尾 1152（`max-w-6xl`）、標準淺底光暈的首頁 Hero 用法。這些只限首頁，其他頁不可用。（Hero 的全螢幕高與標題輪播是現況，未列為標準。）<!-- src: tpl-order-home, home-hero-h1-narrow-27, org-hero-home -->
 - 禁止：把首頁的 1152 容器、白底 Hero 或白／白開頭用在其他頁。
-- 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）、DATAI-620（Flywheel h2）
+- 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）
 <!-- src: tpl-order-home, tpl-container-home-6xl, org-hero-home, page-home -->
 
 ### 6.5 法律頁
@@ -1134,7 +1131,6 @@
 | 票號 | 類別 | 內容 | 盤點 id |
 |---|---|---|---|
 | DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`（受眾頁緊接 FAQ 細線前白色區塊依 §2.11／§6.2 例外，下距固定 32）；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白；卡片網格 `gap-6` 兩處改 `gap-5`（/brands/ 痛點兩卡、首頁身分卡） | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
-| DATAI-620 | 區塊標題組 | h2→說明 16（含頁尾 CTA）；說明寬 576；7 處小標籤改「緊」；首頁 Flywheel h2 改 `.section-heading`；標題組到下方內容 48（11 處） | mol-heading-group-h2-gap、mol-heading-group-desc-width、mol-heading-group-eyebrow-gap、mol-heading-flywheel |
 | DATAI-626 | Hero 對齊 | /developers/、/partnership/、/decisive-engine/ 對齊標準 Hero（下距 48、底部細線、h1 48）；/privacy-policy/、/terms-of-service/、/book-a-demo/ 的 h1 補 `text-balance`；404／錯誤頁標題 48 | org-hero-structure、org-hero-h1-standard、page-404、page-error |
 | DATAI-629 | /content-owners/ 步驟面板 | 說明最後一行被固定高度切掉；輪播改為點擊後永久停止、捲出畫面不輪播，與首頁流程一致 | page-content-owners、org-home-pipeline-carousel |
 | DATAI-630 | AI Mode 頁對齊 | 14／9／7px 間距改 4px 刻度（分享區核准的 14px 除外）；legacy 變數改 `@theme` token；AI Mode 頁仍是例外 | tok-ai-mode-spacing、tok-ai-mode-legacy-vars |

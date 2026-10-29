@@ -39,7 +39,7 @@ export function SolutionPitches() {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
         >
-          <Eyebrow className="mb-3">
+          <Eyebrow>
             The Solution
           </Eyebrow>
           <h2 className="section-heading text-ink">
@@ -72,9 +72,9 @@ export function SolutionPitches() {
               <div className="grid md:grid-cols-[1fr_40px_1fr]">
                 {/* Left — Them (muted) */}
                 <div className="p-5 flex flex-col gap-2 bg-surface">
-                  <Eyebrow color="var(--color-ink-muted)">
+                  <span className="label-eyebrow text-ink-muted">
                     {pitch.them.who}
-                  </Eyebrow>
+                  </span>
                   <p className="text-sm md:text-base leading-relaxed text-ink-muted">
                     {pitch.them.desc}
                   </p>

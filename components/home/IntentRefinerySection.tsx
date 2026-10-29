@@ -17,13 +17,13 @@ export function IntentRefinerySection() {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.5 }}
           >
-            <Eyebrow className="mb-4">
+            <Eyebrow>
               The Intent Refinery
             </Eyebrow>
             <h2 className="section-heading mb-4 text-ink">
               How does AI convert content engagement into commercial transactions?
             </h2>
-            <p className="text-base leading-relaxed text-ink-muted">
+            <p className="text-base leading-relaxed max-w-xl text-ink-muted">
               Through five independently profitable layers, each reader intent signal is refined into a qualified brand lead — from raw traffic to commercial transaction. Enter at the layer that matches your needs.
             </p>
           </motion.div>
