@@ -2,7 +2,7 @@
 // ticket in pending/DATAI-xxx.ts. A violation is allowed only while its
 // ticket still lists it; a listed count higher than what is found means a fix
 // landed and the entry must shrink. The list can only get shorter.
-import { parseRgba, type Kind, type Violation } from './rules'
+import { type Kind, type Violation } from './rules'
 
 export interface PendingEntry { file: string; match: string; count: number }
 export interface PendingPath { prefix: string; kinds: Kind[] }
@@ -47,25 +47,10 @@ export function compareWithPending(violations: Violation[], pending: PendingTick
 
 export const AI_MODE_PREFIXES = ['app/ai-mode-playground/', 'components/pages/ai-mode-playground/']
 
-/** Which open fix ticket owns a current violation (DESIGN.md §10.2). Used only to generate the baseline. */
-export function ticketFor(v: Violation, lineText: string): string {
+/** Only AI Mode has a rule-based ticket assignment; all other ownership needs An. */
+export function ticketFor(v: Violation, _lineText: string): string {
   if (AI_MODE_PREFIXES.some((p) => v.file.startsWith(p))) return 'DATAI-630'
-  if (v.kind === 'arbitrary') {
-    throw new Error(`${v.file}:${v.line} ${v.match} 沒有對應的修正票，先問 An`)
-  }
-  if (v.kind === 'opacity') {
-    const m = v.match.match(/(?:^|:)text-on-dark\/(\d+(?:\.\d+)?|\[[^\]]+\])$/)
-    if (m) {
-      const raw = m[1]
-      const pct = raw.match(/^\[(\d*\.?\d+)%\]$/)
-      const alpha = pct ? Number(pct[1]) / 100 : raw.startsWith('[') ? Number(raw.slice(1, -1)) : Number(raw) / 100
-      if (alpha < 0.85) return 'DATAI-622'
-    }
-    return 'DATAI-623'
-  }
-  const rgba = parseRgba(v.match)
-  if (rgba?.base === 'on-dark' && rgba.alpha !== null && rgba.alpha < 0.85 && /(?<![\w-])color\s*[:=]/.test(lineText)) return 'DATAI-622'
-  return 'DATAI-623'
+  throw new Error(`${v.file}:${v.line} ${v.match} 沒有對應的修正票，先問 An`)
 }
 
 export function buildPending(violations: Violation[], lineText: (v: Violation) => string): PendingTicket[] {

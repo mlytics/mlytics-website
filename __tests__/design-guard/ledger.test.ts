@@ -63,47 +63,45 @@ describe('ticketFor', () => {
     expect(() => ticketFor(v('a.tsx', 'text-[10px]', 'arbitrary'), '')).toThrow(/先問 An/)
   })
 
-  it('sends on-dark text below .85 to DATAI-622 and other colours to DATAI-623', () => {
-    expect(ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), "style={{ color: 'rgba(168,197,195,0.5)' }}")).toBe('DATAI-622')
-    expect(ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), "style={{ borderColor: 'rgba(168,197,195,0.5)' }}")).toBe('DATAI-623')
-    expect(ticketFor(v('a.tsx', '#fff'), "{ color: '#fff' }")).toBe('DATAI-623')
+  it('requires a ticket even for low-alpha on-dark text', () => {
+    expect(() => ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), "style={{ color: 'rgba(168,197,195,0.5)' }}")).toThrow(/先問 An/)
+    expect(() => ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), "style={{ borderColor: 'rgba(168,197,195,0.5)' }}")).toThrow(/先問 An/)
+    expect(() => ticketFor(v('a.tsx', '#fff'), "{ color: '#fff' }")).toThrow(/先問 An/)
   })
 
-  it('sends off-ladder on-dark text classes to DATAI-622 and white/grey opacity classes to DATAI-623', () => {
-    expect(ticketFor(v('a.tsx', 'text-on-dark/65', 'opacity'), '')).toBe('DATAI-622')
-    expect(ticketFor(v('a.tsx', 'md:text-on-dark/[0.5]', 'opacity'), '')).toBe('DATAI-622')
-    expect(ticketFor(v('a.tsx', 'text-on-dark/90', 'opacity'), '')).toBe('DATAI-623')
-    expect(ticketFor(v('a.tsx', 'text-on-dark/[50%]', 'opacity'), '')).toBe('DATAI-622')
-    expect(ticketFor(v('a.tsx', 'text-on-dark/85', 'opacity'), '')).toBe('DATAI-623')
-    expect(ticketFor(v('a.tsx', 'text-on-dark/84.9', 'opacity'), '')).toBe('DATAI-622')
-    expect(ticketFor(v('a.tsx', 'text-on-dark/[0.9]', 'opacity'), '')).toBe('DATAI-623')
-    expect(ticketFor(v('a.tsx', 'border-on-dark/50', 'opacity'), '')).toBe('DATAI-623')
-    expect(ticketFor(v('a.tsx', 'hover:bg-white/10', 'opacity'), '')).toBe('DATAI-623')
-    expect(ticketFor(v('a.tsx', 'border-gray-100/50', 'opacity'), '')).toBe('DATAI-623')
+  it('requires explicit ticket ownership for every non-AI Mode opacity', () => {
+    for (const match of ['text-on-dark/65', 'md:text-on-dark/[0.5]', 'text-on-dark/[50%]', 'text-on-dark/84.9', 'text-on-dark/90', 'text-on-dark/85', 'text-on-dark/[0.9]', 'border-on-dark/50', 'hover:bg-white/10', 'border-gray-100/50']) {
+      expect(() => ticketFor(v('a.tsx', match, 'opacity'), '')).toThrow(/先問 An/)
+    }
   })
 
-  it('distinguishes color from background-color and border-color in CSS', () => {
-    expect(ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), '.x { background-color: rgba(168,197,195,0.5); }')).toBe('DATAI-623')
-    expect(ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), '.x { color: rgba(168,197,195,0.5); }')).toBe('DATAI-622')
+  it('does not infer ticket ownership from a CSS property', () => {
+    expect(() => ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), '.x { background-color: rgba(168,197,195,0.5); }')).toThrow(/先問 An/)
+    expect(() => ticketFor(v('a.tsx', 'rgba(168,197,195,0.5)', 'color-fn'), '.x { color: rgba(168,197,195,0.5); }')).toThrow(/先問 An/)
   })
 
   it('refuses to guess for an arbitrary value with no fix ticket', () => {
     expect(() => ticketFor(v('a.tsx', 'mt-[7px]', 'arbitrary'), '')).toThrow(/先問 An/)
   })
+
+  it('refuses to guess for named colours and newly supported colour functions', () => {
+    expect(() => ticketFor(v('a.tsx', 'red', 'named-color'), 'color: red')).toThrow(/先問 An/)
+    expect(() => ticketFor(v('a.tsx', 'oklch(50% 0 0)', 'color-fn'), 'color: oklch(50% 0 0)')).toThrow(/先問 An/)
+  })
 })
 
 describe('buildPending / serializePending', () => {
-  it('groups by ticket, file and match, and always adds the AI Mode path entry', () => {
-    const tickets = buildPending([v('a.tsx', '#fff'), v('a.tsx', '#fff'), v('a.tsx', 'text-on-dark/65', 'opacity')], () => '')
-    expect(tickets.map((t) => t.ticket)).toEqual(['DATAI-622', 'DATAI-623', 'DATAI-630'])
-    expect(tickets[0].entries).toEqual([{ file: 'a.tsx', match: 'text-on-dark/65', count: 1 }])
-    expect(tickets[1].entries).toEqual([{ file: 'a.tsx', match: '#fff', count: 2 }])
-    expect(tickets[2].paths?.map((p) => p.prefix)).toEqual(['app/ai-mode-playground/', 'components/pages/ai-mode-playground/'])
+  it('groups AI Mode by file and match and requires tickets for all other violations', () => {
+    const tickets = buildPending([v('components/pages/ai-mode-playground/X.module.css', '#fff'), v('components/pages/ai-mode-playground/X.module.css', '#fff')], () => '')
+    expect(tickets.map((t) => t.ticket)).toEqual(['DATAI-630'])
+    expect(tickets[0].entries).toEqual([{ file: 'components/pages/ai-mode-playground/X.module.css', match: '#fff', count: 2 }])
+    expect(tickets[0].paths?.map((p) => p.prefix)).toEqual(['app/ai-mode-playground/', 'components/pages/ai-mode-playground/'])
+    expect(() => buildPending([v('a.tsx', 'text-on-dark/65', 'opacity')], () => '')).toThrow(/先問 An/)
   })
 
   it('writes a module that default-exports the ticket', () => {
-    const text = serializePending({ ticket: 'DATAI-623', entries: [{ file: 'a.tsx', match: "it's", count: 1 }] })
-    expect(text).toContain("ticket: 'DATAI-623'")
+    const text = serializePending({ ticket: 'DATAI-630', entries: [{ file: 'a.tsx', match: "it's", count: 1 }] })
+    expect(text).toContain("ticket: 'DATAI-630'")
     expect(text).toContain('{ file: "a.tsx", match: "it\'s", count: 1 }')
     expect(text).toContain('export default pending')
   })

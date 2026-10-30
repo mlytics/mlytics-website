@@ -158,7 +158,7 @@ export function ContentOwnerVerticals() {
                 }}
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 7h10M7.5 3L12 7l-4.5 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M2 7h10M7.5 3L12 7l-4.5 4" className="stroke-white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </motion.div>
             </div>

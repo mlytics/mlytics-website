@@ -23,6 +23,9 @@ const pending: PendingTicket = {
     { file: "components/pages/ai-mode-playground/ExperiencePanel.module.css", match: "rgba(34, 93, 89, .04)", count: 3 },
     { file: "components/pages/ai-mode-playground/ExperiencePanel.module.css", match: "rgba(34, 93, 89, .05)", count: 1 },
     { file: "components/pages/ai-mode-playground/ExperiencePanel.module.css", match: "rgba(34, 93, 89, .3)", count: 1 },
+    { file: "components/pages/ai-mode-playground/ExperiencePanel.module.css", match: "color-mix(in srgb, var(--color-primary) 18%, transparent)", count: 1 },
+    { file: "components/pages/ai-mode-playground/ExperiencePanel.module.css", match: "color-mix(in srgb, var(--color-primary) 8%, transparent)", count: 1 },
+    { file: "components/pages/ai-mode-playground/ExperiencePanel.module.css", match: "color-mix(in srgb, var(--color-primary) 10%, transparent)", count: 2 },
   ],
 }
 

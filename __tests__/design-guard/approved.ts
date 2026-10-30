@@ -1,7 +1,7 @@
 // Approved exceptions: exact text that DESIGN.md sanctions, in the only files
 // allowed to use it. `designRef` must appear verbatim in DESIGN.md (repo.test.ts
 // checks), so the rules stay in one place. Approved text is blanked before scanning.
-export interface ApprovedException { text: string; files: string[]; designRef: string }
+export interface ApprovedException { text: string; files: string[]; designRef: string; scope?: 'value' }
 
 const NAV = 'components/layout/Nav.tsx'
 
@@ -14,13 +14,15 @@ export const APPROVED: ApprovedException[] = [
     text: 'radial-gradient(ellipse 85% 75% at 50% 45%, rgba(240,248,247,0.97) 0%, rgba(255,255,255,0.65) 65%, transparent 100%)',
     files: ['components/home/HeroSection.tsx', 'components/ui/PlaygroundCTASection.tsx'],
     designRef: 'radial-gradient(ellipse 85% 75% at 50% 45%, rgba(240,248,247,0.97) 0%, rgba(255,255,255,0.65) 65%, transparent 100%)',
+    scope: 'value',
   },
   {
     text: '0 0 0 1px rgba(168,197,195,0.28), 0 6px 28px rgba(34,93,89,0.24)',
     files: ['components/pages/partnership/PartnershipEarnings.tsx', 'components/pages/publishers/LayerOverview.tsx'],
     designRef: "boxShadow: '0 0 0 1px rgba(168,197,195,0.28), 0 6px 28px rgba(34,93,89,0.24)'",
+    scope: 'value',
   },
   { text: 'bg-white/80', files: [NAV], designRef: '導覽列捲動後的 `bg-white/80` 加 `backdrop-blur-sm`' },
-  { text: 'rgba(180,83,9,0.07)', files: ['components/pages/brands/BrandPainSection.tsx'], designRef: '/brands/ 痛點段落的琥珀光暈與琥珀短線' },
-  { text: 'rgba(180,83,9,0.3)', files: ['components/pages/brands/BrandPainSection.tsx'], designRef: '/brands/ 痛點段落的琥珀光暈與琥珀短線' },
+  { text: 'radial-gradient(ellipse 70% 60% at 50% 60%, rgba(180,83,9,0.07) 0%, transparent 70%)', files: ['components/pages/brands/BrandPainSection.tsx'], designRef: '/brands/ 痛點段落的琥珀光暈與琥珀短線', scope: 'value' },
+  { text: 'rgba(180,83,9,0.3)', files: ['components/pages/brands/BrandPainSection.tsx'], designRef: '/brands/ 痛點段落的琥珀光暈與琥珀短線', scope: 'value' },
 ]
