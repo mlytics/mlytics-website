@@ -17,7 +17,7 @@ export function ZeroClickSection() {
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section className="section-white py-16 lg:py-20" ref={ref}>
+    <section className="section-white py-16 lg:py-28" ref={ref}>
       <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <motion.div

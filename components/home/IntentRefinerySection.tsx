@@ -6,7 +6,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow'
 
 export function IntentRefinerySection() {
   return (
-    <section className="section-white py-20 lg:py-28">
+    <section className="section-white py-16 lg:py-28">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           {/* Left: copy */}

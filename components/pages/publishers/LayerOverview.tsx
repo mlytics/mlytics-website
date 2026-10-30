@@ -81,7 +81,7 @@ const LAYERS: Layer[] = [
 
 export function LayerOverview() {
   return (
-    <section className="section-dark py-20 lg:py-28 relative overflow-hidden">
+    <section className="section-dark py-16 lg:py-28 relative overflow-hidden">
       {/* Background glow */}
       <div
         className="absolute inset-0 pointer-events-none"

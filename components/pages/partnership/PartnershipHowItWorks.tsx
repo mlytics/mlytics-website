@@ -23,7 +23,7 @@ const STEPS = [
 
 export function PartnershipHowItWorks() {
   return (
-    <section className="section-white pt-16 lg:pt-20 pb-10">
+    <section className="section-white pt-16 lg:pt-28 pb-12 lg:pb-16">
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
           className="mb-12 text-center"

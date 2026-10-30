@@ -245,16 +245,14 @@
 | 區塊角色 | 上下距 | 寫法 |
 |---|---|---|
 | 一般內容區塊 | 平板與手機 64、桌機（≥1024）112 | `py-16 lg:py-28` |
-| 受眾頁緊接 FAQ 細線前的白色內容區塊 | 上 64、桌機（≥1024）112；下固定 32（含桌機） | `pt-16 lg:pt-28 pb-8` |
+| 細線分段（同一區塊內用細線接兩段，含受眾頁 FAQ 前） | 細線每一側：平板與手機 48、桌機（≥1024）64 | 線上方 `pb-12 lg:pb-16`、線下方 `pt-12 lg:pt-16` |
 | Hero | 上 128、下 48 | `pt-32 pb-12` |
 | 頁尾 CTA | 上下 64 | `py-16` |
-| FAQ 區塊 | 上 32、下 64（桌機 80） | `pt-8 pb-16 lg:pb-20` |
-| FAQ 接在深色區塊之後 | 上方改用一般區塊距離 | — |
+| FAQ 區塊（受眾頁，在細線之後） | 上 48、桌機 64；下 64（桌機 80） | `pt-12 lg:pt-16 pb-16 lg:pb-20` |
+| FAQ 接在深色區塊之後 | 上方改用一般區塊距離 | `pt-16 lg:pt-28 pb-16 lg:pb-20` |
 
-- 禁止：除上表受眾頁 FAQ 細線前的白色內容區塊例外，一般內容區塊用其他上下距（例如 `py-16 lg:py-20`、`py-20 lg:py-28`）。
-- 受眾頁 FAQ 細線上下各留 32：緊接細線前的白色區塊用 `pb-8`，FAQ 維持 `pt-8`；只限該白色區塊，其他一般區塊與 FAQ 直接接深底時的規則不變。<!-- src: An 2026-10-16 裁決 open question #27（細線上下對稱） -->
-- 注意：首頁等目前手機為 80 的區塊，修正後會變 64。
-- 現況偏離：見 §10 DATAI-619
+- 禁止：除上表細線分段外，一般內容區塊用其他上下距（例如 `py-16 lg:py-20`、`py-20 lg:py-28`）。
+- 細線分段：同一區塊內用細線把兩段接成一塊時（例：/brands/ 比較表與 FAQ、/content-owners/「Trusted by」與 FAQ、/partnership/「How it works」與「What Mlytics handles」、/brands/ 深色區塊的段落細線），細線每一側平板與手機 48、桌機 64，永遠小於一般區塊距離，讀起來是同一塊；外側上下緣仍用一般區塊距離。<!-- src: #64 -->
 <!-- src: tpl-section-rhythm, tpl-section-rhythm-112, tpl-section-rhythm-infra, org-faq-top-after-dark, #29-1, #30-1 -->
 
 ### 2.12 容器寬
@@ -273,11 +271,12 @@
 | 預約頁 Hero | 672 | `max-w-2xl` |
 | 404 | 512／576 | `max-w-lg`／`max-w-xl` |
 | 區塊標題下方說明 | 576 | `max-w-xl`（置中時加 `mx-auto`） |
-| 頁尾 | 跟各頁內容寬（首頁 1152、內頁 1024） | — |
+| 頁尾 | 跟各頁內容寬（首頁 1152、內頁 1024） | 首頁 `max-w-6xl`、其他頁 `max-w-5xl`，依 `usePathname()` 切換（`components/layout/Footer.tsx`） |
 
+- 頁尾在內容比 1024 窄的內頁（/book-a-demo/、/privacy-policy/、/terms-of-service/、404、AI Mode 頁）同樣是 1024，與內容左緣不對齊，已接受。<!-- src: #63 -->
 - 禁止：上表以外的容器寬；/developers/ 合作夥伴區不再用 896。
 - 例外：/decisive-engine/ Hero 的文字區 768，底部膠囊列維持 1024。
-- 現況偏離：見 §10 DATAI-619（頁尾寬、/developers/ 合作夥伴區）、DATAI-626（/decisive-engine/ Hero）
+- 現況偏離：見 §10 DATAI-626（/decisive-engine/ Hero）
 <!-- src: tpl-container-widths, tpl-container-home-6xl, tpl-container-footer, tpl-container-infra, tok-max-w, #29-2, #30-2, #31-9 -->
 
 ### 2.13 圓角與框線
@@ -374,7 +373,7 @@
 | `.section-heading` | 區塊標題 h2：30／36／48、700 | 區塊標題 h2 都用它 |
 | `.section-white` | 白色區塊底 | — |
 | `.section-dark` | 深色區塊底（`--bg-dark`）與淺色文字 | 深色區塊一律用它，不用 `bg-primary-dark` |
-| `.section-light` | 淺灰區塊底（`--bg-light`） | 不用於區塊交替（現況偏離：見 §10 DATAI-619，/decisive-engine/ 淺灰改白） |
+| `.section-light` | 淺灰區塊底（`--bg-light`） | 不用於區塊交替；目前沒有區塊使用 |
 | `.pill-btn` | 淺底外框藥丸按鈕 | 全站唯一的外框按鈕定義，位於 `@layer components`：1px 框、600 字重、高 44（與 §3.2 標準 44 同高）；導覽列用內距 utilities 改成 36（§3.4） |
 | `.pill-btn--dark` | 深底外框藥丸按鈕，只作深底次要按鈕 | 疊在 `.pill-btn` 上；與旁邊主要按鈕同高（44） |
 | `.nf-cdn`／`.nf-default` | 404 頁的兩個版本切換（由 `app/not-found.tsx` 的 inline script 決定） | 只用於 404 |
@@ -705,7 +704,6 @@
 - 一排三張：`grid md:grid-cols-3 gap-5`（手機單欄、≥768 三欄；例：`components/pages/publishers/LayerOverview.tsx:110`）。
 - 選級時對照上表的同類排列；拿不準時依 §0 第 2 點詢問。
 - 禁止：卡片網格用上表以外的間距（例如 `gap-6`、`gap-3`、`gap-8`）。
-- 現況偏離：見 §10 DATAI-619（`gap-6` 兩處改 `gap-5`：/brands/ 痛點兩卡 `components/pages/brands/BrandPainSection.tsx:70`、首頁身分卡 `components/home/IdentityCards.tsx:90`）
 <!-- src: An 2026-10-16 缺口裁決 q1（AI 接手測試） -->
 
 ---
@@ -732,7 +730,6 @@
 - 標準版：`components/layout/Footer.tsx`。
 - 規格：深色（`.section-dark`）；品牌區＋ Solutions／Resources／Legal 三欄；欄標題用 `<Eyebrow color="rgba(168,197,195,0.85)">`（合規，見 §3.8）；連結 14px on-dark、滑過白色；目前頁白色 600；**AI Mode 連結固定在 Partnership 與 Contact 之間**；寬度跟各頁內容（首頁 1152、內頁 1024，§2.12）。頁尾 LinkedIn 圖示鈕：16px 圖示＋`p-1 -ml-1`，點擊範圍 24×24（§8.5 下限），圖示與上方文字左緣對齊。
 - 禁止：放任何按鈕（包括 Try AI Mode 與外框次要按鈕）；寫死白色。
-- 現況偏離：見 §10 DATAI-619（寬度固定 1152）
 <!-- src: org-footer, tpl-container-footer, #7, #26 -->
 
 ### 5.3 Hero
@@ -777,21 +774,19 @@
 ### 5.5 FAQ 區塊
 
 - 標準版：`components/pages/brands/BrandFAQ.tsx`（與 `ContentOwnerFAQ.tsx`、`EngineFAQ.tsx` 三份一致）。
-- 規格：白底 `section-white pt-8 pb-16 lg:pb-20`（§2.11；**接在深色區塊之後時，上方改用一般區塊距離**）；1024 容器；置中標題組「FAQ」＋「Common questions.」（`.section-heading`）；每題照 §4.4。
+- 規格：白底，受眾頁 FAQ 在細線之後，上方照細線分段：`section-white pt-12 lg:pt-16 pb-16 lg:pb-20`（§2.11）；**接在深色區塊之後時，上方改用一般區塊距離**：`section-white pt-16 lg:pt-28 pb-16 lg:pb-20`（/decisive-engine/，`components/pages/decisive-engine/EngineFAQ.tsx`）；1024 容器；置中標題組「FAQ」＋「Common questions.」（`.section-heading`）；每題照 §4.4。
 - **必帶 FAQPage JSON-LD**（`components/pages/brands/BrandFAQ.tsx:36-50`）。
 - 禁止：沒有 JSON-LD 的 FAQ；自訂題目樣式。
-- 現況偏離：見 §10 DATAI-619（/decisive-engine/ FAQ 緊接深色區塊、上方只有 32）
 <!-- src: org-faq-group, org-faq-top-after-dark, cross-faq-jsonld -->
 
 ### 5.6 AI Mode 入口區
 
 - 標準版：`components/ui/PlaygroundCTASection.tsx`（/content-owners/ 與 /brands/ 共用，不複製）。
 - 規格：兩種放法，用 `variant` 參數選，不另做第二份：
-  - `variant="standalone"`（預設）：自己是一個白底區塊，背景用 §2.4 標準淺底光暈（/content-owners/）。
+  - `variant="standalone"`（預設）：自己是一個白底區塊，背景用 §2.4 標準淺底光暈（/content-owners/），區塊寫法 `section-white relative overflow-hidden py-16 lg:py-28`。
   - `variant="embedded"`：只輸出內容，放進既有的 `.section-dark` 區塊（/brands/ 方案區塊第四段）。放在淺底會變白字白底，禁止。
   - 標題組照 §4.3；按鈕是 §3.2 標準 44，呼叫 `trackCTA(ctaLabel, trackingPosition)`。
 - 禁止：用 className 覆寫小標籤顏色；embedded 放在淺底。
-- 現況偏離：見 §10 DATAI-619（區塊上下距）
 <!-- src: org-playground-entry -->
 
 ### 5.7 自動輪播
@@ -808,7 +803,7 @@
 | 元件 | 檔案 | 角色 | 待修 |
 |---|---|---|---|
 | Logo 跑馬燈 | `components/home/LogoMarquee.tsx` | 首頁「Trusted by」標誌捲動列，用 `.animate-marquee`，左右淡出遮罩 | — |
-| Flywheel | `components/home/FlywheelSection.tsx` | 首頁專屬深色區塊，含展示大數字（§4.5） | DATAI-619（手機上下距） |
+| Flywheel | `components/home/FlywheelSection.tsx` | 首頁專屬深色區塊，含展示大數字（§4.5） | — |
 | 世界地圖點陣 | `components/home/WorldMapDots.tsx` | 首頁 Hero 背景點陣，訊號點用 `--color-primary-light`、擴散圈用 `.ping-ring`；強訊號點與其擴散圈用 `--color-gold`（`components/home/WorldMapDots.tsx:181`、`:191`） | — |
 | 預約表單 | `app/book-a-demo/BookADemoForm.tsx` | /book-a-demo/ 多欄位表單：欄位 §3.10、送出 §3.3；送出記錄 `contact_form_submit` 事件（維持，不用 `trackCTA`） | — |
 | 換頁捲回頂端 | `components/layout/ScrollToTop.tsx` | 換頁時捲回頁首，沒有畫面 | — |
@@ -830,7 +825,6 @@
   - 同色區塊相鄰時，可用細線區隔（淺底 `border-line`、深底 on-dark .12，§3.11），也可不區隔。
   - 深色區塊用 `.section-dark`、白色區塊用 `.section-white`；上下距見 §2.11、容器見 §2.12；導覽列與頁尾由 `app/layout.tsx` 提供。
 - 禁止：用 `.section-light`（淺灰）做區塊交替。
-- 現況偏離：見 §10 DATAI-619（/decisive-engine/ 淺灰交替改白）
 <!-- src: tpl-order-alternation, tpl-order-content-owners, tpl-order-de-surface, #29-7 -->
 
 ### 6.2 受眾頁（照 /brands/）
@@ -838,21 +832,22 @@
 - 標準版：`app/brands/page.tsx`。
 - 區塊順序（基本骨架，可依下一點加白色區塊）：深 Hero（§5.3）→ 白 痛點 → 深 方案（含 AI Mode 入口 `variant="embedded"`）→ 白 比較 →（可加的白色內容區塊）→ 細線＋白 FAQ（§5.5）→ 深 頁尾 CTA（§5.4）。
 - 加白色內容區塊：方案區塊與 FAQ 之間可再加白色內容區塊，一律放在 FAQ 上方那條細線**之前**，讓 FAQ 的入口固定是「細線＋FAQ」（細線緊接在 FAQ 上方，同 /brands/）。
-  - 緊接 FAQ 細線前的白色內容區塊（未新增時為比較區塊）下距固定 32（含桌機），上距仍為 64／112，寫 `pt-16 lg:pt-28 pb-8`（§2.11）；FAQ 維持 `pt-8`，細線上下各 32。其他新區塊仍用一般上下距 `py-16 lg:py-28`。<!-- src: An 2026-10-16 裁決 open question #27（細線上下對稱） -->
+  - 緊接 FAQ 細線前的白色內容區塊（未新增時為比較區塊）照 §2.11 細線分段：寫 `pt-16 lg:pt-28 pb-12 lg:pb-16`；FAQ 寫 `pt-12 lg:pt-16`，細線每一側 48／64。其他新區塊仍用一般上下距 `py-16 lg:py-28`。<!-- src: An 2026-10-16 裁決 open question #27（細線上下對稱）, #64 -->
   - 新區塊與相鄰白色區塊之間照 §6.1（可用細線區隔，也可不區隔）；FAQ 上方那條細線固定保留。
   <!-- src: An 2026-10-16 缺口裁決 q3（AI 接手測試） -->
 - /content-owners/、/developers/、/partnership/ 屬同一類；/content-owners/ 的連續同色區塊已接受（同色相鄰可細線或不區隔）。
+- /content-owners/ 的 FAQ 入口同為「細線＋FAQ」：「Trusted by」區塊（`components/pages/publishers/ContentOwnerVerticals.tsx`）用 `pt-16 lg:pt-28 pb-12 lg:pb-16`，細線寫法同 /brands/（`app/brands/page.tsx`）。<!-- src: #62 -->
 - 禁止：深色 Hero 以外的開頭；淺灰區塊；省略頁尾 CTA；有 FAQ 卻不帶 JSON-LD。
-- 現況偏離：見 §10 DATAI-619（區塊上下距）、DATAI-626（/developers/、/partnership/ Hero）
+- 現況偏離：見 §10 DATAI-626（/developers/、/partnership/ Hero）
 <!-- src: tpl-order-alternation, tpl-order-content-owners, page-brands -->
 
-### 6.3 產品頁（照 /decisive-engine/，改白底後）
+### 6.3 產品頁（照 /decisive-engine/）
 
-- 標準版：`app/decisive-engine/page.tsx`（DATAI-619 把淺灰區塊改白之後）。
+- 標準版：`app/decisive-engine/page.tsx`。
 - 區塊順序：深 Hero（膠囊列 1024 例外）→ 白 決策迴圈 → 白 優勢 → 白 比較 → 白 使用案例 → 深 結果區 → 白 FAQ（上方用一般區塊距離）→ 深 頁尾 CTA（產品頁變體「Contact Us」，§5.4）。
-- 連續白底之間可用細線區隔或不區隔（§6.1）。
+- 連續白底之間可用細線區隔或不區隔（§6.1）；/decisive-engine/ 的 4 個白色區塊之間不加細線。<!-- src: #62 -->
 - 禁止：淺灰交替；FAQ 緊貼深色區塊（上方只留 32）；頁尾 CTA 改回 email 欄（產品頁用「Contact Us」變體）。
-- 現況偏離：見 §10 DATAI-619（淺灰交替、FAQ 上方距離、區塊上下距）、DATAI-626（Hero）
+- 現況偏離：見 §10 DATAI-626（Hero）
 <!-- src: tpl-order-de-surface, page-decisive-engine, org-faq-top-after-dark, org-de-cta-form -->
 
 ### 6.4 首頁（首頁專屬，不可照抄）
@@ -861,7 +856,6 @@
 - 區塊順序：白 Hero（`HeroSection`）→ 白 身分卡 → 深 Flywheel → 白 Intent Refinery → 深 頁尾 CTA（白／白／深／白／深）。
 - 首頁專屬項目：白／白開頭的區塊順序（白底 Hero）、h1 寫法（≤420px 27px、`tracking-tight`）、內容與頁尾 1152（`max-w-6xl`）、標準淺底光暈的首頁 Hero 用法。這些只限首頁，其他頁不可用。（Hero 的全螢幕高與標題輪播是現況，未列為標準。）<!-- src: tpl-order-home, home-hero-h1-narrow-27, org-hero-home -->
 - 禁止：把首頁的 1152 容器、白底 Hero 或白／白開頭用在其他頁。
-- 現況偏離：見 §10 DATAI-619（手機上下距 80 → 64）
 <!-- src: tpl-order-home, tpl-container-home-6xl, org-hero-home, page-home -->
 
 ### 6.5 法律頁
@@ -870,7 +864,6 @@
 - 結構：深 Hero（§5.3）→ 白 條文區（一般區塊上下距；容器 768 `max-w-3xl`）。
 - 條文小標 20：`text-xl font-bold mb-3 text-ink`；條文內文 14：`text-sm leading-relaxed text-ink-muted`。
 - 禁止：條文小標用 `.section-heading`；inline `style` 上色。
-- 現況偏離：見 §10 DATAI-619（條文區上下距）
 <!-- src: page-legal, tok-color-two-syntaxes -->
 
 ### 6.6 表單頁
@@ -878,7 +871,6 @@
 - 標準版：`app/book-a-demo/page.tsx`。
 - 結構：深 Hero（容器 672 `max-w-2xl`）→ 白 表單區（一般區塊上下距；容器 512 `max-w-lg`）。表單欄位 §3.10、送出用滿版藥丸 §3.3。
 - 禁止：表單區用其他容器寬；方角送出鈕；自做另一套欄位樣式。
-- 現況偏離：見 §10 DATAI-619（表單區上下距）
 <!-- src: page-book-a-demo, tpl-container-widths -->
 
 ### 6.7 404／錯誤頁
@@ -1098,7 +1090,6 @@
 | 首頁專屬項目 | 白／白／深／白／深區塊順序（白底 Hero 開頭）；Hero h1 的 `max-[420px]:text-[27px]` 與 `tracking-tight`；內容與頁尾 1152（`max-w-6xl`）（§2.7、§2.9、§2.12、§6.4） | tpl-order-home（home-section-rhythm）、home-hero-h1-narrow-27、tok-tracking、tpl-container-home-6xl (a)、#29-2 |
 | /decisive-engine/ 產品頁頁尾 CTA 變體 | 頁尾 CTA 不用 `InlineEmailCTA`，改用連到 /book-a-demo 的 §3.2 標準 44「Contact Us」，必須呼叫 `trackCTA`（範圍：§4.7、§5.4） | org-de-cta-form (a) |
 | 首頁 Flywheel 計數動畫 | 首頁 Flywheel 展示大數字用元件內自己的 `CountUp`（`components/home/FlywheelSection.tsx:8`），不改用 `NumberTicker`（§3.13） | #33 |
-| 間距：受眾頁 FAQ 細線前白色區塊 | 僅緊接 FAQ 細線前的白色內容區塊：上 64／112、下固定 32（含桌機），`pt-16 lg:pt-28 pb-8`；搭配 FAQ `pt-8`，細線上下各 32（§2.11、§6.2） | #38（An 2026-10-16 細線上下對稱裁決） |
 | 首頁飛輪圖手機字級 | `components/home/FlywheelDiagram.tsx` 的 SVG 文字在 <768 寬維持原屬性大小（375 寬約 6.5–8.9px），≥768 照 12px 下限補償（`useSvgTextFloor` 帶 `media: '(min-width: 48rem)'`，§2.7）；中心小字「intent · route · earn」所有寬度皆維持原大小（768 寬約 8.9px、1280 寬約 10.3px，`data-text-floor="off"`） | #40、#41 |
 | 間距：手機選單開關 | `p-[11px]`／`-mr-[11px]`，讓 22px 圖示湊成 44×44（§2.10） | #29-4 |
 | 間距：/partnership/ 勾勾 | 2px 下移置中（§2.10） | #29-4 |
@@ -1130,7 +1121,6 @@
 
 | 票號 | 類別 | 內容 | 盤點 id |
 |---|---|---|---|
-| DATAI-619 | 區塊節奏與容器 | 一般內容區塊 `py-16 lg:py-28`（受眾頁緊接 FAQ 細線前白色區塊依 §2.11／§6.2 例外，下距固定 32）；FAQ 接在深色區塊後上方用一般區塊距離；/developers/ 合作夥伴區 112＋1024；頁尾寬跟各頁內容；/decisive-engine/ 淺灰區塊改白；卡片網格 `gap-6` 兩處改 `gap-5`（/brands/ 痛點兩卡、首頁身分卡） | tpl-section-rhythm、tpl-section-rhythm-112、tpl-section-rhythm-infra、org-faq-top-after-dark、tpl-container-infra、tpl-container-footer、tpl-order-de-surface |
 | DATAI-626 | Hero 對齊 | /developers/、/partnership/、/decisive-engine/ 對齊標準 Hero（下距 48、底部細線、h1 48）；/privacy-policy/、/terms-of-service/、/book-a-demo/ 的 h1 補 `text-balance`；404／錯誤頁標題 48 | org-hero-structure、org-hero-h1-standard、page-404、page-error |
 | DATAI-629 | /content-owners/ 步驟面板 | 說明最後一行被固定高度切掉；輪播改為點擊後永久停止、捲出畫面不輪播，與首頁流程一致 | page-content-owners、org-home-pipeline-carousel |
 | DATAI-630 | AI Mode 頁對齊 | 14／9／7px 間距改 4px 刻度（分享區核准的 14px 除外）；legacy 變數改 `@theme` token；AI Mode 頁仍是例外 | tok-ai-mode-spacing、tok-ai-mode-legacy-vars |

@@ -113,7 +113,7 @@ function VerticalCard({ item, i }: { item: typeof VERTICALS[number]; i: number }
 
 export function ContentOwnerVerticals() {
   return (
-    <section className="section-white py-16 lg:py-20">
+    <section className="section-white pt-16 lg:pt-28 pb-12 lg:pb-16">
       <div className="max-w-5xl mx-auto px-6">
         <div className="text-center mb-12">
           <Eyebrow>Trusted By</Eyebrow>

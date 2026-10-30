@@ -42,7 +42,7 @@ export function FlywheelSection() {
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section className="section-dark py-20 lg:py-28 overflow-x-hidden">
+    <section className="section-dark py-16 lg:py-28 overflow-x-hidden">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left: flywheel */}

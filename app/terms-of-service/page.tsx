@@ -17,7 +17,7 @@ export default function TermsOfServicePage() {
         </div>
       </div>
 
-      <section className="section-white py-16 lg:py-20">
+      <section className="section-white py-16 lg:py-28">
         <div className="max-w-3xl mx-auto px-6">
 
           <div className="mb-10">

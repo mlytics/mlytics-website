@@ -51,4 +51,17 @@ describe('Footer', () => {
     expect(screen.getByRole('link', { name: 'AI Mode' })).toHaveClass('text-white', 'font-semibold')
     expect(screen.getByRole('link', { name: 'Brands' })).not.toHaveClass('text-white')
   })
+
+  it('uses the home content width (1152) on the home page', () => {
+    usePathnameMock.mockReturnValue('/')
+    const { container } = render(<Footer />)
+    expect(container.querySelector('footer > div')).toHaveClass('max-w-6xl')
+  })
+
+  it('uses the inner page content width (1024) on other pages', () => {
+    usePathnameMock.mockReturnValue('/brands/')
+    const { container } = render(<Footer />)
+    expect(container.querySelector('footer > div')).toHaveClass('max-w-5xl')
+    expect(container.querySelector('footer > div')).not.toHaveClass('max-w-6xl')
+  })
 })

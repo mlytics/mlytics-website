@@ -18,7 +18,7 @@ const ROWS: ComparisonRow[] = [
 
 export function EngineComparison() {
   return (
-    <section className="section-light py-16 lg:py-20">
+    <section className="section-white py-16 lg:py-28">
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
           className="text-center max-w-3xl mx-auto mb-12"

@@ -90,7 +90,7 @@ function EarningCard({ item, i }: { item: EarningItem; i: number }) {
 
 export function PartnershipEarnings() {
   return (
-    <section className="section-dark py-20 lg:py-28 relative overflow-hidden">
+    <section className="section-dark py-16 lg:py-28 relative overflow-hidden">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{

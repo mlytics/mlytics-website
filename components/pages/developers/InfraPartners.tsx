@@ -98,8 +98,8 @@ function MarqueeRow({ items, reverse = false }: { items: { name: string; src: st
 
 export function InfraPartners() {
   return (
-    <section className="section-white py-16 border-t border-line">
-      <div className="max-w-4xl mx-auto px-6">
+    <section className="section-white py-16 lg:py-28 border-t border-line">
+      <div className="max-w-5xl mx-auto px-6">
         <motion.p
           className="label-eyebrow text-center mb-10 text-ink-muted"
           initial={{ opacity: 0, y: 12 }}

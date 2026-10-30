@@ -105,7 +105,7 @@ export function BrandGEOSection() {
       />
 
       {/* ── MAU part ──────────────────────────────────────────────── */}
-      <div className="relative z-10 pt-16 lg:pt-20 pb-16" ref={mauRef}>
+      <div className="relative z-10 pt-16 lg:pt-28 pb-12 lg:pb-16" ref={mauRef}>
         {/* Ambient glow */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -292,7 +292,7 @@ export function BrandGEOSection() {
       </div>
 
       {/* ── Media AEO workflow ────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-6 relative z-10 pt-16 lg:pt-20 pb-16">
+      <div className="max-w-5xl mx-auto px-6 relative z-10 pt-12 lg:pt-16 pb-12 lg:pb-16">
         <motion.div
           className="mb-12"
           initial={{ opacity: 0, y: 20 }}

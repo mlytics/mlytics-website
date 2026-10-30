@@ -40,7 +40,7 @@ export function PlaygroundCTASection({
     <motion.div
       className={
         isEmbedded
-          ? 'max-w-5xl mx-auto px-6 relative z-10 pt-16 lg:pt-20 pb-20 lg:pb-28 text-center'
+          ? 'max-w-5xl mx-auto px-6 relative z-10 pt-12 lg:pt-16 pb-16 lg:pb-28 text-center'
           : 'relative z-10 max-w-3xl mx-auto px-6 text-center'
       }
       initial={{ opacity: 0, y: 20 }}
@@ -79,7 +79,7 @@ export function PlaygroundCTASection({
   if (isEmbedded) return content
 
   return (
-    <section className="section-white relative overflow-hidden py-16 lg:py-20">
+    <section className="section-white relative overflow-hidden py-16 lg:py-28">
       {/* Echoes the AI Mode playground hero backdrop so the section previews its destination */}
       <div
         aria-hidden="true"

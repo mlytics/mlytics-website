@@ -68,7 +68,11 @@ export default function PublishersPage() {
 
       {/* Proof — verticals + client names */}
       <ContentOwnerVerticals />
-
+      <div className="section-white">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="h-px bg-line" />
+        </div>
+      </div>
       <ContentOwnerFAQ />
 
       <PublisherPageCTA />

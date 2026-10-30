@@ -63,7 +63,7 @@ export function EngineFAQ() {
   const baseId = useId()
 
   return (
-    <section className="section-white pt-8 pb-16 lg:pb-20">
+    <section className="section-white pt-16 lg:pt-28 pb-16 lg:pb-20">
       {/* FAQPage JSON-LD Schema */}
       <script
         type="application/ld+json"

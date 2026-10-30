@@ -152,7 +152,7 @@ export function KnowledgeBaseSection() {
   }, [])
 
   return (
-    <section className="section-dark py-16 lg:py-20 relative overflow-hidden border-b border-on-dark/12">
+    <section className="section-dark py-16 lg:py-28 relative overflow-hidden border-b border-on-dark/12">
       {/* Background glow */}
       <div
         className="absolute inset-0 pointer-events-none"

@@ -38,7 +38,7 @@ export default function BookADemoPage() {
         </div>
       </div>
 
-      <section className="section-white py-16 lg:py-20">
+      <section className="section-white py-16 lg:py-28">
         <div className="max-w-lg mx-auto px-6">
           <Suspense>
             <BookADemoForm />
