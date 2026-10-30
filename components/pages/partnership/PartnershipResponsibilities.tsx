@@ -22,7 +22,7 @@ const YOU_BRING = [
 
 export function PartnershipResponsibilities() {
   return (
-    <section className="section-white pt-10 pb-16 lg:pb-20">
+    <section className="section-white pt-12 lg:pt-16 pb-16 lg:pb-28">
       <div className="max-w-5xl mx-auto px-6">
         <motion.div
           className="text-center mb-12"

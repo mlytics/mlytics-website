@@ -29,7 +29,7 @@ const PITCHES = [
 
 export function SolutionPitches() {
   return (
-    <section className="section-white py-16 lg:py-20 border-t border-line">
+    <section className="section-white py-16 lg:py-28 border-t border-line">
       <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <motion.div

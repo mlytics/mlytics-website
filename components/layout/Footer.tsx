@@ -10,7 +10,7 @@ export function Footer() {
   const isActive = (href: string) => p === href
   return (
     <footer className="section-dark border-t border-on-dark/12">
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className={`${p === '/' ? 'max-w-6xl' : 'max-w-5xl'} mx-auto px-6 py-12`}>
         <div className="flex flex-col md:flex-row items-start justify-between gap-8">
           <div>
             <span className="text-lg font-bold text-white">Mlytics</span>

@@ -59,7 +59,7 @@ export function BrandAEOVsMonitoring() {
   const showBackdrop = isStuck && !isDesktop
 
   return (
-    <section className="section-white pt-16 lg:pt-20 pb-8">
+    <section className="section-white pt-16 lg:pt-28 pb-12 lg:pb-16">
       <div className="max-w-5xl mx-auto px-6">
 
         {/* Section header */}

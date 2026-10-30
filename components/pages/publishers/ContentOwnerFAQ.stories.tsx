@@ -22,14 +22,14 @@ export const 規格說明: Story = {
       <SpecimenBlock
         title="區塊（§5.5）"
         lines={[
-          { element: '區塊 <section>', code: 'section-white pt-8 pb-16 lg:pb-20' },
+          { element: '區塊 <section>', code: 'section-white pt-12 lg:pt-16 pb-16 lg:pb-20' },
           { element: '容器 <div>', code: 'max-w-5xl mx-auto px-6' },
           { element: '標題組 <div>', code: 'text-center mb-12' },
           { element: '標題 <h2>（小標籤「FAQ」用 <Eyebrow>，不加 mb-*）', code: 'section-heading text-ink' },
         ]}
       >
         <ul className="space-y-1 text-sm leading-relaxed text-ink-muted">
-          <li>白底；上 32、下 64（桌機 80）；接在深色區塊之後時，上方改用一般區塊距離（§2.11）。</li>
+          <li>白底；受眾頁 FAQ 在細線之後：上 48（桌機 64）、下 64（桌機 80）；接在深色區塊之後時，上方改用一般區塊距離（§2.11）。</li>
           <li>置中標題組：小標籤「FAQ」＋ h2「Common questions.」。</li>
         </ul>
       </SpecimenBlock>

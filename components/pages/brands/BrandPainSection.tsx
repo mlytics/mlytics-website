@@ -48,7 +48,7 @@ export function BrandPainSection() {
   const pathD = buildPath()
 
   return (
-    <section className="section-white py-16 lg:py-20" ref={ref}>
+    <section className="section-white py-16 lg:py-28" ref={ref}>
       <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <motion.div
@@ -67,7 +67,7 @@ export function BrandPainSection() {
         </motion.div>
 
         {/* Two callout cards */}
-        <div className="grid md:grid-cols-2 gap-6 mb-14">
+        <div className="grid md:grid-cols-2 gap-5 mb-14">
           {/* Card 1 — CPM */}
           <motion.div
             className="rounded-2xl p-6 bg-surface border border-line"
