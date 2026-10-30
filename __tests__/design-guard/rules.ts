@@ -189,18 +189,18 @@ function namedInValue(value: string, base: number, push: (index: number, match: 
   }
 }
 
-const CSS_NAMED_COLOUR_PROPERTY = /^(?:(?:-webkit-)?mask-image|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|inline(?:-start|-end)?|block(?:-start|-end)?))?(?:-color)?|outline(?:-color)?|text-decoration(?:-color)?|box-shadow|text-shadow|accent-color|caret-color|column-rule(?:-color)?|flood-color|lighting-color|stop-color|text-emphasis(?:-color)?|-webkit-text-fill-color|-webkit-text-stroke(?:-color)?|scrollbar-color|fill|stroke|color|--[\w-]+)$/i
+const CSS_NAMED_COLOUR_PROPERTY = /^(?:(?:-webkit-)?mask(?:-image)?|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|inline(?:-start|-end)?|block(?:-start|-end)?))?(?:-color)?|border-image(?:-source)?|outline(?:-color)?|text-decoration(?:-color)?|box-shadow|text-shadow|accent-color|caret-color|column-rule(?:-color)?|flood-color|lighting-color|stop-color|text-emphasis(?:-color)?|-webkit-text-fill-color|-webkit-text-stroke(?:-color)?|scrollbar-color|fill|stroke|color|--[\w-]+)$/i
 const STYLE_NAMED_COLOUR_PROPERTIES = new Set([
   'background', 'backgroundcolor', 'backgroundimage',
   'border', 'bordercolor', 'bordertop', 'bordertopcolor', 'borderright', 'borderrightcolor',
-  'borderbottom', 'borderbottomcolor', 'borderleft', 'borderleftcolor', 'borderinline',
+  'borderbottom', 'borderbottomcolor', 'borderleft', 'borderleftcolor', 'borderimage', 'borderimagesource', 'borderinline',
   'borderinlinecolor', 'borderinlinestart', 'borderinlinestartcolor', 'borderinlineend',
   'borderinlineendcolor', 'borderblock', 'borderblockcolor', 'borderblockstart',
   'borderblockstartcolor', 'borderblockend', 'borderblockendcolor',
   'outline', 'outlinecolor', 'textdecoration', 'textdecorationcolor', 'boxshadow', 'textshadow',
   'accentcolor', 'caretcolor', 'columnrule', 'columnrulecolor', 'floodcolor', 'lightingcolor', 'stopcolor',
   'textemphasis', 'textemphasiscolor', 'webkittextfillcolor', 'webkittextstroke', 'webkittextstrokecolor', 'scrollbarcolor',
-  'fill', 'stroke', 'color', 'filter', 'maskimage', 'webkitmaskimage',
+  'fill', 'stroke', 'color', 'filter', 'mask', 'webkitmask', 'maskimage', 'webkitmaskimage',
 ])
 const SVG_NAMED_COLOUR_ATTRIBUTES = new Set(['fill', 'stroke', 'color', 'stopcolor', 'floodcolor', 'lightingcolor'])
 
@@ -282,18 +282,26 @@ function valueOutputs(sourceFile: ts.SourceFile, source: string, expression: ts.
   return [UNKNOWN_VALUE]
 }
 
-function scanStaticStringLeaves(sourceFile: ts.SourceFile, source: string, node: ts.Expression, push: (index: number, match: string) => void) {
+type VisibleKind = 'hex' | 'color-fn' | 'named-color'
+
+function scanStaticStringLeaves(sourceFile: ts.SourceFile, source: string, node: ts.Expression, push: (index: number, kind: VisibleKind, match: string) => void) {
   const seen = new Set<string>()
   for (const output of valueOutputs(sourceFile, source, node)) {
+    const emit = (at: number, kind: VisibleKind, match: string, decodedOnly = false) => {
+      const index = output.offsets[at]
+      if (index === undefined || index < 0) return
+      if (decodedOnly && source.slice(index, output.offsets[at + match.length - 1] + 1) === match) return
+      const key = `${kind}:${index}:${match}`
+      if (seen.has(key)) return
+      seen.add(key)
+      push(index, kind, match)
+    }
+    for (const hex of output.text.matchAll(HEX)) emit(hex.index!, 'hex', hex[0], true)
+    for (const colour of colourFunctions(output.text)) emit(colour.index, 'color-fn', colour.match, true)
     const withoutReferences = output.text.replace(/url\([^)]*\)/gi, blank)
     for (const word of withoutReferences.matchAll(/(?<![\w-])[a-z]+(?![\w-])/gi)) {
       if (!NAMED_COLORS.has(word[0].toLowerCase())) continue
-      const index = output.offsets[word.index!]
-      if (index === undefined || index < 0) continue
-      const key = `${index}:${word[0]}`
-      if (seen.has(key)) continue
-      seen.add(key)
-      push(index, word[0])
+      emit(word.index!, 'named-color', word[0])
     }
   }
 }
@@ -338,40 +346,43 @@ function styleOutcomes(expression: ts.Expression): StyleOutcome[] {
 }
 
 function alphaMaskOutcome(entries: StyleOutcome): boolean {
-  let mode: string | null | undefined
+  let alpha: boolean | null | undefined
   for (const entry of entries) {
-    if (entry === null) { mode = null; continue }
+    if (entry === null) { alpha = null; continue }
     const rawName = propertyName(entry.name)
-    if (rawName === undefined && ts.isComputedPropertyName(entry.name)) { mode = null; continue }
+    if (rawName === undefined && ts.isComputedPropertyName(entry.name)) { alpha = null; continue }
     const name = rawName?.replace(/-/g, '').toLowerCase()
-    if (name === 'maskmode' || name === 'webkitmaskmode') mode = staticStringExpression(entry.initializer) ?? null
+    if (name === 'maskmode' || name === 'webkitmaskmode' || name === 'mask' || name === 'webkitmask') {
+      const value = staticStringExpression(entry.initializer)
+      alpha = value === undefined ? null : alphaMaskValue(name, value)
+    }
   }
-  return mode === undefined || (mode !== null && alphaModeList(mode))
+  return alpha === undefined || alpha === true
 }
 
-function namedColoursInTsx(code: string, push: (index: number, match: string) => void): boolean {
+function namedColoursInTsx(code: string, push: (index: number, kind: VisibleKind, match: string) => void): boolean {
   const sourceFile = ts.createSourceFile('named-colours.tsx', code, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
   let foundStyleAttribute = false
   const visitStyles = (node: ts.Node) => {
     if (ts.isJsxAttribute(node) && jsxAttributeName(node.name) === 'style' && node.initializer && ts.isJsxExpression(node.initializer) && node.initializer.expression) {
       foundStyleAttribute = true
-      const seen = new Map<string, { index: number; match: string }>()
+      const seen = new Map<string, { index: number; kind: VisibleKind; match: string }>()
       for (const outcome of styleOutcomes(node.initializer.expression)) {
         const alphaMask = alphaMaskOutcome(outcome)
         for (const property of outcome) {
           if (!property) continue
           const rawName = propertyName(property.name)
           const name = rawName?.replace(/-/g, '').toLowerCase()
-          if (!name || !STYLE_NAMED_COLOUR_PROPERTIES.has(name)) continue
-          if ((name === 'maskimage' || name === 'webkitmaskimage') && alphaMask) continue
+          if (!name || (!STYLE_NAMED_COLOUR_PROPERTIES.has(name) && !rawName?.startsWith('--'))) continue
+          if ((name === 'maskimage' || name === 'webkitmaskimage' || name === 'mask' || name === 'webkitmask') && alphaMask) continue
           if (name === 'filter' && !/drop-shadow\s*\(/i.test(property.initializer.getText(sourceFile))) continue
-          scanStaticStringLeaves(sourceFile, code, property.initializer, (index, match) => {
-            const key = `${index}:${match}`
-            seen.set(key, { index, match })
+          scanStaticStringLeaves(sourceFile, code, property.initializer, (index, kind, match) => {
+            const key = `${kind}:${index}:${match}`
+            seen.set(key, { index, kind, match })
           })
         }
       }
-      for (const { index, match } of [...seen.values()].sort((a, b) => a.index - b.index)) push(index, match)
+      for (const { index, kind, match } of [...seen.values()].sort((a, b) => a.index - b.index)) push(index, kind, match)
       return
     }
     ts.forEachChild(node, visitStyles)
@@ -390,7 +401,7 @@ function namedColoursInTsx(code: string, push: (index: number, match: string) =>
   return foundStyleAttribute
 }
 
-function namedColours(file: string, code: string, push: (index: number, match: string) => void) {
+function namedColours(file: string, code: string, push: (index: number, kind: VisibleKind, match: string) => void) {
   if (file.endsWith('.css')) {
     try {
       const root = postcss.parse(code)
@@ -399,16 +410,16 @@ function namedColours(file: string, code: string, push: (index: number, match: s
         const filter = property === 'filter'
         if (!CSS_NAMED_COLOUR_PROPERTY.test(property) && !filter) return
         if (filter && !/drop-shadow\s*\(/i.test(decl.value)) return
-        if (/^(?:-webkit-)?mask-image$/.test(property)) {
-          const siblings = decl.parent?.nodes?.filter((node): node is postcss.Declaration => node.type === 'decl' && node.prop.toLowerCase() === 'mask-mode') ?? []
+        if (/^(?:-webkit-)?mask(?:-image)?$/.test(property)) {
+          const siblings = decl.parent?.nodes?.filter((node): node is postcss.Declaration => node.type === 'decl' && /^(?:-webkit-)?mask(?:-mode)?$/.test(node.prop.toLowerCase())) ?? []
           let winner: postcss.Declaration | undefined
           for (const mode of siblings) if (!winner || (mode.important && !winner.important) || mode.important === winner.important) winner = mode
-          if (!winner || alphaModeList(winner.value)) return
+          if (!winner || alphaMaskValue(winner.prop, winner.value)) return
         }
         const start = decl.source?.start?.offset
         if (start === undefined) return
         const valueStart = start + decl.prop.length + (decl.raws.between ?? ':').length
-        namedInValue(decl.value, valueStart, push)
+        namedInValue(decl.value, valueStart, (index, match) => push(index, 'named-color', match))
       })
       return
     } catch {
@@ -418,7 +429,7 @@ function namedColours(file: string, code: string, push: (index: number, match: s
         const property = m[1]
         const value = m[2]
         if (!CSS_NAMED_COLOUR_PROPERTY.test(property) && !(property.toLowerCase() === 'filter' && /drop-shadow\s*\(/i.test(value))) continue
-        namedInValue(value, m.index! + m[0].lastIndexOf(value), push)
+        namedInValue(value, m.index! + m[0].lastIndexOf(value), (index, match) => push(index, 'named-color', match))
       }
       return
     }
@@ -429,11 +440,13 @@ function namedColours(file: string, code: string, push: (index: number, match: s
     // `style={{ ... }}` rather than a complete JSX element. Parse the same
     // syntax in a harmless wrapper and translate every offset back to source.
     const prefix = 'const __guard = <div '
-    namedColoursInTsx(`${prefix}${code} />`, (index, match) => push(index - prefix.length, match))
+    namedColoursInTsx(`${prefix}${code} />`, (index, kind, match) => push(index - prefix.length, kind, match))
   }
 }
 
 const alphaModeList = (mode: string) => mode.split(',').every((part) => part.trim().toLowerCase() === 'alpha')
+const alphaMaskValue = (property: string, value: string) =>
+  /mask-mode$/i.test(property) ? alphaModeList(value) : !/\b(?:luminance|match-source)\b|\bvar\s*\(/i.test(value)
 
 export function parseRgba(match: string): { base: 'primary' | 'on-dark' | null; alpha: number | null } | null {
   const m = match.match(RGBA)
@@ -545,7 +558,13 @@ export function findViolations(file: string, source: string): Violation[] {
     const hint = colorFnHint(m.match)
     if (hint) push(m.index, 'color-fn', m.match, hint)
   }
-  namedColours(file, code, (index, match) => push(index, 'named-color', match, 'DESIGN.md §2.1：可見顏色請改用色彩 token 或白色 Tailwind class'))
+  namedColours(file, code, (index, kind, match) => {
+    if (kind === 'hex') push(index, kind, match, 'DESIGN.md §2.1：不可寫死色碼，改用色彩 token（例：白色用 text-white／bg-white）')
+    else if (kind === 'color-fn') {
+      const hint = colorFnHint(match)
+      if (hint) push(index, kind, match, hint)
+    } else push(index, kind, match, 'DESIGN.md §2.1：可見顏色請改用色彩 token 或白色 Tailwind class')
+  })
   if (!file.endsWith('.css')) {
     for (const m of code.matchAll(ARBITRARY)) {
       const hint = arbitraryHint(m[2], m[3], m[4])

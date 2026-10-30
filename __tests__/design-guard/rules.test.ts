@@ -166,6 +166,12 @@ describe('new colour syntax regressions', () => {
     ])
   })
 
+  it('catches custom properties and border-image gradients in visible contexts', () => {
+    expect(found('a.tsx', `<div style={{ '--brand': 'red', color: 'var(--brand)' } as React.CSSProperties} />`)).toEqual(['named-color red'])
+    expect(found('a.module.css', '.x { border-image: linear-gradient(red, blue) 1; }')).toEqual(['named-color red', 'named-color blue'])
+    expect(found('a.tsx', `<div style={{ borderImage: 'linear-gradient(red, blue) 1' }} />`)).toEqual(['named-color red', 'named-color blue'])
+  })
+
   it('catches conditional static string leaves in TSX style and SVG colour contexts', () => {
     const source = `<svg
       style={{ accentColor: active ? 'red' : ('blue' as string), filter: active ? 'drop-shadow(0 0 2px green)' : undefined }}
@@ -250,6 +256,12 @@ describe('new colour syntax regressions', () => {
     expect(findViolations('a.tsx', '\n<div style={{ color: "r\\u0065d" }} />')[0]?.line).toBe(2)
   })
 
+  it('scans decoded JavaScript escapes as hex and colour functions', () => {
+    expect(found('a.tsx', `<div style={{ color: '\\x23fff' }} />`)).toEqual(['hex #fff'])
+    expect(found('a.tsx', `<div style={{ color: '\\x72gb(1,2,3)' }} />`)).toEqual(['color-fn rgb(1,2,3)'])
+    expect(findViolations('a.tsx', `\n<div style={{ color: '\\x23fff' }} />`)[0]?.line).toBe(2)
+  })
+
   it('keeps prose and Tailwind text-white outside named-colour contexts', () => {
     expect(found('a.tsx', `const prose = condition ? 'red' : 'blue'; <p className="text-white">white prose</p>`)).toEqual([])
     expect(found('a.module.css', '.x { content: "red"; filter: blur(2px); }')).toEqual([])
@@ -287,6 +299,15 @@ describe('new colour syntax regressions', () => {
   it('handles WebkitMaskImage and static luminance template strings', () => {
     expect(found('a.tsx', "style={{ WebkitMaskImage: 'linear-gradient(black, transparent)' }}")).toEqual([])
     expect(found('a.tsx', 'style={{ maskMode: `luminance`, WebkitMaskImage: `linear-gradient(black, white)` }}')).toEqual(['named-color black', 'named-color white'])
+  })
+
+  it('applies prefixed mask modes and shorthand modes to named mask colours', () => {
+    const blocked = ['named-color black', 'named-color white']
+    expect(found('a.module.css', '.x { -webkit-mask-image: linear-gradient(black, white); -webkit-mask-mode: luminance; }')).toEqual(blocked)
+    expect(found('a.module.css', '.x { mask: linear-gradient(black, white) luminance; }')).toEqual(blocked)
+    expect(found('a.tsx', `<div style={{ mask: 'linear-gradient(black, white) luminance' }} />`)).toEqual(blocked)
+    expect(found('a.module.css', '.x { mask: linear-gradient(black, white) alpha; }')).toEqual([])
+    expect(found('a.tsx', `<div style={{ mask: 'linear-gradient(black, white) alpha' }} />`)).toEqual([])
   })
 
   it('resolves quoted mask keys and case-insensitive alpha mode', () => {
